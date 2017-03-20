@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">PhotoFans</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="photo">Photo</string>
+    <string name="refresh_success">Success to Refresh Data</string>
+    <string name="refresh_error">Fail to Refresh Data</string>
+    <string name="gallery">All Pictures</string>
+    <string name="favorite">Favorite</string>
+    <string name="category">Category</string>
+    <string name="share">Share</string>
+    <string name="tools">Settings</string>
+</resources>
