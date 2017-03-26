@@ -44,11 +44,7 @@ public class RealmHelper {
 
     private RealmHelper() {
 
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder()
-                .name("PhotoFans")
-                .build();
-
-        realm = Realm.getInstance(realmConfig);
+        realm = Realm.getDefaultInstance();
 
         mListeners = new ArrayList<>();
     }

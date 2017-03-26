@@ -25,7 +25,6 @@ import okhttp3.Request;
  * @author JasonWang <br>
  * @since 2017-3-12
  *
- * //TODO: we want to record the last visit point
  * and start crawl it for next time
  */
 
@@ -89,6 +88,8 @@ public class OkHttpDownloader extends AbstractDownloader {
 
         try {
             content = resp.body().string();
+
+            Log.v(LOG_TAG,"handleResponse(): size = " + content);
 
             page.setRawText(content);
             page.setRequest(request);
