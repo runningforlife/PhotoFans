@@ -55,4 +55,11 @@ public class ImageRealm extends RealmObject{
         return this == o || (this.mName.equals(((ImageRealm)o).mName)
                 && this.mUrl.equals(((ImageRealm)o).mUrl));
     }
+
+    @Override
+    public int hashCode(){
+        return (int) (mName.hashCode()
+                        + mUrl.hashCode()
+                        + mTimeStamp >>> 2);
+    }
 }

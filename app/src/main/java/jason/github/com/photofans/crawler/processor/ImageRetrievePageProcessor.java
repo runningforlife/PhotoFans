@@ -1,5 +1,6 @@
 package jason.github.com.photofans.crawler.processor;
 
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -11,14 +12,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import io.realm.Sort;
 import jason.github.com.photofans.model.ImageItem;
-import jason.github.com.photofans.repository.RealmHelper;
+import jason.github.com.photofans.model.ImageRealm;
+import jason.github.com.photofans.model.VisitedPageInfo;
+import jason.github.com.photofans.service.MyThreadFactory;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -44,8 +47,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private List<RetrieveCompleteListener> mListeners;
     private int mMaxRetrievedImages = DEFAULT_RETRIEVED_IMAGES;
 
-    private RealmHelper mHelper;
-    private static Set<String> sAllPages = Collections.newSetFromMap(new HashMap<String,Boolean>());
+    private static HashMap<String,Boolean> sAllPages = new HashMap<>();
     // last url to start this page retrieving
     private static String sLastUrl;
 
@@ -55,7 +57,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         mMaxRetrievedImages = n > 0 ? n : DEFAULT_RETRIEVED_IMAGES;
         mListeners = new ArrayList<>();
 
-        initRealm();
+        loadPages();
     }
 
     @Override
@@ -71,19 +73,13 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     }
 
     public String getStartUrl(){
-        Realm realm = Realm.getDefaultInstance();
-        long time = realm.where(VisitedPageInfo.class)
-                .max("mVisitTime").longValue();
-        sLastUrl = realm.where(VisitedPageInfo.class)
-                .equalTo("mVisitTime",time)
-                .findFirst()
-                .getUrl();
-
+        Log.d(TAG,"getStartUrl(): url = " + sLastUrl);
         return sLastUrl;
     }
 
     public interface RetrieveCompleteListener{
         void onRetrieveComplete(List<ImageItem> data);
+        void onRetrieveComplete(VisitedPageInfo pageInfo);
     }
 
     public void addListener(RetrieveCompleteListener listener){
@@ -96,19 +92,12 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private void retrieveImages(Page page){
 
-        // loading url if there is none
-        if(sAllPages.isEmpty()){
-            loadPages();
-        }
+        ImageRealm imageRealm = new ImageRealm();
 
         if(!isVisited(page)) {
-            // save data to realm
-            VisitedPageInfo pageInfo = new VisitedPageInfo();
-            pageInfo.setUrl(page.getUrl().get());
-            pageInfo.setVisitTime(System.currentTimeMillis());
-            //saveToRealm(pageInfo);
-
-            page.addTargetRequests(page.getHtml().links().regex(URL_FREE_JPG + ".*\\w").all());
+            MyThreadFactory.getInstance()
+                    .newThread(new SaveRunnable(getPageList(page)))
+                    .start();
 
             boolean hasNewData = false;
             // here we retrieve all those IMAGE urls
@@ -123,7 +112,6 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                     }
                     Log.v(TAG, "retrieved image url = " + url);
                     ImageItem info = new ImageItem();
-
 
                     String imgName = img.attr("alt");
                     if (TextUtils.isEmpty(imgName)) {
@@ -140,12 +128,15 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                     info.setUrl(url);
                     info.setTimeStamp(System.currentTimeMillis());
 
+                    imageRealm.setName(imgName);
+                    imageRealm.setUrl(url);
+                    imageRealm.setTimeStamp(System.currentTimeMillis());
+
                     if (!imgList.contains(info)) {
                         imgList.add(info);
                         hasNewData = true;
                     }
                 }
-
                 // enough already
                 if (imgList.size() > mMaxRetrievedImages) {
                     break;
@@ -161,21 +152,23 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         }
     }
 
-    private void initRealm(){
-        mHelper = RealmHelper.getInstance();
+    private void loadPages(){
         Realm realm = Realm.getDefaultInstance();
 
         RealmResults<VisitedPageInfo> pages = realm.where(VisitedPageInfo.class)
-                .findAllSorted("mVisitTime", Sort.DESCENDING);
+                .equalTo("mIsVisited",false)
+                .findAll()
+                .sort("mVisitTime",Sort.DESCENDING);
+        Log.v(TAG,"loadPages(): data size = " + pages.size());
         if(pages.size() > 0){
             try {
-                Log.v(TAG,"initRealm(): data size = " + pages.size());
-                if(pages.size() > 0) {
-                    sLastUrl = pages.get(0).getUrl();
-                    for (VisitedPageInfo info : pages) {
-                        if (sAllPages.contains(info.getUrl())) {
-                            sAllPages.add(info.getUrl());
-                        }
+                // choose a random page from unvisited url
+                Random random = new Random();
+                int idx = random.nextInt(pages.size());
+                sLastUrl = pages.get(idx).getUrl();
+                for (VisitedPageInfo info : pages) {
+                    if (!sAllPages.containsKey(info.getUrl())) {
+                        sAllPages.put(info.getUrl(),info.getIsVisited());
                     }
                 }
             }finally {
@@ -184,38 +177,61 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         }
     }
 
-    private void loadPages(){
-        Realm realm = Realm.getDefaultInstance();
-        try {
-            RealmResults<VisitedPageInfo> pages = realm.where(VisitedPageInfo.class)
-                    .findAll();
-            if (pages.size() > 0) {
-                for (VisitedPageInfo page : pages) {
-                    if (!sAllPages.contains(page.getUrl())) {
-                        sAllPages.add(page.getUrl());
-                    }
-                }
-            }
-        }finally {
-            realm.close();
+    private boolean isVisited(Page page){
+        return (sAllPages.containsKey(page.getUrl().get())
+                && sAllPages.get(page.getUrl().get()));
+    }
+
+    private  class SaveRunnable implements  Runnable{
+        private List<VisitedPageInfo> mPage;
+
+        public SaveRunnable(List<VisitedPageInfo> page){
+            mPage = page;
+        }
+
+        @Override
+        public void run(){
+            Looper.prepare();
+            saveToRealm(mPage);
+            Looper.loop();
         }
     }
 
-    private void saveToRealm(final VisitedPageInfo page){
-        Log.v(TAG,"saveToRealm()");
-        Realm realm = Realm.getDefaultInstance();
+    private List<VisitedPageInfo> getPageList(Page page){
+        List<String> urlList = page.getHtml().links().regex(URL_FREE_JPG + ".*\\w").all();
+        List<VisitedPageInfo> pageList = new ArrayList<>(urlList.size() + 1);
+        page.addTargetRequests(urlList);
 
+        urlList.add(page.getUrl().get());
+        for(String url : urlList){
+            if(!sAllPages.containsKey(url)) {
+                VisitedPageInfo info = new VisitedPageInfo();
+                info.setUrl(url);
+                if(urlList.indexOf(url) != 0) {
+                    info.setIsVisited(false);
+                }else{
+                    info.setIsVisited(true);
+                }
+                info.setVisitTime(System.currentTimeMillis());
+                pageList.add(info);
+                sAllPages.put(url,info.getIsVisited());
+                Log.d(TAG,"getPageList(): page url = " + url);
+            }
+        }
+
+        return pageList;
+    }
+
+    private void saveToRealm(final List<VisitedPageInfo> page){
+        Log.v(TAG,"saveToRealm(): " + page.size() + " pages is retrieved");
+        // save data
+        Realm realm = Realm.getDefaultInstance();
         try {
             realm.beginTransaction();
-            realm.copyFromRealm(page);
+            realm.copyToRealmOrUpdate(page);
             realm.commitTransaction();
         }finally {
             realm.close();
         }
-
-    }
-
-    private boolean isVisited(Page page){
-        return sAllPages.contains(page.getUrl().get());
     }
 }

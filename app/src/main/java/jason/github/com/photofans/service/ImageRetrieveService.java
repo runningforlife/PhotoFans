@@ -5,15 +5,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.os.ResultReceiver;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
 import jason.github.com.photofans.crawler.OkHttpDownloader;
 import jason.github.com.photofans.crawler.processor.ImageRetrievePageProcessor;
+import jason.github.com.photofans.model.VisitedPageInfo;
 import jason.github.com.photofans.model.ImageItem;
-import jason.github.com.photofans.model.ImageRealm;
 import us.codecraft.webmagic.Spider;
 
 /**
@@ -59,26 +61,38 @@ public class ImageRetrieveService extends IntentService implements
         Log.i(TAG,"startCrawler(): max images to be retrieved = " + n);
         mProcessor = new ImageRetrievePageProcessor(n);
         mProcessor.addListener(this);
+        String lastUrl = mProcessor.getStartUrl();
+        if(TextUtils.isEmpty(lastUrl)){
+            lastUrl = URL_FREE_JPG;
+        }
+
         mSpider = Spider.create(mProcessor)
-                .addUrl(URL_FREE_JPG)
+                .addUrl(lastUrl)
                 .setDownloader(new OkHttpDownloader());
         mSpider.run();
+
     }
 
     @Override
     public void onRetrieveComplete(List<ImageItem> data) {
-        Log.v(TAG,"onRetrieveComplete()");
 
         if(data == null || data.isEmpty()){
+            Log.v(TAG,"onRetrieveComplete(): data is empty");
             mReceiver.send(ServiceStatus.ERROR,null);
         }else {
             Bundle bundle = new Bundle();
             bundle.putParcelableArrayList("result", (ArrayList<? extends Parcelable>) data);
             mReceiver.send(ServiceStatus.SUCCESS, bundle);
+            Log.v(TAG,"onRetrieveComplete(): retrieved data size = " + data.size());
         }
         // remove listener
         mProcessor.removeListener(this);
         // stop the spider
         mSpider.stop();
+    }
+
+    @Override
+    public void onRetrieveComplete(final VisitedPageInfo data) {
+        Log.v(TAG,"onRetrieveComplete(): page url = " + data.getUrl());
     }
 }

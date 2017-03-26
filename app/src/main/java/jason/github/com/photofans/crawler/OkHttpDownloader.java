@@ -89,7 +89,7 @@ public class OkHttpDownloader extends AbstractDownloader {
         try {
             content = resp.body().string();
 
-            Log.v(LOG_TAG,"handleResponse(): size = " + content);
+            Log.v(LOG_TAG,"handleResponse(): size = " + content.getBytes().length);
 
             page.setRawText(content);
             page.setRequest(request);

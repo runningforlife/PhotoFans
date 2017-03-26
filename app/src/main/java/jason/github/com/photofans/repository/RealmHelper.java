@@ -12,6 +12,7 @@ import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 import jason.github.com.photofans.model.ImageItem;
 import jason.github.com.photofans.model.ImageRealm;
+import jason.github.com.photofans.model.VisitedPageInfo;
 import jason.github.com.photofans.service.ImageRetrieveService;
 
 /**
@@ -58,6 +59,11 @@ public class RealmHelper {
     public void onStart(){
         mAllImages = realm.where(ImageRealm.class).findAllAsync();
         mAllImages.addChangeListener(new RealmDataSetChangeListener());
+
+        RealmResults<VisitedPageInfo> allPages = realm.where(VisitedPageInfo.class)
+                .equalTo("mIsVisited",false)
+                .findAll();
+        allPages.addChangeListener(new VisitPageChangeListener());
     }
 
     // this should be consistent with UI lifecycle: onDestroy()
@@ -70,7 +76,7 @@ public class RealmHelper {
         Log.v(TAG,"image info = " + info);
         realm.beginTransaction();
 
-        realm.copyFromRealm(info);
+        realm.copyToRealmOrUpdate(info);
 
         realm.commitTransaction();
     }
@@ -102,6 +108,7 @@ public class RealmHelper {
                 ImageRealm info = realm.createObject(ImageRealm.class);
                 info.setName(item.getName());
                 info.setUrl(item.getUrl());
+                info.setTimeStamp(item.getTimeStamp());
             }
         }, new Realm.Transaction.OnSuccess() {
             @Override
@@ -181,6 +188,14 @@ public class RealmHelper {
             for(RealmDataChangeListener listener : mListeners){
                 listener.onRealmDataChange(element);
             }
+        }
+    }
+
+    private class VisitPageChangeListener implements RealmChangeListener<RealmResults<VisitedPageInfo>>{
+
+        @Override
+        public void onChange(RealmResults<VisitedPageInfo> element){
+            Log.v(TAG,"onChange():current marked pages size " + element.size());
         }
     }
 
