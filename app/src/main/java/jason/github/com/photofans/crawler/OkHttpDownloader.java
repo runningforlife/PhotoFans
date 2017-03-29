@@ -6,10 +6,13 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
+import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.downloader.AbstractDownloader;
 import us.codecraft.webmagic.selector.PlainText;
@@ -36,6 +39,15 @@ public class OkHttpDownloader extends AbstractDownloader {
     @Override
     public Page download(us.codecraft.webmagic.Request request, Task task) {
         Log.v(LOG_TAG,"download(): url = " + request.getUrl());
+
+        if(isPossibleImageUrl(request.getUrl())){
+            Page page = new Page();
+            page.setRawText("");
+            // bad request
+            page.setStatusCode(400);
+            return page;
+        }
+
         Site site = null;
         if (task != null) {
             site = task.getSite();
@@ -50,6 +62,8 @@ public class OkHttpDownloader extends AbstractDownloader {
         try{
             Response response = handleRequest(site,httpRequest);
             statusCode = response.code();
+
+            Log.v(LOG_TAG,"download(): status code = " + statusCode);
 
             if(response.isSuccessful()){
                 onSuccess(request);
@@ -70,6 +84,11 @@ public class OkHttpDownloader extends AbstractDownloader {
         onError(request);
 
         return null;
+    }
+
+    @Override
+    public void onError(us.codecraft.webmagic.Request request){
+        Log.v(LOG_TAG,"onError(): url = " + request.getUrl());
     }
 
     @Override
@@ -102,11 +121,10 @@ public class OkHttpDownloader extends AbstractDownloader {
         return page;
     }
 
-    private boolean isImageUrl(String url){
+    private boolean isPossibleImageUrl(String url){
         Pattern pattern = Pattern.compile(REG_IMAGES);
         Matcher matcher = pattern.matcher(url);
 
         return matcher.matches();
     }
-
 }

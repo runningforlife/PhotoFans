@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.realm.Realm;
@@ -68,7 +69,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
 
     @Override
     public void init() {
-        RealmHelper.getInstance().onStart();
+        //RealmHelper.getInstance().onStart();
         RealmHelper.getInstance().addListener(this);
     }
 
@@ -95,6 +96,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
             mIsRefreshing = false;
         }
 
+        Collections.sort(mImgList);
         mView.notifyDataChanged(mImgList);
     }
 
@@ -111,18 +113,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
                 Log.v(TAG,"image retrieve success");
                 mView.onRefreshDone(true);
                 // save to realm
-                saveToRealm(data);
                 break;
-        }
-    }
-
-    private void saveToRealm(Bundle data){
-        List<ImageItem> imgs = data.getParcelableArrayList("result");
-        if(imgs != null) {
-            RealmHelper helper = RealmHelper.getInstance();
-            for (ImageItem item : imgs) {
-                helper.writeAsync(item);
-            }
         }
     }
 }

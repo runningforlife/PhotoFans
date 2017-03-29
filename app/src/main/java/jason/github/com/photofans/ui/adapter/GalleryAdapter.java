@@ -3,6 +3,7 @@ package jason.github.com.photofans.ui.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,12 +16,14 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jason.github.com.photofans.R;
 import jason.github.com.photofans.model.ImageRealm;
+import jason.github.com.photofans.repository.RealmHelper;
 import jason.github.com.photofans.utils.DisplayUtil;
 
 /**
@@ -70,15 +73,24 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
     @Override
     public void onBindViewHolder(PhotoViewHolder vh, int position) {
-        Log.v(TAG,"onBindViewHolder(): view position = " + position);
+        Log.v(TAG,"onBindViewHolder(): view position = " + position + "visit time =" + mImageList.get(position).getTimeStamp());
         // different device panel size may need different width and height
         double ratio = DisplayUtil.getScreenRatio();
         ratio = Double.compare(ratio,0) == 0 ? DEFAULT_SCREEN_RATIO : ratio;
-        mPicasso.load(mImageList.get(position).getUrl())
-                .resize(DEFAULT_IMG_RESOLUTION, (int) (DEFAULT_IMG_RESOLUTION*ratio))
-                .centerCrop()
-                .into(vh.img);
-        vh.setPosition(position);
+        String url = mImageList.get(position).getUrl();
+
+        //TODO: filter those small size pictures
+        if(!TextUtils.isEmpty(url)) {
+            mPicasso.load(url)
+                    .resize(DEFAULT_IMG_RESOLUTION, (int) (DEFAULT_IMG_RESOLUTION * ratio))
+                    .centerCrop()
+                    .into(vh.img);
+            vh.setPosition(position);
+        }else if(mImageList.size() > 0){
+            // remove from the list
+            RealmHelper.getInstance().delete(mImageList.get(position));
+            mImageList.remove(position);
+        }
     }
 
     @Override

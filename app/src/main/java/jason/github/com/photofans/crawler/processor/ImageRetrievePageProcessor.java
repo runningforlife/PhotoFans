@@ -3,22 +3,20 @@ package jason.github.com.photofans.crawler.processor;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.URLUtil;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
-import jason.github.com.photofans.model.ImageItem;
 import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.model.VisitedPageInfo;
 import jason.github.com.photofans.service.MyThreadFactory;
@@ -35,15 +33,21 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000).setTimeOut(10000);
 
-    private final static String URL_FREE_JPG = "http://en.freejpg.com.ar/free/images/";
-    private final static String MATCH_FREE_JPG = "http://en.freejpg.com.ar/asset/";
+    private final static String WIDTH = "width";
+    private final static String HEIGHT = "height";
+    // filter image width and height
+    private final static int MIN_WIDTH = 200;
+    private final static int MIN_HEIGHT = 200;
 
-    private final static String URL_PIXELS = "https://www.pexels.com/";
-    private final static String URL_ALBUM = "http://albumarium.com/";
+    private final static String URL_FREE_JPG = "http://en.freejpg.com.ar/free/images";
+    private final static String MATCH_FREE_JPG = "http://en.freejpg.com.ar/asset";
+
+    private final static String URL_PIXELS = "https://www.pexels.com";
+    private final static String URL_ALBUM = "http://albumarium.com";
 
     private final static String REG_FREE_JPG = "http://en\\.freejpg\\.com\\.ar/.*(\\.(gif|jpg|png))$";
 
-    private List<ImageItem> imgList = new ArrayList<ImageItem>();
+    private List<ImageRealm> imgList = new ArrayList<>();
     private List<RetrieveCompleteListener> mListeners;
     private int mMaxRetrievedImages = DEFAULT_RETRIEVED_IMAGES;
 
@@ -64,7 +68,12 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     public void process(Page page) {
         Log.v(TAG,"process()");
 
-        retrieveImages(page);
+        int status = page.getStatusCode();
+        if(status == 200) {
+            retrieveImages(page);
+        }else if(status >= 400 && status <= 511){
+            // error happens
+        }
     }
 
     @Override
@@ -78,8 +87,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     }
 
     public interface RetrieveCompleteListener{
-        void onRetrieveComplete(List<ImageItem> data);
-        void onRetrieveComplete(VisitedPageInfo pageInfo);
+        void onRetrieveComplete(List<ImageRealm> data);
     }
 
     public void addListener(RetrieveCompleteListener listener){
@@ -92,8 +100,6 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private void retrieveImages(Page page){
 
-        ImageRealm imageRealm = new ImageRealm();
-
         if(!isVisited(page)) {
             MyThreadFactory.getInstance()
                     .newThread(new SaveRunnable(getPageList(page)))
@@ -102,20 +108,44 @@ public class ImageRetrievePageProcessor implements PageProcessor {
             boolean hasNewData = false;
             // here we retrieve all those IMAGE urls
             Document doc = page.getHtml().getDocument();
-            Elements images = doc.select("img[src$=.jpg]");
-            Log.v(TAG, "retrieved image size = " + images.size());
+            Elements images = doc.select("img");
+            Log.v(TAG, "retrieved images = " + images.size());
             for (Element img : images) {
+                // here, absolute URL and relative URL
                 if (img.tagName().equals("img")) {
-                    String url = img.attr("abs:src");
-                    if (!url.startsWith(MATCH_FREE_JPG)) {
+                    String relUrl = img.attr("src");
+                    String url = relUrl;
+                    String absUrl = img.attr("abs:src");
+                    // compose relative url and base url
+                    if(!URLUtil.isNetworkUrl(absUrl)){
+                        if(page.getUrl().get().startsWith(URL_ALBUM)){
+                            url = URL_ALBUM + relUrl;
+                        }
+                    }
+
+                    Log.v(TAG,"base uri = " + img.baseUri());
+
+                    int w = MIN_WIDTH,h = MIN_HEIGHT;
+                    if(img.hasAttr(WIDTH)) {
+                        String width = img.attr("width");
+                        w = Integer.parseInt(width);
+                    }
+                    if(img.hasAttr(HEIGHT)){
+                        h = Integer.parseInt(img.attr(HEIGHT));
+                    }
+
+                    if(w < MIN_WIDTH || h < MIN_HEIGHT){
                         continue;
                     }
                     Log.v(TAG, "retrieved image url = " + url);
-                    ImageItem info = new ImageItem();
+                    if(!URLUtil.isValidUrl(url)){
+                        continue;
+                    }
+                    ImageRealm imageRealm = new ImageRealm();
 
                     String imgName = img.attr("alt");
                     if (TextUtils.isEmpty(imgName)) {
-                        info.setName("unknown");
+                        imageRealm.setName("unknown");
                     } else {
                         String str = imgName;
                         if (imgName.startsWith("free images")) {
@@ -123,17 +153,14 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                         }
                         String firstWord = str.contains(" ") ? str.substring(0, str.indexOf(" "))
                                 : str;
-                        info.setName(firstWord);
+                        imageRealm.setName(firstWord);
                     }
-                    info.setUrl(url);
-                    info.setTimeStamp(System.currentTimeMillis());
-
                     imageRealm.setName(imgName);
                     imageRealm.setUrl(url);
                     imageRealm.setTimeStamp(System.currentTimeMillis());
 
-                    if (!imgList.contains(info)) {
-                        imgList.add(info);
+                    if (!imgList.contains(imageRealm)) {
+                        imgList.add(imageRealm);
                         hasNewData = true;
                     }
                 }
@@ -198,7 +225,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     }
 
     private List<VisitedPageInfo> getPageList(Page page){
-        List<String> urlList = page.getHtml().links().regex(URL_FREE_JPG + ".*\\w").all();
+        List<String> urlList = page.getHtml().links().all();
         List<VisitedPageInfo> pageList = new ArrayList<>(urlList.size() + 1);
         page.addTargetRequests(urlList);
 

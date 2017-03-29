@@ -8,6 +8,7 @@ package jason.github.com.photofans.crawler;
 
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.proxy.Proxy;
@@ -21,8 +22,9 @@ public class OkHttpProxy {
     protected static OkHttpClient getClient(Site site, Proxy proxy){
         OkHttpClient client = builder
                 .connectTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
-                //.readTimeout(site.getTimeOut(), TimeUnit.MILLISECONDS)
-                .retryOnConnectionFailure(true)
+                .readTimeout(site.getTimeOut(), TimeUnit.MILLISECONDS)
+                .connectionPool(new ConnectionPool())
+                //.retryOnConnectionFailure(true)
                 .build();
         return client;
     }

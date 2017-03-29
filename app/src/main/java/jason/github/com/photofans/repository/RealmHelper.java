@@ -10,10 +10,12 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import jason.github.com.photofans.model.ImageItem;
 import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.model.VisitedPageInfo;
 import jason.github.com.photofans.service.ImageRetrieveService;
+import jason.github.com.photofans.service.MyThreadFactory;
 
 /**
  * an helper class to CRUD realm database
@@ -28,7 +30,6 @@ public class RealmHelper {
     private RealmResults<ImageRealm> mAllImages;
     // callback to listen realm changes: update or query complete
     private List<RealmDataChangeListener> mListeners;
-
 
     public interface RealmDataChangeListener{
         void onRealmDataChange(RealmResults<ImageRealm> data);
@@ -57,8 +58,7 @@ public class RealmHelper {
 
     // this should be consistent with UI lifecycle: onCreate() or onResume()
     public void onStart(){
-        mAllImages = realm.where(ImageRealm.class).findAllAsync();
-        mAllImages.addChangeListener(new RealmDataSetChangeListener());
+        queryAndListen();
 
         RealmResults<VisitedPageInfo> allPages = realm.where(VisitedPageInfo.class)
                 .equalTo("mIsVisited",false)
@@ -72,7 +72,7 @@ public class RealmHelper {
         //realm.close();
     }
 
-    public void write(ImageRealm info) {
+    public void write(final ImageRealm info) {
         Log.v(TAG,"image info = " + info);
         realm.beginTransaction();
 
@@ -101,25 +101,13 @@ public class RealmHelper {
                 });
     }
 
-    public void writeAsync(final ImageItem item){
+    public void writeAsync(final List<ImageRealm> data) {
+        Realm realm = Realm.getDefaultInstance();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                ImageRealm info = realm.createObject(ImageRealm.class);
-                info.setName(item.getName());
-                info.setUrl(item.getUrl());
-                info.setTimeStamp(item.getTimeStamp());
-            }
-        }, new Realm.Transaction.OnSuccess() {
-            @Override
-            public void onSuccess() {
-                Log.v(TAG,"onSuccess()");
-            }
-        }, new Realm.Transaction.OnError() {
-            @Override
-            public void onError(Throwable error) {
-                Log.v(TAG,"onError()" + error);
-                //write(info);
+                Log.v(TAG,"execute(): data size = " + data.size());
+                realm.copyToRealmOrUpdate(data);
             }
         });
     }
@@ -133,7 +121,7 @@ public class RealmHelper {
     }
 
     public void queryAllAsync(){
-        mAllImages = realm.where(ImageRealm.class).findAllAsync();
+        queryAndListen();
     }
 
     public void delete(final String url) {
@@ -192,10 +180,22 @@ public class RealmHelper {
     }
 
     private class VisitPageChangeListener implements RealmChangeListener<RealmResults<VisitedPageInfo>>{
-
         @Override
         public void onChange(RealmResults<VisitedPageInfo> element){
             Log.v(TAG,"onChange():current marked pages size " + element.size());
+        }
+    }
+
+    private void queryAndListen(){
+        //FIXME: findALlSortedAsync has a problem: always call onChange event there
+        // is no any change in database
+        mAllImages = realm.where(ImageRealm.class)
+                .findAllAsync();
+                //.sort("mTimeStamp",Sort.DESCENDING);
+        mAllImages.addChangeListener(new RealmDataSetChangeListener());
+        // force to load
+        if(mAllImages.isLoaded()) {
+            mAllImages.load();
         }
     }
 

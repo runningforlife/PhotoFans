@@ -179,8 +179,10 @@ public class GalleryActivity extends AppCompatActivity
     public void notifyDataChanged(List<ImageRealm> result) {
         Log.v(TAG,"notifyDataChanged(): data size = " + result.size());
         mAdapter.setImageList(result);
-        //mRvImgList.invalidate();
         mAdapter.notifyDataSetChanged();
+
+        //mRvImgList.invalidate();
+        //mPresenter.loadAllDataAsync();
 
         if(mRefresher.isRefreshing()){
             mRefresher.setRefreshing(false);

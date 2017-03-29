@@ -14,8 +14,10 @@ import java.util.List;
 import io.realm.Realm;
 import jason.github.com.photofans.crawler.OkHttpDownloader;
 import jason.github.com.photofans.crawler.processor.ImageRetrievePageProcessor;
+import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.model.VisitedPageInfo;
 import jason.github.com.photofans.model.ImageItem;
+import jason.github.com.photofans.repository.RealmHelper;
 import us.codecraft.webmagic.Spider;
 
 /**
@@ -33,8 +35,6 @@ public class ImageRetrieveService extends IntentService implements
     private final static String URL_FREE_JPG = "http://en.freejpg.com.ar/free/images/";
     private final static String URL_PIXELS = "https://www.pexels.com/";
     private final static String URL_ALBUM = "http://albumarium.com/";
-
-    private final static String REG_FREE_JPG = "http://en\\.freejpg\\.com\\.ar/.*(\\.(gif|jpg|png))$";
 
     // max number of images to be retrieved a time
     public static final String EXTRA_MAX_IMAGES = "maxImages";
@@ -63,7 +63,7 @@ public class ImageRetrieveService extends IntentService implements
         mProcessor.addListener(this);
         String lastUrl = mProcessor.getStartUrl();
         if(TextUtils.isEmpty(lastUrl)){
-            lastUrl = URL_FREE_JPG;
+            lastUrl = URL_ALBUM;
         }
 
         mSpider = Spider.create(mProcessor)
@@ -74,14 +74,15 @@ public class ImageRetrieveService extends IntentService implements
     }
 
     @Override
-    public void onRetrieveComplete(List<ImageItem> data) {
+    public void onRetrieveComplete(List<ImageRealm> data) {
 
         if(data == null || data.isEmpty()){
             Log.v(TAG,"onRetrieveComplete(): data is empty");
             mReceiver.send(ServiceStatus.ERROR,null);
         }else {
+            saveToRealm(data);
             Bundle bundle = new Bundle();
-            bundle.putParcelableArrayList("result", (ArrayList<? extends Parcelable>) data);
+            bundle.putLong("result", data.size());
             mReceiver.send(ServiceStatus.SUCCESS, bundle);
             Log.v(TAG,"onRetrieveComplete(): retrieved data size = " + data.size());
         }
@@ -91,8 +92,7 @@ public class ImageRetrieveService extends IntentService implements
         mSpider.stop();
     }
 
-    @Override
-    public void onRetrieveComplete(final VisitedPageInfo data) {
-        Log.v(TAG,"onRetrieveComplete(): page url = " + data.getUrl());
+    private void saveToRealm(List<ImageRealm> data){
+        RealmHelper.getInstance().writeAsync(data);
     }
 }

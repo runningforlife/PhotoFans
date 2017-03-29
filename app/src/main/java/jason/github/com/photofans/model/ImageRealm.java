@@ -1,5 +1,7 @@
 package jason.github.com.photofans.model;
 
+import android.support.annotation.NonNull;
+
 import java.util.Date;
 
 import io.realm.RealmObject;
@@ -9,7 +11,8 @@ import io.realm.annotations.PrimaryKey;
  * image info
  */
 
-public class ImageRealm extends RealmObject{
+public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
+    @PrimaryKey
     private String mUrl;
     private String mName;
     private long mTimeStamp;
@@ -61,5 +64,12 @@ public class ImageRealm extends RealmObject{
         return (int) (mName.hashCode()
                         + mUrl.hashCode()
                         + mTimeStamp >>> 2);
+    }
+
+    // time descending
+    @Override
+    public int compareTo(@NonNull ImageRealm o) {
+        return (mTimeStamp - o.mTimeStamp) < 0 ? 1 :
+                (((mTimeStamp - o.mTimeStamp) == 0) ? 0 : -1);
     }
 }
