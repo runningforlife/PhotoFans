@@ -1,6 +1,6 @@
 package jason.github.com.photofans.ui;
 
-import jason.github.com.photofans.repository.RealmHelper;
+import jason.github.com.photofans.model.RealmHelper;
 
 /**
  * a presenter to do interactions with UI and update database

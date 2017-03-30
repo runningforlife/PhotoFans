@@ -23,4 +23,19 @@ public interface GalleryPresenter extends Presenter{
      * refresh data(download from network asynchrously)
      */
     void refresh();
+
+    /*
+     * get total item
+     */
+    int getItemCount();
+
+    /*
+     * get item at given position
+     */
+    ImageRealm getItemAtPos(int pos);
+
+    /*
+     * remove item at given position
+     */
+    void removeItemAtPos(int pos);
 }

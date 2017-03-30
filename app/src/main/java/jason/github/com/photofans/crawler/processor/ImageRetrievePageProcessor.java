@@ -108,7 +108,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
             boolean hasNewData = false;
             // here we retrieve all those IMAGE urls
             Document doc = page.getHtml().getDocument();
-            Elements images = doc.select("img");
+            Elements images = doc.select("img[src$=.jpg]");
             Log.v(TAG, "retrieved images = " + images.size());
             for (Element img : images) {
                 // here, absolute URL and relative URL
@@ -118,17 +118,18 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                     String absUrl = img.attr("abs:src");
                     // compose relative url and base url
                     if(!URLUtil.isNetworkUrl(absUrl)){
+                        //FIXME: find the base url
                         if(page.getUrl().get().startsWith(URL_ALBUM)){
                             url = URL_ALBUM + relUrl;
                         }
+                    }else{
+                        url = absUrl;
                     }
 
-                    Log.v(TAG,"base uri = " + img.baseUri());
-
+                    Log.v(TAG,"base uri = " + img.baseUri());/*
                     int w = MIN_WIDTH,h = MIN_HEIGHT;
                     if(img.hasAttr(WIDTH)) {
                         String width = img.attr("width");
-
                         w = Integer.parseInt(width);
                     }
                     if(img.hasAttr(HEIGHT)){
@@ -137,7 +138,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
                     if(w < MIN_WIDTH || h < MIN_HEIGHT){
                         continue;
-                    }
+                    }*/
+
                     Log.v(TAG, "retrieved image url = " + url);
                     if(!URLUtil.isValidUrl(url)){
                         continue;

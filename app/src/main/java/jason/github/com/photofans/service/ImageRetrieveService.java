@@ -12,7 +12,7 @@ import java.util.List;
 import jason.github.com.photofans.crawler.OkHttpDownloader;
 import jason.github.com.photofans.crawler.processor.ImageRetrievePageProcessor;
 import jason.github.com.photofans.model.ImageRealm;
-import jason.github.com.photofans.repository.RealmHelper;
+import jason.github.com.photofans.model.RealmHelper;
 import us.codecraft.webmagic.Spider;
 
 /**
@@ -58,7 +58,7 @@ public class ImageRetrieveService extends IntentService implements
         mProcessor.addListener(this);
         String lastUrl = mProcessor.getStartUrl();
         if(TextUtils.isEmpty(lastUrl)){
-            lastUrl = URL_ALBUM;
+            lastUrl = URL_FREE_JPG;
         }
 
         mSpider = Spider.create(mProcessor)

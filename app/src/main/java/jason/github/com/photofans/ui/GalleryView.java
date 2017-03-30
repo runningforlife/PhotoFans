@@ -9,7 +9,7 @@ import jason.github.com.photofans.model.ImageRealm;
  */
 
 public interface GalleryView extends UI {
-    void notifyDataChanged(List<ImageRealm> result);
+    void notifyDataChanged();
 
     void onRefreshDone(boolean isSuccess);
 }

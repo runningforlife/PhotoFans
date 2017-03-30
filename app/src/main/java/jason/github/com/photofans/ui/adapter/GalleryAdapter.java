@@ -2,28 +2,26 @@ package jason.github.com.photofans.ui.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Transformation;
+import com.squareup.picasso.Target;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jason.github.com.photofans.R;
 import jason.github.com.photofans.model.ImageRealm;
-import jason.github.com.photofans.repository.RealmHelper;
+import jason.github.com.photofans.model.RealmHelper;
 import jason.github.com.photofans.utils.DisplayUtil;
 
 /**
@@ -36,32 +34,38 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     private static final int DEFAULT_IMG_RESOLUTION = 512;
     private static final double DEFAULT_SCREEN_RATIO = 0.75;
 
-    private static final int MB = 1024*1024;
-    private static final int MEM_CACHE_SIZE = 3*MB;
-    private static final int DISK_CACHE_SIZE = 50*MB;
+    private static final int KB = 1024;
+    private static final int MIN_IMG_SIZE = KB * 60;
+    private static final int MIN_IMG_WIDTH = 150;
+    private static final int MIN_IMG_HEIGHT = 150;
+
     @SuppressWarnings("unchecked")
     private List<ImageRealm> mImageList = Collections.EMPTY_LIST;
     private LayoutInflater mInflater;
-    private ItemClickListener mListener;
+    private ItemSelectedCallback mCallback;
     private Picasso mPicasso;
+    private double mScreenRatio;
 
-    public interface ItemClickListener{
+    public interface ItemSelectedCallback {
         void onItemClick(int pos);
+        int getItemCount();
+        ImageRealm getItemAtPos(int pos);
+        void removeItemAtPos(int pos);
     }
 
-    public GalleryAdapter(Context context){
+    public GalleryAdapter(Context context,ItemSelectedCallback callback){
+        mCallback = callback;
         mInflater = LayoutInflater.from(context);
         mPicasso = Picasso.with(context);
+        // different device panel size may need different width and height
+        double ratio = DisplayUtil.getScreenRatio();
+        mScreenRatio = Double.compare(ratio,0) == 0 ? DEFAULT_SCREEN_RATIO : ratio;
     }
 
     public GalleryAdapter(Context context, List<ImageRealm> imgList){
         mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mImageList = imgList;
         mPicasso = Picasso.with(context);
-    }
-
-    public void setImageList(List<ImageRealm> imgList){
-        mImageList = imgList;
     }
 
     @Override
@@ -73,23 +77,18 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
     @Override
     public void onBindViewHolder(PhotoViewHolder vh, int position) {
-        Log.v(TAG,"onBindViewHolder(): view position = " + position + "visit time =" + mImageList.get(position).getTimeStamp());
-        // different device panel size may need different width and height
-        double ratio = DisplayUtil.getScreenRatio();
-        ratio = Double.compare(ratio,0) == 0 ? DEFAULT_SCREEN_RATIO : ratio;
-        String url = mImageList.get(position).getUrl();
+        Log.v(TAG,"onBindViewHolder(): view position = " + position);
+        String url = mCallback.getItemAtPos(position).getUrl();
 
-        //TODO: filter those small size pictures
         if(!TextUtils.isEmpty(url)) {
             mPicasso.load(url)
-                    .resize(DEFAULT_IMG_RESOLUTION, (int) (DEFAULT_IMG_RESOLUTION * ratio))
+                    .resize(DEFAULT_IMG_RESOLUTION, (int) (DEFAULT_IMG_RESOLUTION * mScreenRatio))
                     .centerCrop()
-                    .into(vh.img);
+                    .into(new ImageTarget(vh.img,position));
             vh.setPosition(position);
-        }else if(mImageList.size() > 0){
+        }else if(getItemCount() > 0){
             // remove from the list
-            RealmHelper.getInstance().delete(mImageList.get(position));
-            mImageList.remove(position);
+            RealmHelper.getInstance().delete(mCallback.getItemAtPos(position));
         }
     }
 
@@ -100,7 +99,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
     @Override
     public int getItemCount() {
-        return mImageList.size();
+        return mCallback.getItemCount();
     }
 
     public class PhotoViewHolder extends RecyclerView.ViewHolder{
@@ -115,8 +114,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mPos != -1 && mListener != null){
-                        mListener.onItemClick(mPos);
+                    if(mPos != -1 && mCallback != null){
+                        mCallback.onItemClick(mPos);
                     }
                 }
             });
@@ -124,6 +123,45 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
         public void setPosition(int pos){
             mPos = pos;
+        }
+    }
+
+    private class ImageTarget implements Target{
+
+        private ImageView mImg;
+        private int mPos;
+
+        public ImageTarget(ImageView iv, int pos){
+            mImg = iv;
+            mPos = pos;
+        }
+
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            //int imgSize = BitmapUtil.getBitmapSize(bitmap);
+            int imgSize = bitmap.getByteCount();
+            Log.v(TAG,"onBitmapLoaded(): from " + from + ",image size = " + imgSize/KB + "KB");
+            int w = bitmap.getWidth();
+            int h = bitmap.getHeight();
+            // filter small size pictures
+            if(imgSize < MIN_IMG_SIZE || (w < MIN_IMG_WIDTH || h < MIN_IMG_HEIGHT)){
+                mCallback.removeItemAtPos(mPos);
+            }else{
+                // display it
+                mImg.setImageBitmap(bitmap);
+            }
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+            Log.v(TAG,"onBitmapFailed()");
+            //just remove it
+            mCallback.removeItemAtPos(mPos);
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+
         }
     }
 }

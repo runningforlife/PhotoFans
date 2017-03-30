@@ -8,12 +8,12 @@ import android.os.Looper;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import io.realm.RealmResults;
 import jason.github.com.photofans.model.ImageRealm;
-import jason.github.com.photofans.repository.RealmHelper;
+import jason.github.com.photofans.model.RealmHelper;
 import jason.github.com.photofans.service.ImageRetrieveService;
 import jason.github.com.photofans.service.ServiceStatus;
 import jason.github.com.photofans.service.SimpleResultReceiver;
@@ -22,12 +22,14 @@ import jason.github.com.photofans.service.SimpleResultReceiver;
  * a presenter to bridge UI and data repository
  */
 
+//FIXME: images are duplicated in recycle view
 public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiver.Receiver{
     private static final String TAG = "GalleryPresenter";
 
     private Context mContext;
     private GalleryView mView;
     private List<ImageRealm> mImgList;
+    private LinkedList<ImageRealm> mImageList;
     // whether user is refreshing data
     private boolean mIsRefreshing;
     // to receive result from service
@@ -37,6 +39,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
         mView = view;
         mContext = context;
         mImgList = new ArrayList<>();
+        mImageList = new LinkedList<>();
         mIsRefreshing = false;
 
         mReceiver = new SimpleResultReceiver(new Handler(Looper.myLooper()));
@@ -66,8 +69,25 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     }
 
     @Override
+    public int getItemCount() {
+        return mImageList.size();
+    }
+
+    @Override
+    public ImageRealm getItemAtPos(int pos) {
+        return mImageList.get(pos);
+    }
+
+    @Override
+    public void removeItemAtPos(int pos) {
+        Log.v(TAG,"removeItemAtPos(): position = " + pos);
+        RealmHelper.getInstance().delete(mImageList.get(pos));
+        mImageList.remove(pos);
+    }
+
+    @Override
     public void init() {
-        //RealmHelper.getInstance().onStart();
+        RealmHelper.getInstance().onStart();
         RealmHelper.getInstance().addListener(this);
     }
 
@@ -75,6 +95,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     public void onDestroy() {
         RealmHelper.getInstance().removeListener(this);
         mImgList = null;
+        mImageList = null;
         //mView = null;
         RealmHelper.getInstance().onDestroy();
         mReceiver.setReceiver(null);
@@ -84,8 +105,13 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     public void onRealmDataChange(RealmResults<ImageRealm> data) {
         Log.v(TAG,"onRealmDataChange(): data size = " + data.size());
         for(ImageRealm info : data){
+/*
             if(!mImgList.contains(info)) {
                 mImgList.add(info);
+            }
+*/
+            if(!mImageList.contains(info)){
+                mImageList.addFirst(info);
             }
         }
 
@@ -94,8 +120,8 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
             mIsRefreshing = false;
         }
 
-        Collections.sort(mImgList);
-        mView.notifyDataChanged(mImgList);
+        //Collections.sort(mImgList);
+        mView.notifyDataChanged();
     }
 
     @Override

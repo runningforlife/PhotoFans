@@ -1,4 +1,4 @@
-package jason.github.com.photofans.repository;
+package jason.github.com.photofans.model;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -9,8 +9,7 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
-import jason.github.com.photofans.model.ImageRealm;
-import jason.github.com.photofans.model.VisitedPageInfo;
+import io.realm.Sort;
 
 /**
  * an helper class to CRUD realm database
@@ -185,8 +184,8 @@ public class RealmHelper {
         //FIXME: findALlSortedAsync has a problem: always call onChange event there
         // is no any change in database
         mAllImages = realm.where(ImageRealm.class)
-                .findAllAsync();
-                //.sort("mTimeStamp",Sort.DESCENDING);
+                .findAllAsync()
+                .sort("mTimeStamp", Sort.DESCENDING);
         mAllImages.addChangeListener(new RealmDataSetChangeListener());
         // force to load
         if(mAllImages.isLoaded()) {

@@ -26,7 +26,8 @@ import jason.github.com.photofans.ui.GalleryView;
 import jason.github.com.photofans.ui.adapter.GalleryAdapter;
 
 public class GalleryActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, GalleryView{
+        implements NavigationView.OnNavigationItemSelectedListener,
+                    GalleryView,GalleryAdapter.ItemSelectedCallback{
 
     private static final String TAG = "GalleryActivity";
 
@@ -171,18 +172,14 @@ public class GalleryActivity extends AppCompatActivity
         GridLayoutManager gridLayoutMgr = new GridLayoutManager(GalleryActivity.this,2);
         mRvImgList.setLayoutManager(gridLayoutMgr);
 
-        mAdapter = new GalleryAdapter(GalleryActivity.this);
+        mAdapter = new GalleryAdapter(getApplicationContext(),GalleryActivity.this);
         mRvImgList.setAdapter(mAdapter);
     }
 
     @Override
-    public void notifyDataChanged(List<ImageRealm> result) {
-        Log.v(TAG,"notifyDataChanged(): data size = " + result.size());
-        mAdapter.setImageList(result);
+    public void notifyDataChanged() {
+        Log.v(TAG,"notifyDataChanged()");
         mAdapter.notifyDataSetChanged();
-
-        //mRvImgList.invalidate();
-        //mPresenter.loadAllDataAsync();
 
         if(mRefresher.isRefreshing()){
             mRefresher.setRefreshing(false);
@@ -204,5 +201,25 @@ public class GalleryActivity extends AppCompatActivity
             Toast.makeText(getApplicationContext(),R.string.refresh_error,Toast.LENGTH_SHORT)
                     .show();
         }
+    }
+
+    @Override
+    public void onItemClick(int pos) {
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return mPresenter.getItemCount();
+    }
+
+    @Override
+    public ImageRealm getItemAtPos(int pos) {
+        return mPresenter.getItemAtPos(pos);
+    }
+
+    @Override
+    public void removeItemAtPos(int pos) {
+        mPresenter.removeItemAtPos(pos);
     }
 }
