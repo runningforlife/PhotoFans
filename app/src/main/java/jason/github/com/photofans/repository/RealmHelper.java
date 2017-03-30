@@ -8,14 +8,9 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
-import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
-import io.realm.Sort;
-import jason.github.com.photofans.model.ImageItem;
 import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.model.VisitedPageInfo;
-import jason.github.com.photofans.service.ImageRetrieveService;
-import jason.github.com.photofans.service.MyThreadFactory;
 
 /**
  * an helper class to CRUD realm database

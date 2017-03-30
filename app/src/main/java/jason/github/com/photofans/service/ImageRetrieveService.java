@@ -3,20 +3,15 @@ package jason.github.com.photofans.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.os.ResultReceiver;
 import android.text.TextUtils;
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.Realm;
 import jason.github.com.photofans.crawler.OkHttpDownloader;
 import jason.github.com.photofans.crawler.processor.ImageRetrievePageProcessor;
 import jason.github.com.photofans.model.ImageRealm;
-import jason.github.com.photofans.model.VisitedPageInfo;
-import jason.github.com.photofans.model.ImageItem;
 import jason.github.com.photofans.repository.RealmHelper;
 import us.codecraft.webmagic.Spider;
 

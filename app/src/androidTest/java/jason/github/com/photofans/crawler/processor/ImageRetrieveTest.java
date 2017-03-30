@@ -18,10 +18,14 @@ import us.codecraft.webmagic.Spider;
 @RunWith(AndroidJUnit4.class)
 public class ImageRetrieveTest {
 
+    private final static String URL_FREE_JPG = "http://en.freejpg.com.ar/free/images/";
+    private final static String URL_PIXELS = "https://www.pexels.com/";
+    private final static String URL_ALBUM = "http://albumarium.com/";
+
     @Before
     public void initRealm(){
-        MockContext context = new MockContext();
-        Realm.init(context);
+/*        MockContext context = new MockContext();
+        Realm.init(context);*/
     }
 
     @Test
@@ -29,6 +33,6 @@ public class ImageRetrieveTest {
         ImageRetrievePageProcessor processor = new ImageRetrievePageProcessor(20);
         Spider.create(processor)
                 .setDownloader(new OkHttpDownloader())
-                .test("http://en.freejpg.com.ar/free/images/");
+                .addUrl(URL_FREE_JPG);
     }
 }

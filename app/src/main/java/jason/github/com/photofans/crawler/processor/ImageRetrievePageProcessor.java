@@ -128,6 +128,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                     int w = MIN_WIDTH,h = MIN_HEIGHT;
                     if(img.hasAttr(WIDTH)) {
                         String width = img.attr("width");
+
                         w = Integer.parseInt(width);
                     }
                     if(img.hasAttr(HEIGHT)){

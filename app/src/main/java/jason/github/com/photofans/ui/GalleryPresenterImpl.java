@@ -11,9 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.realm.Realm;
 import io.realm.RealmResults;
-import jason.github.com.photofans.model.ImageItem;
 import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.repository.RealmHelper;
 import jason.github.com.photofans.service.ImageRetrieveService;
