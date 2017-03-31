@@ -9,6 +9,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -114,49 +116,38 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                 // here, absolute URL and relative URL
                 if (img.tagName().equals("img")) {
                     String relUrl = img.attr("src");
-                    String url = relUrl;
                     String absUrl = img.attr("abs:src");
+                    String url = absUrl;
                     // compose relative url and base url
                     if(!URLUtil.isNetworkUrl(absUrl)){
                         //FIXME: find the base url
-                        if(page.getUrl().get().startsWith(URL_ALBUM)){
-                            url = URL_ALBUM + relUrl;
+                        String tempUrl = URLUtil.guessUrl(page.getUrl().get());
+                        String rootUrl = tempUrl.substring(0,tempUrl.indexOf("/"));
+                        url = rootUrl + relUrl;
+                    }
+
+                    try {
+                        URL url1 = new URL(page.getUrl().get());
+                        StringBuilder builder = new StringBuilder(url1.getAuthority());
+                        if(!TextUtils.isEmpty(url1.getProtocol())){
+                            builder.insert(0,url1.getProtocol() + "://");
                         }
-                    }else{
-                        url = absUrl;
-                    }
-
-                    Log.v(TAG,"base uri = " + img.baseUri());/*
-                    int w = MIN_WIDTH,h = MIN_HEIGHT;
-                    if(img.hasAttr(WIDTH)) {
-                        String width = img.attr("width");
-                        w = Integer.parseInt(width);
-                    }
-                    if(img.hasAttr(HEIGHT)){
-                        h = Integer.parseInt(img.attr(HEIGHT));
-                    }
-
-                    if(w < MIN_WIDTH || h < MIN_HEIGHT){
+                        Log.v(TAG,"root url = " + builder.toString());
+                        if(!URLUtil.isValidUrl(url) || !url.startsWith(builder.toString())){
+                            continue;
+                        }
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
                         continue;
-                    }*/
+                    }
 
                     Log.v(TAG, "retrieved image url = " + url);
-                    if(!URLUtil.isValidUrl(url)){
-                        continue;
-                    }
+
                     ImageRealm imageRealm = new ImageRealm();
 
                     String imgName = img.attr("alt");
                     if (TextUtils.isEmpty(imgName)) {
                         imageRealm.setName("unknown");
-                    } else {
-                        String str = imgName;
-                        if (imgName.startsWith("free images")) {
-                            str = imgName.substring("free images".length());
-                        }
-                        String firstWord = str.contains(" ") ? str.substring(0, str.indexOf(" "))
-                                : str;
-                        imageRealm.setName(firstWord);
                     }
                     imageRealm.setName(imgName);
                     imageRealm.setUrl(url);

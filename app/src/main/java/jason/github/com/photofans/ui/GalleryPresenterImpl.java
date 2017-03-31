@@ -66,6 +66,15 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
         intent.putExtra("receiver",mReceiver);
         intent.putExtra(ImageRetrieveService.EXTRA_MAX_IMAGES,15);
         mContext.startService(intent);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // time out
+                mView.onRefreshDone(false);
+                mIsRefreshing = false;
+            }
+        },10000);
     }
 
     @Override
