@@ -57,7 +57,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     // last url to start this page retrieving
     private static String sLastUrl;
 
-    private static final int DEFAULT_RETRIEVED_IMAGES = 20;
+    private static final int DEFAULT_RETRIEVED_IMAGES = 10;
 
     public ImageRetrievePageProcessor(int n){
         mMaxRetrievedImages = n > 0 ? n : DEFAULT_RETRIEVED_IMAGES;
@@ -70,11 +70,14 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     public void process(Page page) {
         Log.v(TAG,"process()");
 
-        int status = page.getStatusCode();
-        if(status == 200) {
-            retrieveImages(page);
-        }else if(status >= 400 && status <= 511){
-            // error happens
+        if(page != null) {
+            int status = page.getStatusCode();
+            if (status == 200) {
+                retrieveImages(page);
+            } else if (status >= 400 && status <= 511) {
+                // error happens
+                Log.v(TAG,"cannot download page,status = " + status);
+            }
         }
     }
 
@@ -107,69 +110,24 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                     .newThread(new SaveRunnable(getPageList(page)))
                     .start();
 
-            boolean hasNewData = false;
-            // here we retrieve all those IMAGE urls
-            Document doc = page.getHtml().getDocument();
-            Elements images = doc.select("img[src$=.jpg]");
-            Log.v(TAG, "retrieved images = " + images.size());
-            for (Element img : images) {
-                // here, absolute URL and relative URL
-                if (img.tagName().equals("img")) {
-                    String relUrl = img.attr("src");
-                    String absUrl = img.attr("abs:src");
-                    String url = absUrl;
-                    // compose relative url and base url
-                    if(!URLUtil.isNetworkUrl(absUrl)){
-                        //FIXME: find the base url
-                        String tempUrl = URLUtil.guessUrl(page.getUrl().get());
-                        String rootUrl = tempUrl.substring(0,tempUrl.indexOf("/"));
-                        url = rootUrl + relUrl;
-                    }
-
-                    try {
-                        URL url1 = new URL(page.getUrl().get());
-                        StringBuilder builder = new StringBuilder(url1.getAuthority());
-                        if(!TextUtils.isEmpty(url1.getProtocol())){
-                            builder.insert(0,url1.getProtocol() + "://");
-                        }
-                        Log.v(TAG,"root url = " + builder.toString());
-                        if(!URLUtil.isValidUrl(url) || !url.startsWith(builder.toString())){
-                            continue;
-                        }
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                        continue;
-                    }
-
-                    Log.v(TAG, "retrieved image url = " + url);
-
-                    ImageRealm imageRealm = new ImageRealm();
-
-                    String imgName = img.attr("alt");
-                    if (TextUtils.isEmpty(imgName)) {
-                        imageRealm.setName("unknown");
-                    }
-                    imageRealm.setName(imgName);
-                    imageRealm.setUrl(url);
-                    imageRealm.setTimeStamp(System.currentTimeMillis());
-
-                    if (!imgList.contains(imageRealm)) {
-                        imgList.add(imageRealm);
-                        hasNewData = true;
-                    }
+            imgList = ImageRetrieverFactory.getInstance().
+                    retrieveImages(page);
+            // enough already
+            //TODO: we could save it on another database, and use it later
+            if (imgList.size() > mMaxRetrievedImages) {
+                // marked part of them as used
+                for(int i = 0; i < mMaxRetrievedImages; ++i){
+                    imgList.get(i).setUsed(true);
                 }
-                // enough already
-                if (imgList.size() > mMaxRetrievedImages) {
-                    break;
-                }
+                notifyListeners();
             }
+        }
+    }
 
-            if (hasNewData) {
-                // notify jobs are done
-                for (RetrieveCompleteListener listener : mListeners) {
-                    listener.onRetrieveComplete(imgList);
-                }
-            }
+    private void notifyListeners(){
+        // notify jobs are done
+        for (RetrieveCompleteListener listener : mListeners) {
+            listener.onRetrieveComplete(imgList);
         }
     }
 

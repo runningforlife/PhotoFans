@@ -22,6 +22,7 @@ public class RealmHelper {
     private static RealmHelper sInstance;
     // all the data we have
     private RealmResults<ImageRealm> mAllImages;
+    private RealmResults<ImageRealm> mAllUnUsedImages;
     // callback to listen realm changes: update or query complete
     private List<RealmDataChangeListener> mListeners;
 
@@ -107,11 +108,19 @@ public class RealmHelper {
     }
 
     public RealmResults<ImageRealm> queryAll(){
-        if(mAllImages != null && mAllImages.isLoaded()) {
+        if(mAllImages != null && !mAllImages.isLoaded()) {
             mAllImages.load();
         }
 
         return mAllImages;
+    }
+
+    public RealmResults<ImageRealm> queryAllUnusedImages(){
+        if(!mAllUnUsedImages.isLoaded()){
+            mAllUnUsedImages.load();
+        }
+
+        return mAllUnUsedImages;
     }
 
     public void queryAllAsync(){
@@ -167,7 +176,7 @@ public class RealmHelper {
         @Override
         public void onChange(RealmResults<ImageRealm> element) {
             Log.v(TAG,"onChange(): current image count = " + element.size());
-            for(RealmDataChangeListener listener : mListeners){
+            for (RealmDataChangeListener listener : mListeners) {
                 listener.onRealmDataChange(element);
             }
         }
@@ -181,16 +190,25 @@ public class RealmHelper {
     }
 
     private void queryAndListen(){
+        Log.v(TAG,"queryAndListen(): current thread = " + Thread.currentThread().getId());
         //FIXME: findALlSortedAsync has a problem: always call onChange event there
         // is no any change in database
         mAllImages = realm.where(ImageRealm.class)
+                .equalTo("mIsUsed",true)
                 .findAllAsync()
                 .sort("mTimeStamp", Sort.DESCENDING);
         mAllImages.addChangeListener(new RealmDataSetChangeListener());
         // force to load
-        if(mAllImages.isLoaded()) {
+/*        if(!mAllImages.isLoaded()) {
             mAllImages.load();
-        }
+        }*/
+
+        mAllUnUsedImages = realm.where(ImageRealm.class)
+                .equalTo("mIsUsed",false)
+                .findAllAsync()
+                .sort("mTimeStamp",Sort.DESCENDING);
+        //mAllUnUsedImages.load();
+        mAllUnUsedImages.addChangeListener(new RealmDataSetChangeListener());
     }
 
 }

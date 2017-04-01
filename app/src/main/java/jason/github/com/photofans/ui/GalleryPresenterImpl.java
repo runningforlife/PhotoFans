@@ -2,15 +2,21 @@ package jason.github.com.photofans.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import io.realm.Realm;
 import io.realm.RealmResults;
 import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.model.RealmHelper;
@@ -26,19 +32,22 @@ import jason.github.com.photofans.service.SimpleResultReceiver;
 public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiver.Receiver{
     private static final String TAG = "GalleryPresenter";
 
+    private static final int DEFAULT_RETRIEVED_IMAGES = 10;
+
     private Context mContext;
     private GalleryView mView;
-    private List<ImageRealm> mImgList;
+    private Set<ImageRealm> mUnUsedImages;
     private LinkedList<ImageRealm> mImageList;
     // whether user is refreshing data
     private boolean mIsRefreshing;
     // to receive result from service
     private SimpleResultReceiver mReceiver;
 
+    @SuppressWarnings("unchecked")
     public GalleryPresenterImpl(Context context,GalleryView view){
         mView = view;
         mContext = context;
-        mImgList = new ArrayList<>();
+        mUnUsedImages = new HashSet<>();
         mImageList = new LinkedList<>();
         mIsRefreshing = false;
 
@@ -61,20 +70,35 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     @Override
     public void refresh() {
         Log.v(TAG,"refresh()");
-        mIsRefreshing = true;
-        Intent intent = new Intent(mContext,ImageRetrieveService.class);
-        intent.putExtra("receiver",mReceiver);
-        intent.putExtra(ImageRetrieveService.EXTRA_MAX_IMAGES,15);
-        mContext.startService(intent);
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // time out
-                mView.onRefreshDone(false);
-                mIsRefreshing = false;
+        if(mUnUsedImages.size() <= DEFAULT_RETRIEVED_IMAGES) {
+
+            mIsRefreshing = true;
+            Intent intent = new Intent(mContext, ImageRetrieveService.class);
+            intent.putExtra("receiver", mReceiver);
+            intent.putExtra(ImageRetrieveService.EXTRA_MAX_IMAGES, DEFAULT_RETRIEVED_IMAGES);
+            mContext.startService(intent);
+        }else{
+            // add to the list
+            List<ImageRealm> removed = new ArrayList<>();
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
+            int cn = 0;
+            Iterator iter = mUnUsedImages.iterator();
+            while(iter.hasNext() && ++cn <= DEFAULT_RETRIEVED_IMAGES){
+                ImageRealm item = (ImageRealm)iter.next();
+                item.setUsed(true);
+                mImageList.add(item);
+                removed.add(item);
             }
-        },10000);
+            realm.commitTransaction();
+            // notify UI to refresh
+            mView.onRefreshDone(true);
+            // remove from set
+            for(ImageRealm item : removed){
+                mUnUsedImages.remove(item);
+            }
+        }
     }
 
     @Override
@@ -103,7 +127,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     @Override
     public void onDestroy() {
         RealmHelper.getInstance().removeListener(this);
-        mImgList = null;
+        mUnUsedImages = null;
         mImageList = null;
         //mView = null;
         RealmHelper.getInstance().onDestroy();
@@ -113,24 +137,27 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     @Override
     public void onRealmDataChange(RealmResults<ImageRealm> data) {
         Log.v(TAG,"onRealmDataChange(): data size = " + data.size());
-        for(ImageRealm info : data){
-/*
-            if(!mImgList.contains(info)) {
-                mImgList.add(info);
+
+        if(data.get(0).getUsed()) {
+            for (ImageRealm info : data) {
+                if (!mImageList.contains(info)) {
+                    mImageList.addFirst(info);
+                }
             }
-*/
-            if(!mImageList.contains(info)){
-                mImageList.addFirst(info);
+
+            if (mIsRefreshing) {
+                mView.onRefreshDone(true);
+                mIsRefreshing = false;
+            }
+
+            //Collections.sort(mImgList);
+            mView.notifyDataChanged();
+        }else{
+            Log.v(TAG,"onRealmDataChange(): unused url size = " + data.size());
+            for(ImageRealm img : data){
+                mUnUsedImages.add(img);
             }
         }
-
-        if(mIsRefreshing){
-            mView.onRefreshDone(true);
-            mIsRefreshing = false;
-        }
-
-        //Collections.sort(mImgList);
-        mView.notifyDataChanged();
     }
 
     @Override
