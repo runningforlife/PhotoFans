@@ -183,6 +183,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
         urlList.add(page.getUrl().get());
         for(String url : urlList){
+            //TODO: filter those URL start with existing page urls
             if(!sAllPages.containsKey(url)) {
                 VisitedPageInfo info = new VisitedPageInfo();
                 info.setUrl(url);

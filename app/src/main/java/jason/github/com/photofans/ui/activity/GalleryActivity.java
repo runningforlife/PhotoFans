@@ -2,12 +2,13 @@ package jason.github.com.photofans.ui.activity;
 
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -16,25 +17,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import java.util.List;
-
 import jason.github.com.photofans.R;
-import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.ui.GalleryPresenter;
-import jason.github.com.photofans.ui.GalleryPresenterImpl;
-import jason.github.com.photofans.ui.GalleryView;
 import jason.github.com.photofans.ui.adapter.GalleryAdapter;
+import jason.github.com.photofans.ui.fragment.AllPicturesFragment;
+import jason.github.com.photofans.ui.fragment.BaseFragment;
 
 public class GalleryActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-                    GalleryView,GalleryAdapter.ItemSelectedCallback{
+        AllPicturesFragment.RefreshCallback {
 
     private static final String TAG = "GalleryActivity";
-
-    private SwipeRefreshLayout mRefresher;
-    private RecyclerView mRvImgList;
-    private GalleryPresenter mPresenter;
-    private GalleryAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,16 +54,20 @@ public class GalleryActivity extends AppCompatActivity
             @Override
             public void onDrawerOpened(View drawerView) {
                 Log.v(TAG,"onDrawerOpened()");
-                if(mRefresher.isRefreshing()){
-                    mRefresher.setRefreshing(false);
+                AllPicturesFragment fragment = (AllPicturesFragment)getSupportFragmentManager().
+                        findFragmentByTag(AllPicturesFragment.TAG);
+                if(fragment != null && fragment.isRefreshing()){
+                    fragment.setRefreshing(false);
                 }
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
                 Log.v(TAG,"onDrawerClosed()");
-                if(mRefresher.isRefreshing()){
-                    mRefresher.setRefreshing(false);
+                AllPicturesFragment fragment = (AllPicturesFragment)getSupportFragmentManager().
+                        findFragmentByTag(AllPicturesFragment.TAG);
+                if(fragment != null && fragment.isRefreshing()){
+                    fragment.setRefreshing(false);
                 }
             }
 
@@ -86,15 +83,11 @@ public class GalleryActivity extends AppCompatActivity
     @Override
     public void onResume(){
         super.onResume();
-
-        mPresenter.loadAllDataAsync();
     }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
-
-        mPresenter.onDestroy();
     }
 
     @Override
@@ -151,48 +144,20 @@ public class GalleryActivity extends AppCompatActivity
 
     private void initView(){
 
-        mPresenter = new GalleryPresenterImpl(GalleryActivity.this,this);
-        mPresenter.init();
-
-        mRefresher = (SwipeRefreshLayout)findViewById(R.id.fragment_container);
-        mRefresher.setColorSchemeResources(android.R.color.holo_blue_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_orange_dark);
-        mRefresher.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                Log.v(TAG,"onRefresh()");
-                //mPresenter.loadAllDataAsync();
-                mPresenter.refresh();
-            }
-        });
-
-        mRvImgList = (RecyclerView) mRefresher.findViewById(R.id.rcv_gallery);
-
-        GridLayoutManager gridLayoutMgr = new GridLayoutManager(GalleryActivity.this,2);
-        mRvImgList.setLayoutManager(gridLayoutMgr);
-
-        mAdapter = new GalleryAdapter(getApplicationContext(),GalleryActivity.this);
-        mRvImgList.setAdapter(mAdapter);
-    }
-
-    @Override
-    public void notifyDataChanged() {
-        Log.v(TAG,"notifyDataChanged()");
-        mAdapter.notifyDataSetChanged();
-
-        if(mRefresher.isRefreshing()){
-            mRefresher.setRefreshing(false);
+        FragmentManager fragmentMgr = getSupportFragmentManager();
+        Fragment fragment = fragmentMgr.findFragmentByTag(AllPicturesFragment.TAG);
+        if(fragment == null){
+            fragment = AllPicturesFragment.newInstance();
+            fragmentMgr.beginTransaction()
+                    .add(R.id.fragment_container,fragment,AllPicturesFragment.TAG)
+                    .commit();
         }
+
     }
 
     @Override
     public void onRefreshDone(boolean isSuccess) {
         Log.v(TAG,"onRefreshDone()");
-
-        if(mRefresher.isRefreshing()){
-            mRefresher.setRefreshing(false);
-        }
 
         if(isSuccess) {
             Toast.makeText(getApplicationContext(), R.string.refresh_success, Toast.LENGTH_SHORT)
@@ -201,25 +166,5 @@ public class GalleryActivity extends AppCompatActivity
             Toast.makeText(getApplicationContext(),R.string.refresh_error,Toast.LENGTH_SHORT)
                     .show();
         }
-    }
-
-    @Override
-    public void onItemClick(int pos) {
-
-    }
-
-    @Override
-    public int getItemCount() {
-        return mPresenter.getItemCount();
-    }
-
-    @Override
-    public ImageRealm getItemAtPos(int pos) {
-        return mPresenter.getItemAtPos(pos);
-    }
-
-    @Override
-    public void removeItemAtPos(int pos) {
-        mPresenter.removeItemAtPos(pos);
     }
 }

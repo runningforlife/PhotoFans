@@ -149,7 +149,6 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
                 mView.onRefreshDone(true);
                 mIsRefreshing = false;
             }
-
             //Collections.sort(mImgList);
             mView.notifyDataChanged();
         }else{
