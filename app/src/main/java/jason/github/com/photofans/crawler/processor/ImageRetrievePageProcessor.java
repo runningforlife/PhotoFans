@@ -1,18 +1,12 @@
 package jason.github.com.photofans.crawler.processor;
 
 import android.os.Looper;
-import android.text.TextUtils;
 import android.util.Log;
-import android.webkit.URLUtil;
-
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -22,6 +16,7 @@ import io.realm.Sort;
 import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.model.VisitedPageInfo;
 import jason.github.com.photofans.service.MyThreadFactory;
+import jason.github.com.photofans.utils.UrlUtil;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -56,8 +51,22 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private static HashMap<String,Boolean> sAllPages = new HashMap<>();
     // last url to start this page retrieving
     private static String sLastUrl;
+    private static HashSet<String> sValidPageUrls = new HashSet<>();
+
 
     private static final int DEFAULT_RETRIEVED_IMAGES = 10;
+
+    static{
+        sValidPageUrls.add(ImageSource.URL_1X);
+        sValidPageUrls.add(ImageSource.URL_ALBUM);
+        sValidPageUrls.add(ImageSource.URL_FREE_JPG);
+        sValidPageUrls.add(ImageSource.URL_ILLUSION);
+        sValidPageUrls.add(ImageSource.URL_PIXBABY);
+        sValidPageUrls.add(ImageSource.URL_PIXELS);
+        sValidPageUrls.add(ImageSource.URL_VISUAL_HUNT);
+        sValidPageUrls.add(ImageSource.URL_PUBLIC_ARCHIVE);
+        sValidPageUrls.add(ImageSource.REG_VISUAL_CHINA);
+    }
 
     public ImageRetrievePageProcessor(int n){
         mMaxRetrievedImages = n > 0 ? n : DEFAULT_RETRIEVED_IMAGES;
@@ -105,7 +114,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private void retrieveImages(Page page){
 
-        if(!isVisited(page)) {
+        if(!isVisited(page) && isValidPage(page)) {
             MyThreadFactory.getInstance()
                     .newThread(new SaveRunnable(getPageList(page)))
                     .start();
@@ -159,6 +168,16 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private boolean isVisited(Page page){
         return (sAllPages.containsKey(page.getUrl().get())
                 && sAllPages.get(page.getUrl().get()));
+    }
+
+    private boolean isValidPage(Page page){
+        try {
+            String baseUrl = UrlUtil.getRootUrl(page.getUrl().get());
+            return sValidPageUrls.contains(baseUrl);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private  class SaveRunnable implements  Runnable{

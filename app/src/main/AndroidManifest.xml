@@ -24,6 +24,12 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.activity.ImageDetailActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="">
+
+        </activity>
+
         <service android:name=".service.ImageRetrieveService">
         </service>
     </application>

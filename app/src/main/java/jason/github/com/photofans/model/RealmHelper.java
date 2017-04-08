@@ -176,9 +176,7 @@ public class RealmHelper {
         @Override
         public void onChange(RealmResults<ImageRealm> element) {
             Log.v(TAG,"onChange(): current image count = " + element.size());
-            for (RealmDataChangeListener listener : mListeners) {
-                listener.onRealmDataChange(element);
-            }
+            notifyListeners(element);
         }
     }
 
@@ -198,6 +196,10 @@ public class RealmHelper {
                 .findAllAsync()
                 .sort("mTimeStamp", Sort.DESCENDING);
         mAllImages.addChangeListener(new RealmDataSetChangeListener());
+        Log.v(TAG,"queryAndListen(): image count = " + mAllImages.size());
+        if(mAllImages.isLoaded()){
+            notifyListeners(mAllImages);
+        }
         // force to load
 /*        if(!mAllImages.isLoaded()) {
             mAllImages.load();
@@ -209,6 +211,12 @@ public class RealmHelper {
                 .sort("mTimeStamp",Sort.DESCENDING);
         //mAllUnUsedImages.load();
         mAllUnUsedImages.addChangeListener(new RealmDataSetChangeListener());
+    }
+
+    private void notifyListeners(RealmResults<ImageRealm> element){
+        for (RealmDataChangeListener listener : mListeners) {
+            listener.onRealmDataChange(element);
+        }
     }
 
 }

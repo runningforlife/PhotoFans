@@ -13,4 +13,6 @@
     <string name="category">Category</string>
     <string name="share">Share</string>
     <string name="tools">Settings</string>
+    <string name="image_detail">Image Detail</string>
+    <string name="image_preview">Image Preview</string>
 </resources>

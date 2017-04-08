@@ -138,23 +138,25 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     public void onRealmDataChange(RealmResults<ImageRealm> data) {
         Log.v(TAG,"onRealmDataChange(): data size = " + data.size());
 
-        if(data.get(0).getUsed()) {
-            for (ImageRealm info : data) {
-                if (!mImageList.contains(info)) {
-                    mImageList.addFirst(info);
+        if(data.size() > 0) {
+            if (data.get(0).getUsed()) {
+                for (ImageRealm info : data) {
+                    if (!mImageList.contains(info)) {
+                        mImageList.addFirst(info);
+                    }
                 }
-            }
 
-            if (mIsRefreshing) {
-                mView.onRefreshDone(true);
-                mIsRefreshing = false;
-            }
-            //Collections.sort(mImgList);
-            mView.notifyDataChanged();
-        }else{
-            Log.v(TAG,"onRealmDataChange(): unused url size = " + data.size());
-            for(ImageRealm img : data){
-                mUnUsedImages.add(img);
+                if (mIsRefreshing) {
+                    mView.onRefreshDone(true);
+                    mIsRefreshing = false;
+                }
+                //Collections.sort(mImgList);
+                mView.notifyDataChanged();
+            } else {
+                Log.v(TAG, "onRealmDataChange(): unused url size = " + data.size());
+                for (ImageRealm img : data) {
+                    mUnUsedImages.add(img);
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 package jason.github.com.photofans.ui.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -18,6 +19,7 @@ import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.ui.GalleryPresenter;
 import jason.github.com.photofans.ui.GalleryPresenterImpl;
 import jason.github.com.photofans.ui.GalleryView;
+import jason.github.com.photofans.ui.activity.ImageDetailActivity;
 import jason.github.com.photofans.ui.adapter.GalleryAdapter;
 
 /**
@@ -129,7 +131,11 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
 
     @Override
     public void onItemClick(int pos) {
+        Log.v(TAG,"onItemClick(): pos = " + pos);
 
+        Intent intent = new Intent(getContext(),ImageDetailActivity.class);
+        intent.putExtra("image",pos);
+        startActivity(intent);
     }
 
     @Override

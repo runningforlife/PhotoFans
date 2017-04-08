@@ -77,8 +77,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
     @Override
     public void onBindViewHolder(PhotoViewHolder vh, int position) {
-        Log.v(TAG,"onBindViewHolder(): view position = " + position);
         String url = mCallback.getItemAtPos(position).getUrl();
+        Log.v(TAG,"onBindViewHolder(): image url = " + url);
 
         if(!TextUtils.isEmpty(url)) {
             mPicasso.load(url)

@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import jason.github.com.photofans.model.ImageRealm;
+import jason.github.com.photofans.utils.UrlUtil;
 import us.codecraft.webmagic.Page;
 
 /**
@@ -59,8 +60,7 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
         String url = page.getUrl().get();
         Log.v(TAG,"retrieved page base url = " + url);
         try {
-            URL absUrl = new URL(url);
-            String baseUrl = absUrl.getProtocol() + "://" + absUrl.getAuthority();
+            String baseUrl = UrlUtil.getRootUrl(url);
             switch (baseUrl){
                 case URL_FREE_JPG:
                     imgList = retrieve(page,URL_FREE_JPG);
