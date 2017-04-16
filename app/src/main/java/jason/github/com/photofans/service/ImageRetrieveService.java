@@ -67,12 +67,17 @@ public class ImageRetrieveService extends IntentService implements
         mProcessor.addListener(this);
         String lastUrl = mProcessor.getStartUrl();
         if(TextUtils.isEmpty(lastUrl)){
-            lastUrl = URL_FREE_JPG;
+            String[] allUrls = {URL_PIXELS,URL_ALBUM,URL_FREE_JPG,URL_ILLUSION,
+            URL_VISUAL_CHINA,URL_VISUAL_HUNT,URL_1X,URL_PUBLIC_ARCHIVE};
+            mSpider = Spider.create(mProcessor)
+                    .addUrl(allUrls)
+                    .setDownloader(new OkHttpDownloader());
+        }else{
+            mSpider = Spider.create(mProcessor)
+                    .addUrl(lastUrl)
+                    .setDownloader(new OkHttpDownloader());
         }
 
-        mSpider = Spider.create(mProcessor)
-                .addUrl(lastUrl)
-                .setDownloader(new OkHttpDownloader());
         mSpider.run();
 
         new Handler().postDelayed(new Runnable() {

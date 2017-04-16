@@ -6,10 +6,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -18,10 +16,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import jason.github.com.photofans.R;
-import jason.github.com.photofans.ui.GalleryPresenter;
-import jason.github.com.photofans.ui.adapter.GalleryAdapter;
 import jason.github.com.photofans.ui.fragment.AllPicturesFragment;
-import jason.github.com.photofans.ui.fragment.BaseFragment;
 
 public class GalleryActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -103,7 +98,7 @@ public class GalleryActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.home, menu);
+        getMenuInflater().inflate(R.menu.menu_home, menu);
         return true;
     }
 

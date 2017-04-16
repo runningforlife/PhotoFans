@@ -3,6 +3,7 @@
     android:id="@+id/iv_preview"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_marginLeft="1dp"
     android:contentDescription="@string/image_preview"
     android:adjustViewBounds="true"
     android:scaleType="centerCrop" />

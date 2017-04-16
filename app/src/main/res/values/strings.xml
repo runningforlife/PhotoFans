@@ -15,4 +15,6 @@
     <string name="tools">Settings</string>
     <string name="image_detail">Image Detail</string>
     <string name="image_preview">Image Preview</string>
+    <string name="action_share">Share</string>
+    <string name="action_favorite">Favorite</string>
 </resources>

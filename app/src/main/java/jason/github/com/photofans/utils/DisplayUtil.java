@@ -30,4 +30,10 @@ public class DisplayUtil {
 
         return metrics.widthPixels/metrics.heightPixels;
     }
+
+    public static int dp2px(int px){
+        final float scale = getScreenDimen().density;
+
+        return (int)(scale*px  + 0.5f);
+    }
 }

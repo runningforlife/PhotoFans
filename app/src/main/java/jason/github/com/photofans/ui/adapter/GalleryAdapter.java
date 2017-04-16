@@ -20,6 +20,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jason.github.com.photofans.R;
+import jason.github.com.photofans.loader.PicassoLoader;
 import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.model.RealmHelper;
 import jason.github.com.photofans.utils.DisplayUtil;
@@ -31,8 +32,8 @@ import jason.github.com.photofans.utils.DisplayUtil;
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoViewHolder>{
     private static final String TAG = "GalleryAdapter";
 
-    private static final int DEFAULT_IMG_RESOLUTION = 512;
-    private static final double DEFAULT_SCREEN_RATIO = 0.75;
+    private static final int DEFAULT_IMG_WIDTH = 512;
+    private static final int DEFAULT_IMG_HEIGHT = (int)(DEFAULT_IMG_WIDTH*DisplayUtil.getScreenRatio());
 
     private static final int KB = 1024;
     private static final int MIN_IMG_SIZE = KB * 60;
@@ -40,11 +41,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     private static final int MIN_IMG_HEIGHT = 150;
 
     @SuppressWarnings("unchecked")
-    private List<ImageRealm> mImageList = Collections.EMPTY_LIST;
     private LayoutInflater mInflater;
     private ItemSelectedCallback mCallback;
-    private Picasso mPicasso;
-    private double mScreenRatio;
+    private Context mContext;
 
     public interface ItemSelectedCallback {
         void onItemClick(int pos);
@@ -56,16 +55,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     public GalleryAdapter(Context context,ItemSelectedCallback callback){
         mCallback = callback;
         mInflater = LayoutInflater.from(context);
-        mPicasso = Picasso.with(context);
         // different device panel size may need different width and height
         double ratio = DisplayUtil.getScreenRatio();
-        mScreenRatio = Double.compare(ratio,0) == 0 ? DEFAULT_SCREEN_RATIO : ratio;
-    }
-
-    public GalleryAdapter(Context context, List<ImageRealm> imgList){
-        mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mImageList = imgList;
-        mPicasso = Picasso.with(context);
+        mContext = context;
     }
 
     @Override
@@ -81,14 +73,13 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         Log.v(TAG,"onBindViewHolder(): image url = " + url);
 
         if(!TextUtils.isEmpty(url)) {
-            mPicasso.load(url)
-                    .resize(DEFAULT_IMG_RESOLUTION, (int) (DEFAULT_IMG_RESOLUTION * mScreenRatio))
-                    .centerCrop()
-                    .into(new ImageTarget(vh.img,position));
+            PicassoLoader.load(mContext,new ImageTarget(vh.img,position),url,
+                    DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
             vh.setPosition(position);
         }else if(getItemCount() > 0){
             // remove from the list
             RealmHelper.getInstance().delete(mCallback.getItemAtPos(position));
+            notifyItemChanged(position);
         }
     }
 
@@ -103,7 +94,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     }
 
     public class PhotoViewHolder extends RecyclerView.ViewHolder{
-        public @BindView(R.id.iv_photo) ImageView img;
+        @BindView(R.id.iv_photo) ImageView img;
         private int mPos = -1;
 
         public PhotoViewHolder(View root) {
