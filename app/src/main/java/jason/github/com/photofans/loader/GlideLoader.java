@@ -4,6 +4,8 @@ import android.content.Context;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
 
 import jason.github.com.photofans.R;
 
@@ -13,11 +15,14 @@ import jason.github.com.photofans.R;
 
 public class GlideLoader {
 
-    public static void load(Context context, ImageView iv, String url, int w, int h) {
+    public static void load(Context context, RequestListener<String,GlideDrawable> listener, String url, int w, int h) {
         Glide.with(context)
                 .load(url)
                 .placeholder(R.drawable.ic_android_black_150dp)
+                .error(R.drawable.ic_mood_bad_grey_24dp)
+                .listener(listener)
                 .centerCrop()
-                .into(iv);
+                .crossFade()
+                .into(w,h);
     }
 }

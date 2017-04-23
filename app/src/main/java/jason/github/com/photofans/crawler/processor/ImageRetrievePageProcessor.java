@@ -115,20 +115,20 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private void retrieveImages(Page page){
 
         if(!isVisited(page) && isValidPage(page)) {
-            MyThreadFactory.getInstance()
-                    .newThread(new SaveRunnable(getPageList(page)))
-                    .start();
-
             imgList = ImageRetrieverFactory.getInstance().
                     retrieveImages(page);
-            // enough already
-            //TODO: we could save it on another database, and use it later
-            if (imgList.size() > mMaxRetrievedImages) {
-                // marked part of them as used
-                for(int i = 0; i < mMaxRetrievedImages; ++i){
-                    imgList.get(i).setUsed(true);
+            if(imgList != null && imgList.size() > 0) {
+                MyThreadFactory.getInstance()
+                        .newThread(new SaveRunnable(getPageList(page)))
+                        .start();
+                //TODO: we could save it on another database, and use it later
+                if (imgList.size() > mMaxRetrievedImages) {
+                    // marked part of them as used
+                    for (int i = 0; i < mMaxRetrievedImages; ++i) {
+                        imgList.get(i).setUsed(true);
+                    }
+                    notifyListeners();
                 }
-                notifyListeners();
             }
         }
     }

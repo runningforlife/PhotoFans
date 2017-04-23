@@ -28,7 +28,7 @@ public class DisplayUtil {
     public static double getScreenRatio(){
         DisplayMetrics metrics = getScreenDimen();
 
-        return metrics.widthPixels/metrics.heightPixels;
+        return ((double)metrics.widthPixels)/metrics.heightPixels;
     }
 
     public static int dp2px(int px){

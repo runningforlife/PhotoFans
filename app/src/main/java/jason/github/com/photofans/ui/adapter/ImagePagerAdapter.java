@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import jason.github.com.photofans.R;
-import jason.github.com.photofans.loader.GlideLoader;
 import jason.github.com.photofans.loader.PicassoLoader;
 import jason.github.com.photofans.utils.DisplayUtil;
 
@@ -20,7 +19,7 @@ import jason.github.com.photofans.utils.DisplayUtil;
 public class ImagePagerAdapter extends PagerAdapter{
     private static final String TAG = "ImagePageAdapter";
 
-    private static final int DEFAULT_WIDTH = 1024;
+    private static final int DEFAULT_WIDTH = 512;
     private Context mContext;
     private ImageAdapterCallback mCallback;
     private int mPageHeight;

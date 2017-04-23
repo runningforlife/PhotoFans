@@ -1,5 +1,6 @@
 package jason.github.com.photofans.ui.adapter;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -11,15 +12,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-
-import java.util.Collections;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jason.github.com.photofans.R;
+import jason.github.com.photofans.loader.GlideLoader;
 import jason.github.com.photofans.loader.PicassoLoader;
 import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.model.RealmHelper;
@@ -32,7 +34,7 @@ import jason.github.com.photofans.utils.DisplayUtil;
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoViewHolder>{
     private static final String TAG = "GalleryAdapter";
 
-    private static final int DEFAULT_IMG_WIDTH = 512;
+    private static final int DEFAULT_IMG_WIDTH = 1024;
     private static final int DEFAULT_IMG_HEIGHT = (int)(DEFAULT_IMG_WIDTH*DisplayUtil.getScreenRatio());
 
     private static final int KB = 1024;
@@ -73,9 +75,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         Log.v(TAG,"onBindViewHolder(): image url = " + url);
 
         if(!TextUtils.isEmpty(url)) {
-            PicassoLoader.load(mContext,new ImageTarget(vh.img,position),url,
-                    DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
-            vh.setPosition(position);
+/*            PicassoLoader.load(mContext,new ImageTarget(vh.img,position),url,
+                    DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);*/
+
+            GlideLoader.load(mContext,new GlideLoaderListener(vh.img),url,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
         }else if(getItemCount() > 0){
             // remove from the list
             RealmHelper.getInstance().delete(mCallback.getItemAtPos(position));
@@ -95,7 +98,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
     public class PhotoViewHolder extends RecyclerView.ViewHolder{
         @BindView(R.id.iv_photo) ImageView img;
-        private int mPos = -1;
 
         public PhotoViewHolder(View root) {
             super(root);
@@ -105,26 +107,23 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mPos != -1 && mCallback != null){
-                        mCallback.onItemClick(mPos);
+                    if(mCallback != null){
+                        mCallback.onItemClick(getAdapterPosition());
                     }
                 }
             });
         }
-
-        public void setPosition(int pos){
-            mPos = pos;
-        }
     }
 
-    private class ImageTarget implements Target{
+    // picasso loader
+    final class ImageTarget implements Target{
 
         private ImageView mImg;
         private int mPos;
 
         public ImageTarget(ImageView iv, int pos){
             mImg = iv;
-            mPos = pos;
+            this.mPos = pos;
         }
 
         @Override
@@ -147,12 +146,37 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         public void onBitmapFailed(Drawable errorDrawable) {
             Log.v(TAG,"onBitmapFailed()");
             //just remove it
-            mCallback.removeItemAtPos(mPos);
+            //mCallback.removeItemAtPos(mPos);
         }
 
         @Override
         public void onPrepareLoad(Drawable placeHolderDrawable) {
 
+        }
+    }
+
+    // glide loader
+    final class GlideLoaderListener implements RequestListener<String,GlideDrawable>{
+        private ImageView image;
+
+        public GlideLoaderListener(ImageView view){
+            this.image = view;
+        }
+
+        @TargetApi(21)
+        @Override
+        public boolean onException(Exception e, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFirstResource) {
+            Log.v(TAG,"onException(): " + e);
+            image.setImageDrawable(mContext.getDrawable(R.drawable.ic_mood_bad_grey_24dp));
+            return false;
+        }
+
+        @Override
+        public boolean onResourceReady(GlideDrawable resource, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+            Log.v(TAG,"onResourceReady(): from memory = " + isFromMemoryCache);
+            image.setImageDrawable(resource);
+
+            return false;
         }
     }
 }
