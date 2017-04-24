@@ -22,6 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import jason.github.com.photofans.R;
 import jason.github.com.photofans.loader.GlideLoader;
+import jason.github.com.photofans.loader.GlideLoaderListener;
 import jason.github.com.photofans.loader.PicassoLoader;
 import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.model.RealmHelper;
@@ -152,31 +153,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         @Override
         public void onPrepareLoad(Drawable placeHolderDrawable) {
 
-        }
-    }
-
-    // glide loader
-    final class GlideLoaderListener implements RequestListener<String,GlideDrawable>{
-        private ImageView image;
-
-        public GlideLoaderListener(ImageView view){
-            this.image = view;
-        }
-
-        @TargetApi(21)
-        @Override
-        public boolean onException(Exception e, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFirstResource) {
-            Log.v(TAG,"onException(): " + e);
-            image.setImageDrawable(mContext.getDrawable(R.drawable.ic_mood_bad_grey_24dp));
-            return false;
-        }
-
-        @Override
-        public boolean onResourceReady(GlideDrawable resource, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-            Log.v(TAG,"onResourceReady(): from memory = " + isFromMemoryCache);
-            image.setImageDrawable(resource);
-
-            return false;
         }
     }
 }

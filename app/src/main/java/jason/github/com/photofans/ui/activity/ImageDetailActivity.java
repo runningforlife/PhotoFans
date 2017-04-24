@@ -2,22 +2,20 @@ package jason.github.com.photofans.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 
-import com.squareup.picasso.Picasso;
 import com.tmall.ultraviewpager.UltraViewPager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jason.github.com.photofans.R;
-import jason.github.com.photofans.loader.PicassoLoader;
 import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.ui.ImageDetailPresenter;
 import jason.github.com.photofans.ui.ImageDetailPresenterImpl;
@@ -25,7 +23,6 @@ import jason.github.com.photofans.ui.ImageDetailView;
 import jason.github.com.photofans.ui.adapter.ImageAdapterCallback;
 import jason.github.com.photofans.ui.adapter.ImagePagerAdapter;
 import jason.github.com.photofans.ui.adapter.PreviewAdapter;
-import jason.github.com.photofans.utils.DisplayUtil;
 
 /**
  * activity to show the detail of the images
@@ -35,10 +32,9 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         ImageAdapterCallback {
     private static final String TAG = "ImageDetailActivity";
 
-    @BindView(R.id.toolbar) Toolbar mActionBar;
     //@BindView(R.id.iv_detail) ImageView mIvDetail;
     @BindView(R.id.rv_images) RecyclerView mLvImgPreview;
-    @BindView(R.id.uvp_image) UltraViewPager mImgPager;
+    @BindView(R.id.vp_image) ViewPager mImgPager;
     private ImagePagerAdapter mPagerAdapter;
     private ImageDetailPresenter mPresenter;
     private PreviewAdapter mAdapter;
@@ -52,7 +48,16 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         ButterKnife.bind(this);
 
-        setSupportActionBar(mActionBar);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_back_white_24dp);
+
+            actionBar.setTitle("40/80");
+        }
 
         initView();
     }
@@ -61,8 +66,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     public void onResume(){
         super.onResume();
         Log.v(TAG,"onResume()");
-        // for adjust w/h ratio
-        mPagerAdapter.setPageHeight(mImgPager.getHeight());
     }
 
     @Override
@@ -80,7 +83,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         // image pager
         //mImgPager = new UltraViewPager(this);
-        mImgPager.setScrollMode(UltraViewPager.ScrollMode.HORIZONTAL);
         //mImgPager.setAutoMeasureHeight(true);
         mPagerAdapter = new ImagePagerAdapter(getApplicationContext(),this);
         mImgPager.setAdapter(mPagerAdapter);
@@ -100,6 +102,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     @Override
     public void onDataSetChanged() {
         Log.v(TAG,"onDataSetChanged()");
+        mPagerAdapter.notifyDataSetChanged();
         mAdapter.notifyDataSetChanged();
 
         mLvImgPreview.smoothScrollToPosition(mCurrentImgIdx);

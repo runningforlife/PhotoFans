@@ -1,6 +1,7 @@
 package jason.github.com.photofans.loader;
 
 import android.content.Context;
+import android.support.annotation.DrawableRes;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -24,5 +25,15 @@ public class GlideLoader {
                 .centerCrop()
                 .crossFade()
                 .into(w,h);
+    }
+
+    public static void load(Context context, String url, ImageView target){
+        Glide.with(context)
+             .load(url)
+             .placeholder(R.drawable.ic_android_black_150dp)
+             .error(R.drawable.ic_mood_bad_grey_24dp)
+             .centerCrop()
+             .crossFade()
+             .into(target);
     }
 }

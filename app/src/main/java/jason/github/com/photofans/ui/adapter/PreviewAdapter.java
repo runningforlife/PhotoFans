@@ -11,6 +11,8 @@ import android.widget.ImageView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jason.github.com.photofans.R;
+import jason.github.com.photofans.loader.GlideLoader;
+import jason.github.com.photofans.loader.GlideLoaderListener;
 import jason.github.com.photofans.loader.PicassoLoader;
 
 /**
@@ -39,8 +41,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
     public void onBindViewHolder(ImageViewHolder holder, int position) {
         Log.v(TAG,"onBindViewHolder(): position = " + position);
 
-        holder.setPosition(position);
-        PicassoLoader.load(mContext,holder.preview,
+        GlideLoader.load(mContext,new GlideLoaderListener(holder.preview),
                 mCallback.getItemAtPos(position).getUrl(),150,150);
     }
 
@@ -51,7 +52,6 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
 
     final class ImageViewHolder extends RecyclerView.ViewHolder{
         @BindView(R.id.iv_preview) ImageView preview;
-        int pos = -1;
 
         public ImageViewHolder(View root) {
             super(root);
@@ -61,15 +61,9 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(pos > -1) {
-                        mCallback.onItemClicked(pos);
-                    }
+                    mCallback.onItemClicked(getAdapterPosition());
                 }
             });
-        }
-
-        void setPosition(int pos){
-            this.pos = pos;
         }
     }
 }

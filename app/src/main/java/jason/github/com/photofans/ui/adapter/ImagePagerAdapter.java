@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import jason.github.com.photofans.R;
+import jason.github.com.photofans.loader.GlideLoader;
+import jason.github.com.photofans.loader.GlideLoaderListener;
 import jason.github.com.photofans.loader.PicassoLoader;
 import jason.github.com.photofans.utils.DisplayUtil;
 
@@ -19,22 +21,16 @@ import jason.github.com.photofans.utils.DisplayUtil;
 public class ImagePagerAdapter extends PagerAdapter{
     private static final String TAG = "ImagePageAdapter";
 
-    private static final int DEFAULT_WIDTH = 512;
+    private static final int DEFAULT_WIDTH = 1024;
+    private static final int DEFAULT_HEIGHT = (int)(DEFAULT_WIDTH*DisplayUtil.getScreenRatio());
+    private static final int MAX_HEIGHT = (int)(DEFAULT_WIDTH*1.5*DisplayUtil.getScreenRatio());
+
     private Context mContext;
     private ImageAdapterCallback mCallback;
-    private int mPageHeight;
 
     public ImagePagerAdapter(Context context, ImageAdapterCallback callback){
         mCallback = callback;
         mContext = context;
-    }
-
-    public void setPageHeight(int h){
-        Log.v(TAG,"setPageHeight(): page height = " + h);
-        if(h != 0){
-            mPageHeight = DisplayUtil.getScreenDimen().widthPixels/h * DEFAULT_WIDTH;
-        }
-        //mPageHeight = (DisplayUtil.getScreenDimen().widthPixels/h*DEFAULT_WIDTH);
     }
 
     @Override
@@ -50,19 +46,16 @@ public class ImagePagerAdapter extends PagerAdapter{
     @Override
     public Object instantiateItem(ViewGroup parent, int position){
         Log.v(TAG,"instantiateItem(): position = " + position);
-        // get the height of the page
-        if(mPageHeight == 0){
-            int h = parent.getMeasuredHeight();
-            mPageHeight = DEFAULT_WIDTH*DisplayUtil.getScreenDimen().widthPixels/h;
-            Log.v(TAG,"instantiateItem(): page height = " + mPageHeight);
-        }
 
         ImageView iv = (ImageView) LayoutInflater.from(mContext)
                 .inflate(R.layout.item_image_detail,parent,false);
 
-        PicassoLoader.load(mContext,iv,mCallback.getItemAtPos(position).getUrl(),
-                DEFAULT_WIDTH,mPageHeight);
-
+        //iv.setMaxHeight(MAX_HEIGHT);
+/*        PicassoLoader.load(mContext,iv,mCallback.getItemAtPos(position).getUrl(),
+                DEFAULT_WIDTH,DEFAULT_HEIGHT);*/
+        GlideLoader.load(mContext,new GlideLoaderListener(iv),mCallback.getItemAtPos(position).getUrl(),
+                DEFAULT_WIDTH,DEFAULT_HEIGHT);
+        //GlideLoader.load(mContext,mCallback.getItemAtPos(position).getUrl(),iv);
         parent.addView(iv);
 
         return iv;

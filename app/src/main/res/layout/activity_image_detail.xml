@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@color/colorDarkBlack"
+    tools:context=".ui.activity.ImageDetailActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -14,26 +18,26 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@android:color/transparent"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            style="@style/StyledToolbar"/>
     </android.support.design.widget.AppBarLayout>
 
-    <com.tmall.ultraviewpager.UltraViewPager
-        android:id="@+id/uvp_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/ColorGrey"
-        android:layout_gravity="center"
-        android:layout_marginBottom="@dimen/uvp_margin">
 
-    </com.tmall.ultraviewpager.UltraViewPager>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+    </android.support.v4.view.ViewPager>
 
     <!-- this list view contains a list of image preview -->
     <LinearLayout android:id="@+id/lv_container"
         android:layout_width="match_parent"
         android:layout_height="@dimen/image_small"
         android:orientation="horizontal"
-        android:layout_gravity="bottom">
+        android:layout_gravity="bottom"
+        android:gravity="bottom"
+        android:layout_marginBottom="@dimen/activity_vertical_margin">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_images"
