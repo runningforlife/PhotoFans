@@ -41,8 +41,10 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
     public void onBindViewHolder(ImageViewHolder holder, int position) {
         Log.v(TAG,"onBindViewHolder(): position = " + position);
 
-        GlideLoader.load(mContext,new GlideLoaderListener(holder.preview),
-                mCallback.getItemAtPos(position).getUrl(),150,150);
+        PicassoLoader.load(mContext,holder.preview,mCallback.getItemAtPos(position).getUrl(),
+                150,150);
+/*        GlideLoader.load(mContext,new GlideLoaderListener(holder.preview),
+                mCallback.getItemAtPos(position).getUrl(),150,150);*/
     }
 
     @Override

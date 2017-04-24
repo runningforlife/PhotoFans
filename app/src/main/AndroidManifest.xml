@@ -26,7 +26,8 @@
 
         <activity android:name=".ui.activity.ImageDetailActivity"
             android:theme="@style/AppTheme.NoActionBar.DarkStatusBar"
-            android:label="">
+            android:label=""
+            android:parentActivityName=".ui.activity.GalleryActivity">
 
         </activity>
 

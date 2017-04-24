@@ -32,7 +32,7 @@ public class GlideLoader {
              .load(url)
              .placeholder(R.drawable.ic_android_black_150dp)
              .error(R.drawable.ic_mood_bad_grey_24dp)
-             .centerCrop()
+             .fitCenter()
              .crossFade()
              .into(target);
     }

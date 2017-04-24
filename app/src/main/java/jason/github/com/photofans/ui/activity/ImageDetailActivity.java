@@ -1,7 +1,9 @@
 package jason.github.com.photofans.ui.activity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -9,17 +11,21 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.tmall.ultraviewpager.UltraViewPager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jason.github.com.photofans.BuildConfig;
 import jason.github.com.photofans.R;
 import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.ui.ImageDetailPresenter;
 import jason.github.com.photofans.ui.ImageDetailPresenterImpl;
 import jason.github.com.photofans.ui.ImageDetailView;
+import jason.github.com.photofans.ui.adapter.GalleryAdapter;
 import jason.github.com.photofans.ui.adapter.ImageAdapterCallback;
 import jason.github.com.photofans.ui.adapter.ImagePagerAdapter;
 import jason.github.com.photofans.ui.adapter.PreviewAdapter;
@@ -75,18 +81,39 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mPresenter.onDestroy();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+
+        int id = item.getItemId();
+        if(id == android.R.id.home){
+            if(Build.VERSION.SDK_INT >= 16) {
+                NavUtils.navigateUpFromSameTask(this);
+            }else{
+                Intent intent = new Intent(this, GalleryActivity.class);
+                NavUtils.navigateUpTo(this,intent);
+            }
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void initView(){
         mPresenter = new ImageDetailPresenterImpl(getApplicationContext(),ImageDetailActivity.this);
         mAdapter = new PreviewAdapter(getApplicationContext(),ImageDetailActivity.this);
+        mPagerAdapter = new ImagePagerAdapter(getApplicationContext(),this);
         // may have null pointer exception
         mPresenter.init();
 
         // image pager
         //mImgPager = new UltraViewPager(this);
         //mImgPager.setAutoMeasureHeight(true);
-        mPagerAdapter = new ImagePagerAdapter(getApplicationContext(),this);
         mImgPager.setAdapter(mPagerAdapter);
-
         LinearLayoutManager llMgr = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         mLvImgPreview.setAdapter(mAdapter);
         mLvImgPreview.setVisibility(View.VISIBLE);
