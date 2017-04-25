@@ -37,9 +37,4 @@ dependencies {
     compile 'in.srain.cube:ultra-ptr:1.0.11'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.github.bumptech.glide:glide:3.7.0'
-
-    compile 'com.romandanylyk:pageindicatorview:0.1.2@aar'
-    compile ('com.alibaba.android:ultraviewpager:1.0.1@aar') {
-        transitive = true
-    }
 }

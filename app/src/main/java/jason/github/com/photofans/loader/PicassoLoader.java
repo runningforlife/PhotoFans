@@ -21,6 +21,7 @@ public class PicassoLoader{
         Picasso.with(context)
                 .load(url)
                 .placeholder(R.drawable.ic_android_black_150dp)
+                .error(R.drawable.ic_mood_bad_grey_24dp)
                 .resize(w,h)
                 .centerCrop()
                 .into(iv);

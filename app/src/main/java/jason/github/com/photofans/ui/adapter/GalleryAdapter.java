@@ -79,7 +79,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 /*            PicassoLoader.load(mContext,new ImageTarget(vh.img,position),url,
                     DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);*/
 
-            GlideLoader.load(mContext,new GlideLoaderListener(vh.img),url,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
+            GlideLoader.load(mContext,url,vh.img,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
         }else if(getItemCount() > 0){
             // remove from the list
             RealmHelper.getInstance().delete(mCallback.getItemAtPos(position));

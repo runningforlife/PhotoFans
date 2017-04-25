@@ -6,4 +6,4 @@
     android:layout_margin="1dp"
     android:contentDescription="@string/image_preview"
     android:adjustViewBounds="true"
-    android:scaleType="centerInside" />
+    android:scaleType="centerCrop" />

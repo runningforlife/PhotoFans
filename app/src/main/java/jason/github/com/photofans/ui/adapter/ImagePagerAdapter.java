@@ -22,7 +22,7 @@ public class ImagePagerAdapter extends PagerAdapter{
     private static final String TAG = "ImagePageAdapter";
 
     private static final int DEFAULT_WIDTH = 1024;
-    private static final int DEFAULT_HEIGHT = (int)(DEFAULT_WIDTH*DisplayUtil.getScreenRatio());
+    private static final int DEFAULT_HEIGHT = (int)(DEFAULT_WIDTH/DisplayUtil.getScreenRatio());
     private static final int MAX_HEIGHT = (int)(DEFAULT_WIDTH*1.5*DisplayUtil.getScreenRatio());
 
     private Context mContext;

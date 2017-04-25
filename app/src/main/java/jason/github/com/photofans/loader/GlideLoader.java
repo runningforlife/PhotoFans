@@ -22,18 +22,18 @@ public class GlideLoader {
                 .placeholder(R.drawable.ic_android_black_150dp)
                 .error(R.drawable.ic_mood_bad_grey_24dp)
                 .listener(listener)
-                .centerCrop()
                 .crossFade()
                 .into(w,h);
     }
 
-    public static void load(Context context, String url, ImageView target){
+    public static void load(Context context, String url, ImageView target, int w, int h){
         Glide.with(context)
              .load(url)
+             .listener(new GlideLoaderListener(target))
              .placeholder(R.drawable.ic_android_black_150dp)
              .error(R.drawable.ic_mood_bad_grey_24dp)
-             .fitCenter()
+             .centerCrop()
              .crossFade()
-             .into(target);
+             .into(w,h);
     }
 }
