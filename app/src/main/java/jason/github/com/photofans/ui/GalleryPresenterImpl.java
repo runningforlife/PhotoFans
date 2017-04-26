@@ -37,7 +37,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     private Context mContext;
     private GalleryView mView;
     private Set<ImageRealm> mUnUsedImages;
-    private LinkedList<ImageRealm> mImageList;
+    private List<ImageRealm> mImageList;
     // whether user is refreshing data
     private boolean mIsRefreshing;
     // to receive result from service
@@ -48,7 +48,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
         mView = view;
         mContext = context;
         mUnUsedImages = new HashSet<>();
-        mImageList = new LinkedList<>();
+        mImageList = new ArrayList<>();
         mIsRefreshing = false;
 
         mReceiver = new SimpleResultReceiver(new Handler(Looper.myLooper()));
@@ -142,7 +142,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
             if (data.get(0).getUsed()) {
                 for (ImageRealm info : data) {
                     if (!mImageList.contains(info)) {
-                        mImageList.addFirst(info);
+                        mImageList.add(info);
                     }
                 }
 

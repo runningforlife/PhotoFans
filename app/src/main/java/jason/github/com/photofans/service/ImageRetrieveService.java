@@ -84,6 +84,7 @@ public class ImageRetrieveService extends IntentService implements
             @Override
             public void run() {
                 // time out
+                mSpider.stop();
                 sendResult(0);
             }
         }, 60000);
@@ -93,6 +94,7 @@ public class ImageRetrieveService extends IntentService implements
     @Override
     public void onRetrieveComplete(List<ImageRealm> data) {
 
+        mSpider.stop();
         if(data == null || data.isEmpty()){
             Log.v(TAG,"onRetrieveComplete(): data is empty");
             sendResult(0);

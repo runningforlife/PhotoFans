@@ -123,7 +123,10 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mCurrentImgIdx = data.getIntExtra("image",0);
         Log.v(TAG,"initView(): current image index = " + mCurrentImgIdx);
         mImgPager.setCurrentItem(mCurrentImgIdx);
+        //TODO: try to scroll to center
         mLvImgPreview.scrollToPosition(mCurrentImgIdx);
+
+        getPreviewScrollParams();
     }
 
     @Override
@@ -153,6 +156,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mImgPager.setCurrentItem(pos);
         mLvImgPreview.scrollToPosition(pos);
 
+        getPreviewScrollParams();
         // change title
         setTitle();
     }
@@ -186,5 +190,15 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         public void onPageScrollStateChanged(int state) {
             // do nothing
         }
+    }
+
+    private int getPreviewScrollParams(){
+        int hOffset = mLvImgPreview.computeHorizontalScrollOffset();
+        int hRange = mLvImgPreview.computeHorizontalScrollRange();
+        int hExtent = mLvImgPreview.computeHorizontalScrollExtent();
+
+        Log.v(TAG,"getPreviewScrollParams(): horizontal offset = " + hOffset + ", range = " + hRange + ", extent = " + hExtent);
+
+        return mLvImgPreview.computeHorizontalScrollRange();
     }
 }

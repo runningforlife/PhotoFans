@@ -137,6 +137,9 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     public void onItemClick(int pos) {
         Log.v(TAG,"onItemClick(): pos = " + pos);
 
+        if(mRefresher.isRefreshing()){
+            mRefresher.setRefreshing(false);
+        }
         Intent intent = new Intent(getContext(),ImageDetailActivity.class);
         intent.putExtra("image",pos);
         startActivity(intent);

@@ -34,8 +34,6 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
     private Context mContext;
     private ImageAdapterCallback mCallback;
     private HashMap<ImageView,Boolean> mChecked;
-    // the last checked image view
-    private ImageView mLastChecked;
 
     public PreviewAdapter(Context context, ImageAdapterCallback callback){
         mContext = context;
@@ -56,13 +54,28 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
 
 /*        PicassoLoader.load(mContext,holder.preview,mCallback.getItemAtPos(position).getUrl(),
                 150,150);*/
-        GlideLoader.load(mContext,mCallback.getItemAtPos(position).getUrl(),
-                holder.preview,150,150);
+        GlideLoader.load(mContext,mCallback.getItemAtPos(position).getUrl(),holder.preview,150,150);
     }
 
     @Override
     public int getItemCount() {
         return mCallback.getCount();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    public void onPageSelectedChange(ImageView view){
+        Iterator iterator = mChecked.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry entry = (Map.Entry) iterator.next();
+            ImageView image = (ImageView)(entry.getKey());
+            if(image != view){
+                mChecked.put(image,false);
+                image.setBackground(null);
+            }else{
+                mChecked.put(view,true);
+                image.setBackgroundResource(R.drawable.rect_image_preview);
+            }
+        }
     }
 
     final class ImageViewHolder extends RecyclerView.ViewHolder{
@@ -79,26 +92,19 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
                 public void onClick(View v) {
                     mCallback.onItemClicked(getAdapterPosition());
 
-                    if(preview != mLastChecked){
-                        preview.setBackgroundResource(R.drawable.rect_image_preview);
-                        mLastChecked = preview;
-                    }else{
-                        // remove background
-                        mLastChecked.setBackground(null);
-                    }
-
-/*                    mChecked.put(preview,Boolean.TRUE);
                     Iterator iterator = mChecked.entrySet().iterator();
                     while(iterator.hasNext()) {
                         Map.Entry entry = (Map.Entry)iterator.next();
                         ImageView view = (ImageView)entry.getKey();
                         if(view == preview){
+                            mChecked.put(preview,Boolean.TRUE);
                             preview.setBackgroundResource(R.drawable.rect_image_preview);
                         }else{
                             // remove background
                             preview.setBackground(null);
+                            mChecked.put(view,false);
                         }
-                    }*/
+                    }
                 }
             });
         }
