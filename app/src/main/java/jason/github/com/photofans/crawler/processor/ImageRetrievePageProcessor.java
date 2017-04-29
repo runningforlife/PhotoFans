@@ -5,10 +5,12 @@ import android.util.Log;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -21,28 +23,13 @@ import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
 
+import static jason.github.com.photofans.crawler.processor.ImageSource.ALL_URLS;
+
 public class ImageRetrievePageProcessor implements PageProcessor {
 
     private static final String TAG = "PageProcessor";
 
-    // maximum number of letters of the name
-    private final static int MAX_NAME_LEN = 10;
-
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000).setTimeOut(10000);
-
-    private final static String WIDTH = "width";
-    private final static String HEIGHT = "height";
-    // filter image width and height
-    private final static int MIN_WIDTH = 200;
-    private final static int MIN_HEIGHT = 200;
-
-    private final static String URL_FREE_JPG = "http://en.freejpg.com.ar/free/images";
-    private final static String MATCH_FREE_JPG = "http://en.freejpg.com.ar/asset";
-
-    private final static String URL_PIXELS = "https://www.pexels.com";
-    private final static String URL_ALBUM = "http://albumarium.com";
-
-    private final static String REG_FREE_JPG = "http://en\\.freejpg\\.com\\.ar/.*(\\.(gif|jpg|png))$";
 
     private List<ImageRealm> imgList = new ArrayList<>();
     private List<RetrieveCompleteListener> mListeners;
@@ -51,22 +38,10 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private static HashMap<String,Boolean> sAllPages = new HashMap<>();
     // last url to start this page retrieving
     private static String sLastUrl;
-    private static HashSet<String> sValidPageUrls = new HashSet<>();
-
+    @SuppressWarnings("unchecked")
+    private static HashSet<String> sValidPageUrls = new HashSet<>(new ArrayList(Arrays.asList(ALL_URLS)));
 
     private static final int DEFAULT_RETRIEVED_IMAGES = 10;
-
-    static{
-        sValidPageUrls.add(ImageSource.URL_1X);
-        sValidPageUrls.add(ImageSource.URL_ALBUM);
-        sValidPageUrls.add(ImageSource.URL_FREE_JPG);
-        sValidPageUrls.add(ImageSource.URL_ILLUSION);
-        sValidPageUrls.add(ImageSource.URL_PIXBABY);
-        sValidPageUrls.add(ImageSource.URL_PIXELS);
-        sValidPageUrls.add(ImageSource.URL_VISUAL_HUNT);
-        sValidPageUrls.add(ImageSource.URL_PUBLIC_ARCHIVE);
-        sValidPageUrls.add(ImageSource.REG_VISUAL_CHINA);
-    }
 
     public ImageRetrievePageProcessor(int n){
         mMaxRetrievedImages = n > 0 ? n : DEFAULT_RETRIEVED_IMAGES;

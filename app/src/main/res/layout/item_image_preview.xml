@@ -5,5 +5,4 @@
     android:layout_height="wrap_content"
     android:layout_margin="1dp"
     android:contentDescription="@string/image_preview"
-    android:adjustViewBounds="true"
     android:scaleType="centerCrop" />

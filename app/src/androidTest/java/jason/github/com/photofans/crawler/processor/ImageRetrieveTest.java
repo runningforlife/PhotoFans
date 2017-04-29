@@ -11,16 +11,14 @@ import io.realm.Realm;
 import jason.github.com.photofans.crawler.OkHttpDownloader;
 import us.codecraft.webmagic.Spider;
 
+import static jason.github.com.photofans.crawler.processor.ImageSource.URL_MM;
+
 /**
  * test image retrieve
  */
 
 @RunWith(AndroidJUnit4.class)
 public class ImageRetrieveTest {
-
-    private final static String URL_FREE_JPG = "http://en.freejpg.com.ar/free/images/";
-    private final static String URL_PIXELS = "https://www.pexels.com/";
-    private final static String URL_ALBUM = "http://albumarium.com/";
 
     @Before
     public void initRealm(){
@@ -33,6 +31,7 @@ public class ImageRetrieveTest {
         ImageRetrievePageProcessor processor = new ImageRetrievePageProcessor(20);
         Spider.create(processor)
                 .setDownloader(new OkHttpDownloader())
-                .addUrl(URL_FREE_JPG);
+                .addUrl(URL_MM)
+                .run();
     }
 }

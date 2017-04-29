@@ -9,17 +9,17 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import jason.github.com.photofans.model.ImageRealm;
 import jason.github.com.photofans.utils.UrlUtil;
 import us.codecraft.webmagic.Page;
+import us.codecraft.webmagic.selector.Html;
 
 /**
  * Created by jason on 4/1/17.
@@ -29,6 +29,7 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
     private static final String TAG = "RetrieverFactory";
 
     private static Map<String,String> sImgSource = new HashMap<>();
+    private static Map<String,String> sImageUrlStart = new HashMap<>();
 
     private static class InstanceHolder{
         private static final ImageRetrieverFactory instance = new ImageRetrieverFactory();
@@ -37,13 +38,21 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
     private ImageRetrieverFactory(){
         sImgSource.put(URL_FREE_JPG,REG_FREE_JPG);
         sImgSource.put(URL_ALBUM,REG_ALBUM);
-        sImgSource.put(URL_1X,REG_1X);
-        sImgSource.put(URL_ILLUSION,REG_ILLUSION);
         sImgSource.put(URL_PIXELS,REG_PIXELS);
         sImgSource.put(URL_PIXBABY,REG_PEXBABY);
         sImgSource.put(URL_PUBLIC_ARCHIVE,REG_PUBLIC_ARCHIVE);
         sImgSource.put(URL_VISUAL_CHINA,REG_VISUAL_CHINA);
         sImgSource.put(URL_VISUAL_HUNT,REG_VISUAL_HUNG);
+        sImgSource.put(URL_YOUWU,REG_YOUWU);
+        sImgSource.put(URL_MM,REG_MM);
+
+        sImageUrlStart.put(URL_ALBUM,ALBUM_IMAGE_START);
+        sImageUrlStart.put(URL_PIXBABY,PIXABAY_IMAGE_START);
+        sImageUrlStart.put(URL_PUBLIC_ARCHIVE,PDN_IMAGE_START);
+        sImageUrlStart.put(URL_VISUAL_CHINA,VC_IMAGE_START);
+        sImageUrlStart.put(URL_PIXELS, PIXELS_IMAGE_START);
+        sImageUrlStart.put(URL_YOUWU,YW_IMAGE_START);
+        sImageUrlStart.put(URL_MM,MM_IMAGE_START);
     }
 
     public static ImageRetrieverFactory getInstance(){
@@ -68,12 +77,6 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
                 case URL_ALBUM:
                     imgList = retrieve(page,URL_ALBUM);
                     break;
-                case URL_1X:
-                    imgList = retrieve(page,URL_1X);
-                    break;
-                case URL_ILLUSION:
-                    imgList = retrieve(page,URL_ILLUSION);
-                    break;
                 case URL_PIXBABY:
                     imgList = retrieve(page,URL_PIXBABY);
                     break;
@@ -89,6 +92,11 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
                 case URL_VISUAL_HUNT:
                     imgList = retrieve(page,URL_VISUAL_HUNT);
                     break;
+                case URL_YOUWU:
+                    imgList = retrieveMmImage(page,URL_YOUWU);
+                    break;
+                case URL_MM:
+                    imgList = retrieveMmImage(page,URL_MM);
                 default:
                     break;
             }
@@ -118,12 +126,14 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
                 if(!URLUtil.isValidUrl(absUrl)){
                     url = imgSrc + relUrl;
                 }
-
-                if(!URLUtil.isValidUrl(url) || !url.startsWith(imgSrc)){
+                // check the image url
+                if(!URLUtil.isValidUrl(url) || !url.startsWith(imgSrc)
+                        || checkImageUrlStart(url,imgSrc)){
                     continue;
                 }
 
                 Log.v(TAG, "retrieved image url = " + url);
+
 
                 ImageRealm imageRealm = new ImageRealm();
 
@@ -141,5 +151,71 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
         }
 
         return imgList;
+    }
+
+    // check whether the url start with a given URL string
+    private boolean checkImageUrlStart(String url, @IMAGE_SOURCE String src){
+        Iterator it = sImageUrlStart.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry entry = (Map.Entry)it.next();
+            String rootUrl = (String)entry.getKey();
+            String startUrl = (String)entry.getValue();
+            if(src.equals(rootUrl) && url.startsWith(startUrl)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private List<ImageRealm> retrieveMmImage(Page page, @IMAGE_SOURCE String src){
+        Log.v(TAG,"retrieveMmImage(): url = " + page.getUrl());
+        List<ImageRealm> imgUrls = new ArrayList<>();
+
+        Html html =  page.getHtml();
+        Document doc = html.getDocument();
+
+        Log.v(TAG,"document = " + doc);
+        Elements divs = null;
+        String reg = null; // regression to retrieve images
+        if(src.equals(URL_MM)) {
+            // div whose class name is content
+            divs = doc.select("div.content");
+            reg = REG_MM;
+        }else if(src.equals(URL_YOUWU)){
+            // div whose class name is big-pic
+            divs = doc.select("div.big-pic");
+            reg = REG_YOUWU;
+        }
+
+        if(divs != null) {
+            for (Element div : divs) {
+                Elements allImgs = div.select(reg);
+                for (Element img : allImgs) {
+                    ImageRealm imageRealm = new ImageRealm();
+
+                    String relUrl = img.attr("src");
+                    String absUrl = img.attr("abs:src");
+                    String url = absUrl;
+                    // compose relative url and base url
+                    if (!URLUtil.isValidUrl(absUrl)) {
+                        url = src + relUrl;
+                    }
+
+                    String name = img.attr("alt");
+                    if (TextUtils.isEmpty(name)) {
+                        name = "unknown";
+                    }
+                    imageRealm.setName(name);
+                    imageRealm.setUrl(url);
+                    imageRealm.setTimeStamp(System.currentTimeMillis());
+                    imageRealm.setUsed(false);
+
+                    imgUrls.add(imageRealm);
+                }
+            }
+        }
+        Log.v(TAG,"retrieveMmImage(): retrieved images = " + imgUrls.size());
+        return imgUrls;
     }
 }
