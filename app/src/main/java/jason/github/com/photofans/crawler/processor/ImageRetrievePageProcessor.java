@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -31,7 +30,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000).setTimeOut(10000);
 
-    private List<ImageRealm> imgList = new ArrayList<>();
+    private List<ImageRealm> mImgList = new ArrayList<>();
     private List<RetrieveCompleteListener> mListeners;
     private int mMaxRetrievedImages = DEFAULT_RETRIEVED_IMAGES;
 
@@ -90,28 +89,29 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private void retrieveImages(Page page){
 
         if(!isVisited(page) && isValidPage(page)) {
-            imgList = ImageRetrieverFactory.getInstance().
+            List<ImageRealm> result = ImageRetrieverFactory.getInstance().
                     retrieveImages(page);
-            if(imgList != null && imgList.size() > 0) {
-                MyThreadFactory.getInstance()
-                        .newThread(new SaveRunnable(getPageList(page)))
-                        .start();
-                //TODO: we could save it on another database, and use it later
-                if (imgList.size() > mMaxRetrievedImages) {
+            if(result != null && result.size() > 0) {
+                mImgList.addAll(result);
+                if (mImgList.size() > mMaxRetrievedImages) {
                     // marked part of them as used
                     for (int i = 0; i < mMaxRetrievedImages; ++i) {
-                        imgList.get(i).setUsed(true);
+                        mImgList.get(i).setUsed(true);
                     }
                     notifyListeners();
                 }
             }
+            // save to disk
+            MyThreadFactory.getInstance()
+                    .newThread(new SaveRunnable(getPageList(page)))
+                    .start();
         }
     }
 
     private void notifyListeners(){
         // notify jobs are done
         for (RetrieveCompleteListener listener : mListeners) {
-            listener.onRetrieveComplete(imgList);
+            listener.onRetrieveComplete(mImgList);
         }
     }
 
@@ -123,6 +123,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                 .findAll()
                 .sort("mVisitTime",Sort.DESCENDING);
         Log.v(TAG,"loadPages(): data size = " + pages.size());
+
         if(pages.size() > 0){
             try {
                 // choose a random page from unvisited url
@@ -158,7 +159,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private  class SaveRunnable implements  Runnable{
         private List<VisitedPageInfo> mPage;
 
-        public SaveRunnable(List<VisitedPageInfo> page){
+        SaveRunnable(List<VisitedPageInfo> page){
             mPage = page;
         }
 

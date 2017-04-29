@@ -56,12 +56,6 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     }
 
     @Override
-    public List<ImageRealm> loadAllData() {
-        // blocking call
-        return RealmHelper.getInstance().queryAll();
-    }
-
-    @Override
     public void loadAllDataAsync() {
         Log.v(TAG,"loadAllDataAsync()");
         RealmHelper.getInstance().queryAllAsync();
@@ -71,7 +65,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     public void refresh() {
         Log.v(TAG,"refresh()");
 
-        if(mUnUsedImages.size() <= DEFAULT_RETRIEVED_IMAGES) {
+        if(mUnUsedImages.size() < DEFAULT_RETRIEVED_IMAGES) {
 
             mIsRefreshing = true;
             Intent intent = new Intent(mContext, ImageRetrieveService.class);
@@ -150,7 +144,11 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
                     mView.onRefreshDone(true);
                     mIsRefreshing = false;
                 }
-                //Collections.sort(mImgList);
+                // unsorted: keep list descending sorted
+                if(mImageList.get(0).getTimeStamp() <
+                        mImageList.get(mImageList.size()-1).getTimeStamp()){
+                    Collections.sort(mImageList);
+                }
                 mView.notifyDataChanged();
             } else {
                 Log.v(TAG, "onRealmDataChange(): unused url size = " + data.size());

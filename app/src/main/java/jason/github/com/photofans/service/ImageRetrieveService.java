@@ -30,6 +30,7 @@ public class ImageRetrieveService extends IntentService implements
         ImageRetrievePageProcessor.RetrieveCompleteListener{
 
     private static final String TAG = "ImageRetrieveService";
+    private static final long MAX_RETRIEVE_TIMEOUT = 30000;
     // max number of images to be retrieved a time
     public static final String EXTRA_MAX_IMAGES = "maxImages";
 
@@ -58,7 +59,7 @@ public class ImageRetrieveService extends IntentService implements
         String lastUrl = mProcessor.getStartUrl();
         if(TextUtils.isEmpty(lastUrl)){
             mSpider = Spider.create(mProcessor)
-                    .addUrl(new String[]{URL_MM,URL_YOUWU})
+                    .addUrl(ALL_URLS)
                     .setDownloader(new OkHttpDownloader());
         }else{
             mSpider = Spider.create(mProcessor)
@@ -74,7 +75,7 @@ public class ImageRetrieveService extends IntentService implements
                 // time out
                 sendResult(0);
             }
-        }, 60000);
+        }, MAX_RETRIEVE_TIMEOUT);
 
     }
 
@@ -95,6 +96,7 @@ public class ImageRetrieveService extends IntentService implements
     }
 
     private void sendResult(int size){
+        Log.v(TAG,"sendResult(): size = " + size);
         // stop the spider
         mSpider.stop();
         

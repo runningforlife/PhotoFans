@@ -10,11 +10,6 @@ import jason.github.com.photofans.model.ImageRealm;
 
 public interface GalleryPresenter extends Presenter{
     /*
-     * load data list synchronously
-     */
-    List<ImageRealm> loadAllData();
-
-    /*
      * load data asynchronously
      */
     void loadAllDataAsync();

@@ -175,7 +175,6 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
         Html html =  page.getHtml();
         Document doc = html.getDocument();
 
-        Log.v(TAG,"document = " + doc);
         Elements divs = null;
         String reg = null; // regression to retrieve images
         if(src.equals(URL_MM)) {

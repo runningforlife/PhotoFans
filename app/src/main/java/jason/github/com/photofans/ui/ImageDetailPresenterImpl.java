@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -58,6 +59,12 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter{
             if(!mImgList.contains(img)){
                 mImgList.add(img);
             }
+        }
+
+        // keep sorted
+        if(mImgList.get(0).getTimeStamp() >
+                mImgList.get(mImgList.size()-1).getTimeStamp()){
+            Collections.sort(mImgList);
         }
 
         mView.onDataSetChanged();
