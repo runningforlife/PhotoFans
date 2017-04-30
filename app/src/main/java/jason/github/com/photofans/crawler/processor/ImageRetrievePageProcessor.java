@@ -36,7 +36,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private static HashMap<String,Boolean> sAllPages = new HashMap<>();
     // last url to start this page retrieving
-    private static String sLastUrl;
+    private static final int MAX_SEED_URL = 3;
+    private static List<String> sLastUrl = new ArrayList<>();
     @SuppressWarnings("unchecked")
     private static HashSet<String> sValidPageUrls = new HashSet<>(new ArrayList(Arrays.asList(ALL_URLS)));
 
@@ -69,8 +70,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         return site;
     }
 
-    public String getStartUrl(){
-        Log.d(TAG,"getStartUrl(): url = " + sLastUrl);
+    public List<String> getStartUrl(){
+        Log.d(TAG,"getStartUrl(): url = " + sLastUrl.size());
         return sLastUrl;
     }
 
@@ -131,9 +132,11 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         if(pages.size() > 0){
             try {
                 // choose a random page from unvisited url
-                Random random = new Random();
-                int idx = random.nextInt(pages.size());
-                sLastUrl = pages.get(idx).getUrl();
+                for(int i = 0; i < MAX_SEED_URL; ++i) {
+                    Random random = new Random();
+                    int idx = random.nextInt(pages.size());
+                    sLastUrl.add(pages.get(idx).getUrl());
+                }
                 for (VisitedPageInfo info : pages) {
                     if (!sAllPages.containsKey(info.getUrl())) {
                         sAllPages.put(info.getUrl(),info.getIsVisited());

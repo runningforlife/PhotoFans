@@ -49,25 +49,6 @@ public class ImageRetrieveService extends IntentService implements
         if(mReceiver != null) {
             mReceiver.send(ServiceStatus.RUNNING, null);
         }
-        startCrawler(max);
-    }
-
-    private void startCrawler(int n){
-        Log.i(TAG,"startCrawler(): max images to be retrieved = " + n);
-        mProcessor = new ImageRetrievePageProcessor(n);
-        mProcessor.addListener(this);
-        String lastUrl = mProcessor.getStartUrl();
-        if(TextUtils.isEmpty(lastUrl)){
-            mSpider = Spider.create(mProcessor)
-                    .addUrl(ALL_URLS)
-                    .setDownloader(new OkHttpDownloader());
-        }else{
-            mSpider = Spider.create(mProcessor)
-                    .addUrl(lastUrl)
-                    .setDownloader(new OkHttpDownloader());
-        }
-
-        mSpider.run();
 
         //FIXME: cannot run this
         new Handler(Looper.myLooper()).postDelayed(new Runnable() {
@@ -79,6 +60,27 @@ public class ImageRetrieveService extends IntentService implements
             }
         }, MAX_RETRIEVE_TIMEOUT);
 
+        startCrawler(max);
+
+
+    }
+
+    private void startCrawler(int n){
+        Log.i(TAG,"startCrawler(): max images to be retrieved = " + n);
+        mProcessor = new ImageRetrievePageProcessor(n);
+        mProcessor.addListener(this);
+        List<String> lastUrl =  mProcessor.getStartUrl();
+        if(lastUrl.size() <= 0){
+            mSpider = Spider.create(mProcessor)
+                    .addUrl(ALL_URLS)
+                    .setDownloader(new OkHttpDownloader());
+        }else{
+            mSpider = Spider.create(mProcessor)
+                    .addUrl((String[])lastUrl.toArray(new String[lastUrl.size()]))
+                    .setDownloader(new OkHttpDownloader());
+        }
+
+        mSpider.run();
     }
 
     @Override

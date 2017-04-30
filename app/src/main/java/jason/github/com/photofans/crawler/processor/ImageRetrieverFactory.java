@@ -53,6 +53,8 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
         sImageUrlStart.put(URL_PIXELS, PIXELS_IMAGE_START);
         sImageUrlStart.put(URL_YOUWU,YW_IMAGE_START);
         sImageUrlStart.put(URL_MM,MM_IMAGE_START);
+        sImageUrlStart.put(URL_FREE_JPG,FREEJPG_IMAGE_START);
+        sImageUrlStart.put(URL_VISUAL_HUNT,VH_IMAGE_START);
     }
 
     public static ImageRetrieverFactory getInstance(){

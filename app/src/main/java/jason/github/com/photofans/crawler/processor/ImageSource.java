@@ -50,6 +50,8 @@ public interface ImageSource {
     String VC_IMAGE_START = "https//goss.vcg.com/html/images/";
     String YW_IMAGE_START = "http://www.youwu.cc/uploads/allimg/";
     String MM_IMAGE_START = "http://www.mmjpg.com/mm/";
+    String FREEJPG_IMAGE_START = "http://en.freejpg.com.ar/asset/";
+    String VH_IMAGE_START = "https://visualhunt.com/photos/";
 
     String[] ALL_URLS = {URL_FREE_JPG,URL_PIXELS,URL_ALBUM, URL_VISUAL_HUNT,
             URL_PIXBABY,URL_PUBLIC_ARCHIVE, URL_VISUAL_CHINA,URL_YOUWU,URL_MM};
