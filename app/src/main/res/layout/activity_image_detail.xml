@@ -30,6 +30,15 @@
 
     </android.support.v4.view.ViewPager>
 
+    <com.github.rahatarmanahmed.cpv.CircularProgressView
+        android:id="@+id/cpv_load"
+        android:layout_width="@dimen/progress_view_size"
+        android:layout_height="@dimen/progress_view_size"
+        app:cpv_animAutostart="false"
+        app:cpv_indeterminate="true"
+        app:cpv_color="@color/ColorGrey"
+        android:layout_gravity="center"/>
+
     <!-- this list view contains a list of image preview -->
     <LinearLayout android:id="@+id/lv_container"
         android:layout_width="match_parent"

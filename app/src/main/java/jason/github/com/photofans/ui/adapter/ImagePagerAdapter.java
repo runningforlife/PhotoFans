@@ -1,14 +1,24 @@
 package jason.github.com.photofans.ui.adapter;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.media.Image;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import jason.github.com.photofans.R;
+import jason.github.com.photofans.app.AppGlobals;
 import jason.github.com.photofans.loader.GlideLoader;
 import jason.github.com.photofans.loader.GlideLoaderListener;
 import jason.github.com.photofans.loader.PicassoLoader;
@@ -47,22 +57,49 @@ public class ImagePagerAdapter extends PagerAdapter{
     public Object instantiateItem(ViewGroup parent, int position){
         Log.v(TAG,"instantiateItem(): position = " + position);
 
-        ImageView iv = (ImageView) LayoutInflater.from(mContext)
+        ImageView view = (ImageView) LayoutInflater.from(mContext)
                 .inflate(R.layout.item_image_detail,parent,false);
+        // start loading
+        mCallback.onImageLoadStart(position);
 
-        //iv.setMaxHeight(MAX_HEIGHT);
-/*        PicassoLoader.load(mContext,iv,mCallback.getItemAtPos(position).getUrl(),
-                DEFAULT_WIDTH,DEFAULT_HEIGHT);*/
-        GlideLoader.load(mContext,new GlideLoaderListener(iv),mCallback.getItemAtPos(position).getUrl(),
+        GlideLoader.load(mContext,new ImageLoaderListener(view,position),mCallback.getItemAtPos(position).getUrl(),
                 DEFAULT_WIDTH,DEFAULT_HEIGHT);
-        //GlideLoader.load(mContext,mCallback.getItemAtPos(position).getUrl(),iv);
-        parent.addView(iv);
 
-        return iv;
+        parent.addView(view);
+
+        return view;
     }
 
     @Override
     public void destroyItem(ViewGroup parent,int position, Object object){
         parent.removeView((ImageView)object);
+    }
+
+    private final class ImageLoaderListener implements RequestListener<String,GlideDrawable> {
+        private static final String TAG = "GlideLoader";
+        private ImageView image;
+        private int pos;
+
+        ImageLoaderListener(ImageView view, int pos){
+            this.image = view;
+            this.pos = pos;
+        }
+
+        @TargetApi(21)
+        @Override
+        public boolean onException(Exception e, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFirstResource) {
+            Log.v(TAG,"onException(): " + e);
+            image.setImageDrawable(AppGlobals.getInstance().getDrawable(R.drawable.ic_mood_bad_grey_24dp));
+            mCallback.onImageLoadDone(pos,false);
+            return false;
+        }
+
+        @Override
+        public boolean onResourceReady(GlideDrawable resource, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+            Log.v(TAG,"onResourceReady(): from memory = " + isFromMemoryCache);
+            image.setImageDrawable(resource);
+            mCallback.onImageLoadDone(pos,true);
+            return false;
+        }
     }
 }

@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -15,6 +16,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,6 +41,8 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     //@BindView(R.id.iv_detail) ImageView mIvDetail;
     @BindView(R.id.rv_images) RecyclerView mLvImgPreview;
     @BindView(R.id.vp_image) ViewPager mImgPager;
+    @BindView(R.id.cpv_load) CircularProgressView mCpvLoad;
+
     private ImagePagerAdapter mPagerAdapter;
     private ImageDetailPresenter mPresenter;
     private PreviewAdapter mAdapter;
@@ -108,9 +113,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         // may have null pointer exception
         mPresenter.init();
 
-        // image pager
-        //mImgPager = new UltraViewPager(this);
-        //mImgPager.setAutoMeasureHeight(true);
+
         mImgPager.setAdapter(mPagerAdapter);
         mImgPager.addOnPageChangeListener(new ImagePageStateListener());
         LinearLayoutManager llMgr = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
@@ -159,6 +162,23 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         getPreviewScrollParams();
         // change title
         setTitle();
+    }
+
+    // https://github.com/yash786agg/AnimatedLoadingIndicator?utm_source=android-arsenal.com&utm_medium=referral&utm_campaign=5627
+    @Override
+    public void onImageLoadStart(int pos) {
+        Log.v(TAG,"onImageLoadStart()");
+
+        mCpvLoad.setVisibility(View.VISIBLE);
+        mCpvLoad.startAnimation();
+    }
+
+    @Override
+    public void onImageLoadDone(int pos, boolean isSuccess) {
+        Log.v(TAG,"onImageLoadDone()");
+
+        mCpvLoad.stopAnimation();
+        mCpvLoad.setVisibility(View.INVISIBLE);
     }
 
     private void setTitle(){

@@ -33,7 +33,7 @@ public interface ImageSource {
     @interface REG_RETRIEVER{}
 
     String REG_FREE_JPG = "img[src$=.jpg]";
-    String REG_PIXELS = "img";
+    String REG_PIXELS = "img"; // FIXME: still has problem
     String REG_ALBUM = "img";
     String REG_VISUAL_HUNG = "img[src$=.jpg]";
     String REG_PEXBABY = "img[src$=.jpg]";

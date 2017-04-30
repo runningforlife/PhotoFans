@@ -23,4 +23,15 @@ public interface ImageAdapterCallback {
      */
     void onItemClicked(int pos);
 
+
+    /*
+     * image start loading
+     */
+    void onImageLoadStart(int pos);
+
+    /*
+     * image loading complete
+     */
+    void onImageLoadDone(int pos, boolean isSuccess);
+
 }

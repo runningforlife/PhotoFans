@@ -69,11 +69,13 @@ public class ImageRetrieveService extends IntentService implements
 
         mSpider.run();
 
+        //FIXME: cannot run this
         new Handler(Looper.myLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
                 // time out
-                sendResult(0);
+                saveToRealm(mProcessor.getImageList());
+                sendResult(mProcessor.getImageList().size());
             }
         }, MAX_RETRIEVE_TIMEOUT);
 
@@ -99,7 +101,7 @@ public class ImageRetrieveService extends IntentService implements
         Log.v(TAG,"sendResult(): size = " + size);
         // stop the spider
         mSpider.stop();
-        
+
         Bundle bundle = new Bundle();
         bundle.putLong("result", size);
         if(size != 0) {

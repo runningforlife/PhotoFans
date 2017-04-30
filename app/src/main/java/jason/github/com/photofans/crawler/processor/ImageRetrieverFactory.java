@@ -128,12 +128,21 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
                 }
                 // check the image url
                 if(!URLUtil.isValidUrl(url) || !url.startsWith(imgSrc)
-                        || checkImageUrlStart(url,imgSrc)){
+                        || !checkImageUrlStart(url,imgSrc)){
                     continue;
                 }
 
                 Log.v(TAG, "retrieved image url = " + url);
 
+                // for public archive images, we need to check width and height
+                String width = img.attr("width");
+                String height = img.attr("height");
+
+                Log.v(TAG,"image width = " + width + ",height = " + height);
+                if(URL_PUBLIC_ARCHIVE.equals(imgSrc) &&
+                        (TextUtils.isEmpty(width) && TextUtils.isEmpty(height))){
+                    continue;
+                }
 
                 ImageRealm imageRealm = new ImageRealm();
 

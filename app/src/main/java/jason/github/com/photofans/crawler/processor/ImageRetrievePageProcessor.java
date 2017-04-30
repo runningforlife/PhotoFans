@@ -86,6 +86,10 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         mListeners.remove(listener);
     }
 
+    public List<ImageRealm> getImageList(){
+        return mImgList;
+    }
+
     private void retrieveImages(Page page){
 
         if(!isVisited(page) && isValidPage(page)) {

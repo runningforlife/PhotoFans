@@ -13,4 +13,5 @@
     <dimen name="line_thick_medium">3dp</dimen>
     <dimen name="margin_small">5dp</dimen>
     <dimen name="uvp_margin">56dp</dimen>
+    <dimen name="progress_view_size">40dp</dimen>
 </resources>
