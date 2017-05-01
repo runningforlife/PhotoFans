@@ -31,6 +31,17 @@
 
         </activity>
 
+        <activity android:name=".ui.activity.SettingsActivity"
+            android:theme="@style/AppTheme"
+            android:label="@string/action_settings">
+
+        </activity>
+
+        <activity android:name="jason.github.com.photofans.ui.activity.ImageSourceSelectionActivity"
+            android:theme="@style/AppTheme"
+            android:label="@string/select_your_favorite_websites">
+        </activity>
+
         <service android:name=".service.ImageRetrieveService">
         </service>
     </application>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:longClickable="true">
+
+    <CheckBox android:id="@+id/cb_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_item_margin"
+        android:layout_marginBottom="@dimen/list_item_margin_small"
+        android:textColorHighlight="@color/colorLightGrey"/>
+
+    <TextView android:id="@+id/tv_site_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/cb_select"
+        android:layout_alignBaseline="@id/cb_select"
+        android:layout_marginLeft="@dimen/dialog_item_margin"
+        android:textStyle="bold"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+
+    <TextView android:id="@+id/tv_site_url"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_site_name"
+        android:layout_alignLeft="@id/tv_site_name"
+        android:layout_marginTop="@dimen/list_item_margin"
+        android:layout_marginBottom="@dimen/list_item_margin"/>
+
+</RelativeLayout>

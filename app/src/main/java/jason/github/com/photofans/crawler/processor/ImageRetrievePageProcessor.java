@@ -98,7 +98,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                     retrieveImages(page);
             if(result != null && result.size() > 0) {
                 mImgList.addAll(result);
-                if (mImgList.size() > mMaxRetrievedImages) {
+                if (mImgList.size() >= mMaxRetrievedImages) {
                     // marked part of them as used
                     for (int i = 0; i < mMaxRetrievedImages; ++i) {
                         mImgList.get(i).setUsed(true);
@@ -106,6 +106,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                     notifyListeners();
                 }
             }
+
             // save to disk
             MyThreadFactory.getInstance()
                     .newThread(new SaveRunnable(getPageList(page)))

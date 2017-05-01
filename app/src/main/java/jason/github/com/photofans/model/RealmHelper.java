@@ -46,11 +46,6 @@ public class RealmHelper {
         mListeners = new ArrayList<>();
     }
 
-
-    public boolean isEmpty(){
-        return mAllImages.size() == 0;
-    }
-
     // this should be consistent with UI lifecycle: onCreate() or onResume()
     public void onStart(){
         queryAndListen();
@@ -65,15 +60,6 @@ public class RealmHelper {
     public void onDestroy(){
         mAllImages.removeAllChangeListeners();
         //realm.close();
-    }
-
-    public void write(final ImageRealm info) {
-        Log.v(TAG,"image info = " + info);
-        realm.beginTransaction();
-
-        realm.copyToRealmOrUpdate(info);
-
-        realm.commitTransaction();
     }
 
     public void writeAsync(final ImageRealm info) {
@@ -97,6 +83,8 @@ public class RealmHelper {
     }
 
     public void writeAsync(final List<ImageRealm> data) {
+        if(data.size() <= 0) return;
+
         Realm realm = Realm.getDefaultInstance();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
@@ -115,36 +103,8 @@ public class RealmHelper {
         return mAllImages;
     }
 
-    public RealmResults<ImageRealm> queryAllUnusedImages(){
-        if(!mAllUnUsedImages.isLoaded()){
-            mAllUnUsedImages.load();
-        }
-
-        return mAllUnUsedImages;
-    }
-
     public void queryAllAsync(){
         queryAndListen();
-    }
-
-    public void delete(final String url) {
-        if(TextUtils.isEmpty(url)) return;
-
-        if (mAllImages != null && !mAllImages.isLoaded()) {
-            // force load data
-            mAllImages.load();
-        }
-
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                for(ImageRealm info: mAllImages){
-                    if(url.equals(info.getUrl())){
-                        info.deleteFromRealm();
-                    }
-                }
-            }
-        });
     }
 
     public void delete(final ImageRealm info){

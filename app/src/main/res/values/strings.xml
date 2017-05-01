@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/tools">
     <string name="app_name">PhotoFans</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -17,4 +17,13 @@
     <string name="image_preview">Image Preview</string>
     <string name="action_share">Share</string>
     <string name="action_favorite">Favorite</string>
+    <string name="pref_wifi_download">pref_wifi_only_download</string>
+    <string name="way_to_download_images">The way to download images</string>
+    <string name="wifi_only_download">Download Images only wifi-connected</string>
+    <string name="pref_image_source_website">pref_source_website</string>
+    <string name="website_to_download_images">Websites to download images</string>
+    <string name="website_download_images">Choose websites you like to download images</string>
+    <string name="select_your_favorite_websites">Choose the Websites you like</string>
+    <string name="mottos_for_every_day">Every Day Mottos</string>
+    <string name="pref_choose_image_source">key_choose_image_source</string>
 </resources>

@@ -14,4 +14,9 @@
     <dimen name="margin_small">5dp</dimen>
     <dimen name="uvp_margin">56dp</dimen>
     <dimen name="progress_view_size">40dp</dimen>
+    <dimen name="dialog_item_margin">8dp</dimen>
+    <dimen name="dialog_vertical_margin">10dp</dimen>
+    <dimen name="dialog_horizontal_margin">10dp</dimen>
+    <dimen name="list_item_margin_small">5dp</dimen>
+    <dimen name="list_item_margin">12dp</dimen>
 </resources>

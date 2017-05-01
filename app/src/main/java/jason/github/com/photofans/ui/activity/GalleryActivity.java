@@ -1,5 +1,6 @@
 package jason.github.com.photofans.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -127,7 +128,7 @@ public class GalleryActivity extends AppCompatActivity
         } else if (id == R.id.nav_category) {
 
         } else if (id == R.id.nav_manage) {
-
+            startSetting();
         } else if (id == R.id.nav_share) {
 
         }
@@ -135,6 +136,19 @@ public class GalleryActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onRefreshDone(boolean isSuccess) {
+        Log.v(TAG,"onRefreshDone()");
+
+        if(isSuccess) {
+            Toast.makeText(getApplicationContext(), R.string.refresh_success, Toast.LENGTH_SHORT)
+                    .show();
+        }else{
+            Toast.makeText(getApplicationContext(),R.string.refresh_error,Toast.LENGTH_SHORT)
+                    .show();
+        }
     }
 
     private void initView(){
@@ -150,16 +164,8 @@ public class GalleryActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public void onRefreshDone(boolean isSuccess) {
-        Log.v(TAG,"onRefreshDone()");
-
-        if(isSuccess) {
-            Toast.makeText(getApplicationContext(), R.string.refresh_success, Toast.LENGTH_SHORT)
-                    .show();
-        }else{
-            Toast.makeText(getApplicationContext(),R.string.refresh_error,Toast.LENGTH_SHORT)
-                    .show();
-        }
+    private void startSetting(){
+        Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
+        startActivity(intent);
     }
 }

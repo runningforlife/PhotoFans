@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="image_website_url">
+        <item>http://en.freejpg.com.ar</item>
+        <item>https://www.pexels.com</item>
+        <item>http://albumarium.com</item>
+        <item>https://visualhunt.com</item>
+        <item>https://pixabay.com</item>
+        <item>http://publicdomainarchive.com</item>
+        <item>http://www.vcg.com</item>
+        <item>http://www.youwu.cc</item>
+        <item>http://www.mmjpg.com</item>
+    </string-array>
+
+    <string-array name="image_website_name">
+        <item>Free JPG</item>
+        <item>Pexels</item>
+        <item>Albumarium</item>
+        <item>Visual Hunt</item>
+        <item>Pixabay</item>
+        <item>Public Domain Archive</item>
+        <item>Visual China</item>
+        <item>You Wu</item>
+        <item>MM JPG</item>
+    </string-array>
+
+    <string-array name="default_image_source">
+        <item>MM JPG</item>
+        <item>You Wu</item>
+        <item>Public Domain Archive</item>
+    </string-array>
+
+</resources>
