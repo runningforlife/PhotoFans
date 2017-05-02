@@ -7,13 +7,13 @@
         android:defaultValue="true">
     </SwitchPreference>
 
-    <jason.github.com.photofans.ui.preference.EmptyListPreference
+    <com.github.runningforlife.photofans.ui.preference.EmptyListPreference
         android:key="@string/pref_choose_image_source"
         android:title="@string/website_to_download_images"
         android:summary="@string/website_to_download_images"
         android:entries="@array/image_website_name"
         android:entryValues="@array/image_website_url"
         android:defaultValue="@array/default_image_source">
-    </jason.github.com.photofans.ui.preference.EmptyListPreference>
+    </com.github.runningforlife.photofans.ui.preference.EmptyListPreference>
 
 </PreferenceScreen>

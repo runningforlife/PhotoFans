@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="jason.github.com.photofans">
+    package="com.github.runningforlife.photofans">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -37,7 +37,7 @@
 
         </activity>
 
-        <activity android:name="jason.github.com.photofans.ui.activity.ImageSourceSelectionActivity"
+        <activity android:name=".ui.activity.ImageSourceSelectionActivity"
             android:theme="@style/AppTheme"
             android:label="@string/select_your_favorite_websites">
         </activity>
