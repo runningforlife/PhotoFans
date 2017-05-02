@@ -10,8 +10,11 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.github.runningforlife.photofans.R;
@@ -27,7 +30,7 @@ public class MultiSelectionListAdapter extends BaseAdapter {
     private List<ImageSource> mImgSource;
     private Set<String> mNewSource;
     private SelectionItemClickListener mCallback;
-    private List<CheckBox> mCbs;
+    private HashMap<CheckBox,Integer> mCbs;
 
     public interface SelectionItemClickListener{
         void onLongClick(ImageSource src);
@@ -35,7 +38,7 @@ public class MultiSelectionListAdapter extends BaseAdapter {
 
     public MultiSelectionListAdapter(List<ImageSource> sources){
         mImgSource = sources;
-        mCbs = new ArrayList<>(sources.size());
+        mCbs = new HashMap<>();
     }
 
     public void setDefaultSource(List<String> defaultSource){
@@ -87,19 +90,21 @@ public class MultiSelectionListAdapter extends BaseAdapter {
             }else{
                 cb.setChecked(false);
             }
-            mCbs.add(position,cb);
 
             cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                     if(isChecked) {
-                        int pos = mCbs.indexOf(cb);
+                        int pos = mCbs.get(cb);
                         mNewSource.add(mImgSource.get(pos).name);
                     }
                 }
             });
         }
+
+        final CheckBox cb = (CheckBox)root.findViewById(R.id.cb_select);
+        mCbs.put(cb,position);
 
         root.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,7 +114,7 @@ public class MultiSelectionListAdapter extends BaseAdapter {
                 cb.setChecked((!isChecked));
 
                 if(cb.isChecked()) {
-                    int pos = mCbs.indexOf(cb);
+                    int pos = mCbs.get(cb);
                     mNewSource.add(mImgSource.get(pos).name);
                 }
             }
@@ -120,7 +125,7 @@ public class MultiSelectionListAdapter extends BaseAdapter {
             public boolean onLongClick(View v) {
                 if(mCallback != null){
                     CheckBox cb = (CheckBox)v.findViewById(R.id.cb_select);
-                    int pos = mCbs.indexOf(cb);
+                    int pos = mCbs.get(cb);
                     mCallback.onLongClick(mImgSource.get(pos));
                 }
                 // input consumed

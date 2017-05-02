@@ -1,7 +1,9 @@
 package com.github.runningforlife.photofans.ui.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
@@ -96,5 +98,15 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
     @Override
     public void onLongClick(ImageSource src) {
         Log.v(TAG,"onLongClick()");
+
+        startBrowser(src.url);
+    }
+
+    private void startBrowser(String url){
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 }
