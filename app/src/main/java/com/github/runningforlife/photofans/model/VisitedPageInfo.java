@@ -13,6 +13,13 @@ public class VisitedPageInfo extends RealmObject {
     private long mVisitTime;
     private boolean mIsVisited;
 
+    public VisitedPageInfo(){
+    }
+
+    public VisitedPageInfo(String url){
+        mIsVisited = false;
+    }
+
     public void setUrl(String url){
         mUrl = url;
     }

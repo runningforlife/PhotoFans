@@ -82,7 +82,7 @@ public class RealmHelper {
     }
 
     public void writeAsync(final List<ImageRealm> data) {
-        if(data.size() <= 0) return;
+        if(data == null || data.size() <= 0) return;
 
         Realm realm = Realm.getDefaultInstance();
         realm.executeTransactionAsync(new Realm.Transaction() {
@@ -90,6 +90,18 @@ public class RealmHelper {
             public void execute(Realm realm) {
                 Log.v(TAG,"execute(): data size = " + data.size());
                 realm.copyToRealmOrUpdate(data);
+            }
+        });
+    }
+
+    public void writeAsync(final VisitedPageInfo page){
+        if(page == null) return;
+
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.copyToRealmOrUpdate(page);
             }
         });
     }

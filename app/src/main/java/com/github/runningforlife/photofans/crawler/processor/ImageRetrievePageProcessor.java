@@ -19,6 +19,7 @@ import io.realm.RealmResults;
 import io.realm.Sort;
 
 import com.github.runningforlife.photofans.service.MyThreadFactory;
+import com.github.runningforlife.photofans.utils.SharedPrefUtil;
 import com.github.runningforlife.photofans.utils.UrlUtil;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
@@ -126,14 +127,14 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
         RealmResults<VisitedPageInfo> pages = realm.where(VisitedPageInfo.class)
                 .equalTo("mIsVisited",false)
-                .findAll()
-                .sort("mVisitTime",Sort.DESCENDING);
+                .findAll();
         Log.v(TAG,"loadPages(): data size = " + pages.size());
 
         if(pages.size() > 0){
             try {
+
                 // choose a random page from unvisited url
-                for(int i = 0; i < MAX_SEED_URL; ++i) {
+                for(int i = 0; i < MAX_SEED_URL && i < pages.size(); ++i) {
                     Random random = new Random();
                     int idx = random.nextInt(pages.size());
                     sLastUrl.add(pages.get(idx).getUrl());
@@ -146,6 +147,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
             }finally {
                 realm.close();
             }
+        }else{
+            sLastUrl = SharedPrefUtil.getImageSource();
         }
     }
 
