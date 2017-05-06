@@ -48,7 +48,7 @@ public interface ImageSource {
     String PIXABAY_IMAGE_START = "https://cdn.pixabay.com/photo/";
     String PDN_IMAGE_START = "http://publicdomainarchive.com/wp-content/";
     String VC_IMAGE_START = "https//goss.vcg.com/html/images/";
-    String YW_IMAGE_START = "http://www.youwu.cc/uploads/allimg/";
+    String YW_IMAGE_START = "http://www.youwu.cc/uploads/";
     String MM_IMAGE_START = "http://www.mmjpg.com/mm/";
     String FREEJPG_IMAGE_START = "http://en.freejpg.com.ar/asset/";
     String VH_IMAGE_START = "https://visualhunt.com/photos/";

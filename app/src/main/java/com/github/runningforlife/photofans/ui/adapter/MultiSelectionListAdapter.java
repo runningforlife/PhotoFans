@@ -12,13 +12,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.model.ImageSource;
+import com.github.runningforlife.photofans.model.ImageWebSite;
 
 /**
  * a list adapter to bind data to list view
@@ -27,16 +25,16 @@ import com.github.runningforlife.photofans.model.ImageSource;
 public class MultiSelectionListAdapter extends BaseAdapter {
     private static final String TAG = "SelectionListAdapter";
 
-    private List<ImageSource> mImgSource;
+    private List<ImageWebSite> mImgSource;
     private Set<String> mNewSource;
     private SelectionItemClickListener mCallback;
     private HashMap<CheckBox,Integer> mCbs;
 
     public interface SelectionItemClickListener{
-        void onLongClick(ImageSource src);
+        void onLongClick(ImageWebSite src);
     }
 
-    public MultiSelectionListAdapter(List<ImageSource> sources){
+    public MultiSelectionListAdapter(List<ImageWebSite> sources){
         mImgSource = sources;
         mCbs = new HashMap<>();
     }
@@ -81,11 +79,11 @@ public class MultiSelectionListAdapter extends BaseAdapter {
             TextView name = (TextView)root.findViewById(R.id.tv_site_name);
             TextView url = (TextView)root.findViewById(R.id.tv_site_url);
 
-            String webSiteName = mImgSource.get(position).name;
-            name.setText(webSiteName);
-            url.setText(mImgSource.get(position).url);
+            name.setText(mImgSource.get(position).name);
+            String srcUrl = mImgSource.get(position).url;
+            url.setText(srcUrl);
 
-            if(mNewSource.contains(webSiteName)){
+            if(mNewSource.contains(srcUrl)){
                 cb.setChecked(true);
             }else{
                 cb.setChecked(false);
@@ -94,10 +92,12 @@ public class MultiSelectionListAdapter extends BaseAdapter {
             cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                    int pos = mCbs.get(cb);
+                    String siteUrl = mImgSource.get(pos).url;
                     if(isChecked) {
-                        int pos = mCbs.get(cb);
-                        mNewSource.add(mImgSource.get(pos).name);
+                        mNewSource.add(siteUrl);
+                    } else {
+                        mNewSource.remove(siteUrl);
                     }
                 }
             });

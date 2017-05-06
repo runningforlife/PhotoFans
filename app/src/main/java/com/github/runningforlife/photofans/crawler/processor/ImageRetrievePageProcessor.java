@@ -127,12 +127,12 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
         RealmResults<VisitedPageInfo> pages = realm.where(VisitedPageInfo.class)
                 .equalTo("mIsVisited",false)
+                .isNotNull("mUrl")
                 .findAll();
         Log.v(TAG,"loadPages(): data size = " + pages.size());
 
         if(pages.size() > 0){
             try {
-
                 // choose a random page from unvisited url
                 for(int i = 0; i < MAX_SEED_URL && i < pages.size(); ++i) {
                     Random random = new Random();
@@ -167,6 +167,16 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         }
     }
 
+    private boolean isValidUrl(String url){
+        try {
+            String baseUrl = UrlUtil.getRootUrl(url);
+            return sValidPageUrls.contains(baseUrl);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     private  class SaveRunnable implements  Runnable{
         private List<VisitedPageInfo> mPage;
 
@@ -189,8 +199,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
         urlList.add(page.getUrl().get());
         for(String url : urlList){
-            //TODO: filter those URL start with existing page urls
-            if(!sAllPages.containsKey(url)) {
+            if(!sAllPages.containsKey(url) && isValidUrl(url)) {
                 VisitedPageInfo info = new VisitedPageInfo();
                 info.setUrl(url);
                 if(urlList.indexOf(url) != 0) {

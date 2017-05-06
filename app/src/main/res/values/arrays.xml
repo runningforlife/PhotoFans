@@ -25,10 +25,10 @@
         <item>MM JPG</item>
     </string-array>
 
-    <string-array name="default_image_source">
-        <item>MM JPG</item>
-        <item>You Wu</item>
-        <item>Public Domain Archive</item>
+    <string-array name="default_source_url">
+        <item>http://www.mmjpg.com</item>
+        <item>http://www.youwu.cc</item>
+        <item>http://publicdomainarchive.com</item>
     </string-array>
 
 </resources>

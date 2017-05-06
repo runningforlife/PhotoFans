@@ -19,4 +19,6 @@
     <dimen name="dialog_horizontal_margin">10dp</dimen>
     <dimen name="list_item_margin_small">5dp</dimen>
     <dimen name="list_item_margin">12dp</dimen>
+    <dimen name="image_min_height">120dp</dimen>
+    <dimen name="preview_image_min_size">40dp</dimen>
 </resources>

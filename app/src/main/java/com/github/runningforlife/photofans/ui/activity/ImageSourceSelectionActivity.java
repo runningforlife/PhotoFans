@@ -1,6 +1,5 @@
 package com.github.runningforlife.photofans.ui.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -14,14 +13,21 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.model.ImageSource;
+import com.github.runningforlife.photofans.model.ImageWebSite;
+import com.github.runningforlife.photofans.model.RealmHelper;
+import com.github.runningforlife.photofans.model.VisitedPageInfo;
 import com.github.runningforlife.photofans.ui.adapter.MultiSelectionListAdapter;
+import com.github.runningforlife.photofans.utils.SharedPrefUtil;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * an activity to select image source website
@@ -56,16 +62,19 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
 
 
     @Override
-    public void onDestroy(){
-        super.onDestroy();
+    public void onPause(){
+        super.onPause();
 
         String key = getString(R.string.pref_choose_image_source);
 
         List<String> values = mAdapter.getImageSource();
 
         SharedPreferences.Editor editor = mSharePref.edit();
-        editor.putStringSet(key,new HashSet<String>(values));
+        editor.putStringSet(key,new HashSet<>(values));
         editor.apply();
+
+        // update database
+        saveImageSource(values);
     }
 
 
@@ -86,7 +95,7 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
         Log.v(TAG,"initView()");
 
         Intent intent = getIntent();
-        List<ImageSource> srcList = intent.getParcelableArrayListExtra("image_source");
+        List<ImageWebSite> srcList = intent.getParcelableArrayListExtra("image_source");
         List<String> defaultSrc = intent.getStringArrayListExtra("default_value");
 
         mAdapter = new MultiSelectionListAdapter(srcList);
@@ -96,7 +105,7 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLongClick(ImageSource src) {
+    public void onLongClick(ImageWebSite src) {
         Log.v(TAG,"onLongClick()");
 
         startBrowser(src.url);
@@ -108,5 +117,36 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
         intent.setData(Uri.parse(url));
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    private void saveImageSource(List<String> src){
+        Log.v(TAG,"saveImageSource()");
+        Realm realm = Realm.getDefaultInstance();
+
+        RealmResults<VisitedPageInfo> pages = realm.where(VisitedPageInfo.class)
+                .equalTo("mIsVisited",false)
+                .isNotNull("mUrl")
+                .findAll();
+
+        if(pages.size() > 0) {
+            Set<String> allUrls = new HashSet<>();
+            for (VisitedPageInfo p : pages) {
+                allUrls.add(p.getUrl());
+            }
+            // whether we should update database
+            for (String url : src) {
+                if(!allUrls.contains(url)){
+                    VisitedPageInfo pageInfo = new VisitedPageInfo(url);
+                    RealmHelper.getInstance().writeAsync(pageInfo);
+                }
+            }
+        }else{
+            // save it to data base
+            for(String url : src){
+                VisitedPageInfo pageInfo = new VisitedPageInfo(url);
+                RealmHelper.getInstance().writeAsync(pageInfo);
+            }
+        }
+
     }
 }

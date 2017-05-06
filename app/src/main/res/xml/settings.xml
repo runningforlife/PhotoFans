@@ -13,7 +13,7 @@
         android:summary="@string/website_to_download_images"
         android:entries="@array/image_website_name"
         android:entryValues="@array/image_website_url"
-        android:defaultValue="@array/default_image_source">
+        android:defaultValue="@array/default_source_url">
     </com.github.runningforlife.photofans.ui.preference.EmptyListPreference>
 
 </PreferenceScreen>

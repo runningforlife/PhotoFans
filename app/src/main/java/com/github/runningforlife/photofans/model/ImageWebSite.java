@@ -7,29 +7,29 @@ import android.os.Parcelable;
  * a class to save image source site info
  */
 
-public class ImageSource implements Parcelable{
+public class ImageWebSite implements Parcelable{
     public String url;
     public String name;
 
-    public ImageSource(String name, String url){
+    public ImageWebSite(String name, String url){
         this.url = url;
         this.name = name;
     }
 
-    protected ImageSource(Parcel in) {
+    ImageWebSite(Parcel in) {
         url = in.readString();
         name = in.readString();
     }
 
-    public static final Creator<ImageSource> CREATOR = new Creator<ImageSource>() {
+    public static final Creator<ImageWebSite> CREATOR = new Creator<ImageWebSite>() {
         @Override
-        public ImageSource createFromParcel(Parcel in) {
-            return new ImageSource(in);
+        public ImageWebSite createFromParcel(Parcel in) {
+            return new ImageWebSite(in);
         }
 
         @Override
-        public ImageSource[] newArray(int size) {
-            return new ImageSource[size];
+        public ImageWebSite[] newArray(int size) {
+            return new ImageWebSite[size];
         }
     };
 

@@ -50,21 +50,13 @@ public class GalleryActivity extends AppCompatActivity
             @Override
             public void onDrawerOpened(View drawerView) {
                 Log.v(TAG,"onDrawerOpened()");
-                AllPicturesFragment fragment = (AllPicturesFragment)getSupportFragmentManager().
-                        findFragmentByTag(AllPicturesFragment.TAG);
-                if(fragment != null && fragment.isRefreshing()){
-                    fragment.setRefreshing(false);
-                }
+                setRefreshing(false);
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
                 Log.v(TAG,"onDrawerClosed()");
-                AllPicturesFragment fragment = (AllPicturesFragment)getSupportFragmentManager().
-                        findFragmentByTag(AllPicturesFragment.TAG);
-                if(fragment != null && fragment.isRefreshing()){
-                    fragment.setRefreshing(false);
-                }
+
             }
 
             @Override
@@ -166,7 +158,17 @@ public class GalleryActivity extends AppCompatActivity
     }
 
     private void startSetting(){
+        setRefreshing(false);
+
         Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
         startActivity(intent);
+    }
+
+    private void setRefreshing(boolean refreshing){
+        AllPicturesFragment fragment = (AllPicturesFragment)getSupportFragmentManager().
+                findFragmentByTag(AllPicturesFragment.TAG);
+        if(fragment != null && fragment.isRefreshing()){
+            fragment.setRefreshing(refreshing);
+        }
     }
 }

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.github.runningforlife.photofans.model.ImageSource;
+import com.github.runningforlife.photofans.model.ImageWebSite;
 import com.github.runningforlife.photofans.ui.activity.ImageSourceSelectionActivity;
 
 /**
@@ -45,9 +45,9 @@ public class EmptyListPreference extends MultiSelectListPreference{
         CharSequence[] sourceUrl = getEntryValues();
         Set<String> defaultValues = getValues();
 
-        List<ImageSource> sources = new ArrayList<>(sourceName.length);
+        List<ImageWebSite> sources = new ArrayList<>(sourceName.length);
         for(int i = 0; i < sourceName.length; ++i){
-            ImageSource src = new ImageSource(sourceName[i].toString(),sourceUrl[i].toString());
+            ImageWebSite src = new ImageWebSite(sourceName[i].toString(),sourceUrl[i].toString());
             sources.add(src);
         }
 

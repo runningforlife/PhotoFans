@@ -25,7 +25,7 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/vp_image"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center">
 
     </android.support.v4.view.ViewPager>
@@ -36,7 +36,7 @@
         android:layout_height="@dimen/progress_view_size"
         app:cpv_animAutostart="false"
         app:cpv_indeterminate="true"
-        app:cpv_color="@color/ColorGrey"
+        app:cpv_color="@color/colorLightGrey"
         android:layout_gravity="center"/>
 
     <!-- this list view contains a list of image preview -->
@@ -46,7 +46,7 @@
         android:orientation="horizontal"
         android:layout_gravity="bottom"
         android:gravity="bottom"
-        android:layout_marginBottom="@dimen/activity_vertical_margin">
+        android:layout_marginBottom="@dimen/grid_margin">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_images"
