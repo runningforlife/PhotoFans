@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:minHeight="@dimen/preview_image_min_size"
     android:minWidth="@dimen/preview_image_min_size"
-    android:layout_margin="1dp"
+    android:layout_marginLeft="1dp"
+    android:layout_marginRight="1dp"
     android:contentDescription="@string/image_preview"
     android:scaleType="centerCrop" />

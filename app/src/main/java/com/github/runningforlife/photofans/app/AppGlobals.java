@@ -1,6 +1,7 @@
 package com.github.runningforlife.photofans.app;
 
 import android.app.Application;
+import android.os.Environment;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -11,6 +12,8 @@ import io.realm.RealmConfiguration;
 
 public class AppGlobals extends Application{
 
+    private static final String IMAGE_PATH = Environment.getExternalStorageState() +
+            "/PhotoFans/Picture/";
     private static AppGlobals sInstance;
 
     public static AppGlobals getInstance(){
@@ -28,5 +31,9 @@ public class AppGlobals extends Application{
         Realm.setDefaultConfiguration(realmConfig);
         // it seems that we should init here
         sInstance = AppGlobals.this;
+    }
+
+    public String getImagePath(){
+        return IMAGE_PATH;
     }
 }

@@ -58,12 +58,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if(key.equals(keyImgSrc)) {
             Set<String> src = sharedPreferences.getStringSet(key,null);
             if(src != null) {
-                Realm realm = Realm.getDefaultInstance();
-                RealmResults<VisitedPageInfo> visited = realm.where(VisitedPageInfo.class)
-                        .equalTo("mIsVisited", true)
-                        .findAll();
-
                 RealmHelper helper = RealmHelper.getInstance();
+
+                RealmResults<VisitedPageInfo> visited = helper.getAllVisitedPages();
 
                 Iterator it = src.iterator();
                 while(it.hasNext()){

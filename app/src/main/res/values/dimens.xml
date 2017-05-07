@@ -21,4 +21,7 @@
     <dimen name="list_item_margin">12dp</dimen>
     <dimen name="image_min_height">120dp</dimen>
     <dimen name="preview_image_min_size">40dp</dimen>
+    <dimen name="action_text_size">32px</dimen>
+    <dimen name="progress_view_thickness">2dp</dimen>
+    <dimen name="action_min_height">48dp</dimen>
 </resources>

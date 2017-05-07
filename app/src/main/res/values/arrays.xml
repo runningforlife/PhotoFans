@@ -31,4 +31,11 @@
         <item>http://publicdomainarchive.com</item>
     </string-array>
 
+    <string-array name="detail_action_list">
+        <item>Share</item>
+        <item>Save</item>
+        <item>Favor</item>
+        <item>Delete</item>
+    </string-array>
+
 </resources>

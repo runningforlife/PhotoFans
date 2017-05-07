@@ -15,8 +15,10 @@
     <string name="tools">Settings</string>
     <string name="image_detail">Image Detail</string>
     <string name="image_preview">Image Preview</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
     <string name="action_share">Share</string>
-    <string name="action_favorite">Favorite</string>
+    <string name="action_favorite">Favor</string>
     <string name="pref_wifi_download">pref_wifi_only_download</string>
     <string name="way_to_download_images">The way to download images</string>
     <string name="wifi_only_download">Download Images only wifi-connected</string>
@@ -26,4 +28,5 @@
     <string name="select_your_favorite_websites">Choose the Websites you like</string>
     <string name="mottos_for_every_day">Every Day Mottos</string>
     <string name="pref_choose_image_source">key_choose_image_source</string>
+    <string name="action_more">Check More</string>
 </resources>
