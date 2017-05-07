@@ -141,7 +141,7 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
                 String width = img.attr("width");
                 String height = img.attr("height");
 
-                Log.v(TAG,"image width = " + width + ",height = " + height);
+                Log.d(TAG,"image width = " + width + ",height = " + height);
                 if(URL_PUBLIC_ARCHIVE.equals(imgSrc) &&
                         (TextUtils.isEmpty(width) && TextUtils.isEmpty(height))){
                     continue;

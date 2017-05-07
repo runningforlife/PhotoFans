@@ -12,7 +12,7 @@ import com.github.runningforlife.photofans.model.RealmHelper;
 public interface Presenter extends RealmHelper.RealmDataChangeListener {
     void init();
 
-    void onResume();
+    void onStart();
 
     void onDestroy();
 }

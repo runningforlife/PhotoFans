@@ -52,7 +52,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         View root = inflater.inflate(R.layout.fragment_photos_gallery,parent,false);
         ButterKnife.bind(this,root);
 
-        // need to call it here for onResume is too late
+        // need to call it here for onStart is too late
         initPresenter();
 
         initView();
@@ -76,7 +76,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     public void onResume(){
         super.onResume();
 
-        mPresenter.onResume();
+        mPresenter.onStart();
     }
 
     @Override

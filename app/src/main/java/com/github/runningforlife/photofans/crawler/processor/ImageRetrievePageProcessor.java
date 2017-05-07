@@ -124,29 +124,21 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     }
 
     private void loadPages(){
-        Realm realm = Realm.getDefaultInstance();
-
-        RealmResults<VisitedPageInfo> pages = realm.where(VisitedPageInfo.class)
-                .equalTo("mIsVisited",false)
-                .isNotNull("mUrl")
-                .findAll();
-        Log.v(TAG,"loadPages(): data size = " + pages.size());
+        RealmResults<VisitedPageInfo> pages = RealmHelper.getInstance()
+                .getAllUnvisitedPages();
+        Log.d(TAG,"loadPages(): unvisisted page size = " + pages.size());
 
         if(pages.size() > 0){
-            try {
-                // choose a random page from unvisited url
-                for(int i = 0; i < MAX_SEED_URL && i < pages.size(); ++i) {
-                    Random random = new Random();
-                    int idx = random.nextInt(pages.size());
-                    sLastUrl.add(pages.get(idx).getUrl());
+            // choose a random page from unvisited url
+            for(int i = 0; i < MAX_SEED_URL && i < pages.size(); ++i) {
+                Random random = new Random();
+                int idx = random.nextInt(pages.size());
+                sLastUrl.add(pages.get(idx).getUrl());
+            }
+            for (VisitedPageInfo info : pages) {
+                if (!sAllPages.containsKey(info.getUrl())) {
+                    sAllPages.put(info.getUrl(),info.getIsVisited());
                 }
-                for (VisitedPageInfo info : pages) {
-                    if (!sAllPages.containsKey(info.getUrl())) {
-                        sAllPages.put(info.getUrl(),info.getIsVisited());
-                    }
-                }
-            }finally {
-                realm.close();
             }
         }else{
             sLastUrl = SharedPrefUtil.getImageSource();

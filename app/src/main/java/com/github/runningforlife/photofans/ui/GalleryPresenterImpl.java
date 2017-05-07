@@ -126,7 +126,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     }
 
     @Override
-    public void onResume() {
+    public void onStart() {
         mHelper.addListener(this);
     }
 
@@ -135,8 +135,6 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
         mHelper.removeListener(this);
         //mView = null;
         mHelper.onDestroy();
-        mUnUsedImages = null;
-        mImageList = null;
         mReceiver.setReceiver(null);
     }
 

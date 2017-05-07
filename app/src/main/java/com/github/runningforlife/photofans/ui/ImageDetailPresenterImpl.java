@@ -41,12 +41,12 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter{
     public void init() {
         mImgList = new ArrayList<>();
         mHelper = RealmHelper.getInstance();
-        // start earlier
         mHelper.onStart();
     }
 
     @Override
-    public void onResume() {
+    public void onStart() {
+        Log.v(TAG,"onStart()");
         mHelper.addListener(this);
     }
 

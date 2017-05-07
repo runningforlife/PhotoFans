@@ -56,7 +56,7 @@ public class ActionListDialogFragment extends DialogFragment{
     @Override
     public void onResume(){
         super.onResume();
-        Log.v(TAG,"onResume()");
+        Log.v(TAG,"onStart()");
         initDialogWindow(getDialog());
     }
 

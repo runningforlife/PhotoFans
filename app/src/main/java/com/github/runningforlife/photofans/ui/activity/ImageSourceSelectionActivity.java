@@ -121,12 +121,9 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
 
     private void saveImageSource(List<String> src){
         Log.v(TAG,"saveImageSource()");
-        Realm realm = Realm.getDefaultInstance();
+        RealmHelper helper = RealmHelper.getInstance();
 
-        RealmResults<VisitedPageInfo> pages = realm.where(VisitedPageInfo.class)
-                .equalTo("mIsVisited",false)
-                .isNotNull("mUrl")
-                .findAll();
+        RealmResults<VisitedPageInfo> pages = helper.getAllUnvisitedPages();
 
         if(pages.size() > 0) {
             Set<String> allUrls = new HashSet<>();
@@ -137,14 +134,14 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
             for (String url : src) {
                 if(!allUrls.contains(url)){
                     VisitedPageInfo pageInfo = new VisitedPageInfo(url);
-                    RealmHelper.getInstance().writeAsync(pageInfo);
+                    helper.writeAsync(pageInfo);
                 }
             }
         }else{
             // save it to data base
             for(String url : src){
                 VisitedPageInfo pageInfo = new VisitedPageInfo(url);
-                RealmHelper.getInstance().writeAsync(pageInfo);
+                helper.writeAsync(pageInfo);
             }
         }
 

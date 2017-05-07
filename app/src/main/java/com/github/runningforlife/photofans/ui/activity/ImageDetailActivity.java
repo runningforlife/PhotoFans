@@ -3,7 +3,6 @@ package com.github.runningforlife.photofans.ui.activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -97,13 +96,13 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         initActionList();
         // keep it here to ensure data set is loaded
-        mPresenter.onResume();
+        mPresenter.onStart();
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        Log.v(TAG,"onResume()");
+        Log.v(TAG,"onStart()");
 
         mMainHandler = new EventHandler(Looper.myLooper());
 
@@ -133,7 +132,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         int id = item.getItemId();
         if(id == android.R.id.home){
             // call this to avoid close Realm when navigation is done
-            mPresenter.onDestroy();
+            //mPresenter.onDestroy();
             Intent intent = new Intent(this, GalleryActivity.class);
             NavUtils.navigateUpTo(this,intent);
             return true;

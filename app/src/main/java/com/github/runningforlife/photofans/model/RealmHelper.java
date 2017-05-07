@@ -18,7 +18,7 @@ import io.realm.Sort;
 public class RealmHelper {
     private static final String TAG = "RealmHelper";
 
-    private static RealmHelper sInstance;
+    private static RealmHelper sInstance = new RealmHelper();
     private Realm realm;
     // all the data we have
     private RealmResults<ImageRealm> mAllImages;
@@ -31,11 +31,6 @@ public class RealmHelper {
     }
 
     public static RealmHelper getInstance() {
-        if (sInstance == null) {
-
-            sInstance = new RealmHelper();
-        }
-
         return sInstance;
     }
 
@@ -44,7 +39,7 @@ public class RealmHelper {
         mListeners = new ArrayList<>();
     }
 
-    // this should be consistent with UI lifecycle: onCreate() or onResume()
+    // this should be consistent with UI lifecycle: onCreate() or onStart()
     public void onStart(){
         query();
     }
@@ -65,37 +60,46 @@ public class RealmHelper {
         }
     }
 
+    //Note: Realm objects can only be accessed on the thread they were created
     public void writeAsync(final RealmObject info) {
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.copyToRealmOrUpdate(info);
-            }
-        }, new Realm.Transaction.OnSuccess() {
-            @Override
-            public void onSuccess() {
-                Log.v(TAG, "onSuccess()");
-            }
-        }, new Realm.Transaction.OnError() {
-            @Override
-            public void onError(Throwable error) {
-                Log.v(TAG, "onError()" + error);
-                //write(info);
-            }
-        });
+        Realm r = Realm.getDefaultInstance();
+        try {
+            r.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.copyToRealmOrUpdate(info);
+                }
+            }, new Realm.Transaction.OnSuccess() {
+                @Override
+                public void onSuccess() {
+                    Log.v(TAG, "onSuccess()");
+                }
+            }, new Realm.Transaction.OnError() {
+                @Override
+                public void onError(Throwable error) {
+                    Log.v(TAG, "onError()" + error);
+                    //write(info);
+                }
+            });
+        }finally {
+            r.close();
+        }
     }
 
     public void writeAsync(final List<? extends RealmObject> data) {
         if(data == null || data.size() <= 0) return;
-
-        Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Log.v(TAG,"execute(): saved data size = " + data.size());
-                realm.copyToRealmOrUpdate(data);
-            }
-        });
+        Realm r = Realm.getDefaultInstance();
+        try {
+            r.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Log.v(TAG, "execute(): saved data size = " + data.size());
+                    realm.copyToRealmOrUpdate(data);
+                }
+            });
+        }finally {
+            r.close();
+        }
     }
 
     public void queryAllAsync(){
@@ -103,14 +107,22 @@ public class RealmHelper {
     }
 
     public RealmResults<VisitedPageInfo> getAllVisitedPages(){
-        Realm realm = Realm.getDefaultInstance();
-
-        RealmResults<VisitedPageInfo> visited;
-        visited = realm.where(VisitedPageInfo.class)
+        RealmResults<VisitedPageInfo> visited = realm.where(VisitedPageInfo.class)
                 .equalTo("mIsVisited", true)
+                .isNotNull("mUrl")
                 .findAll();
 
         return visited;
+    }
+
+    public RealmResults<VisitedPageInfo> getAllUnvisitedPages(){
+        Realm realm1 = Realm.getDefaultInstance();
+        RealmResults<VisitedPageInfo> unVisited = realm1.where(VisitedPageInfo.class)
+                .equalTo("mIsVisited",false)
+                .isNotNull("mUrl")
+                .findAll();
+
+        return unVisited;
     }
 
     public void delete(final ImageRealm info){
