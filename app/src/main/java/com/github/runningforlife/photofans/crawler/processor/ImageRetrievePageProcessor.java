@@ -4,6 +4,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.github.runningforlife.photofans.model.ImageRealm;
+import com.github.runningforlife.photofans.model.RealmHelper;
 import com.github.runningforlife.photofans.model.VisitedPageInfo;
 
 import java.net.MalformedURLException;
@@ -220,13 +221,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private void saveToRealm(final List<VisitedPageInfo> page){
         Log.v(TAG,"saveToRealm(): " + page.size() + " pages is retrieved");
         // save data
-        Realm realm = Realm.getDefaultInstance();
-        try {
-            realm.beginTransaction();
-            realm.copyToRealmOrUpdate(page);
-            realm.commitTransaction();
-        }finally {
-            realm.close();
-        }
+        RealmHelper.getInstance()
+                .writeAsync(page);
     }
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
+import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -17,8 +18,8 @@ import io.realm.Sort;
 public class RealmHelper {
     private static final String TAG = "RealmHelper";
 
-    private Realm realm;
     private static RealmHelper sInstance;
+    private Realm realm;
     // all the data we have
     private RealmResults<ImageRealm> mAllImages;
     private RealmResults<ImageRealm> mAllUnUsedImages;
@@ -39,83 +40,77 @@ public class RealmHelper {
     }
 
     private RealmHelper() {
-
         realm = Realm.getDefaultInstance();
-
         mListeners = new ArrayList<>();
     }
 
     // this should be consistent with UI lifecycle: onCreate() or onResume()
     public void onStart(){
-        queryAndListen();
-
-        RealmResults<VisitedPageInfo> allPages = realm.where(VisitedPageInfo.class)
-                .equalTo("mIsVisited",false)
-                .findAll();
-        allPages.addChangeListener(new VisitPageChangeListener());
+        query();
     }
 
     // this should be consistent with UI lifecycle: onDestroy()
     public void onDestroy(){
-        mAllImages.removeAllChangeListeners();
-        //realm.close();
+        if(mAllImages != null) {
+            mAllImages.removeAllChangeListeners();
+            mAllImages = null;
+        }
+        if(mAllUnUsedImages != null) {
+            mAllUnUsedImages.removeAllChangeListeners();
+            mAllUnUsedImages = null;
+        }
+        if(realm != null){
+            realm.close();
+            realm = null;
+        }
     }
 
-    public void writeAsync(final ImageRealm info) {
+    public void writeAsync(final RealmObject info) {
         realm.executeTransactionAsync(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        realm.copyFromRealm(info);
-                    }
-                }, new Realm.Transaction.OnSuccess() {
-                    @Override
-                    public void onSuccess() {
-                        Log.v(TAG,"onSuccess()");
-                    }
-                }, new Realm.Transaction.OnError() {
-                    @Override
-                    public void onError(Throwable error) {
-                        Log.v(TAG,"onError()" + error);
-                        //write(info);
-                    }
-                });
+            @Override
+            public void execute(Realm realm) {
+                realm.copyToRealmOrUpdate(info);
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                Log.v(TAG, "onSuccess()");
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                Log.v(TAG, "onError()" + error);
+                //write(info);
+            }
+        });
     }
 
-    public void writeAsync(final List<ImageRealm> data) {
+    public void writeAsync(final List<? extends RealmObject> data) {
         if(data == null || data.size() <= 0) return;
 
         Realm realm = Realm.getDefaultInstance();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                Log.v(TAG,"execute(): data size = " + data.size());
+                Log.v(TAG,"execute(): saved data size = " + data.size());
                 realm.copyToRealmOrUpdate(data);
             }
         });
     }
 
-    public void writeAsync(final VisitedPageInfo page){
-        if(page == null) return;
-
-        Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.copyToRealmOrUpdate(page);
-            }
-        });
-    }
-
-    public RealmResults<ImageRealm> queryAll(){
-        if(mAllImages != null && !mAllImages.isLoaded()) {
-            mAllImages.load();
-        }
-
-        return mAllImages;
-    }
-
     public void queryAllAsync(){
-        queryAndListen();
+        query();
+    }
+
+    public RealmResults<VisitedPageInfo> getAllVisitedPages(){
+        Realm realm = Realm.getDefaultInstance();
+
+        RealmResults<VisitedPageInfo> visited;
+        visited = realm.where(VisitedPageInfo.class)
+                .equalTo("mIsVisited", true)
+                .findAll();
+
+        return visited;
     }
 
     public void delete(final ImageRealm info){
@@ -136,6 +131,9 @@ public class RealmHelper {
 
     public void addListener(RealmDataChangeListener listener){
         mListeners.add(listener);
+        if(mAllImages != null && !mAllImages.isEmpty()){
+            listener.onRealmDataChange(mAllImages);
+        }
     }
 
     public void removeListener(RealmDataChangeListener listener){
@@ -151,40 +149,40 @@ public class RealmHelper {
         }
     }
 
-    private class VisitPageChangeListener implements RealmChangeListener<RealmResults<VisitedPageInfo>>{
-        @Override
-        public void onChange(RealmResults<VisitedPageInfo> element){
-            Log.v(TAG,"onChange():current marked pages size " + element.size());
+    private void query(){
+        Log.v(TAG,"query(): current thread = " + Thread.currentThread().getId());
+        if(realm == null || realm.isClosed()){
+            realm = Realm.getDefaultInstance();
         }
-    }
 
-    private void queryAndListen(){
-        Log.v(TAG,"queryAndListen(): current thread = " + Thread.currentThread().getId());
-        //FIXME: findALlSortedAsync has a problem: always call onChange event there
-        // is no any change in database
-        mAllImages = realm.where(ImageRealm.class)
-                .equalTo("mIsUsed",true)
-                .findAllAsync()
-                .sort("mTimeStamp", Sort.DESCENDING);
-        mAllImages.addChangeListener(new RealmDataSetChangeListener());
-        Log.v(TAG,"queryAndListen(): image count = " + mAllImages.size());
-        if(mAllImages.isLoaded()){
+        if (mAllImages == null || !mAllImages.isValid()) {
+            mAllImages = realm.where(ImageRealm.class)
+                    .equalTo("mIsUsed", true)
+                    .findAllAsync()
+                    .sort("mTimeStamp", Sort.DESCENDING);
+            mAllImages.addChangeListener(new RealmDataSetChangeListener());
+            Log.v(TAG, "query(): image count = " + mAllImages.size());
+
+/*            if(!mAllImages.isEmpty() && mAllImages.isValid()){
+                notifyListeners(mAllImages);
+            }*/
+        }else if(mAllImages.isValid() && !mAllImages.isEmpty()){
+            mAllImages.addChangeListener(new RealmDataSetChangeListener());
             notifyListeners(mAllImages);
         }
-        // force to load
-/*        if(!mAllImages.isLoaded()) {
-            mAllImages.load();
-        }*/
 
-        mAllUnUsedImages = realm.where(ImageRealm.class)
-                .equalTo("mIsUsed",false)
-                .findAllAsync()
-                .sort("mTimeStamp",Sort.DESCENDING);
-        //mAllUnUsedImages.load();
-        mAllUnUsedImages.addChangeListener(new RealmDataSetChangeListener());
+        if(mAllUnUsedImages == null || !mAllUnUsedImages.isValid()) {
+            mAllUnUsedImages = realm.where(ImageRealm.class)
+                    .equalTo("mIsUsed", false)
+                    .findAllAsync()
+                    .sort("mTimeStamp", Sort.DESCENDING);
+            mAllUnUsedImages.addChangeListener(new RealmDataSetChangeListener());
+        }
     }
 
     private void notifyListeners(RealmResults<ImageRealm> element){
+        if(mListeners.isEmpty()) return;
+
         for (RealmDataChangeListener listener : mListeners) {
             listener.onRealmDataChange(element);
         }

@@ -48,10 +48,14 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedState){
+        Log.v(TAG,"onCreateView()");
         View root = inflater.inflate(R.layout.fragment_photos_gallery,parent,false);
         ButterKnife.bind(this,root);
 
-        initView(getContext());
+        // need to call it here for onResume is too late
+        initPresenter();
+
+        initView();
 
         return root;
     }
@@ -71,13 +75,21 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     @Override
     public void onResume(){
         super.onResume();
-        mPresenter.loadAllDataAsync();
+
+        mPresenter.onResume();
+    }
+
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+        Log.v(TAG,"onDestroyView()");
+        //mPresenter.onDestroy();
     }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
-
+        Log.v(TAG,"onDestroy()");
         mPresenter.onDestroy();
     }
 
@@ -89,31 +101,6 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     @Override
     public void setRefreshing(boolean enable){
         mRefresher.setRefreshing(enable);
-    }
-
-    private void initView(Context context){
-        Log.v(TAG,"initView()");
-        mPresenter = new GalleryPresenterImpl(context,this);
-        mPresenter.init();
-
-        LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
-        //GridLayoutManager gridLayoutMgr = new GridLayoutManager(context,2, GridLayoutManager.VERTICAL,false);
-        mRvImgList.setLayoutManager(llMgr);
-        mRvImgList.setItemAnimator(new DefaultItemAnimator());
-
-        mAdapter = new GalleryAdapter(context,this);
-        mRvImgList.setAdapter(mAdapter);
-
-        mRefresher.setColorSchemeResources(android.R.color.holo_blue_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_orange_dark);
-        mRefresher.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                Log.v(TAG,"onRefresh()");
-                mPresenter.refresh();
-            }
-        });
     }
 
     @Override
@@ -158,5 +145,34 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     @Override
     public void removeItemAtPos(int pos) {
         mPresenter.removeItemAtPos(pos);
+    }
+
+
+    private void initView(){
+        Log.v(TAG,"initView()");
+
+        LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
+        //GridLayoutManager gridLayoutMgr = new GridLayoutManager(context,2, GridLayoutManager.VERTICAL,false);
+        mRvImgList.setLayoutManager(llMgr);
+        mRvImgList.setItemAnimator(new DefaultItemAnimator());
+
+        mAdapter = new GalleryAdapter(getContext(),this);
+        mRvImgList.setAdapter(mAdapter);
+
+        mRefresher.setColorSchemeResources(android.R.color.holo_blue_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_orange_dark);
+        mRefresher.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.v(TAG,"onRefresh()");
+                mPresenter.refresh();
+            }
+        });
+    }
+
+    private void initPresenter(){
+        mPresenter = new GalleryPresenterImpl(getContext(),this);
+        mPresenter.init();
     }
 }

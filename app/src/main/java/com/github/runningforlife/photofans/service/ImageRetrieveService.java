@@ -96,7 +96,8 @@ public class ImageRetrieveService extends IntentService implements
     }
 
     private void saveToRealm(List<ImageRealm> data){
-        RealmHelper.getInstance().writeAsync(data);
+        RealmHelper.getInstance()
+                .writeAsync(data);
     }
 
     private void sendResult(int size){

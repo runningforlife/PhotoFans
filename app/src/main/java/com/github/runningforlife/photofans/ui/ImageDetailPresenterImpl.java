@@ -25,8 +25,6 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter{
 
     public ImageDetailPresenterImpl(Context context, ImageDetailView view){
         mView = view;
-        mImgList = new ArrayList<>();
-        mHelper = RealmHelper.getInstance();
     }
 
     @Override
@@ -41,8 +39,15 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter{
 
     @Override
     public void init() {
+        mImgList = new ArrayList<>();
+        mHelper = RealmHelper.getInstance();
+        // start earlier
+        mHelper.onStart();
+    }
+
+    @Override
+    public void onResume() {
         mHelper.addListener(this);
-        mHelper.queryAllAsync();
     }
 
     @Override

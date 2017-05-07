@@ -26,8 +26,6 @@ import com.github.runningforlife.photofans.service.SimpleResultReceiver;
 /**
  * a presenter to bridge UI and data repository
  */
-
-//FIXME: images are duplicated in recycle view
 public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiver.Receiver{
     private static final String TAG = "GalleryPresenter";
 
@@ -41,17 +39,13 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     private boolean mIsRefreshing;
     // to receive result from service
     private SimpleResultReceiver mReceiver;
+    private RealmHelper mHelper;
 
     @SuppressWarnings("unchecked")
     public GalleryPresenterImpl(Context context,GalleryView view){
         mView = view;
         mContext = context;
-        mUnUsedImages = new HashSet<>();
-        mImageList = new ArrayList<>();
-        mIsRefreshing = false;
-
-        mReceiver = new SimpleResultReceiver(new Handler(Looper.myLooper()));
-        mReceiver.setReceiver(this);
+        mHelper = RealmHelper.getInstance();
     }
 
     @Override
@@ -75,22 +69,29 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
             // add to the list
             List<ImageRealm> removed = new ArrayList<>();
             Realm realm = Realm.getDefaultInstance();
-            realm.beginTransaction();
-            int cn = 0;
-            Iterator iter = mUnUsedImages.iterator();
-            while(iter.hasNext() && ++cn <= DEFAULT_RETRIEVED_IMAGES){
-                ImageRealm item = (ImageRealm)iter.next();
-                item.setUsed(true);
-                mImageList.add(item);
-                removed.add(item);
+
+            try {
+                realm.beginTransaction();
+                int cn = 0;
+                Iterator iter = mUnUsedImages.iterator();
+                while (iter.hasNext() && ++cn <= DEFAULT_RETRIEVED_IMAGES) {
+                    ImageRealm item = (ImageRealm) iter.next();
+                    item.setUsed(true);
+                    mImageList.add(item);
+                    removed.add(item);
+                }
+                realm.commitTransaction();
+                // notify UI to refresh
+                mView.onRefreshDone(true);
+                // remove from set
+                for (ImageRealm item : removed) {
+                    mUnUsedImages.remove(item);
+                }
+            }finally {
+                realm.close();
             }
-            realm.commitTransaction();
-            // notify UI to refresh
-            mView.onRefreshDone(true);
-            // remove from set
-            for(ImageRealm item : removed){
-                mUnUsedImages.remove(item);
-            }
+
+            mIsRefreshing = false;
         }
     }
 
@@ -113,17 +114,29 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
 
     @Override
     public void init() {
-        RealmHelper.getInstance().onStart();
-        RealmHelper.getInstance().addListener(this);
+        mUnUsedImages = new HashSet<>();
+        mImageList = new ArrayList<>();
+        mIsRefreshing = false;
+
+        mReceiver = new SimpleResultReceiver(new Handler(Looper.myLooper()));
+        mReceiver.setReceiver(this);
+
+        // start earlier
+        mHelper.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        mHelper.addListener(this);
     }
 
     @Override
     public void onDestroy() {
-        RealmHelper.getInstance().removeListener(this);
+        mHelper.removeListener(this);
+        //mView = null;
+        mHelper.onDestroy();
         mUnUsedImages = null;
         mImageList = null;
-        //mView = null;
-        RealmHelper.getInstance().onDestroy();
         mReceiver.setReceiver(null);
     }
 
@@ -134,7 +147,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
         if(data.size() > 0) {
             if (data.get(0).getUsed()) {
                 for (ImageRealm info : data) {
-                    if (!mImageList.contains(info)) {
+                    if (!mImageList.contains(info) && info != null) {
                         mImageList.add(info);
                     }
                 }
@@ -166,10 +179,12 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
                 break;
             case ServiceStatus.ERROR:
                 mView.onRefreshDone(false);
+                mIsRefreshing = false;
                 break;
             case ServiceStatus.SUCCESS:
                 Log.v(TAG,"image retrieve success");
                 mView.onRefreshDone(true);
+                mIsRefreshing = false;
                 // save to realm
                 break;
         }
