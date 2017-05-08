@@ -6,15 +6,12 @@ import android.preference.PreferenceFragment;
 import android.util.Log;
 
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.model.RealmHelper;
-import com.github.runningforlife.photofans.model.VisitedPageInfo;
+import com.github.runningforlife.photofans.realm.RealmHelper;
+import com.github.runningforlife.photofans.realm.VisitedPageInfo;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
-import io.realm.Realm;
 import io.realm.RealmResults;
 
 /**

@@ -3,14 +3,14 @@ package com.github.runningforlife.photofans.ui;
 import android.content.Context;
 import android.util.Log;
 
-import com.github.runningforlife.photofans.model.RealmHelper;
+import com.github.runningforlife.photofans.realm.RealmHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import io.realm.RealmResults;
-import com.github.runningforlife.photofans.model.ImageRealm;
+import com.github.runningforlife.photofans.realm.ImageRealm;
 
 /**
  * Created by jason on 4/6/17.

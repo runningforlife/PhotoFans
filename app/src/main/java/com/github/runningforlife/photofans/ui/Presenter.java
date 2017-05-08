@@ -1,6 +1,6 @@
 package com.github.runningforlife.photofans.ui;
 
-import com.github.runningforlife.photofans.model.RealmHelper;
+import com.github.runningforlife.photofans.realm.RealmHelper;
 
 /**
  * a presenter to do interactions with UI and update database

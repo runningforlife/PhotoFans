@@ -13,20 +13,17 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.model.ImageWebSite;
-import com.github.runningforlife.photofans.model.RealmHelper;
-import com.github.runningforlife.photofans.model.VisitedPageInfo;
+import com.github.runningforlife.photofans.realm.ImageWebSite;
+import com.github.runningforlife.photofans.realm.RealmHelper;
+import com.github.runningforlife.photofans.realm.VisitedPageInfo;
 import com.github.runningforlife.photofans.ui.adapter.MultiSelectionListAdapter;
-import com.github.runningforlife.photofans.utils.SharedPrefUtil;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.realm.Realm;
 import io.realm.RealmResults;
 
 /**

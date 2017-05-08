@@ -26,7 +26,7 @@ import android.widget.ImageView;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.github.runningforlife.photofans.R;
 import com.github.runningforlife.photofans.app.AppGlobals;
-import com.github.runningforlife.photofans.model.ImageRealm;
+import com.github.runningforlife.photofans.realm.ImageRealm;
 import com.github.runningforlife.photofans.ui.ImageDetailPresenter;
 import com.github.runningforlife.photofans.ui.ImageDetailPresenterImpl;
 import com.github.runningforlife.photofans.ui.ImageDetailView;
@@ -38,13 +38,13 @@ import butterknife.ButterKnife;
 import com.github.runningforlife.photofans.ui.adapter.ImagePagerAdapter;
 import com.github.runningforlife.photofans.ui.adapter.PreviewAdapter;
 import com.github.runningforlife.photofans.ui.fragment.ActionListDialogFragment;
-import com.github.runningforlife.photofans.model.UserAction;
+import com.github.runningforlife.photofans.realm.UserAction;
 import com.github.runningforlife.photofans.utils.BitmapUtil;
 
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 
-import static com.github.runningforlife.photofans.model.UserAction.*;
+import static com.github.runningforlife.photofans.realm.UserAction.*;
 
 /**
  * activity to show the detail of the images

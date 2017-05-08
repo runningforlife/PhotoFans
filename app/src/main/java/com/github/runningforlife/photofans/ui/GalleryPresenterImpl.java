@@ -7,7 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.github.runningforlife.photofans.model.RealmHelper;
+import com.github.runningforlife.photofans.realm.RealmHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +18,7 @@ import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import com.github.runningforlife.photofans.model.ImageRealm;
+import com.github.runningforlife.photofans.realm.ImageRealm;
 import com.github.runningforlife.photofans.service.ImageRetrieveService;
 import com.github.runningforlife.photofans.service.ServiceStatus;
 import com.github.runningforlife.photofans.service.SimpleResultReceiver;

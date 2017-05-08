@@ -1,6 +1,6 @@
 package com.github.runningforlife.photofans.ui;
 
-import com.github.runningforlife.photofans.model.ImageRealm;
+import com.github.runningforlife.photofans.realm.ImageRealm;
 
 /**
  * a presenter to show the detail of the image

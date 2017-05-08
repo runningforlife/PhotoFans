@@ -1,4 +1,4 @@
-package com.github.runningforlife.photofans.model;
+package com.github.runningforlife.photofans.realm;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;

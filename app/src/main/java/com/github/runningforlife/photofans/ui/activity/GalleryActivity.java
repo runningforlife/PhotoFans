@@ -17,7 +17,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.model.RealmHelper;
+import com.github.runningforlife.photofans.realm.RealmHelper;
 import com.github.runningforlife.photofans.ui.fragment.AllPicturesFragment;
 
 public class GalleryActivity extends AppCompatActivity

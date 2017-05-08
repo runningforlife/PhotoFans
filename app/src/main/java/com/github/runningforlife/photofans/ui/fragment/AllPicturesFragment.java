@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.model.ImageRealm;
+import com.github.runningforlife.photofans.realm.ImageRealm;
 import com.github.runningforlife.photofans.ui.GalleryPresenter;
 import com.github.runningforlife.photofans.ui.GalleryPresenterImpl;
 import com.github.runningforlife.photofans.ui.GalleryView;

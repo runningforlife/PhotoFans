@@ -12,14 +12,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.model.RealmHelper;
+import com.github.runningforlife.photofans.realm.RealmHelper;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.github.runningforlife.photofans.loader.GlideLoader;
-import com.github.runningforlife.photofans.model.ImageRealm;
+import com.github.runningforlife.photofans.realm.ImageRealm;
 import com.github.runningforlife.photofans.utils.DisplayUtil;
 
 /**
