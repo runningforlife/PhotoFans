@@ -17,7 +17,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.realm.RealmHelper;
+import com.github.runningforlife.photofans.realm.RealmManager;
 import com.github.runningforlife.photofans.ui.fragment.AllPicturesFragment;
 
 public class GalleryActivity extends AppCompatActivity
@@ -78,7 +78,7 @@ public class GalleryActivity extends AppCompatActivity
     public void onDestroy(){
         super.onDestroy();
         // ok, we want to close Realm
-        RealmHelper.getInstance().onDestroy();
+        RealmManager.getInstance().onDestroy();
     }
 
     @Override

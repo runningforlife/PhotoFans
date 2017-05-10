@@ -14,7 +14,7 @@ import android.widget.ListView;
 
 import com.github.runningforlife.photofans.R;
 import com.github.runningforlife.photofans.realm.ImageWebSite;
-import com.github.runningforlife.photofans.realm.RealmHelper;
+import com.github.runningforlife.photofans.realm.RealmManager;
 import com.github.runningforlife.photofans.realm.VisitedPageInfo;
 import com.github.runningforlife.photofans.ui.adapter.MultiSelectionListAdapter;
 
@@ -24,6 +24,7 @@ import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.Realm;
 import io.realm.RealmResults;
 
 /**
@@ -118,9 +119,10 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
 
     private void saveImageSource(List<String> src){
         Log.v(TAG,"saveImageSource()");
-        RealmHelper helper = RealmHelper.getInstance();
+        RealmManager helper = RealmManager.getInstance();
 
-        RealmResults<VisitedPageInfo> pages = helper.getAllUnvisitedPages();
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<VisitedPageInfo> pages = helper.getAllUnvisitedPages(realm);
 
         if(pages.size() > 0) {
             Set<String> allUrls = new HashSet<>();
@@ -142,5 +144,6 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
             }
         }
 
+        realm.close();
     }
 }

@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.realm.RealmHelper;
+import com.github.runningforlife.photofans.realm.RealmManager;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -76,7 +76,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
             GlideLoader.load(mContext,url,vh.img,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
         }else if(getItemCount() > 0){
             // remove from the list
-            RealmHelper.getInstance().delete(mCallback.getItemAtPos(position));
+            RealmManager.getInstance().delete(mCallback.getItemAtPos(position));
             notifyItemChanged(position);
         }
     }

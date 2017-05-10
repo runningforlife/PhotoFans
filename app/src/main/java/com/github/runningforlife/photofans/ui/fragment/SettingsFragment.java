@@ -6,12 +6,13 @@ import android.preference.PreferenceFragment;
 import android.util.Log;
 
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.realm.RealmHelper;
+import com.github.runningforlife.photofans.realm.RealmManager;
 import com.github.runningforlife.photofans.realm.VisitedPageInfo;
 
 import java.util.Iterator;
 import java.util.Set;
 
+import io.realm.Realm;
 import io.realm.RealmResults;
 
 /**
@@ -55,9 +56,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if(key.equals(keyImgSrc)) {
             Set<String> src = sharedPreferences.getStringSet(key,null);
             if(src != null) {
-                RealmHelper helper = RealmHelper.getInstance();
+                RealmManager helper = RealmManager.getInstance();
 
-                RealmResults<VisitedPageInfo> visited = helper.getAllVisitedPages();
+                Realm realm = Realm.getDefaultInstance();
+                RealmResults<VisitedPageInfo> visited = helper.getAllVisitedPages(realm);
 
                 Iterator it = src.iterator();
                 while(it.hasNext()){
@@ -66,6 +68,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         helper.writeAsync(new VisitedPageInfo(url));
                     }
                 }
+
+                realm.close();
             }
         }
     }

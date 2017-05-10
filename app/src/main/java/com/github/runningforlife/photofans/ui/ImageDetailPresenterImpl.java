@@ -3,7 +3,7 @@ package com.github.runningforlife.photofans.ui;
 import android.content.Context;
 import android.util.Log;
 
-import com.github.runningforlife.photofans.realm.RealmHelper;
+import com.github.runningforlife.photofans.realm.RealmManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +21,7 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter{
 
     private List<ImageRealm> mImgList;
     private ImageDetailView mView;
-    private RealmHelper mHelper;
+    private RealmManager mHelper;
 
     public ImageDetailPresenterImpl(Context context, ImageDetailView view){
         mView = view;
@@ -40,7 +40,7 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter{
     @Override
     public void init() {
         mImgList = new ArrayList<>();
-        mHelper = RealmHelper.getInstance();
+        mHelper = RealmManager.getInstance();
         mHelper.onStart();
     }
 

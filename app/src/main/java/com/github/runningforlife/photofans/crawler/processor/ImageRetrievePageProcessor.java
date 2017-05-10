@@ -4,7 +4,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.github.runningforlife.photofans.realm.ImageRealm;
-import com.github.runningforlife.photofans.realm.RealmHelper;
+import com.github.runningforlife.photofans.realm.RealmManager;
 import com.github.runningforlife.photofans.realm.VisitedPageInfo;
 
 import java.net.MalformedURLException;
@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
+import io.realm.Realm;
 import io.realm.RealmResults;
 
 import com.github.runningforlife.photofans.service.MyThreadFactory;
@@ -37,7 +38,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private static HashMap<String,Boolean> sAllPages = new HashMap<>();
     // last url to start this page retrieving
     private static final int MAX_SEED_URL = 3;
-    private static List<String> sLastUrl = new ArrayList<>();
+    private static List<String> sLastUrl;
     @SuppressWarnings("unchecked")
     private static HashSet<String> sValidPageUrls = new HashSet<>(new ArrayList(Arrays.asList(ImageSource.ALL_URLS)));
 
@@ -46,7 +47,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     public ImageRetrievePageProcessor(int n){
         mMaxRetrievedImages = n > 0 ? n : DEFAULT_RETRIEVED_IMAGES;
         mListeners = new ArrayList<>();
-
+        sLastUrl = new ArrayList<>();
         loadPages();
     }
 
@@ -122,8 +123,9 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     }
 
     private void loadPages(){
-        RealmResults<VisitedPageInfo> pages = RealmHelper.getInstance()
-                .getAllUnvisitedPages();
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<VisitedPageInfo> pages = RealmManager.getInstance()
+                .getAllUnvisitedPages(realm);
         Log.d(TAG,"loadPages(): unvisisted page size = " + pages.size());
 
         if(pages.size() > 0){
@@ -141,6 +143,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         }else{
             sLastUrl = SharedPrefUtil.getImageSource();
         }
+
+        realm.close();
     }
 
     private boolean isVisited(Page page){
@@ -211,7 +215,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private void saveToRealm(final List<VisitedPageInfo> page){
         Log.v(TAG,"saveToRealm(): " + page.size() + " pages is retrieved");
         // save data
-        RealmHelper.getInstance()
+        RealmManager.getInstance()
                 .writeAsync(page);
     }
 }

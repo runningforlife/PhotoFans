@@ -11,7 +11,7 @@ import android.util.Log;
 import com.github.runningforlife.photofans.crawler.processor.ImageRetrievePageProcessor;
 import com.github.runningforlife.photofans.crawler.processor.ImageSource;
 import com.github.runningforlife.photofans.realm.ImageRealm;
-import com.github.runningforlife.photofans.realm.RealmHelper;
+import com.github.runningforlife.photofans.realm.RealmManager;
 
 import java.util.List;
 
@@ -96,7 +96,7 @@ public class ImageRetrieveService extends IntentService implements
     }
 
     private void saveToRealm(List<ImageRealm> data){
-        RealmHelper.getInstance()
+        RealmManager.getInstance()
                 .writeAsync(data);
     }
 

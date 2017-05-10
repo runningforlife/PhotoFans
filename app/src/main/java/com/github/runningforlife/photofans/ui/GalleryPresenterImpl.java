@@ -7,7 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.github.runningforlife.photofans.realm.RealmHelper;
+import com.github.runningforlife.photofans.realm.RealmManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,19 +39,19 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     private boolean mIsRefreshing;
     // to receive result from service
     private SimpleResultReceiver mReceiver;
-    private RealmHelper mHelper;
+    private RealmManager mHelper;
 
     @SuppressWarnings("unchecked")
     public GalleryPresenterImpl(Context context,GalleryView view){
         mView = view;
         mContext = context;
-        mHelper = RealmHelper.getInstance();
+        mHelper = RealmManager.getInstance();
     }
 
     @Override
     public void loadAllDataAsync() {
         Log.v(TAG,"loadAllDataAsync()");
-        RealmHelper.getInstance().queryAllAsync();
+        RealmManager.getInstance().queryAllAsync();
     }
 
     @Override
@@ -108,7 +108,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     @Override
     public void removeItemAtPos(int pos) {
         Log.v(TAG,"removeItemAtPos(): position = " + pos);
-        RealmHelper.getInstance().delete(mImageList.get(pos));
+        RealmManager.getInstance().delete(mImageList.get(pos));
         mImageList.remove(pos);
     }
 

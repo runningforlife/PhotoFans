@@ -2,6 +2,8 @@ package com.github.runningforlife.photofans.realm;
 
 import android.util.Log;
 
+import com.github.runningforlife.photofans.ui.LifeCycle;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,10 +17,10 @@ import io.realm.Sort;
  * an helper class to CRUD realm database
  */
 
-public class RealmHelper {
-    private static final String TAG = "RealmHelper";
+public class RealmManager implements LifeCycle{
+    private static final String TAG = "RealmManager";
 
-    private static RealmHelper sInstance = new RealmHelper();
+    private static RealmManager sInstance = new RealmManager();
     private Realm realm;
     // all the data we have
     private RealmResults<ImageRealm> mAllImages;
@@ -30,21 +32,23 @@ public class RealmHelper {
         void onRealmDataChange(RealmResults<ImageRealm> data);
     }
 
-    public static RealmHelper getInstance() {
+    public static RealmManager getInstance() {
         return sInstance;
     }
 
-    private RealmHelper() {
+    private RealmManager() {
         realm = Realm.getDefaultInstance();
         mListeners = new ArrayList<>();
     }
 
     // this should be consistent with UI lifecycle: onCreate() or onStart()
+    @Override
     public void onStart(){
         query();
     }
 
     // this should be consistent with UI lifecycle: onDestroy()
+    @Override
     public void onDestroy(){
         if(mAllImages != null) {
             mAllImages.removeAllChangeListeners();
@@ -106,8 +110,8 @@ public class RealmHelper {
         query();
     }
 
-    public RealmResults<VisitedPageInfo> getAllVisitedPages(){
-        RealmResults<VisitedPageInfo> visited = realm.where(VisitedPageInfo.class)
+    public RealmResults<VisitedPageInfo> getAllVisitedPages(Realm r){
+        RealmResults<VisitedPageInfo> visited = r.where(VisitedPageInfo.class)
                 .equalTo("mIsVisited", true)
                 .isNotNull("mUrl")
                 .findAll();
@@ -115,9 +119,8 @@ public class RealmHelper {
         return visited;
     }
 
-    public RealmResults<VisitedPageInfo> getAllUnvisitedPages(){
-        Realm realm1 = Realm.getDefaultInstance();
-        RealmResults<VisitedPageInfo> unVisited = realm1.where(VisitedPageInfo.class)
+    public RealmResults<VisitedPageInfo> getAllUnvisitedPages(Realm r){
+        RealmResults<VisitedPageInfo> unVisited = r.where(VisitedPageInfo.class)
                 .equalTo("mIsVisited",false)
                 .isNotNull("mUrl")
                 .findAll();
@@ -157,7 +160,7 @@ public class RealmHelper {
         @Override
         public void onChange(RealmResults<ImageRealm> element) {
             Log.v(TAG,"onChange(): current image count = " + element.size());
-            notifyListeners(element);
+            RealmManager.this.notify(element);
         }
     }
 
@@ -175,12 +178,9 @@ public class RealmHelper {
             mAllImages.addChangeListener(new RealmDataSetChangeListener());
             Log.v(TAG, "query(): image count = " + mAllImages.size());
 
-/*            if(!mAllImages.isEmpty() && mAllImages.isValid()){
-                notifyListeners(mAllImages);
-            }*/
         }else if(mAllImages.isValid() && !mAllImages.isEmpty()){
             mAllImages.addChangeListener(new RealmDataSetChangeListener());
-            notifyListeners(mAllImages);
+            notify(mAllImages);
         }
 
         if(mAllUnUsedImages == null || !mAllUnUsedImages.isValid()) {
@@ -192,7 +192,7 @@ public class RealmHelper {
         }
     }
 
-    private void notifyListeners(RealmResults<ImageRealm> element){
+    private void notify(RealmResults<ImageRealm> element){
         if(mListeners.isEmpty()) return;
 
         for (RealmDataChangeListener listener : mListeners) {
