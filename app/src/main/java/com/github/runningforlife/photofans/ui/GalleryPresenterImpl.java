@@ -39,13 +39,13 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     private boolean mIsRefreshing;
     // to receive result from service
     private SimpleResultReceiver mReceiver;
-    private RealmManager mHelper;
+    private RealmManager mRealmMgr;
 
     @SuppressWarnings("unchecked")
     public GalleryPresenterImpl(Context context,GalleryView view){
         mView = view;
         mContext = context;
-        mHelper = RealmManager.getInstance();
+        mRealmMgr = RealmManager.getInstance();
     }
 
     @Override
@@ -122,19 +122,19 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
         mReceiver.setReceiver(this);
 
         // start earlier
-        mHelper.onStart();
+        mRealmMgr.onStart();
     }
 
     @Override
     public void onStart() {
-        mHelper.addListener(this);
+        mRealmMgr.addListener(this);
     }
 
     @Override
     public void onDestroy() {
-        mHelper.removeListener(this);
+        mRealmMgr.removeListener(this);
         //mView = null;
-        mHelper.onDestroy();
+        mRealmMgr.onDestroy();
         mReceiver.setReceiver(null);
     }
 

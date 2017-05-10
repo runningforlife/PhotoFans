@@ -21,7 +21,7 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter{
 
     private List<ImageRealm> mImgList;
     private ImageDetailView mView;
-    private RealmManager mHelper;
+    private RealmManager mRealmMgr;
 
     public ImageDetailPresenterImpl(Context context, ImageDetailView view){
         mView = view;
@@ -40,20 +40,20 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter{
     @Override
     public void init() {
         mImgList = new ArrayList<>();
-        mHelper = RealmManager.getInstance();
-        mHelper.onStart();
+        mRealmMgr = RealmManager.getInstance();
+        mRealmMgr.onStart();
     }
 
     @Override
     public void onStart() {
         Log.v(TAG,"onStart()");
-        mHelper.addListener(this);
+        mRealmMgr.addListener(this);
     }
 
     @Override
     public void onDestroy() {
-        mHelper.removeListener(this);
-        mHelper.onDestroy();
+        mRealmMgr.removeListener(this);
+        //mRealmMgr.onDestroy();
     }
 
     @Override

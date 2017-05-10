@@ -8,6 +8,7 @@ import com.github.runningforlife.photofans.R;
 import com.github.runningforlife.photofans.app.AppGlobals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +28,8 @@ public class SharedPrefUtil {
         Set<String> imgSrc = pref.getStringSet(key, null);
 
         if (imgSrc == null) {
-            return Collections.EMPTY_LIST;
+            String[] src = context.getResources().getStringArray(R.array.default_source_url);
+            return Arrays.asList(src);
         }else{
             return new ArrayList<>(imgSrc);
         }

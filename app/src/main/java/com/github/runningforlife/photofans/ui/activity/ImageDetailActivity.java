@@ -132,7 +132,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         int id = item.getItemId();
         if(id == android.R.id.home){
             // call this to avoid close Realm when navigation is done
-            //mPresenter.onDestroy();
+            mPresenter.onDestroy();
             Intent intent = new Intent(this, GalleryActivity.class);
             NavUtils.navigateUpTo(this,intent);
             return true;
