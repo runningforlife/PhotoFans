@@ -4,8 +4,10 @@ import android.util.Log;
 
 import com.github.runningforlife.photofans.ui.LifeCycle;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
@@ -21,12 +23,13 @@ public class RealmManager implements LifeCycle{
     private static final String TAG = "RealmManager";
 
     private static RealmManager sInstance = new RealmManager();
+    private AtomicInteger mRealRefCount = new AtomicInteger(0);
     private Realm realm;
     // all the data we have
     private RealmResults<ImageRealm> mAllImages;
     private RealmResults<ImageRealm> mAllUnUsedImages;
     // callback to listen realm changes: update or query complete
-    private List<RealmDataChangeListener> mListeners;
+    private Set<RealmDataChangeListener> mListeners;
 
     public interface RealmDataChangeListener{
         void onRealmDataChange(RealmResults<ImageRealm> data);
@@ -38,29 +41,37 @@ public class RealmManager implements LifeCycle{
 
     private RealmManager() {
         realm = Realm.getDefaultInstance();
-        mListeners = new ArrayList<>();
+        mListeners = new HashSet<>();
     }
 
     // this should be consistent with UI lifecycle: onCreate() or onStart()
     @Override
     public void onStart(){
         query();
+        mRealRefCount.incrementAndGet();
+        Log.d(TAG,"onStart(): ref count = " + mRealRefCount.get());
     }
 
     // this should be consistent with UI lifecycle: onDestroy()
     @Override
     public void onDestroy(){
-        if(mAllImages != null) {
-            mAllImages.removeAllChangeListeners();
-            mAllImages = null;
+        if( mRealRefCount.get() > 0) {
+            mRealRefCount.decrementAndGet();
         }
-        if(mAllUnUsedImages != null) {
-            mAllUnUsedImages.removeAllChangeListeners();
-            mAllUnUsedImages = null;
-        }
-        if(realm != null){
-            realm.close();
-            realm = null;
+        Log.d(TAG,"onDestroy(): ref count = " + mRealRefCount.get());
+        if(mRealRefCount.get() == 0) {
+            if (mAllImages != null) {
+                mAllImages.removeAllChangeListeners();
+                mAllImages = null;
+            }
+            if (mAllUnUsedImages != null) {
+                mAllUnUsedImages.removeAllChangeListeners();
+                mAllUnUsedImages = null;
+            }
+            if (realm != null) {
+                realm.close();
+                realm = null;
+            }
         }
     }
 
@@ -131,17 +142,8 @@ public class RealmManager implements LifeCycle{
     public void delete(final ImageRealm info){
         if(info == null) return;
 
-        if (!mAllImages.isLoaded()) {
-            mAllImages.load();
-        }
+        info.deleteFromRealm();
 
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                mAllImages.get(mAllImages.indexOf(info))
-                        .deleteFromRealm();
-            }
-        });
     }
 
     public void addListener(RealmDataChangeListener listener){

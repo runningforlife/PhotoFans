@@ -138,6 +138,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
         mReceiver.setReceiver(null);
     }
 
+    //FIXME: sometimes too many callback events are called
     @Override
     public void onRealmDataChange(RealmResults<ImageRealm> data) {
         Log.v(TAG,"onRealmDataChange(): data size = " + data.size());
@@ -165,6 +166,11 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
                 for (ImageRealm img : data) {
                     mUnUsedImages.add(img);
                 }
+            }
+        }else{
+            if (mIsRefreshing) {
+                mView.onRefreshDone(false);
+                mIsRefreshing = false;
             }
         }
     }

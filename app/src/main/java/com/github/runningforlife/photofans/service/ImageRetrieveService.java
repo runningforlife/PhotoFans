@@ -84,6 +84,11 @@ public class ImageRetrieveService extends Service implements
     @Override
     public void onRetrieveComplete(List<ImageRealm> data) {
         Log.v(TAG,"onRetrieveComplete()");
+        // remove listener
+        mProcessor.removeListener(this);
+        // stop the spider
+        //mSpider.close();
+        mSpider.stop();
         if(!mServiceHandler.hasMessages(H.EVENT_RETRIEVE_DONE)) {
             Message msg = mServiceHandler.obtainMessage(H.EVENT_RETRIEVE_DONE);
             msg.obj = data.size();
@@ -91,11 +96,6 @@ public class ImageRetrieveService extends Service implements
         }
 
         saveToRealm(data);
-        // stop the spider
-        //mSpider.close();
-        mSpider.stop();
-        // remove listener
-        mProcessor.removeListener(this);
     }
 
     private void start(Intent intent, int startId){
@@ -107,7 +107,7 @@ public class ImageRetrieveService extends Service implements
 
         Message timeout = mServiceHandler.obtainMessage(H.EVENT_RETRIEVE_TIMEOUT);
         timeout.arg1 = startId;
-        timeout.sendToTarget();
+        mServiceHandler.sendMessageDelayed(timeout,MAX_RETRIEVE_TIMEOUT);
     }
 
     private void handleIntent(Intent intent) {

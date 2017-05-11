@@ -83,14 +83,14 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     public void onDestroyView(){
         super.onDestroyView();
         Log.v(TAG,"onDestroyView()");
-        //mPresenter.onDestroy();
+        mPresenter.onDestroy();
     }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
         Log.v(TAG,"onDestroy()");
-        mPresenter.onDestroy();
+        //mPresenter.onDestroy();
     }
 
     @Override

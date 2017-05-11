@@ -17,7 +17,7 @@ import com.github.runningforlife.photofans.realm.ImageRealm;
  */
 
 public class ImageDetailPresenterImpl implements ImageDetailPresenter{
-    private static final String TAG = "ImagePreviewPresenter";
+    private static final String TAG = "ImageDetailPresenter";
 
     private List<ImageRealm> mImgList;
     private ImageDetailView mView;
@@ -53,7 +53,7 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter{
     @Override
     public void onDestroy() {
         mRealmMgr.removeListener(this);
-        //mRealmMgr.onDestroy();
+        mRealmMgr.onDestroy();
     }
 
     @Override
