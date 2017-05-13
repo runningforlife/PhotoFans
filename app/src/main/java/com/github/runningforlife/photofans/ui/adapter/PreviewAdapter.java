@@ -50,7 +50,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
 
 /*        PicassoLoader.load(mContext,holder.preview,mCallback.getItemAtPos(position).getUrl(),
                 150,150);*/
-        GlideLoader.load(mContext,mCallback.getItemAtPos(position).getUrl(),holder.preview,150,150);
+        GlideLoader.load(mContext,mCallback.getItemAtPos(position).getUrl(),holder.preview,100,100);
     }
 
     @Override

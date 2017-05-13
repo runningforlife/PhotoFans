@@ -20,4 +20,9 @@ public interface ImageDetailPresenter extends Presenter{
      * @return the number of all items
      */
     int getItemCount();
+
+    /**
+     * remove file at give position
+     */
+    void removeItemAtPos(int pos);
 }

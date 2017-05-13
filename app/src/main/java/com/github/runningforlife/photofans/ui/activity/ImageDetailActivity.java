@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
@@ -40,9 +41,12 @@ import com.github.runningforlife.photofans.ui.adapter.PreviewAdapter;
 import com.github.runningforlife.photofans.ui.fragment.ActionListDialogFragment;
 import com.github.runningforlife.photofans.realm.UserAction;
 import com.github.runningforlife.photofans.utils.BitmapUtil;
+import com.github.runningforlife.photofans.utils.ToastUtil;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
+import java.util.Date;
 
 import static com.github.runningforlife.photofans.realm.UserAction.*;
 
@@ -72,6 +76,8 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     private static UserAction ACTION_SAVE = SAVE;
     private static UserAction ACTION_FAVOR = FAVOR;
     private static UserAction ACTION_DELETE = DELETE;
+
+    private static final int PREVIEW_HIDE_COUNT_DOWN = 5000; // 5s
 
     @Override
     public void onCreate(Bundle savedSate){
@@ -114,8 +120,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         super.onDestroy();
         Log.v(TAG,"onDestroy()");
         mMainHandler = null;
-        //FIXME: too late to call
-        //mPresenter.onDestroy();
+        mPresenter.onDestroy();
     }
 
     @Override
@@ -132,7 +137,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         int id = item.getItemId();
         if(id == android.R.id.home){
             // call this to avoid close Realm when navigation is done
-            mPresenter.onDestroy();
+            //mPresenter.onDestroy();
             Intent intent = new Intent(this, GalleryActivity.class);
             NavUtils.navigateUpTo(this,intent);
             return true;
@@ -196,14 +201,23 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         Log.v(TAG,"onActionClick(): action = " + action);
 
         if(action.equals(ACTION_SAVE.action())){
-
+            saveImage();
         }else if(action.equals(ACTION_DELETE.action())){
-
+            // remove image
+            mPresenter.removeItemAtPos(mCurrentImgIdx);
         }else if(action.equals(ACTION_FAVOR.action())){
 
         }else if(action.equals(ACTION_SHARE.action())){
 
         }
+
+        // hide fragment
+        FragmentManager ft = getSupportFragmentManager();
+
+        ft.beginTransaction()
+          .detach(ft.findFragmentByTag("ActionList"))
+          .commit();
+;
     }
 
     private void initView(){
@@ -225,6 +239,8 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mImgPager.setCurrentItem(mCurrentImgIdx);
         //TODO: try to scroll to center
         mLvImgPreview.scrollToPosition(mCurrentImgIdx);
+        // invisible
+        mLvImgPreview.setVisibility(View.INVISIBLE);
 
         getPreviewScrollParams();
     }
@@ -269,6 +285,15 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
                 view.setBackgroundResource(R.drawable.rect_image_preview);
             }
             mLvImgPreview.scrollToPosition(position);
+
+            int visible = mLvImgPreview.getVisibility();
+            if(visible == View.VISIBLE){
+                //after given time, preview should be hidden
+                Message msg = mMainHandler.obtainMessage(EventHandler.EVENT_HIDE_PREVIEW);
+                mMainHandler.sendMessageDelayed(msg,PREVIEW_HIDE_COUNT_DOWN);
+            }else{
+                mLvImgPreview.setVisibility(View.VISIBLE);
+            }
         }
 
         @Override
@@ -299,27 +324,36 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
           .commit();
     }
 
-    private void saveImage(){
-        ImageView iv = (ImageView)mImgPager.getChildAt(mCurrentImgIdx);
+    private void hidePreview(){
+        mLvImgPreview.setVisibility(View.INVISIBLE);
+    }
 
+    private void saveImage(){
+        ImageView iv = (ImageView)(mImgPager.getChildAt(mImgPager.getCurrentItem()));
+        if(iv == null) return;
         Drawable drawable = iv.getDrawable();
         if(drawable != null){
             final Bitmap bitmap = BitmapUtil.drawableToBitmap(drawable);
 
+            final ImageRealm imageRealm = mPresenter.getItemAtPos(mCurrentImgIdx);
+            final String name = imageRealm.getName();
             final String path = AppGlobals.getInstance().getImagePath();
+
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        BitmapUtil.saveToFile(bitmap,path);
+                        BitmapUtil.saveToFile(bitmap,path,name);
                         // yes, job is done
                         Message msg = mMainHandler.obtainMessage(EventHandler.IMAGE_SAVE_COMPLETE);
-                        msg.obj = null;
+                        msg.obj = path;
+                        msg.sendToTarget();
                     } catch (FileNotFoundException e) {
                         Log.v(TAG,"saveImage(): fail to save image");
                         e.printStackTrace();
-                        Message msg = mMainHandler.obtainMessage(EventHandler.IMAGE_SAVE_COMPLETE);
+                        Message msg = mMainHandler.obtainMessage(EventHandler.IMAGE_SAVE_FAIL);
                         msg.obj = e.getCause();
+                        msg.sendToTarget();
                     }
                 }
             }).start();
@@ -329,9 +363,11 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     private class EventHandler extends Handler{
 
         static final int IMAGE_SAVE_COMPLETE = 1;
-        static final int IMAGE_FAVOR_COMPLETE = 2;
-        static final int IMAGE_DELETE_COMPLETE = 3;
-        static final int IMAGE_SHARE_COMPLETE = 4;
+        static final int IMAGE_SAVE_FAIL = 2;
+        static final int IMAGE_FAVOR_COMPLETE = 3;
+        static final int IMAGE_DELETE_COMPLETE = 4;
+        static final int IMAGE_SHARE_COMPLETE = 5;
+        static final int EVENT_HIDE_PREVIEW = 6;
 
         public EventHandler(Looper looper){
             super(looper);
@@ -343,6 +379,14 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
             switch (what){
                 case IMAGE_SAVE_COMPLETE:
+                    String toast = getString(R.string.save_image_to) + msg.obj;
+                    ToastUtil.showToast(ImageDetailActivity.this,toast);
+                    break;
+                case IMAGE_SAVE_FAIL:
+                    String toast1 = getString(R.string.save_image_fail);
+                    ToastUtil.showToast(ImageDetailActivity.this,toast1);
+                case EVENT_HIDE_PREVIEW:
+                    hidePreview();
                     break;
                 default:
                     break;

@@ -38,6 +38,13 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter{
     }
 
     @Override
+    public void removeItemAtPos(int pos) {
+        Log.d(TAG,"removeItemAtPos()");
+        mRealmMgr.delete(mImgList.get(pos));
+        mImgList.remove(pos);
+    }
+
+    @Override
     public void init() {
         mImgList = new ArrayList<>();
         mRealmMgr = RealmManager.getInstance();

@@ -77,8 +77,6 @@ public class GalleryActivity extends AppCompatActivity
     @Override
     public void onDestroy(){
         super.onDestroy();
-        // ok, we want to close Realm
-        RealmManager.getInstance().onDestroy();
     }
 
     @Override

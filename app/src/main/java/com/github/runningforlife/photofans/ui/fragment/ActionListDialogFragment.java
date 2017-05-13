@@ -124,20 +124,22 @@ public class ActionListDialogFragment extends DialogFragment{
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             View view = convertView;
             if(view == null){
                 view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.item_dialog_action,parent,false);
                 TextView tv = (TextView)view.findViewById(R.id.tv_action);
 
-                String action = mActionList.get(position);
+                final String action = mActionList.get(position);
                 tv.setText(action);
 
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        if(mCb != null){
+                            mCb.onActionClick(action,position);
+                        }
                     }
                 });
             }

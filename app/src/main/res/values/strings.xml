@@ -29,4 +29,6 @@
     <string name="mottos_for_every_day">Every Day Mottos</string>
     <string name="pref_choose_image_source">key_choose_image_source</string>
     <string name="action_more">Check More</string>
+    <string name="save_image_to">Image Saved To</string>
+    <string name="save_image_fail">Fail to Save Image</string>
 </resources>

@@ -20,6 +20,14 @@ import java.io.OutputStream;
 
 public class MediaStoreUtil {
 
+    public static void addImageToGallery(Context context, String imgPath,String fileName, String description){
+        try {
+            MediaStore.Images.Media.insertImage(context.getContentResolver(),imgPath, fileName, description);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void addImageToGallery(Context context, File imgPath){
         Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         Uri uri = Uri.fromFile(imgPath);

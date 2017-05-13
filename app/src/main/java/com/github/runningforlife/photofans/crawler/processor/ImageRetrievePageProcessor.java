@@ -38,6 +38,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private static HashMap<String,Boolean> sAllPages = new HashMap<>();
     // last url to start this page retrieving
     private static final int MAX_SEED_URL = 3;
+    // max pages we want to save
+    private static final int MAX_SAVED_PAGES = 100;
     private static List<String> sLastUrl;
     @SuppressWarnings("unchecked")
     private static HashSet<String> sValidPageUrls = new HashSet<>(new ArrayList(Arrays.asList(ImageSource.ALL_URLS)));
@@ -188,8 +190,10 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     }
 
     private List<VisitedPageInfo> getPageList(Page page){
+
         List<String> urlList = page.getHtml().links().all();
         List<VisitedPageInfo> pageList = new ArrayList<>(urlList.size() + 1);
+
         page.addTargetRequests(urlList);
 
         urlList.add(page.getUrl().get());

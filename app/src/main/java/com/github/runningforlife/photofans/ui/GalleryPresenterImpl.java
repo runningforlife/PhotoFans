@@ -114,15 +114,15 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
 
     @Override
     public void init() {
+        // start earlier
+        mRealmMgr.onStart();
+
         mUnUsedImages = new HashSet<>();
         mImageList = new ArrayList<>();
         mIsRefreshing = false;
 
         mReceiver = new SimpleResultReceiver(new Handler(Looper.myLooper()));
         mReceiver.setReceiver(this);
-
-        // start earlier
-        mRealmMgr.onStart();
     }
 
     @Override
