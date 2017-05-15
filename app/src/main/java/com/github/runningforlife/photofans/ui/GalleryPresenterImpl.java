@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import io.realm.Realm;
@@ -156,10 +157,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
                     mIsRefreshing = false;
                 }
                 // unsorted: keep list descending sorted
-                if(mImageList.get(0).getTimeStamp() <
-                        mImageList.get(mImageList.size()-1).getTimeStamp()){
-                    Collections.sort(mImageList);
-                }
+                sort();
                 mView.notifyDataChanged();
             } else {
                 Log.v(TAG, "onRealmDataChange(): unused url size = " + data.size());
@@ -191,6 +189,14 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
                 mIsRefreshing = false;
                 // save to realm
                 break;
+        }
+    }
+
+    private void sort(){
+        int r = new Random().nextInt(mImageList.size()-1);
+        if(mImageList.get(0).getTimeStamp() <
+                mImageList.get(r).getTimeStamp()){
+            Collections.sort(mImageList);
         }
     }
 }

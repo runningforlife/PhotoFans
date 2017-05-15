@@ -7,6 +7,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.github.runningforlife.photofans.R;
+import com.github.runningforlife.photofans.ui.adapter.ImagePagerAdapter;
 
 
 /**
@@ -15,13 +16,15 @@ import com.github.runningforlife.photofans.R;
 
 public class GlideLoader {
 
-    public static void load(Context context, RequestListener<String,GlideDrawable> listener, String url, int w, int h) {
+    public static void load(Context context, ImagePagerAdapter.ImageLoaderListener listener, String url, int w, int h) {
         Glide.with(context)
                 .load(url)
+                .asBitmap()
                 .placeholder(R.drawable.ic_android_black_150dp)
                 .error(R.drawable.ic_mood_bad_grey_24dp)
                 .listener(listener)
                 .crossFade()
+                .thumbnail((float)0.3)
                 .into(w,h);
     }
 

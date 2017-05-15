@@ -29,7 +29,7 @@ import com.github.runningforlife.photofans.utils.DisplayUtil;
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoViewHolder>{
     private static final String TAG = "GalleryAdapter";
 
-    private static final int DEFAULT_IMG_WIDTH = 512;
+    private static final int DEFAULT_IMG_WIDTH = 1024;
     private static final int DEFAULT_IMG_HEIGHT = (int)(DEFAULT_IMG_WIDTH*DisplayUtil.getScreenRatio());
 
     private static final int KB = 1024;

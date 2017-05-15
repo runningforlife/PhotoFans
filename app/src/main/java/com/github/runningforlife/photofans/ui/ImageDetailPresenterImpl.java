@@ -8,6 +8,7 @@ import com.github.runningforlife.photofans.realm.RealmManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import io.realm.RealmResults;
 import com.github.runningforlife.photofans.realm.ImageRealm;
@@ -74,11 +75,15 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter{
         }
 
         // keep sorted
-        if(mImgList.get(0).getTimeStamp() >
-                mImgList.get(mImgList.size()-1).getTimeStamp()){
+        sort();
+        mView.onDataSetChanged();
+    }
+
+    private void sort(){
+        int r = new Random().nextInt(mImgList.size()-1);
+        if(mImgList.get(0).getTimeStamp() <
+                mImgList.get(r).getTimeStamp()){
             Collections.sort(mImgList);
         }
-
-        mView.onDataSetChanged();
     }
 }

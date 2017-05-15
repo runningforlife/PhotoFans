@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -151,9 +152,9 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     private void initView(){
         Log.v(TAG,"initView()");
 
-        LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
-        //GridLayoutManager gridLayoutMgr = new GridLayoutManager(context,2, GridLayoutManager.VERTICAL,false);
-        mRvImgList.setLayoutManager(llMgr);
+        //LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
+        GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(),2, GridLayoutManager.VERTICAL,false);
+        mRvImgList.setLayoutManager(gridLayoutMgr);
         mRvImgList.setItemAnimator(new DefaultItemAnimator());
 
         mAdapter = new GalleryAdapter(getContext(),this);

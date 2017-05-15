@@ -30,6 +30,7 @@ public class RealmManager implements LifeCycle{
     private RealmResults<ImageRealm> mAllUnUsedImages;
     // callback to listen realm changes: update or query complete
     private Set<RealmDataChangeListener> mListeners;
+    private RealmDataSetChangeListener mDataSetChangeListener;
 
     public interface RealmDataChangeListener{
         void onRealmDataChange(RealmResults<ImageRealm> data);
@@ -42,24 +43,21 @@ public class RealmManager implements LifeCycle{
     private RealmManager() {
         realm = Realm.getDefaultInstance();
         mListeners = new HashSet<>();
+        mDataSetChangeListener = new RealmDataSetChangeListener();
     }
 
     // this should be consistent with UI lifecycle: onCreate() or onStart()
     @Override
     public void onStart(){
         query();
-        mRealRefCount.incrementAndGet();
-        Log.d(TAG,"onStart(): ref count = " + mRealRefCount.get());
+        Log.d(TAG,"onStart(): ref count = " + mRealRefCount.incrementAndGet());
     }
 
     // this should be consistent with UI lifecycle: onDestroy()
     @Override
     public void onDestroy(){
-        if( mRealRefCount.get() > 0) {
-            mRealRefCount.decrementAndGet();
-        }
         Log.d(TAG,"onDestroy(): ref count = " + mRealRefCount.get());
-        if(mRealRefCount.get() == 0) {
+        if(mRealRefCount.decrementAndGet() == 0) {
             if (mAllImages != null) {
                 mAllImages.removeAllChangeListeners();
                 mAllImages = null;
@@ -158,7 +156,7 @@ public class RealmManager implements LifeCycle{
     }
 
     private class RealmDataSetChangeListener implements RealmChangeListener<RealmResults<ImageRealm>>{
-
+        //FIXME: sometimes, Realm will call this too many times, which may cause sluggish
         @Override
         public void onChange(RealmResults<ImageRealm> element) {
             Log.v(TAG,"onChange(): current image count = " + element.size());
@@ -177,11 +175,11 @@ public class RealmManager implements LifeCycle{
                     .equalTo("mIsUsed", true)
                     .findAllAsync()
                     .sort("mTimeStamp", Sort.DESCENDING);
-            mAllImages.addChangeListener(new RealmDataSetChangeListener());
+            mAllImages.addChangeListener(mDataSetChangeListener);
             Log.v(TAG, "query(): image count = " + mAllImages.size());
 
         }else if(mAllImages.isValid() && !mAllImages.isEmpty()){
-            mAllImages.addChangeListener(new RealmDataSetChangeListener());
+            //mAllImages.addChangeListener(new RealmDataSetChangeListener());
             notify(mAllImages);
         }
 
@@ -190,7 +188,7 @@ public class RealmManager implements LifeCycle{
                     .equalTo("mIsUsed", false)
                     .findAllAsync()
                     .sort("mTimeStamp", Sort.DESCENDING);
-            mAllUnUsedImages.addChangeListener(new RealmDataSetChangeListener());
+            mAllUnUsedImages.addChangeListener(mDataSetChangeListener);
         }
     }
 

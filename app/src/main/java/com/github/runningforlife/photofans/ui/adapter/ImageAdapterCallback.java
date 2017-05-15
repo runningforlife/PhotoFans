@@ -21,7 +21,7 @@ public interface ImageAdapterCallback {
     /*
      * item at pos is clicked
      */
-    void onItemClicked(int pos);
+    void onItemClicked(int pos, String adapter);
 
 
     /*

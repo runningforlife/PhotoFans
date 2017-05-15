@@ -25,7 +25,7 @@ import butterknife.ButterKnife;
  */
 
 public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageViewHolder> {
-    private static final String TAG = "PreviewAdapter";
+    public static final String TAG = "PreviewAdapter";
 
     private Context mContext;
     private ImageAdapterCallback mCallback;
@@ -50,7 +50,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
 
 /*        PicassoLoader.load(mContext,holder.preview,mCallback.getItemAtPos(position).getUrl(),
                 150,150);*/
-        GlideLoader.load(mContext,mCallback.getItemAtPos(position).getUrl(),holder.preview,100,100);
+        GlideLoader.load(mContext,mCallback.getItemAtPos(position).getUrl(),holder.preview,150,150);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
                 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
                 @Override
                 public void onClick(View v) {
-                    mCallback.onItemClicked(getAdapterPosition());
+                    mCallback.onItemClicked(getAdapterPosition(),TAG);
 
                     Iterator iterator = mChecked.entrySet().iterator();
                     while(iterator.hasNext()) {

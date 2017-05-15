@@ -2,6 +2,6 @@
 <layoutAnimation xmlns:android="http://schemas.android.com/apk/res/android"
     android:animation="@android:anim/fade_in"
     android:interpolator="@android:interpolator/linear"
-    android:delay="0.3">
+    android:delay="300">
 
 </layoutAnimation>

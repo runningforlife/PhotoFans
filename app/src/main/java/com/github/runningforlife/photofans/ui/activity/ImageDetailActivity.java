@@ -21,7 +21,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
@@ -103,14 +105,14 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         initActionList();
         // keep it here to ensure data set is loaded
         mPresenter.onStart();
+
+        mMainHandler = new EventHandler(Looper.getMainLooper());
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        Log.v(TAG,"onStart()");
-
-        mMainHandler = new EventHandler(Looper.myLooper());
+        Log.v(TAG,"onResume()");
 
         setTitle();
     }
@@ -136,8 +138,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         int id = item.getItemId();
         if(id == android.R.id.home){
-            // call this to avoid close Realm when navigation is done
-            //mPresenter.onDestroy();
             Intent intent = new Intent(this, GalleryActivity.class);
             NavUtils.navigateUpTo(this,intent);
             return true;
@@ -168,12 +168,24 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     @Override
-    public void onItemClicked(int pos) {
+    public void onItemClicked(int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos " + pos);
         mCurrentImgIdx = pos;
         // loading image
         mImgPager.setCurrentItem(pos);
         mLvImgPreview.scrollToPosition(pos);
+
+        if(ImagePagerAdapter.TAG.equals(adapter)){
+            int visible = mLvImgPreview.getVisibility();
+            if(visible != View.VISIBLE){
+                mLvImgPreview.setVisibility(View.VISIBLE);
+                //after given time, preview should be hidden
+                Message msg = mMainHandler.obtainMessage(EventHandler.EVENT_HIDE_PREVIEW);
+                mMainHandler.sendMessageDelayed(msg,PREVIEW_HIDE_COUNT_DOWN);
+            }else{
+                mLvImgPreview.setVisibility(View.INVISIBLE);
+            }
+        }
 
         getPreviewScrollParams();
         // change title
@@ -232,6 +244,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mLvImgPreview.setVisibility(View.VISIBLE);
         mLvImgPreview.setLayoutManager(llMgr);
         mLvImgPreview.setItemAnimator(new DefaultItemAnimator());
+        //mLvImgPreview.setAnimation(AnimationUtils.loadAnimation(this,R.anim.anim_dialog_enter));
 
         Intent data = getIntent();
         mCurrentImgIdx = data.getIntExtra("image",0);
@@ -240,9 +253,10 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         //TODO: try to scroll to center
         mLvImgPreview.scrollToPosition(mCurrentImgIdx);
         // invisible
-        mLvImgPreview.setVisibility(View.INVISIBLE);
+        mLvImgPreview.setVisibility(View.VISIBLE);
 
         getPreviewScrollParams();
+
     }
 
     private void initPresenter(){
@@ -284,15 +298,8 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
             if(view != null) {
                 view.setBackgroundResource(R.drawable.rect_image_preview);
             }
-            mLvImgPreview.scrollToPosition(position);
-
-            int visible = mLvImgPreview.getVisibility();
-            if(visible == View.VISIBLE){
-                //after given time, preview should be hidden
-                Message msg = mMainHandler.obtainMessage(EventHandler.EVENT_HIDE_PREVIEW);
-                mMainHandler.sendMessageDelayed(msg,PREVIEW_HIDE_COUNT_DOWN);
-            }else{
-                mLvImgPreview.setVisibility(View.VISIBLE);
+            if(mLvImgPreview.getVisibility() == View.VISIBLE) {
+                mLvImgPreview.scrollToPosition(position);
             }
         }
 
@@ -329,6 +336,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     private void saveImage(){
+        // FIXME: it seem that sometimes iv is null
         ImageView iv = (ImageView)(mImgPager.getChildAt(mImgPager.getCurrentItem()));
         if(iv == null) return;
         Drawable drawable = iv.getDrawable();
@@ -360,6 +368,17 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         }
     }
 
+    private class PreviewTouchListener implements View.OnTouchListener{
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if (mMainHandler.hasMessages(EventHandler.EVENT_HIDE_PREVIEW)) {
+                mMainHandler.removeMessages(EventHandler.EVENT_HIDE_PREVIEW);
+            }
+            return false;
+        }
+    }
+
     private class EventHandler extends Handler{
 
         static final int IMAGE_SAVE_COMPLETE = 1;
@@ -369,7 +388,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         static final int IMAGE_SHARE_COMPLETE = 5;
         static final int EVENT_HIDE_PREVIEW = 6;
 
-        public EventHandler(Looper looper){
+        EventHandler(Looper looper){
             super(looper);
         }
 
