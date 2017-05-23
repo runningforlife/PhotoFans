@@ -16,4 +16,11 @@
         android:defaultValue="@array/default_source_url">
     </com.github.runningforlife.photofans.ui.preference.EmptyListPreference>
 
+    <EditTextPreference
+        android:key="@string/pref_max_reserved_images"
+        android:title="@string/max_reserved_images"
+        android:summary="@string/how_many_images_reserved"
+        android:defaultValue="@integer/max_reserved_image_number">
+    </EditTextPreference>
+
 </PreferenceScreen>

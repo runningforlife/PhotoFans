@@ -35,12 +35,15 @@ public class SharedPrefUtil {
         }
     }
 
-    public static boolean isAllowedDownload(){
-        Context context = AppGlobals.getInstance();
+    public static boolean getWifiDownloadMode(Context context, String key){
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 
-        String key = context.getString(R.string.pref_wifi_download);
-
         return pref.getBoolean(key, true);
+    }
+
+    public static int getMaxReservedImages(Context context, String key, int def){
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return pref.getInt(key,def);
     }
 }
