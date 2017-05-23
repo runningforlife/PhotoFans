@@ -18,6 +18,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -25,10 +29,15 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
     compile 'com.android.support:support-annotations:24.2.1'
     testCompile 'junit:junit:4.12'
+    // mockito
+    androidTestCompile "org.mockito:mockito-android:2.8.9"
+    testCompile "org.mockito:mockito-core:2.8.9"
+
     compile 'us.codecraft:webmagic-core:0.6.1'
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
     //compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
