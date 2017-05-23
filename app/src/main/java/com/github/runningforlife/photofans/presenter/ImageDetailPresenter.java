@@ -1,4 +1,4 @@
-package com.github.runningforlife.photofans.ui;
+package com.github.runningforlife.photofans.presenter;
 
 import com.github.runningforlife.photofans.realm.ImageRealm;
 
@@ -6,7 +6,7 @@ import com.github.runningforlife.photofans.realm.ImageRealm;
  * a presenter to show the detail of the image
  */
 
-public interface ImageDetailPresenter extends Presenter{
+public interface ImageDetailPresenter extends Presenter {
 
     /*
      * get image item at position

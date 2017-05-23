@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
@@ -23,15 +22,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.github.runningforlife.photofans.R;
 import com.github.runningforlife.photofans.app.AppGlobals;
 import com.github.runningforlife.photofans.realm.ImageRealm;
-import com.github.runningforlife.photofans.ui.ImageDetailPresenter;
-import com.github.runningforlife.photofans.ui.ImageDetailPresenterImpl;
+import com.github.runningforlife.photofans.presenter.ImageDetailPresenter;
+import com.github.runningforlife.photofans.presenter.ImageDetailPresenterImpl;
 import com.github.runningforlife.photofans.ui.ImageDetailView;
 import com.github.runningforlife.photofans.ui.adapter.ImageAdapterCallback;
 
@@ -45,10 +43,8 @@ import com.github.runningforlife.photofans.realm.UserAction;
 import com.github.runningforlife.photofans.utils.BitmapUtil;
 import com.github.runningforlife.photofans.utils.ToastUtil;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
-import java.util.Date;
 
 import static com.github.runningforlife.photofans.realm.UserAction.*;
 

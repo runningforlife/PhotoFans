@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,8 +15,8 @@ import android.view.ViewGroup;
 
 import com.github.runningforlife.photofans.R;
 import com.github.runningforlife.photofans.realm.ImageRealm;
-import com.github.runningforlife.photofans.ui.GalleryPresenter;
-import com.github.runningforlife.photofans.ui.GalleryPresenterImpl;
+import com.github.runningforlife.photofans.presenter.GalleryPresenter;
+import com.github.runningforlife.photofans.presenter.GalleryPresenterImpl;
 import com.github.runningforlife.photofans.ui.GalleryView;
 import com.github.runningforlife.photofans.ui.activity.ImageDetailActivity;
 import com.github.runningforlife.photofans.ui.adapter.GalleryAdapter;

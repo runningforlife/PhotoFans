@@ -1,4 +1,4 @@
-package com.github.runningforlife.photofans.ui;
+package com.github.runningforlife.photofans.presenter;
 
 /**
  *  interface to follow activity/fragment lifecycle

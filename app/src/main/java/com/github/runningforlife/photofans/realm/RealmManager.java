@@ -2,7 +2,7 @@ package com.github.runningforlife.photofans.realm;
 
 import android.util.Log;
 
-import com.github.runningforlife.photofans.ui.LifeCycle;
+import com.github.runningforlife.photofans.presenter.LifeCycle;
 
 import java.util.HashSet;
 import java.util.List;

@@ -38,8 +38,8 @@ public class ImageRetrieveService extends Service implements
     private volatile Looper mServiceLooper;
     private volatile H mServiceHandler;
     //private boolean mRedelivery;
-
-    private static final long MAX_RETRIEVE_TIMEOUT = 30000;
+    // timeout should be less than screen off timing
+    private static final long MAX_RETRIEVE_TIMEOUT = 20000;
     // max number of images to be retrieved a time
     public static final String EXTRA_MAX_IMAGES = "maxImages";
 

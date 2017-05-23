@@ -1,5 +1,6 @@
-package com.github.runningforlife.photofans.ui;
+package com.github.runningforlife.photofans.presenter;
 
+import com.github.runningforlife.photofans.presenter.LifeCycle;
 import com.github.runningforlife.photofans.realm.RealmManager;
 
 /**
@@ -9,7 +10,7 @@ import com.github.runningforlife.photofans.realm.RealmManager;
  * @since 1.0
  */
 
-public interface Presenter extends RealmManager.RealmDataChangeListener,LifeCycle{
+public interface Presenter extends RealmManager.RealmDataChangeListener,LifeCycle {
     /*
      * init presenter
      */

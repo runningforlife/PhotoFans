@@ -1,4 +1,4 @@
-package com.github.runningforlife.photofans.ui;
+package com.github.runningforlife.photofans.presenter;
 
 import com.github.runningforlife.photofans.realm.ImageRealm;
 
@@ -6,7 +6,7 @@ import com.github.runningforlife.photofans.realm.ImageRealm;
  * a gallery presenter used to load photo list
  */
 
-public interface GalleryPresenter extends Presenter{
+public interface GalleryPresenter extends Presenter {
     /*
      * load data asynchronously
      */

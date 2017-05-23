@@ -1,4 +1,4 @@
-package com.github.runningforlife.photofans.ui;
+package com.github.runningforlife.photofans.presenter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.github.runningforlife.photofans.presenter.GalleryPresenter;
 import com.github.runningforlife.photofans.realm.RealmManager;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import com.github.runningforlife.photofans.realm.ImageRealm;
 import com.github.runningforlife.photofans.service.ImageRetrieveService;
 import com.github.runningforlife.photofans.service.ServiceStatus;
 import com.github.runningforlife.photofans.service.SimpleResultReceiver;
+import com.github.runningforlife.photofans.ui.GalleryView;
 
 /**
  * a presenter to bridge UI and data repository

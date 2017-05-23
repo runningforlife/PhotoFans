@@ -1,8 +1,9 @@
-package com.github.runningforlife.photofans.ui;
+package com.github.runningforlife.photofans.presenter;
 
 import android.content.Context;
 import android.util.Log;
 
+import com.github.runningforlife.photofans.presenter.ImageDetailPresenter;
 import com.github.runningforlife.photofans.realm.RealmManager;
 
 import java.util.ArrayList;
@@ -12,12 +13,13 @@ import java.util.Random;
 
 import io.realm.RealmResults;
 import com.github.runningforlife.photofans.realm.ImageRealm;
+import com.github.runningforlife.photofans.ui.ImageDetailView;
 
 /**
  * Created by jason on 4/6/17.
  */
 
-public class ImageDetailPresenterImpl implements ImageDetailPresenter{
+public class ImageDetailPresenterImpl implements ImageDetailPresenter {
     private static final String TAG = "ImageDetailPresenter";
 
     private List<ImageRealm> mImgList;
