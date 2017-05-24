@@ -78,7 +78,12 @@ public class ImageRetrieveService extends Service implements
 
     @Override
     public void onDestroy(){
+        Log.v(TAG,"onDestroy()");
         mServiceLooper.quit();
+        saveToRealm(mProcessor.getImageList());
+        if(mSpider.getStatus() == Spider.Status.Running){
+            mSpider.stop();
+        }
     }
 
     @Override

@@ -82,10 +82,6 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
     }
 
     private void sort(){
-        int r = new Random().nextInt(mImgList.size()-1);
-        if(mImgList.get(0).getTimeStamp() <
-                mImgList.get(r).getTimeStamp()){
-            Collections.sort(mImgList);
-        }
+        Collections.sort(mImgList);
     }
 }

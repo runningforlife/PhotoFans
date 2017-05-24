@@ -41,9 +41,19 @@ public class SharedPrefUtil {
         return pref.getBoolean(key, true);
     }
 
-    public static int getMaxReservedImages(Context context, String key, int def){
+    public static int getMaxReservedImages(Context context){
+        String key = context.getString(R.string.pref_max_reserved_images);
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 
-        return pref.getInt(key,def);
+        return pref.getInt(key,100);
+    }
+
+    public static int getMaxReservedImages(){
+        Context context = AppGlobals.getInstance();
+        String key = context.getString(R.string.pref_max_reserved_images);
+        SharedPreferences pref = PreferenceManager.
+                getDefaultSharedPreferences(context);
+
+        return pref.getInt(key,100);
     }
 }

@@ -3,6 +3,7 @@ package com.github.runningforlife.photofans.realm;
 import android.util.Log;
 
 import com.github.runningforlife.photofans.presenter.LifeCycle;
+import com.github.runningforlife.photofans.utils.SharedPrefUtil;
 
 import java.util.HashSet;
 import java.util.List;
@@ -85,7 +86,9 @@ public class RealmManager implements LifeCycle{
             }, new Realm.Transaction.OnSuccess() {
                 @Override
                 public void onSuccess() {
-                    Log.v(TAG, "onSuccess()");
+                    Log.v(TAG,"writeAsync(): success");
+                    //cannot access from this thread
+                    //reserve();
                 }
             }, new Realm.Transaction.OnError() {
                 @Override
@@ -97,6 +100,8 @@ public class RealmManager implements LifeCycle{
         }finally {
             r.close();
         }
+
+        //reserve();
     }
 
     public void writeAsync(final List<? extends RealmObject> data) {
@@ -109,10 +114,17 @@ public class RealmManager implements LifeCycle{
                     Log.v(TAG, "execute(): saved data size = " + data.size());
                     realm.copyToRealmOrUpdate(data);
                 }
+            }, new Realm.Transaction.OnSuccess() {
+                @Override
+                public void onSuccess() {
+                    Log.v(TAG,"writeAsync(): success");
+                }
             });
         }finally {
             r.close();
         }
+
+        //reserve();
     }
 
     public void queryAllAsync(){
@@ -137,11 +149,21 @@ public class RealmManager implements LifeCycle{
         return unVisited;
     }
 
-    public void delete(final ImageRealm info){
-        if(info == null) return;
+    public void delete(final RealmObject object){
+        if(object == null) return;
 
-        info.deleteFromRealm();
-
+        Realm r = Realm.getDefaultInstance();
+/*
+        r.beginTransaction();
+        object.deleteFromRealm();
+        r.commitTransaction();
+*/
+        r.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                object.deleteFromRealm();
+            }
+        });
     }
 
     public void addListener(RealmDataChangeListener listener){
@@ -160,6 +182,7 @@ public class RealmManager implements LifeCycle{
         @Override
         public void onChange(RealmResults<ImageRealm> element) {
             Log.v(TAG,"onChange(): current image count = " + element.size());
+            //element.sort("mTimeStamp",Sort.DESCENDING);
             RealmManager.this.notify(element);
         }
     }
@@ -181,7 +204,10 @@ public class RealmManager implements LifeCycle{
         }else if(mAllImages.isValid() && !mAllImages.isEmpty()){
             //mAllImages.addChangeListener(new RealmDataSetChangeListener());
             notify(mAllImages);
+            //reserve();
         }
+
+        reserve();
 
         if(mAllUnUsedImages == null || !mAllUnUsedImages.isValid()) {
             mAllUnUsedImages = realm.where(ImageRealm.class)
@@ -197,6 +223,21 @@ public class RealmManager implements LifeCycle{
 
         for (RealmDataChangeListener listener : mListeners) {
             listener.onRealmDataChange(element);
+        }
+    }
+
+    // keep latest images
+    private void reserve(){
+        int maxImgs = SharedPrefUtil.getMaxReservedImages();
+        if(mAllImages != null && mAllImages.isValid()
+                && mAllImages.isLoaded()){
+            mAllImages.sort("mTimeStamp",Sort.DESCENDING);
+
+            realm.beginTransaction();
+            for(int i = maxImgs; i < mAllImages.size(); ++i){
+                mAllImages.get(i).deleteFromRealm();
+            }
+            realm.commitTransaction();
         }
     }
 
