@@ -1,6 +1,6 @@
 package com.github.runningforlife.photofans.ui.adapter;
 
-import com.github.runningforlife.photofans.realm.ImageRealm;
+import com.github.runningforlife.photofans.model.ImageRealm;
 
 /**
  * image detail adapter callback

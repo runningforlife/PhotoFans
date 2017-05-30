@@ -3,18 +3,12 @@ package com.github.runningforlife.photofans.presenter;
 import android.content.Context;
 import android.util.Log;
 
-import com.github.runningforlife.photofans.presenter.ImageDetailPresenter;
-import com.github.runningforlife.photofans.realm.RealmManager;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import com.github.runningforlife.photofans.model.RealmManager;
 
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-import com.github.runningforlife.photofans.realm.ImageRealm;
+import com.github.runningforlife.photofans.model.ImageRealm;
 import com.github.runningforlife.photofans.ui.ImageDetailView;
 
 /**

@@ -13,9 +13,9 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.realm.ImageWebSite;
-import com.github.runningforlife.photofans.realm.RealmManager;
-import com.github.runningforlife.photofans.realm.VisitedPageInfo;
+import com.github.runningforlife.photofans.model.ImageWebSite;
+import com.github.runningforlife.photofans.model.RealmManager;
+import com.github.runningforlife.photofans.model.VisitedPageInfo;
 import com.github.runningforlife.photofans.ui.adapter.MultiSelectionListAdapter;
 
 import java.util.HashSet;

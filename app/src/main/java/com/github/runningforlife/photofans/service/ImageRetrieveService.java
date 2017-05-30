@@ -1,6 +1,5 @@
 package com.github.runningforlife.photofans.service;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,8 +14,8 @@ import android.util.Log;
 
 import com.github.runningforlife.photofans.crawler.processor.ImageRetrievePageProcessor;
 import com.github.runningforlife.photofans.crawler.processor.ImageSource;
-import com.github.runningforlife.photofans.realm.ImageRealm;
-import com.github.runningforlife.photofans.realm.RealmManager;
+import com.github.runningforlife.photofans.model.ImageRealm;
+import com.github.runningforlife.photofans.model.RealmManager;
 
 import java.util.List;
 

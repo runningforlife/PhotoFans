@@ -4,7 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
 
-import com.github.runningforlife.photofans.realm.ImageRealm;
+import com.github.runningforlife.photofans.model.ImageRealm;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

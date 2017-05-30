@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.realm.ImageRealm;
+import com.github.runningforlife.photofans.model.ImageRealm;
 import com.github.runningforlife.photofans.presenter.GalleryPresenter;
 import com.github.runningforlife.photofans.presenter.GalleryPresenterImpl;
 import com.github.runningforlife.photofans.ui.GalleryView;
@@ -106,6 +106,9 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     @Override
     public void notifyDataChanged() {
         Log.v(TAG,"notifyDataChanged()");
+        if(mRvImgList.getAdapter() == null){
+            mRvImgList.setAdapter(mAdapter);
+        }
         mAdapter.notifyDataSetChanged();
     }
 
@@ -157,8 +160,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         mRvImgList.setItemAnimator(new DefaultItemAnimator());
 
         mAdapter = new GalleryAdapter(getContext(),this);
-        mRvImgList.setAdapter(mAdapter);
-
+        //mRvImgList.setAdapter(mAdapter);
         mRefresher.setColorSchemeResources(android.R.color.holo_blue_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_orange_dark);

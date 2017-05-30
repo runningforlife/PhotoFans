@@ -1,7 +1,6 @@
 package com.github.runningforlife.photofans.presenter;
 
-import com.github.runningforlife.photofans.presenter.LifeCycle;
-import com.github.runningforlife.photofans.realm.RealmManager;
+import com.github.runningforlife.photofans.model.RealmManager;
 
 /**
  * a presenter to do interactions with UI and update database

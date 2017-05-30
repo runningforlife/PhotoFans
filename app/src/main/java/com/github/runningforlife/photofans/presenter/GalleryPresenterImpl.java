@@ -7,21 +7,15 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.github.runningforlife.photofans.realm.RealmManager;
+import com.github.runningforlife.photofans.model.RealmManager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-import com.github.runningforlife.photofans.realm.ImageRealm;
+import com.github.runningforlife.photofans.model.ImageRealm;
 import com.github.runningforlife.photofans.service.ImageRetrieveService;
 import com.github.runningforlife.photofans.service.ServiceStatus;
 import com.github.runningforlife.photofans.service.SimpleResultReceiver;

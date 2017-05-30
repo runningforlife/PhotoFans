@@ -1,4 +1,4 @@
-package com.github.runningforlife.photofans.realm;
+package com.github.runningforlife.photofans.model;
 
 /**
  * all user action like : save/share/delete/Favor

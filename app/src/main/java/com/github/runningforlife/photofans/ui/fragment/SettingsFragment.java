@@ -6,8 +6,8 @@ import android.preference.PreferenceFragment;
 import android.util.Log;
 
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.realm.RealmManager;
-import com.github.runningforlife.photofans.realm.VisitedPageInfo;
+import com.github.runningforlife.photofans.model.RealmManager;
+import com.github.runningforlife.photofans.model.VisitedPageInfo;
 
 import java.util.Iterator;
 import java.util.Set;

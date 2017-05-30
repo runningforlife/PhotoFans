@@ -1,4 +1,4 @@
-package com.github.runningforlife.photofans.realm;
+package com.github.runningforlife.photofans.model;
 
 import android.support.annotation.NonNull;
 

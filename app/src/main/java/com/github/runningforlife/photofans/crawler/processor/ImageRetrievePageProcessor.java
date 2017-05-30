@@ -3,9 +3,9 @@ package com.github.runningforlife.photofans.crawler.processor;
 import android.os.Looper;
 import android.util.Log;
 
-import com.github.runningforlife.photofans.realm.ImageRealm;
-import com.github.runningforlife.photofans.realm.RealmManager;
-import com.github.runningforlife.photofans.realm.VisitedPageInfo;
+import com.github.runningforlife.photofans.model.ImageRealm;
+import com.github.runningforlife.photofans.model.RealmManager;
+import com.github.runningforlife.photofans.model.VisitedPageInfo;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;

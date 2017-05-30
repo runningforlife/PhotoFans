@@ -2,7 +2,7 @@ package com.github.runningforlife.photofans.crawler.processor;
 
 import java.util.List;
 
-import com.github.runningforlife.photofans.realm.ImageRealm;
+import com.github.runningforlife.photofans.model.ImageRealm;
 import us.codecraft.webmagic.Page;
 
 /**

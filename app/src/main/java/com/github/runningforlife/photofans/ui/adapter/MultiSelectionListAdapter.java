@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.realm.ImageWebSite;
+import com.github.runningforlife.photofans.model.ImageWebSite;
 
 /**
  * a list adapter to bind data to list view
