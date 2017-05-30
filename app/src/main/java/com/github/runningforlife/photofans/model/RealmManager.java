@@ -74,8 +74,6 @@ public class RealmManager implements LifeCycle{
             }
         }
         mListeners.clear();
-        // trim data size
-        //trimData();
     }
 
     //Note: Realm objects can only be accessed on the thread they were created
@@ -216,12 +214,8 @@ public class RealmManager implements LifeCycle{
             Log.v(TAG, "query(): image count = " + mAllImages.size());
 
         }else if(mAllImages.isValid() && !mAllImages.isEmpty()){
-            //mAllImages.addChangeListener(new RealmDataSetChangeListener());
             notify(mAllImages);
-            //trimData();
         }
-
-        //trimData();
 
         if(mAllUnUsedImages == null || !mAllUnUsedImages.isValid()) {
             mAllUnUsedImages = realm.where(ImageRealm.class)

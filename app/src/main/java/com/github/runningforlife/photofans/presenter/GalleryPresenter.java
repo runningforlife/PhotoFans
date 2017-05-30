@@ -1,5 +1,7 @@
 package com.github.runningforlife.photofans.presenter;
 
+import android.graphics.Bitmap;
+
 import com.github.runningforlife.photofans.model.ImageRealm;
 
 /**
@@ -31,4 +33,9 @@ public interface GalleryPresenter extends Presenter {
      * remove item at given position
      */
     void removeItemAtPos(int pos);
+
+    /*
+     * save bitmap at pos
+     */
+    void saveImageAtPos(int pos, Bitmap bitmap);
 }

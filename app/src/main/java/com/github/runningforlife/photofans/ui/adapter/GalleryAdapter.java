@@ -2,6 +2,8 @@ package com.github.runningforlife.photofans.ui.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.github.runningforlife.photofans.R;
+import com.github.runningforlife.photofans.loader.GlideLoaderListener;
 import com.github.runningforlife.photofans.model.RealmManager;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -21,6 +24,9 @@ import butterknife.ButterKnife;
 import com.github.runningforlife.photofans.loader.GlideLoader;
 import com.github.runningforlife.photofans.model.ImageRealm;
 import com.github.runningforlife.photofans.utils.DisplayUtil;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * a gallery adapter to bind image data to recycleview
@@ -41,12 +47,15 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     private LayoutInflater mInflater;
     private ItemSelectedCallback mCallback;
     private Context mContext;
+    // decode bitmap
+    private ExecutorService mExecutor;
 
     public interface ItemSelectedCallback {
         void onItemClick(int pos);
         int getItemCount();
         ImageRealm getItemAtPos(int pos);
         void removeItemAtPos(int pos);
+        void saveImage(int pos, Bitmap bitmap);
     }
 
     public GalleryAdapter(Context context,ItemSelectedCallback callback){
@@ -55,6 +64,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         // different device panel size may need different width and height
         double ratio = DisplayUtil.getScreenRatio();
         mContext = context;
+        mExecutor = Executors.newFixedThreadPool(3);
     }
 
     @Override
@@ -65,19 +75,36 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     }
 
     @Override
-    public void onBindViewHolder(PhotoViewHolder vh, int position) {
-        String url = mCallback.getItemAtPos(position).getUrl();
-        Log.v(TAG,"onBindViewHolder(): image url = " + url);
+    public void onBindViewHolder(final PhotoViewHolder vh, final int position) {
+        final ImageRealm img = mCallback.getItemAtPos(position);
+        final String url = img.getUrl();
+        Log.d(TAG,"onBindViewHolder(): image url = " + url);
 
-        if(!TextUtils.isEmpty(url)) {
-/*            PicassoLoader.load(mContext,new ImageTarget(vh.img,position),url,
-                    DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);*/
-
-            GlideLoader.load(mContext,url,vh.img,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
+        if(img.getData() != null) {
+            mExecutor.submit(new DecodeRunnable(img.getData(), new DecodeCallback() {
+                @Override
+                public void onDecodeDone(Bitmap bitmap) {
+                    if(bitmap != null) {
+                        vh.img.setImageBitmap(bitmap);
+                    }else{
+                        GlideLoader.load(mContext,url,new GlideLoaderListener(vh.img),DEFAULT_IMG_WIDTH,
+                                DEFAULT_IMG_HEIGHT);
+                    }
+                }
+            }));
+        }else if(!TextUtils.isEmpty(url)) {
+            GlideLoaderListener listener = new GlideLoaderListener(vh.img);
+            listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+                @Override
+                public void onImageLoadDone(Bitmap bitmap) {
+                    // save image
+                    mCallback.saveImage(vh.getAdapterPosition(),bitmap);
+                }
+            });
+            GlideLoader.load(mContext,url,listener,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
         }else if(getItemCount() > 0){
             // remove from the list
-            RealmManager.getInstance().delete(mCallback.getItemAtPos(position));
-            notifyItemChanged(position);
+            mCallback.removeItemAtPos(position);
         }
     }
 
@@ -110,43 +137,28 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         }
     }
 
-    // picasso loader
-    final class ImageTarget implements Target{
+    public class DecodeRunnable implements Runnable{
+        private byte[] data;
+        private DecodeCallback callback;
 
-        private ImageView mImg;
-        private int mPos;
-
-        public ImageTarget(ImageView iv, int pos){
-            mImg = iv;
-            this.mPos = pos;
+        public DecodeRunnable(byte[] data, DecodeCallback callback){
+            this.data = data;
+            this.callback = callback;
         }
 
         @Override
-        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            //int imgSize = BitmapUtil.getBitmapSize(bitmap);
-            int imgSize = bitmap.getByteCount();
-            Log.v(TAG,"onBitmapLoaded(): from " + from + ",image size = " + imgSize/KB + "KB");
-            int w = bitmap.getWidth();
-            int h = bitmap.getHeight();
-            // filter small size pictures
-            if(imgSize < MIN_IMG_SIZE || (w < MIN_IMG_WIDTH || h < MIN_IMG_HEIGHT)){
-                mCallback.removeItemAtPos(mPos);
-            }else{
-                // display it
-                mImg.setImageBitmap(bitmap);
-            }
-        }
+        public void run() {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            options.outWidth = DEFAULT_IMG_WIDTH;
+            options.outHeight = DEFAULT_IMG_HEIGHT;
 
-        @Override
-        public void onBitmapFailed(Drawable errorDrawable) {
-            Log.v(TAG,"onBitmapFailed()");
-            //just remove it
-            //mCallback.removeItemAtPos(mPos);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(data,0,data.length,options);
+            callback.onDecodeDone(bitmap);
         }
+    }
 
-        @Override
-        public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-        }
+    private interface DecodeCallback{
+        void onDecodeDone(Bitmap bitmap);
     }
 }

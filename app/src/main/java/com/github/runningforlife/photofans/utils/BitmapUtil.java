@@ -5,6 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -18,13 +20,21 @@ import java.util.Date;
 
 public class BitmapUtil {
 
+    public static void getBytes(byte[] result,Bitmap bitmap, int quality) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(result.length);
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG,quality,bos);
+
+        bos.write(result);
+        bos.close();
+    }
+
     public static String saveToFile(Bitmap bitmap, String path, String name) throws FileNotFoundException {
         String imgName = buildFileName(name);
         File file = new File(path, imgName);
         FileOutputStream fos = new FileOutputStream(file);
 
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-
         try {
             fos.flush();
             fos.close();

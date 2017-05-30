@@ -17,6 +17,7 @@ public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
     private String mName;
     private long mTimeStamp;
     private boolean mIsUsed;
+    private byte[] mData;
 
     public void setUrl(String url){
         mUrl = url;
@@ -48,6 +49,14 @@ public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
 
     public boolean getUsed(){
         return mIsUsed;
+    }
+
+    public void setData(byte[] data){
+        mData  = data;
+    }
+
+    public byte[] getData(){
+        return mData;
     }
 
     @Override

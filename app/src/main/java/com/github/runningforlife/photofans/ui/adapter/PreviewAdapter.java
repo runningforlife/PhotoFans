@@ -12,6 +12,7 @@ import android.widget.ImageView;
 
 import com.github.runningforlife.photofans.R;
 import com.github.runningforlife.photofans.loader.GlideLoader;
+import com.github.runningforlife.photofans.loader.GlideLoaderListener;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,9 +49,8 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
     public void onBindViewHolder(ImageViewHolder holder, int position) {
         Log.v(TAG,"onBindViewHolder(): position = " + position);
 
-/*        PicassoLoader.load(mContext,holder.preview,mCallback.getItemAtPos(position).getUrl(),
-                150,150);*/
-        GlideLoader.load(mContext,mCallback.getItemAtPos(position).getUrl(),holder.preview,150,150);
+        String url = mCallback.getItemAtPos(position).getUrl();
+        GlideLoader.load(mContext,url,new GlideLoaderListener(holder.preview),150,150);
     }
 
     @Override

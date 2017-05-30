@@ -3,6 +3,8 @@ package com.github.runningforlife.photofans.app;
 import android.app.Application;
 import android.os.Environment;
 
+import com.github.runningforlife.photofans.model.ImageRealmMigration;
+
 import java.io.File;
 
 import io.realm.Realm;
@@ -29,6 +31,7 @@ public class AppGlobals extends Application{
         Realm.init(this);
         RealmConfiguration realmConfig = new RealmConfiguration.Builder()
                 .name("PhotoFans")
+                .migration(new ImageRealmMigration())
                 .build();
         Realm.setDefaultConfiguration(realmConfig);
         // it seems that we should init here

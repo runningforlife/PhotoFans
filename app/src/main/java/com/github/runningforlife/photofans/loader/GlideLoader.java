@@ -20,7 +20,6 @@ public class GlideLoader {
         Glide.with(context)
                 .load(url)
                 .asBitmap()
-                .placeholder(R.drawable.ic_android_black_150dp)
                 .error(R.drawable.ic_mood_bad_grey_24dp)
                 .listener(listener)
                 .crossFade()
@@ -28,11 +27,11 @@ public class GlideLoader {
                 .into(w,h);
     }
 
-    public static void load(Context context, String url, ImageView target, int w, int h){
+    public static void load(Context context, String url, GlideLoaderListener listener, int w, int h){
         Glide.with(context)
              .load(url)
-             .listener(new GlideLoaderListener(target))
-             .placeholder(R.drawable.ic_android_black_150dp)
+             .asBitmap()
+             .listener(listener)
              .error(R.drawable.ic_mood_bad_grey_24dp)
              .centerCrop()
              .crossFade()
