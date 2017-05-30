@@ -209,7 +209,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                 info.setVisitTime(System.currentTimeMillis());
                 pageList.add(info);
                 sAllPages.put(url,info.getIsVisited());
-                Log.d(TAG,"getPageList(): page url = " + url);
+                //Log.d(TAG,"getPageList(): page url = " + url);
             }
         }
 

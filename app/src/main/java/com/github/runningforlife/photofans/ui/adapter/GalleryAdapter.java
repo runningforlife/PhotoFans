@@ -15,9 +15,7 @@ import android.widget.ImageView;
 
 import com.github.runningforlife.photofans.R;
 import com.github.runningforlife.photofans.loader.GlideLoaderListener;
-import com.github.runningforlife.photofans.model.RealmManager;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import com.github.runningforlife.photofans.utils.ThreadTimeUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -98,7 +96,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                 @Override
                 public void onImageLoadDone(Bitmap bitmap) {
                     // save image
-                    mCallback.saveImage(vh.getAdapterPosition(),bitmap);
+                    mCallback.saveImage(position,bitmap);
                 }
             });
             GlideLoader.load(mContext,url,listener,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
@@ -148,6 +146,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
         @Override
         public void run() {
+            ThreadTimeUtil.start();
+
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             options.outWidth = DEFAULT_IMG_WIDTH;
@@ -155,6 +155,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
             Bitmap bitmap = BitmapFactory.decodeByteArray(data,0,data.length,options);
             callback.onDecodeDone(bitmap);
+
+            Log.d(TAG,"run(): decoding bitmap takes " + ThreadTimeUtil.getElapse() + "ms");
         }
     }
 

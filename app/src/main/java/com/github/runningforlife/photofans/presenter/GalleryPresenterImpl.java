@@ -28,6 +28,7 @@ import com.github.runningforlife.photofans.ui.GalleryView;
 import com.github.runningforlife.photofans.utils.BitmapUtil;
 import com.github.runningforlife.photofans.utils.DisplayUtil;
 import com.github.runningforlife.photofans.utils.SharedPrefUtil;
+import com.github.runningforlife.photofans.utils.ThreadTimeUtil;
 
 /**
  * a presenter to bridge UI and data repository
@@ -54,7 +55,8 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
         mView = view;
         mContext = context;
         mRealmMgr = RealmManager.getInstance();
-        mExecutor = Executors.newFixedThreadPool(5);
+        // realm only allow one transaction a time
+        mExecutor = Executors.newSingleThreadExecutor();
     }
 
     @Override
@@ -98,29 +100,41 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
 
     @Override
     public int getItemCount() {
+        if(mImageList == null) return 0;
+
         return mImageList.size();
     }
 
     @Override
     public ImageRealm getItemAtPos(int pos) {
+        if(mImageList == null) return null;
+
         return mImageList.get(pos);
     }
 
     @Override
     public void removeItemAtPos(int pos) {
         Log.v(TAG,"removeItemAtPos(): position = " + pos);
+        if(mImageList == null) return;
+
         mRealmMgr.delete(mImageList.get(pos));
     }
 
     @Override
     public void saveImageAtPos(int pos, Bitmap bitmap) {
         Log.v(TAG,"saveImageAtPos(): pos = " + pos);
-        mExecutor.submit(new BitmapSaveRunnable(mImageList.get(pos),bitmap));
+        if(pos >= 0 && pos < mImageList.size()) {
+            ImageRealm img = mImageList.get(pos);
+            if(img.getData() == null) {
+                mExecutor.submit(new BitmapSaveRunnable(img, bitmap));
+            }
+        }
     }
 
     @Override
     public void init() {
         // start earlier
+        mRealmMgr.addListener(this);
         mRealmMgr.onStart();
         mIsRefreshing = false;
 
@@ -130,6 +144,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
 
     @Override
     public void onStart() {
+        Log.v(TAG,"onStart()");
         mRealmMgr.addListener(this);
     }
 
@@ -155,9 +170,8 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
             return;
         }
 
+        mPrevImgCount = data.size();
         if(data.size() > 0 && data.size() <= sMaxReservedImg) {
-            // save the current image count
-            mPrevImgCount = data.size();
             if (data.get(0).getUsed()) {
                 mImageList = data;
                 // unsorted: keep list descending sorted
@@ -219,18 +233,23 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
 
         @Override
         public void run() {
-            Bitmap bm = Bitmap.createScaledBitmap(bitmap,256,(int)(256*DisplayUtil.getScreenRatio()),false);
+            ThreadTimeUtil.start();
+            int w = 256; // width
+            int h = (int)(w*DisplayUtil.getScreenRatio());
+            Bitmap bm = Bitmap.createScaledBitmap(bitmap,w,h,false);
 
-            byte[] bytes = new byte[256*256*2];
+            byte[] bytes = new byte[w*h*2];
+            Realm r = Realm.getDefaultInstance();
             try {
                 BitmapUtil.getBytes(bytes,bm,100);
-                Realm r = Realm.getDefaultInstance();
                 r.beginTransaction();
                 cache.setData(bytes);
                 r.commitTransaction();
             } catch (IOException e) {
-                bytes = null;
                 e.printStackTrace();
+            } finally {
+                r.close();
+                Log.d(TAG,"run(): saving image takes " + ThreadTimeUtil.getElapse() + "ms");
             }
         }
     }

@@ -85,6 +85,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
             root.setOnClickListener(new View.OnClickListener() {
                 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
                 @Override
+                // FIXME: there is exception when item is clicked
                 public void onClick(View v) {
                     mCallback.onItemClicked(getAdapterPosition(),TAG);
 

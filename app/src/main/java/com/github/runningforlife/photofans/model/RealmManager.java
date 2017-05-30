@@ -23,7 +23,7 @@ import io.realm.Sort;
 public class RealmManager implements LifeCycle{
     private static final String TAG = "RealmManager";
 
-    private static RealmManager sInstance = new RealmManager();
+    private static final RealmManager sInstance = new RealmManager();
     private AtomicInteger mRealRefCount = new AtomicInteger(0);
     private Realm realm;
     // all the data we have
@@ -190,7 +190,6 @@ public class RealmManager implements LifeCycle{
     }
 
     private class RealmDataSetChangeListener implements RealmChangeListener<RealmResults<ImageRealm>>{
-        //FIXME: sometimes, Realm will call this too many times, which may cause sluggish
         @Override
         public void onChange(RealmResults<ImageRealm> element) {
             Log.v(TAG,"onChange(): current image count = " + element.size());
@@ -212,7 +211,7 @@ public class RealmManager implements LifeCycle{
                     .sort("mTimeStamp", Sort.DESCENDING);
             mAllImages.addChangeListener(mDataSetChangeListener);
             Log.v(TAG, "query(): image count = " + mAllImages.size());
-
+            notify(mAllImages);
         }else if(mAllImages.isValid() && !mAllImages.isEmpty()){
             notify(mAllImages);
         }

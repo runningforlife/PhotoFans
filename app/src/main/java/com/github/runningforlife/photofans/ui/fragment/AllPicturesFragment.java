@@ -53,10 +53,9 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         View root = inflater.inflate(R.layout.fragment_photos_gallery,parent,false);
         ButterKnife.bind(this,root);
 
+        initView();
         // need to call it here for onStart is too late
         initPresenter();
-
-        initView();
 
         return root;
     }

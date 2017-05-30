@@ -1,6 +1,5 @@
 package com.github.runningforlife.photofans.ui.adapter;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.view.PagerAdapter;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.github.runningforlife.photofans.R;
@@ -20,7 +18,6 @@ import com.github.runningforlife.photofans.utils.DisplayUtil;
 import com.github.runningforlife.photofans.loader.GlideLoader;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
