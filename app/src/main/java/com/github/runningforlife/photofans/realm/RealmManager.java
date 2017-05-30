@@ -59,6 +59,7 @@ public class RealmManager implements LifeCycle{
     public void onDestroy(){
         Log.d(TAG,"onDestroy(): ref count = " + mRealRefCount.get());
         if(mRealRefCount.decrementAndGet() == 0) {
+            //trimData();
             if (mAllImages != null) {
                 mAllImages.removeAllChangeListeners();
                 mAllImages = null;
@@ -72,6 +73,9 @@ public class RealmManager implements LifeCycle{
                 realm = null;
             }
         }
+        mListeners.clear();
+        // trim data size
+        //trimData();
     }
 
     //Note: Realm objects can only be accessed on the thread they were created
@@ -88,7 +92,7 @@ public class RealmManager implements LifeCycle{
                 public void onSuccess() {
                     Log.v(TAG,"writeAsync(): success");
                     //cannot access from this thread
-                    //reserve();
+                    //trimData();
                 }
             }, new Realm.Transaction.OnError() {
                 @Override
@@ -101,7 +105,7 @@ public class RealmManager implements LifeCycle{
             r.close();
         }
 
-        //reserve();
+        //trimData();
     }
 
     public void writeAsync(final List<? extends RealmObject> data) {
@@ -124,7 +128,7 @@ public class RealmManager implements LifeCycle{
             r.close();
         }
 
-        //reserve();
+        //trimData();
     }
 
     public void queryAllAsync(){
@@ -151,19 +155,29 @@ public class RealmManager implements LifeCycle{
 
     public void delete(final RealmObject object){
         if(object == null) return;
-
         Realm r = Realm.getDefaultInstance();
-/*
-        r.beginTransaction();
-        object.deleteFromRealm();
-        r.commitTransaction();
-*/
+
         r.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 object.deleteFromRealm();
             }
         });
+    }
+
+    // keep latest images
+    public void trimData(){
+        int maxImgs = SharedPrefUtil.getMaxReservedImages();
+        if(mAllImages != null && mAllImages.isValid()
+                && mAllImages.isLoaded()){
+            mAllImages.sort("mTimeStamp",Sort.DESCENDING);
+
+            realm.beginTransaction();
+            for(int i = maxImgs; i < mAllImages.size(); ++i){
+                mAllImages.get(i).deleteFromRealm();
+            }
+            realm.commitTransaction();
+        }
     }
 
     public void addListener(RealmDataChangeListener listener){
@@ -204,10 +218,10 @@ public class RealmManager implements LifeCycle{
         }else if(mAllImages.isValid() && !mAllImages.isEmpty()){
             //mAllImages.addChangeListener(new RealmDataSetChangeListener());
             notify(mAllImages);
-            //reserve();
+            //trimData();
         }
 
-        reserve();
+        //trimData();
 
         if(mAllUnUsedImages == null || !mAllUnUsedImages.isValid()) {
             mAllUnUsedImages = realm.where(ImageRealm.class)
@@ -223,21 +237,6 @@ public class RealmManager implements LifeCycle{
 
         for (RealmDataChangeListener listener : mListeners) {
             listener.onRealmDataChange(element);
-        }
-    }
-
-    // keep latest images
-    private void reserve(){
-        int maxImgs = SharedPrefUtil.getMaxReservedImages();
-        if(mAllImages != null && mAllImages.isValid()
-                && mAllImages.isLoaded()){
-            mAllImages.sort("mTimeStamp",Sort.DESCENDING);
-
-            realm.beginTransaction();
-            for(int i = maxImgs; i < mAllImages.size(); ++i){
-                mAllImages.get(i).deleteFromRealm();
-            }
-            realm.commitTransaction();
         }
     }
 

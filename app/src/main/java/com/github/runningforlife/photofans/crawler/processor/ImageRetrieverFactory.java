@@ -70,7 +70,7 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
         List<ImageRealm> imgList = Collections.EMPTY_LIST;
 
         String url = page.getUrl().get();
-        Log.v(TAG,"retrieved page base url = " + url);
+        Log.d(TAG,"retrieved page base url = " + url);
         try {
             String baseUrl = UrlUtil.getRootUrl(url);
             switch (baseUrl){

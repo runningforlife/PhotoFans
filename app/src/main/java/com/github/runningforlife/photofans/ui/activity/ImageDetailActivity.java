@@ -41,6 +41,7 @@ import com.github.runningforlife.photofans.ui.adapter.PreviewAdapter;
 import com.github.runningforlife.photofans.ui.fragment.ActionListDialogFragment;
 import com.github.runningforlife.photofans.realm.UserAction;
 import com.github.runningforlife.photofans.utils.BitmapUtil;
+import com.github.runningforlife.photofans.utils.MediaStoreUtil;
 import com.github.runningforlife.photofans.utils.ToastUtil;
 
 import java.io.FileNotFoundException;
@@ -147,6 +148,10 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     @Override
     public void onDataSetChanged() {
         Log.v(TAG,"onDataSetChanged()");
+        if(mImgPager.getAdapter() == null) {
+            mImgPager.setAdapter(mPagerAdapter);
+            mLvImgPreview.setAdapter(mAdapter);
+        }
         mPagerAdapter.notifyDataSetChanged();
         mAdapter.notifyDataSetChanged();
 
@@ -186,6 +191,12 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         getPreviewScrollParams();
         // change title
         setTitle();
+    }
+
+    @Override
+    public void onItemLongClicked(int pos, String adapter) {
+        Log.v(TAG,"onItemLongClicked()");
+        showActionDialog();
     }
 
     @Override
@@ -232,8 +243,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         Log.v(TAG,"initView()");
         mAdapter = new PreviewAdapter(getApplicationContext(),ImageDetailActivity.this);
         mPagerAdapter = new ImagePagerAdapter(getApplicationContext(),this);
-        mImgPager.setAdapter(mPagerAdapter);
-        mLvImgPreview.setAdapter(mAdapter);
 
         mImgPager.addOnPageChangeListener(new ImagePageStateListener());
         LinearLayoutManager llMgr = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
@@ -333,12 +342,11 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
     private void saveImage(){
         // FIXME: it seem that sometimes iv is null
-        ImageView iv = (ImageView)(mImgPager.getChildAt(mImgPager.getCurrentItem()));
+        ImageView iv = (ImageView)(mPagerAdapter.getViewAtPos(mCurrentImgIdx));
         if(iv == null) return;
-        Drawable drawable = iv.getDrawable();
+        Log.v(TAG,"saveImage()");
+        final Drawable drawable = iv.getDrawable();
         if(drawable != null){
-            final Bitmap bitmap = BitmapUtil.drawableToBitmap(drawable);
-
             final ImageRealm imageRealm = mPresenter.getItemAtPos(mCurrentImgIdx);
             final String name = imageRealm.getName();
             final String path = AppGlobals.getInstance().getImagePath();
@@ -347,11 +355,14 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
                 @Override
                 public void run() {
                     try {
+                        Bitmap bitmap = BitmapUtil.drawableToBitmap(drawable);
                         BitmapUtil.saveToFile(bitmap,path,name);
                         // yes, job is done
                         Message msg = mMainHandler.obtainMessage(EventHandler.IMAGE_SAVE_COMPLETE);
                         msg.obj = path;
                         msg.sendToTarget();
+                        // save it to gallery
+                        MediaStoreUtil.addImageToGallery(getApplicationContext(),bitmap,name);
                     } catch (FileNotFoundException e) {
                         Log.v(TAG,"saveImage(): fail to save image");
                         e.printStackTrace();

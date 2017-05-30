@@ -25,6 +25,12 @@ public interface ImageAdapterCallback {
 
 
     /*
+     * item at pos is long clicked
+     */
+    void onItemLongClicked(int pos, String adapter);
+
+
+    /*
      * image start loading
      */
     void onImageLoadStart(int pos);

@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Random;
 
 import io.realm.RealmResults;
+import io.realm.Sort;
+
 import com.github.runningforlife.photofans.realm.ImageRealm;
 import com.github.runningforlife.photofans.ui.ImageDetailView;
 
@@ -22,12 +24,13 @@ import com.github.runningforlife.photofans.ui.ImageDetailView;
 public class ImageDetailPresenterImpl implements ImageDetailPresenter {
     private static final String TAG = "ImageDetailPresenter";
 
-    private List<ImageRealm> mImgList;
+    private RealmResults<ImageRealm> mImgList;
     private ImageDetailView mView;
     private RealmManager mRealmMgr;
 
     public ImageDetailPresenterImpl(Context context, ImageDetailView view){
         mView = view;
+        mRealmMgr = RealmManager.getInstance();
     }
 
     @Override
@@ -44,13 +47,11 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
     public void removeItemAtPos(int pos) {
         Log.d(TAG,"removeItemAtPos()");
         mRealmMgr.delete(mImgList.get(pos));
-        mImgList.remove(pos);
     }
 
     @Override
     public void init() {
-        mImgList = new ArrayList<>();
-        mRealmMgr = RealmManager.getInstance();
+        //mImgList = new ArrayList<>();
         mRealmMgr.onStart();
     }
 
@@ -69,19 +70,13 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
     @Override
     public void onRealmDataChange(RealmResults<ImageRealm> data) {
         Log.v(TAG,"onRealmDataChange(): data size = " + data.size());
-
-        for(ImageRealm img : data){
-            if(!mImgList.contains(img)){
-                mImgList.add(img);
-            }
-        }
-
+        mImgList = data;
         // keep sorted
         sort();
         mView.onDataSetChanged();
     }
 
     private void sort(){
-        Collections.sort(mImgList);
+        mImgList.sort("mTimeStamp", Sort.DESCENDING);
     }
 }

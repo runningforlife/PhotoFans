@@ -45,7 +45,7 @@ public class SharedPrefUtil {
         String key = context.getString(R.string.pref_max_reserved_images);
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 
-        return pref.getInt(key,100);
+        return Integer.parseInt(pref.getString(key,"100"));
     }
 
     public static int getMaxReservedImages(){
@@ -54,6 +54,6 @@ public class SharedPrefUtil {
         SharedPreferences pref = PreferenceManager.
                 getDefaultSharedPreferences(context);
 
-        return pref.getInt(key,100);
+        return Integer.parseInt(pref.getString(key,"100"));
     }
 }
