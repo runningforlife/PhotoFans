@@ -1,6 +1,7 @@
 package com.github.runningforlife.photofans.glide;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
@@ -12,8 +13,10 @@ import com.bumptech.glide.module.GlideModule;
  */
 
 public class DiskStorageModule implements GlideModule {
+    private static final String TAG = "DiskStorageModule";
     @Override
     public void applyOptions(Context context, GlideBuilder builder) {
+        Log.d(TAG,"applyOptions()");
         builder.setDecodeFormat(DecodeFormat.PREFER_ARGB_8888)
                 .setDiskCache(new DiskLruFactory(context));
     }

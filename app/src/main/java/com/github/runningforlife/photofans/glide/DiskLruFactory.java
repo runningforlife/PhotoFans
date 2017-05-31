@@ -1,9 +1,10 @@
 package com.github.runningforlife.photofans.glide;
 
 import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
 
 import com.bumptech.glide.load.engine.cache.DiskLruCacheFactory;
-import com.github.runningforlife.photofans.app.AppGlobals;
 
 import java.io.File;
 
@@ -12,8 +13,9 @@ import java.io.File;
  */
 
 public class DiskLruFactory extends DiskLruCacheFactory{
-    public static final String DISK_CACHE_DIR = "PhotoFans/Pictures/Cache/";
-    public static final int DISK_CACHE_SIZE = 1024*1024*100;
+    private static final String TAG = "DiskLru";
+    static final String DISK_CACHE_DIR = "PhotoFans/Pictures/Cache/";
+    static final int DISK_CACHE_SIZE = 1024*1024*100;
 
     public DiskLruFactory(Context context) {
         this(context, DISK_CACHE_DIR, DISK_CACHE_SIZE);
@@ -27,9 +29,10 @@ public class DiskLruFactory extends DiskLruCacheFactory{
         super(new CacheDirectoryGetter() {
             @Override
             public File getCacheDirectory() {
-                File dir = context.getFilesDir();
+                File dir = Environment.getExternalStorageDirectory();
+                Log.d(TAG,"getCacheDirectory()");
                 if(dir == null){
-                    return null;
+                    dir = context.getFilesDir();
                 }
 
                 if(diskCacheName != null){
