@@ -45,6 +45,10 @@
         <service android:name=".service.ImageRetrieveService">
         </service>
 
+        <meta-data android:name="com.github.runningforlife.photofans.glide.DiskStorageModule"
+            android:value="GlideModule">
+        </meta-data>
+
     </application>
 
 </manifest>

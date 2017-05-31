@@ -17,3 +17,4 @@
 #}
 
 -keep class com.bumptech.glide.integration.okhttp3.OkHttpGlideModule
+-keepnames class * com.github.runningforlife.photofans.glide.DiskStorageModule
