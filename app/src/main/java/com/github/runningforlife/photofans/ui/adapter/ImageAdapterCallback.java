@@ -1,5 +1,7 @@
 package com.github.runningforlife.photofans.ui.adapter;
 
+import android.graphics.Bitmap;
+
 import com.github.runningforlife.photofans.model.ImageRealm;
 
 /**
@@ -40,4 +42,9 @@ public interface ImageAdapterCallback {
      */
     void onImageLoadDone(int pos, boolean isSuccess);
 
+
+    /*
+     * remove item at pos
+     */
+    void removeItemAtPos(int pos);
 }

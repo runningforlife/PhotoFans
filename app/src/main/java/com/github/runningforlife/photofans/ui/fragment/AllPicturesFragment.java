@@ -9,6 +9,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,8 @@ import com.github.runningforlife.photofans.presenter.GalleryPresenterImpl;
 import com.github.runningforlife.photofans.ui.GalleryView;
 import com.github.runningforlife.photofans.ui.activity.ImageDetailActivity;
 import com.github.runningforlife.photofans.ui.adapter.GalleryAdapter;
+import com.github.runningforlife.photofans.ui.adapter.ImageAdapterCallback;
+import com.github.runningforlife.photofans.utils.ToastUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,7 +33,7 @@ import butterknife.ButterKnife;
  */
 
 public class AllPicturesFragment extends BaseFragment implements GalleryView,
-        GalleryAdapter.ItemSelectedCallback {
+        ImageAdapterCallback {
     public static final String TAG = "AllPicturesFragment";
 
     @BindView(R.id.rcv_gallery) RecyclerView mRvImgList;
@@ -38,6 +41,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     private GalleryPresenter mPresenter;
     private GalleryAdapter mAdapter;
     private RefreshCallback mCallback;
+
 
     public interface RefreshCallback {
         void onRefreshDone(boolean success);
@@ -124,7 +128,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     }
 
     @Override
-    public void onItemClick(int pos) {
+    public void onItemClicked(int pos,String adapter) {
         Log.v(TAG,"onItemClick(): pos = " + pos);
 
         if(mRefresher.isRefreshing()){
@@ -136,7 +140,22 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     }
 
     @Override
-    public int getItemCount() {
+    public void onItemLongClicked(int pos, String adapter) {
+
+    }
+
+    @Override
+    public void onImageLoadStart(int pos) {
+
+    }
+
+    @Override
+    public void onImageLoadDone(int pos, boolean isSuccess) {
+
+    }
+
+    @Override
+    public int getCount() {
         return mPresenter.getItemCount();
     }
 
@@ -150,10 +169,19 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         mPresenter.removeItemAtPos(pos);
     }
 
-    @Override
-    public void saveImage(int pos, Bitmap bitmap) {
+    private void saveImage(int pos, Bitmap bitmap) {
         Log.d(TAG,"saveImage(): pos = " + pos);
-        mPresenter.saveImageAtPos(pos,bitmap);
+        mPresenter.saveImageAtPos(pos);
+    }
+
+    @Override
+    public void onImageSaveDone(String path) {
+        Log.v(TAG,"onImageSaveDone(): isOk = " + !TextUtils.isEmpty(path));
+        if(!TextUtils.isEmpty(path)) {
+            ToastUtil.showToast(getContext(), getString(R.string.save_image_Success) + path);
+        }else{
+            ToastUtil.showToast(getContext(),getString(R.string.save_image_fail));
+        }
     }
 
     private void initView(){

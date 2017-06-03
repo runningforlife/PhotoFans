@@ -140,6 +140,8 @@ public class ActionListDialogFragment extends DialogFragment{
                         if(mCb != null){
                             mCb.onActionClick(action,position);
                         }
+                        // destroy dialog
+                        dismiss();
                     }
                 });
             }

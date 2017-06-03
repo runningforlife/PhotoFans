@@ -1,8 +1,6 @@
 package com.github.runningforlife.photofans.ui.activity;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,17 +16,15 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.github.runningforlife.photofans.R;
-import com.github.runningforlife.photofans.app.AppGlobals;
 import com.github.runningforlife.photofans.model.ImageRealm;
 import com.github.runningforlife.photofans.presenter.ImageDetailPresenter;
 import com.github.runningforlife.photofans.presenter.ImageDetailPresenterImpl;
@@ -42,15 +38,9 @@ import com.github.runningforlife.photofans.ui.adapter.ImagePagerAdapter;
 import com.github.runningforlife.photofans.ui.adapter.PreviewAdapter;
 import com.github.runningforlife.photofans.ui.fragment.ActionListDialogFragment;
 import com.github.runningforlife.photofans.model.UserAction;
-import com.github.runningforlife.photofans.utils.BitmapUtil;
-import com.github.runningforlife.photofans.utils.MediaStoreUtil;
 import com.github.runningforlife.photofans.utils.ToastUtil;
 
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 
 import static com.github.runningforlife.photofans.model.UserAction.*;
 
@@ -221,11 +211,16 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     @Override
+    public void removeItemAtPos(int pos) {
+
+    }
+
+    @Override
     public void onActionClick(String action, int pos) {
         Log.v(TAG,"onActionClick(): action = " + action);
 
         if(action.equals(ACTION_SAVE.action())){
-            saveImage();
+            saveImage(mCurrentImgIdx);
         }else if(action.equals(ACTION_DELETE.action())){
             // remove image
             mPresenter.removeItemAtPos(pos);
@@ -308,6 +303,19 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mActionBar.setWindowTitle(title);
     }
 
+    @Override
+    public void onImageSaveDone(String path) {
+        Log.v(TAG,"onImageSaveDone(): isOk = " + !TextUtils.isEmpty(path));
+
+        if(!TextUtils.isEmpty(path)) {
+            Message msg = mMainHandler.obtainMessage(EventHandler.IMAGE_SAVE_COMPLETE,path);
+            msg.sendToTarget();
+        }else{
+            Message msg = mMainHandler.obtainMessage(EventHandler.IMAGE_SAVE_FAIL);
+            msg.sendToTarget();
+        }
+    }
+
     private final class ImagePageStateListener implements ViewPager.OnPageChangeListener{
 
         @Override
@@ -356,40 +364,9 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mLvImgPreview.setVisibility(View.INVISIBLE);
     }
 
-    private void saveImage(){
-        // FIXME: it seem that sometimes iv is null
-        // FIXME: move this to presenter
-        ImageView iv = (ImageView)(mPagerAdapter.getViewAtPos(mCurrentImgIdx));
-        if(iv == null) return;
+    private void saveImage(int pos){
         Log.v(TAG,"saveImage()");
-        final Drawable drawable = iv.getDrawable();
-        if(drawable != null){
-            final ImageRealm imageRealm = mPresenter.getItemAtPos(mCurrentImgIdx);
-            final String name = imageRealm.getName();
-            final String path = AppGlobals.getInstance().getImagePath();
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Bitmap bitmap = BitmapUtil.drawableToBitmap(drawable);
-                        BitmapUtil.saveToFile(bitmap,path,name);
-                        // yes, job is done
-                        Message msg = mMainHandler.obtainMessage(EventHandler.IMAGE_SAVE_COMPLETE);
-                        msg.obj = path;
-                        msg.sendToTarget();
-                        // save it to gallery
-                        MediaStoreUtil.addImageToGallery(getApplicationContext(),bitmap,name);
-                    } catch (FileNotFoundException e) {
-                        Log.v(TAG,"saveImage(): fail to save image");
-                        e.printStackTrace();
-                        Message msg = mMainHandler.obtainMessage(EventHandler.IMAGE_SAVE_FAIL);
-                        msg.obj = e.getCause();
-                        msg.sendToTarget();
-                    }
-                }
-            }).start();
-        }
+        mPresenter.saveImageAtPos(pos);
     }
 
     private class EventHandler extends Handler{
@@ -411,7 +388,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
             switch (what){
                 case IMAGE_SAVE_COMPLETE:
-                    String toast = getString(R.string.save_image_to) + msg.obj;
+                    String toast = getString(R.string.save_image_Success) + msg.obj;
                     ToastUtil.showToast(ImageDetailActivity.this,toast);
                     break;
                 case IMAGE_SAVE_FAIL:

@@ -1,10 +1,6 @@
 package com.github.runningforlife.photofans.ui.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Path;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,16 +11,12 @@ import android.widget.ImageView;
 
 import com.github.runningforlife.photofans.R;
 import com.github.runningforlife.photofans.loader.GlideLoaderListener;
-import com.github.runningforlife.photofans.utils.ThreadTimeUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.github.runningforlife.photofans.loader.GlideLoader;
 import com.github.runningforlife.photofans.model.ImageRealm;
 import com.github.runningforlife.photofans.utils.DisplayUtil;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * a gallery adapter to bind image data to recycleview
@@ -43,26 +35,14 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
     @SuppressWarnings("unchecked")
     private LayoutInflater mInflater;
-    private ItemSelectedCallback mCallback;
+    private ImageAdapterCallback mCallback;
     private Context mContext;
-    // decode bitmap
-    private ExecutorService mExecutor;
 
-    public interface ItemSelectedCallback {
-        void onItemClick(int pos);
-        int getItemCount();
-        ImageRealm getItemAtPos(int pos);
-        void removeItemAtPos(int pos);
-        void saveImage(int pos, Bitmap bitmap);
-    }
-
-    public GalleryAdapter(Context context,ItemSelectedCallback callback){
+    public GalleryAdapter(Context context,ImageAdapterCallback callback){
         mCallback = callback;
         mInflater = LayoutInflater.from(context);
         // different device panel size may need different width and height
-        double ratio = DisplayUtil.getScreenRatio();
         mContext = context;
-        mExecutor = Executors.newFixedThreadPool(3);
     }
 
     @Override
@@ -78,27 +58,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         final String url = img.getUrl();
         Log.d(TAG,"onBindViewHolder(): image url = " + url);
 
-        if(img.getData() != null) {
-            mExecutor.submit(new DecodeRunnable(img.getData(), new DecodeCallback() {
-                @Override
-                public void onDecodeDone(Bitmap bitmap) {
-                    if(bitmap != null) {
-                        vh.img.setImageBitmap(bitmap);
-                    }else{
-                        GlideLoader.load(mContext,url,new GlideLoaderListener(vh.img),DEFAULT_IMG_WIDTH,
-                                DEFAULT_IMG_HEIGHT);
-                    }
-                }
-            }));
-        }else if(!TextUtils.isEmpty(url)) {
+        if(!TextUtils.isEmpty(url)) {
             GlideLoaderListener listener = new GlideLoaderListener(vh.img);
-            listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
-                @Override
-                public void onImageLoadDone(Bitmap bitmap) {
-                    // save image
-                    mCallback.saveImage(position,bitmap);
-                }
-            });
             GlideLoader.load(mContext,url,listener,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
         }else if(getItemCount() > 0){
             // remove from the list
@@ -113,7 +74,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
     @Override
     public int getItemCount() {
-        return mCallback.getItemCount();
+        return mCallback.getCount();
     }
 
     public class PhotoViewHolder extends RecyclerView.ViewHolder{
@@ -128,39 +89,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                 @Override
                 public void onClick(View v) {
                     if(mCallback != null){
-                        mCallback.onItemClick(getAdapterPosition());
+                        mCallback.onItemClicked(getAdapterPosition(),TAG);
                     }
                 }
             });
         }
-    }
-
-    public class DecodeRunnable implements Runnable{
-        private byte[] data;
-        private DecodeCallback callback;
-
-        public DecodeRunnable(byte[] data, DecodeCallback callback){
-            this.data = data;
-            this.callback = callback;
-        }
-
-        @Override
-        public void run() {
-            ThreadTimeUtil.start();
-
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            options.outWidth = DEFAULT_IMG_WIDTH;
-            options.outHeight = DEFAULT_IMG_HEIGHT;
-
-            Bitmap bitmap = BitmapFactory.decodeByteArray(data,0,data.length,options);
-            callback.onDecodeDone(bitmap);
-
-            Log.d(TAG,"run(): decoding bitmap takes " + ThreadTimeUtil.getElapse() + "ms");
-        }
-    }
-
-    private interface DecodeCallback{
-        void onDecodeDone(Bitmap bitmap);
     }
 }

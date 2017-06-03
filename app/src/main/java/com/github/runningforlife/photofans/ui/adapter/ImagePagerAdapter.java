@@ -29,7 +29,6 @@ public class ImagePagerAdapter extends PagerAdapter{
 
     private static final int DEFAULT_WIDTH = 1024;
     private static final int DEFAULT_HEIGHT = (int)(DEFAULT_WIDTH/ DisplayUtil.getScreenRatio());
-    private List<ImageView> mAllImages;
     private Context mContext;
     private ImageAdapterCallback mCallback;
 
@@ -37,11 +36,6 @@ public class ImagePagerAdapter extends PagerAdapter{
         mCallback = callback;
         mContext = context;
         //mAllImages = new ArrayList<>(mCallback.getCount());
-    }
-
-    //get view at index
-    public View getViewAtPos(int pos){
-        return mAllImages.get(pos);
     }
 
     @Override
@@ -85,11 +79,6 @@ public class ImagePagerAdapter extends PagerAdapter{
             }
         });
         parent.addView(view);
-        // save it for later use
-        if(mAllImages == null){
-            mAllImages = new ArrayList<>(mCallback.getCount());
-        }
-        mAllImages.add(position,view);
         return view;
     }
 

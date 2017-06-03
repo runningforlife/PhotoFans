@@ -37,5 +37,5 @@ public interface GalleryPresenter extends Presenter {
     /*
      * save bitmap at pos
      */
-    void saveImageAtPos(int pos, Bitmap bitmap);
+    void saveImageAtPos(int pos);
 }

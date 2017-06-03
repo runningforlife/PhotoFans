@@ -3,15 +3,17 @@ package com.github.runningforlife.photofans.presenter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.github.runningforlife.photofans.loader.GlideLoader;
+import com.github.runningforlife.photofans.loader.GlideLoaderListener;
 import com.github.runningforlife.photofans.model.RealmManager;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,10 +27,10 @@ import com.github.runningforlife.photofans.service.ImageRetrieveService;
 import com.github.runningforlife.photofans.service.ServiceStatus;
 import com.github.runningforlife.photofans.service.SimpleResultReceiver;
 import com.github.runningforlife.photofans.ui.GalleryView;
-import com.github.runningforlife.photofans.utils.BitmapUtil;
 import com.github.runningforlife.photofans.utils.DisplayUtil;
+import com.github.runningforlife.photofans.utils.MediaStoreUtil;
 import com.github.runningforlife.photofans.utils.SharedPrefUtil;
-import com.github.runningforlife.photofans.utils.ThreadTimeUtil;
+import com.github.runningforlife.photofans.utils.ThreadUtil;
 
 /**
  * a presenter to bridge UI and data repository
@@ -37,6 +39,8 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     private static final String TAG = "GalleryPresenter";
 
     private static final int DEFAULT_RETRIEVED_IMAGES = 10;
+    private static final int DEFAULT_WIDTH = 1024;
+    private static final int DEFAULT_HEIGHT = (int)(DEFAULT_WIDTH*DisplayUtil.getScreenRatio());
 
     private Context mContext;
     private GalleryView mView;
@@ -121,13 +125,21 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     }
 
     @Override
-    public void saveImageAtPos(int pos, Bitmap bitmap) {
+    public void saveImageAtPos(final int pos) {
         Log.v(TAG,"saveImageAtPos(): pos = " + pos);
         if(pos >= 0 && pos < mImageList.size()) {
-            ImageRealm img = mImageList.get(pos);
-            if(img.getData() == null) {
-                mExecutor.submit(new BitmapSaveRunnable(img, bitmap));
-            }
+            GlideLoaderListener listener = new GlideLoaderListener(null);
+            listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+                @Override
+                public void onImageLoadDone(Object o) {
+                    Log.d(TAG,"onImageLoadDone()");
+                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap)o), mImageList.get(pos).getName());
+                    r.addCallback(GalleryPresenterImpl.this);
+                    mExecutor.submit(r);
+                }
+            });
+            GlideLoader.downloadOnly(mContext, mImageList.get(pos).getUrl(), listener,
+                    DEFAULT_WIDTH, DEFAULT_HEIGHT);
         }
     }
 
@@ -222,35 +234,8 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
         }
     }
 
-    private class BitmapSaveRunnable implements Runnable{
-        private ImageRealm cache;
-        private Bitmap bitmap;
-
-        public BitmapSaveRunnable(ImageRealm cache, Bitmap bitmap){
-            this.cache = cache;
-            this.bitmap = bitmap;
-        }
-
-        @Override
-        public void run() {
-            ThreadTimeUtil.start();
-            int w = 256; // width
-            int h = (int)(w*DisplayUtil.getScreenRatio());
-            Bitmap bm = Bitmap.createScaledBitmap(bitmap,w,h,false);
-
-            byte[] bytes = new byte[w*h*2];
-            Realm r = Realm.getDefaultInstance();
-            try {
-                BitmapUtil.getBytes(bytes,bm,100);
-                r.beginTransaction();
-                cache.setData(bytes);
-                r.commitTransaction();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                r.close();
-                Log.d(TAG,"run(): saving image takes " + ThreadTimeUtil.getElapse() + "ms");
-            }
-        }
+    @Override
+    public void onImageSaveDone(String path) {
+        mView.onImageSaveDone(path);
     }
 }

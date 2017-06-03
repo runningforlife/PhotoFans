@@ -1,7 +1,5 @@
 package com.github.runningforlife.photofans.utils;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -16,7 +14,7 @@ public class ThreadTimeUtilTest{
 
     @Test
     public void threadElapseTest(){
-        ThreadTimeUtil.start();
+        ThreadUtil.start();
 
         new Thread(new Runnable() {
             @Override
@@ -26,7 +24,7 @@ public class ThreadTimeUtilTest{
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                assertEquals("time should larger than 3s", ThreadTimeUtil.getElapse()/1000 >= 3, true);
+                assertEquals("time should larger than 3s", ThreadUtil.getElapse()/1000 >= 3, true);
             }
         }).start();
     }

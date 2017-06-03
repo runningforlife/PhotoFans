@@ -7,4 +7,8 @@ package com.github.runningforlife.photofans.ui;
  */
 
 public interface UI {
+    /*
+     * image save is done
+     */
+    void onImageSaveDone(String path);
 }

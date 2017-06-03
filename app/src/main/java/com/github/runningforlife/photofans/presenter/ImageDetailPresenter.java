@@ -25,4 +25,10 @@ public interface ImageDetailPresenter extends Presenter {
      * remove file at give position
      */
     void removeItemAtPos(int pos);
+
+
+    /*
+     * save image at pos
+     */
+    void saveImageAtPos(int pos);
 }

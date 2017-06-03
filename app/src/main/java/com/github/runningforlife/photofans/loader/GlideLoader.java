@@ -1,6 +1,7 @@
 package com.github.runningforlife.photofans.loader;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -36,5 +37,14 @@ public class GlideLoader {
              .centerCrop()
              .crossFade()
              .into(w,h);
+    }
+
+    public static void downloadOnly(Context context, String url, RequestListener<String,Bitmap> listener,
+                                    int w, int h){
+        Glide.with(context)
+                .load(url)
+                .asBitmap()
+                .listener(listener)
+                .into(w,h);
     }
 }

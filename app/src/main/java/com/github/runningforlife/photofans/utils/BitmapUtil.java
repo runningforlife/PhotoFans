@@ -42,7 +42,7 @@ public class BitmapUtil {
             e.printStackTrace();
         }
 
-        return imgName;
+        return file.getAbsolutePath();
     }
 
     public static Bitmap drawableToBitmap(Drawable d) {

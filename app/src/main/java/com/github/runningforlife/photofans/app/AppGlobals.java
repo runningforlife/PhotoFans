@@ -18,6 +18,7 @@ import io.realm.RealmConfiguration;
 
 public class AppGlobals extends Application{
 
+    private static final String ROOT_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
     private static final String PATH_NAME = "photos";
     private static AppGlobals sInstance;
     private static String sImagePath;
@@ -40,7 +41,7 @@ public class AppGlobals extends Application{
         sInstance = AppGlobals.this;
 
         String appName = getString(R.string.app_name);
-        sImagePath = appName + File.separator + appName;
+        sImagePath = ROOT_PATH + File.separator + appName + File.separator + PATH_NAME;
         File file = new File(sImagePath);
         if(!file.exists()) {
             file.mkdirs();
@@ -49,7 +50,8 @@ public class AppGlobals extends Application{
 
     public String getImagePath(){
         if(TextUtils.isEmpty(sImagePath)){
-            return "PhotoFans" + File.separator + PATH_NAME;
+            String appName = getString(R.string.app_name);
+            return ROOT_PATH + File.separator + appName + File.separator + PATH_NAME;
         }
         return sImagePath;
     }
