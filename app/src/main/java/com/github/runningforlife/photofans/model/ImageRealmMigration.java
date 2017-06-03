@@ -19,5 +19,11 @@ public class ImageRealmMigration implements RealmMigration{
                     .addField("mData",byte[].class);
             ++oldVersion;
         }
+
+        if(oldVersion == 1){
+            schema.get("ImageRealm")
+                    .removeField("mData");
+            ++oldVersion;
+        }
     }
 }

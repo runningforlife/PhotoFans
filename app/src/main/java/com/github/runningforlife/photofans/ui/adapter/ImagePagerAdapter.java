@@ -36,7 +36,7 @@ public class ImagePagerAdapter extends PagerAdapter{
     public ImagePagerAdapter(Context context, ImageAdapterCallback callback){
         mCallback = callback;
         mContext = context;
-        mAllImages = new ArrayList<>();
+        //mAllImages = new ArrayList<>(mCallback.getCount());
     }
 
     //get view at index
@@ -86,6 +86,9 @@ public class ImagePagerAdapter extends PagerAdapter{
         });
         parent.addView(view);
         // save it for later use
+        if(mAllImages == null){
+            mAllImages = new ArrayList<>(mCallback.getCount());
+        }
         mAllImages.add(position,view);
         return view;
     }

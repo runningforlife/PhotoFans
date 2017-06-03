@@ -102,8 +102,6 @@ public class RealmManager implements LifeCycle{
         }finally {
             r.close();
         }
-
-        //trimData();
     }
 
     public void writeAsync(final List<? extends RealmObject> data) {
@@ -125,8 +123,6 @@ public class RealmManager implements LifeCycle{
         }finally {
             r.close();
         }
-
-        //trimData();
     }
 
     public void queryAllAsync(){

@@ -3,10 +3,12 @@ package com.github.runningforlife.photofans.ui.activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
@@ -45,7 +47,10 @@ import com.github.runningforlife.photofans.utils.MediaStoreUtil;
 import com.github.runningforlife.photofans.utils.ToastUtil;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import static com.github.runningforlife.photofans.model.UserAction.*;
 
@@ -118,7 +123,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     public void onDestroy(){
         super.onDestroy();
         Log.v(TAG,"onDestroy()");
-        mMainHandler = null;
+        //mMainHandler = null;
         mPresenter.onDestroy();
     }
 
@@ -154,7 +159,8 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         }
         mPagerAdapter.notifyDataSetChanged();
         mAdapter.notifyDataSetChanged();
-
+        // current index is changed
+        mCurrentImgIdx = mImgPager.getCurrentItem();
         mLvImgPreview.smoothScrollToPosition(mCurrentImgIdx);
     }
 
@@ -168,6 +174,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         return mPresenter.getItemAtPos(pos);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onItemClicked(int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos " + pos);
@@ -183,8 +190,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
                 //after given time, preview should be hidden
                 Message msg = mMainHandler.obtainMessage(EventHandler.EVENT_HIDE_PREVIEW);
                 mMainHandler.sendMessageDelayed(msg,PREVIEW_HIDE_COUNT_DOWN);
-            }else{
-                mLvImgPreview.setVisibility(View.INVISIBLE);
             }
         }
 
@@ -223,7 +228,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
             saveImage();
         }else if(action.equals(ACTION_DELETE.action())){
             // remove image
-            mPresenter.removeItemAtPos(mCurrentImgIdx);
+            mPresenter.removeItemAtPos(pos);
         }else if(action.equals(ACTION_FAVOR.action())){
 
         }else if(action.equals(ACTION_SHARE.action())){
@@ -249,7 +254,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mLvImgPreview.setVisibility(View.VISIBLE);
         mLvImgPreview.setLayoutManager(llMgr);
         mLvImgPreview.setItemAnimator(new DefaultItemAnimator());
-        //mLvImgPreview.setAnimation(AnimationUtils.loadAnimation(this,R.anim.anim_dialog_enter));
 
         Intent data = getIntent();
         mCurrentImgIdx = data.getIntExtra("image",0);
@@ -257,8 +261,25 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mImgPager.setCurrentItem(mCurrentImgIdx);
         //TODO: try to scroll to center
         mLvImgPreview.scrollToPosition(mCurrentImgIdx);
-        // invisible
         mLvImgPreview.setVisibility(View.VISIBLE);
+        mLvImgPreview.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                Log.d(TAG,"onScrollStateChanged(): new state " + newState);
+                if(newState == RecyclerView.SCROLL_STATE_DRAGGING){
+                    // dragging state, no hide
+                    if(mMainHandler != null && mMainHandler.hasMessages(EventHandler.EVENT_HIDE_PREVIEW)){
+                        mMainHandler.removeMessages(EventHandler.EVENT_HIDE_PREVIEW);
+                    }
+                }else if(newState == RecyclerView.SCROLL_STATE_IDLE){
+                    if (mMainHandler != null &&
+                            !mMainHandler.hasMessages(EventHandler.EVENT_HIDE_PREVIEW)) {
+                        Message msg = mMainHandler.obtainMessage(EventHandler.EVENT_HIDE_PREVIEW);
+                        mMainHandler.sendMessageDelayed(msg,PREVIEW_HIDE_COUNT_DOWN);
+                    }
+                }
+            }
+        });
 
         getPreviewScrollParams();
 
@@ -294,18 +315,13 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
             // do nothing
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
         @Override
         public void onPageSelected(int position) {
             Log.v(TAG,"onPageSelected()");
             mCurrentImgIdx = position;
             setTitle();
-            View view = mLvImgPreview.getChildAt(position);
-            if(view != null) {
-                view.setBackgroundResource(R.drawable.rect_image_preview);
-            }
-            if(mLvImgPreview.getVisibility() == View.VISIBLE) {
-                mLvImgPreview.scrollToPosition(position);
-            }
+            mLvImgPreview.scrollToPosition(position);
         }
 
         @Override
@@ -342,6 +358,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
     private void saveImage(){
         // FIXME: it seem that sometimes iv is null
+        // FIXME: move this to presenter
         ImageView iv = (ImageView)(mPagerAdapter.getViewAtPos(mCurrentImgIdx));
         if(iv == null) return;
         Log.v(TAG,"saveImage()");
@@ -372,17 +389,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
                     }
                 }
             }).start();
-        }
-    }
-
-    private class PreviewTouchListener implements View.OnTouchListener{
-
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            if (mMainHandler.hasMessages(EventHandler.EVENT_HIDE_PREVIEW)) {
-                mMainHandler.removeMessages(EventHandler.EVENT_HIDE_PREVIEW);
-            }
-            return false;
         }
     }
 

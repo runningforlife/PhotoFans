@@ -34,6 +34,8 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
 
     @Override
     public int getItemCount() {
+        if(mImgList == null) return 0;
+
         return mImgList.size();
     }
 

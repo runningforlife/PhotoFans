@@ -30,12 +30,10 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
 
     private Context mContext;
     private ImageAdapterCallback mCallback;
-    private HashMap<ImageView,Boolean> mChecked;
 
     public PreviewAdapter(Context context, ImageAdapterCallback callback){
         mContext = context;
         mCallback = callback;
-        mChecked = new HashMap<>();
     }
 
     @Override
@@ -58,22 +56,6 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
         return mCallback.getCount();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    public void onPageSelectedChange(ImageView view){
-        Iterator iterator = mChecked.entrySet().iterator();
-        while (iterator.hasNext()){
-            Map.Entry entry = (Map.Entry) iterator.next();
-            ImageView image = (ImageView)(entry.getKey());
-            if(image != view){
-                mChecked.put(image,false);
-                image.setBackground(null);
-            }else{
-                mChecked.put(view,true);
-                image.setBackgroundResource(R.drawable.rect_image_preview);
-            }
-        }
-    }
-
     final class ImageViewHolder extends RecyclerView.ViewHolder{
         @BindView(R.id.iv_preview) ImageView preview;
 
@@ -87,20 +69,8 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
                 @Override
                 // FIXME: there is exception when item is clicked
                 public void onClick(View v) {
-                    mCallback.onItemClicked(getAdapterPosition(),TAG);
-
-                    Iterator iterator = mChecked.entrySet().iterator();
-                    while(iterator.hasNext()) {
-                        Map.Entry entry = (Map.Entry)iterator.next();
-                        ImageView view = (ImageView)entry.getKey();
-                        if(view == preview){
-                            mChecked.put(preview,Boolean.TRUE);
-                            preview.setBackgroundResource(R.drawable.rect_image_preview);
-                        }else{
-                            // remove background
-                            preview.setBackground(null);
-                            mChecked.put(view,false);
-                        }
+                    if(mCallback != null) {
+                        mCallback.onItemClicked(getAdapterPosition(), TAG);
                     }
                 }
             });

@@ -2,7 +2,9 @@ package com.github.runningforlife.photofans.app;
 
 import android.app.Application;
 import android.os.Environment;
+import android.text.TextUtils;
 
+import com.github.runningforlife.photofans.R;
 import com.github.runningforlife.photofans.model.ImageRealmMigration;
 
 import java.io.File;
@@ -16,9 +18,9 @@ import io.realm.RealmConfiguration;
 
 public class AppGlobals extends Application{
 
-    private static final String IMAGE_PATH = Environment.getExternalStorageDirectory() +
-            "/PhotoFans/Picture/";
+    private static final String PATH_NAME = "photos";
     private static AppGlobals sInstance;
+    private static String sImagePath;
 
     public static AppGlobals getInstance(){
         return sInstance;
@@ -37,13 +39,18 @@ public class AppGlobals extends Application{
         // it seems that we should init here
         sInstance = AppGlobals.this;
 
-        File file = new File(IMAGE_PATH);
+        String appName = getString(R.string.app_name);
+        sImagePath = appName + File.separator + appName;
+        File file = new File(sImagePath);
         if(!file.exists()) {
             file.mkdirs();
         }
     }
 
     public String getImagePath(){
-        return IMAGE_PATH;
+        if(TextUtils.isEmpty(sImagePath)){
+            return "PhotoFans" + File.separator + PATH_NAME;
+        }
+        return sImagePath;
     }
 }
