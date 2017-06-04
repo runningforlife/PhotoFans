@@ -35,7 +35,7 @@ public class OkHttpDownloader extends AbstractDownloader {
 
     @Override
     public Page download(us.codecraft.webmagic.Request request, Task task) {
-        Log.v(LOG_TAG,"download(): url = " + request.getUrl());
+        Log.v(LOG_TAG,"download()");
 
         if(isPossibleImageUrl(request.getUrl())){
             Page page = new Page();

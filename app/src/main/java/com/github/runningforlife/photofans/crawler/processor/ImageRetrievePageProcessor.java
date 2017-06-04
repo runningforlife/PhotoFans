@@ -2,12 +2,14 @@ package com.github.runningforlife.photofans.crawler.processor;
 
 import android.os.Looper;
 import android.util.Log;
+import android.webkit.URLUtil;
 
 import com.github.runningforlife.photofans.model.ImageRealm;
 import com.github.runningforlife.photofans.model.RealmManager;
 import com.github.runningforlife.photofans.model.VisitedPageInfo;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,18 +40,16 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private static HashMap<String,Boolean> sAllPages = new HashMap<>();
     // last url to start this page retrieving
     private static final int MAX_SEED_URL = 3;
-    // max pages we want to save
-    private static final int MAX_SAVED_PAGES = 100;
     private static List<String> sLastUrl;
     @SuppressWarnings("unchecked")
-    private static HashSet<String> sValidPageUrls = new HashSet<>(new ArrayList(Arrays.asList(ImageSource.ALL_URLS)));
-
+    private SourcePageFilter mPageFilter;
     private static final int DEFAULT_RETRIEVED_IMAGES = 10;
 
     public ImageRetrievePageProcessor(int n){
         mMaxRetrievedImages = n > 0 ? n : DEFAULT_RETRIEVED_IMAGES;
         mListeners = new ArrayList<>();
         sLastUrl = new ArrayList<>();
+        mPageFilter = new SourcePageFilter();
         loadPages();
     }
 
@@ -132,18 +132,27 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
         if(pages.size() > 0){
             // choose a random page from unvisited url
-            for(int i = 0; i < MAX_SEED_URL && i < pages.size(); ++i) {
+            for(int i = 0; sLastUrl.size() < MAX_SEED_URL && i < pages.size(); ++i) {
                 Random random = new Random();
                 int idx = random.nextInt(pages.size());
-                sLastUrl.add(pages.get(idx).getUrl());
+
+                final String url;
+                try {
+                    String pageUrl = pages.get(idx).getUrl();
+                    url = UrlUtil.getRootUrl(pageUrl);
+                    if(mPageFilter.accept(url) && !sLastUrl.contains(pageUrl)) {
+                        sLastUrl.add(pageUrl);
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
             }
+
             for (VisitedPageInfo info : pages) {
                 if (!sAllPages.containsKey(info.getUrl())) {
                     sAllPages.put(info.getUrl(),info.getIsVisited());
                 }
             }
-        }else{
-            sLastUrl = SharedPrefUtil.getImageSource();
         }
 
         realm.close();
@@ -157,7 +166,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private boolean isValidPage(Page page){
         try {
             String baseUrl = UrlUtil.getRootUrl(page.getUrl().get());
-            return sValidPageUrls.contains(baseUrl);
+            return URLUtil.isValidUrl(baseUrl) && mPageFilter.accept(baseUrl);
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return false;
@@ -167,7 +176,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private boolean isValidUrl(String url){
         try {
             String baseUrl = UrlUtil.getRootUrl(url);
-            return sValidPageUrls.contains(baseUrl);
+            return URLUtil.isValidUrl(baseUrl);
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return false;

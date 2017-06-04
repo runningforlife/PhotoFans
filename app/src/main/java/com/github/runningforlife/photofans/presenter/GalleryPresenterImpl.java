@@ -74,7 +74,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     public void refresh() {
         Log.v(TAG,"refresh()");
 
-        mRealmMgr.addListener(this);
+        stopRetrieveIfNeeded();
 
         if(mUnUsedImages == null || mUnUsedImages.size() < DEFAULT_RETRIEVED_IMAGES) {
             mIsRefreshing = true;
@@ -87,12 +87,14 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
             Realm realm = Realm.getDefaultInstance();
 
             try {
-                realm.beginTransaction();
                 int cn = 0;
+                realm.beginTransaction();
                 for (Iterator iter = mUnUsedImages.iterator();
                       iter.hasNext() && ++cn <= DEFAULT_RETRIEVED_IMAGES; ) {
                     ImageRealm item = (ImageRealm) iter.next();
                     item.setUsed(true);
+                    // update time stamp
+                    item.setTimeStamp(System.currentTimeMillis());
                 }
                 realm.commitTransaction();
             }finally {
@@ -100,7 +102,11 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
             }
 
             mIsRefreshing = false;
+            mView.onRefreshDone(true);
         }
+
+        // notify
+        mRealmMgr.addListener(this);
     }
 
     @Override
@@ -149,6 +155,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
         //mRealmMgr.onStart();
         mIsRefreshing = false;
         mRealmMgr.onStart();
+        mRealmMgr.addListener(this);
         mReceiver = new SimpleResultReceiver(new Handler(Looper.myLooper()));
         mReceiver.setReceiver(this);
     }
@@ -227,11 +234,10 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     }
 
     private void stopRetrieveIfNeeded(){
-        if(mIsRefreshing){
-            mIsRefreshing = false;
-            Intent intent = new Intent(mContext,ImageRetrieveService.class);
-            mContext.stopService(intent);
-        }
+        mIsRefreshing = false;
+        // try to stop service firstly
+        Intent intent = new Intent(mContext,ImageRetrieveService.class);
+        mContext.stopService(intent);
     }
 
     @Override

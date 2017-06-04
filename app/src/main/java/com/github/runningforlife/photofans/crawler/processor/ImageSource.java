@@ -52,7 +52,4 @@ public interface ImageSource {
     String MM_IMAGE_START = "http://www.mmjpg.com/mm/";
     String FREEJPG_IMAGE_START = "http://en.freejpg.com.ar/asset/";
     String VH_IMAGE_START = "https://visualhunt.com/photos/";
-
-    String[] ALL_URLS = {URL_YOUWU,URL_MM,URL_FREE_JPG,URL_VISUAL_CHINA,URL_PIXELS,URL_ALBUM, URL_VISUAL_HUNT,
-            URL_PIXBABY,URL_PUBLIC_ARCHIVE};
 }

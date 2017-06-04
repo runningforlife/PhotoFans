@@ -37,6 +37,7 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
     }
 
     private ImageRetrieverFactory(){
+        //FIXME: we may want to use string array to do this
         sImgSource.put(URL_FREE_JPG,REG_FREE_JPG);
         sImgSource.put(URL_ALBUM,REG_ALBUM);
         sImgSource.put(URL_PIXELS,REG_PIXELS);

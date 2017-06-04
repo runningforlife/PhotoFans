@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.os.ResultReceiver;
 import android.util.Log;
 
+import com.github.runningforlife.photofans.R;
 import com.github.runningforlife.photofans.crawler.processor.ImageRetrievePageProcessor;
 import com.github.runningforlife.photofans.crawler.processor.ImageSource;
 import com.github.runningforlife.photofans.model.ImageRealm;
@@ -20,6 +21,7 @@ import com.github.runningforlife.photofans.model.RealmManager;
 import java.util.List;
 
 import com.github.runningforlife.photofans.crawler.OkHttpDownloader;
+import com.github.runningforlife.photofans.utils.SharedPrefUtil;
 
 import us.codecraft.webmagic.Spider;
 
@@ -73,7 +75,6 @@ public class ImageRetrieveService extends Service implements
         start(intent, startId);
         return START_NOT_STICKY;
     }
-
 
     @Override
     public void onDestroy(){
@@ -130,8 +131,11 @@ public class ImageRetrieveService extends Service implements
         mProcessor.addListener(this);
         List<String> lastUrl =  mProcessor.getStartUrl();
         if(lastUrl.size() <= 0){
+            List<String> defList = SharedPrefUtil.getImageSource();
+            String[] defSource = (String[]) defList.
+                    toArray(new String[defList.size()]);
             mSpider = Spider.create(mProcessor)
-                    .addUrl(ImageSource.ALL_URLS)
+                    .addUrl(defSource)
                     .setDownloader(new OkHttpDownloader());
         }else{
             mSpider = Spider.create(mProcessor)
@@ -159,8 +163,10 @@ public class ImageRetrieveService extends Service implements
 
     private void saveToRealm(List<ImageRealm> data){
         Log.v(TAG,"saveToRealm()");
-        RealmManager.getInstance()
-                .writeAsync(data);
+        if(data != null && !data.isEmpty()) {
+            RealmManager.getInstance()
+                    .writeAsync(data);
+        }
     }
 
     private void sendResult(int startId, int size){
