@@ -74,37 +74,38 @@ public class MultiSelectionListAdapter extends BaseAdapter {
         if(root == null){
             root = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.selection_list_dialog,parent,false);
-
-            final CheckBox cb = (CheckBox)root.findViewById(R.id.cb_select);
-            TextView name = (TextView)root.findViewById(R.id.tv_site_name);
-            TextView url = (TextView)root.findViewById(R.id.tv_site_url);
-
-            name.setText(mImgSource.get(position).name);
-            String srcUrl = mImgSource.get(position).url;
-            url.setText(srcUrl);
-
-            if(mNewSource.contains(srcUrl)){
-                cb.setChecked(true);
-            }else{
-                cb.setChecked(false);
-            }
-
-            cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    int pos = mCbs.get(cb);
-                    String siteUrl = mImgSource.get(pos).url;
-                    if(isChecked) {
-                        mNewSource.add(siteUrl);
-                    } else {
-                        mNewSource.remove(siteUrl);
-                    }
-                }
-            });
         }
 
         final CheckBox cb = (CheckBox)root.findViewById(R.id.cb_select);
         mCbs.put(cb,position);
+
+        TextView name = (TextView)root.findViewById(R.id.tv_site_name);
+        TextView url = (TextView)root.findViewById(R.id.tv_site_url);
+
+        name.setText(mImgSource.get(position).name);
+        String srcUrl = mImgSource.get(position).url;
+        url.setText(srcUrl);
+
+        Log.d(TAG,"getView(): position = " + position + ", source = " + srcUrl);
+
+        if(mNewSource.contains(srcUrl)){
+            cb.setChecked(true);
+        }else{
+            cb.setChecked(false);
+        }
+
+        cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                int pos = mCbs.get(cb);
+                String siteUrl = mImgSource.get(pos).url;
+                if(isChecked) {
+                    mNewSource.add(siteUrl);
+                } else {
+                    mNewSource.remove(siteUrl);
+                }
+            }
+        });
 
         root.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,11 +113,11 @@ public class MultiSelectionListAdapter extends BaseAdapter {
                 CheckBox cb = (CheckBox)v.findViewById(R.id.cb_select);
                 boolean isChecked = cb.isChecked();
                 cb.setChecked((!isChecked));
-
+/*
                 if(cb.isChecked()) {
                     int pos = mCbs.get(cb);
-                    mNewSource.add(mImgSource.get(pos).name);
-                }
+                    mNewSource.add(mImgSource.get(pos).url);
+                }*/
             }
         });
 
