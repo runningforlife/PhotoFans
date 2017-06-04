@@ -79,7 +79,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     @Override
     public void onResume(){
         super.onResume();
-
+        // FIXME: some times, data set seems not loaded in recycle view
         mPresenter.onStart();
     }
 
@@ -113,6 +113,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         if(mRvImgList.getAdapter() == null){
             mRvImgList.setAdapter(mAdapter);
         }
+        mRvImgList.invalidate();
         mAdapter.notifyDataSetChanged();
     }
 

@@ -28,11 +28,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     private static final int DEFAULT_IMG_WIDTH = 1024;
     private static final int DEFAULT_IMG_HEIGHT = (int)(DEFAULT_IMG_WIDTH*DisplayUtil.getScreenRatio());
 
-    private static final int KB = 1024;
-    private static final int MIN_IMG_SIZE = KB * 60;
-    private static final int MIN_IMG_WIDTH = 150;
-    private static final int MIN_IMG_HEIGHT = 150;
-
     @SuppressWarnings("unchecked")
     private LayoutInflater mInflater;
     private ImageAdapterCallback mCallback;
@@ -56,9 +51,11 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     public void onBindViewHolder(final PhotoViewHolder vh, final int position) {
         final ImageRealm img = mCallback.getItemAtPos(position);
         final String url = img.getUrl();
-        Log.d(TAG,"onBindViewHolder(): image url = " + url);
+        Log.d(TAG,"onBindViewHolder(): pos = " + position);
 
         if(!TextUtils.isEmpty(url)) {
+            //FIXME: some item is not visible,force to invalidate
+            vh.img.invalidate();
             GlideLoaderListener listener = new GlideLoaderListener(vh.img);
             GlideLoader.load(mContext,url,listener,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
         }else if(getItemCount() > 0){

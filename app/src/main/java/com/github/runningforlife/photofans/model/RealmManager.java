@@ -24,7 +24,7 @@ public class RealmManager implements LifeCycle{
     private static final String TAG = "RealmManager";
 
     private static final RealmManager sInstance = new RealmManager();
-    private AtomicInteger mRealRefCount = new AtomicInteger(0);
+    private static AtomicInteger sRealmRefCount = new AtomicInteger(0);
     private Realm realm;
     // all the data we have
     private RealmResults<ImageRealm> mAllImages;
@@ -51,14 +51,14 @@ public class RealmManager implements LifeCycle{
     @Override
     public void onStart(){
         query();
-        Log.d(TAG,"onStart(): ref count = " + mRealRefCount.incrementAndGet());
+        Log.d(TAG,"onStart(): ref count = " + sRealmRefCount.incrementAndGet());
     }
 
     // this should be consistent with UI lifecycle: onDestroy()
     @Override
     public void onDestroy(){
-        Log.d(TAG,"onDestroy(): ref count = " + mRealRefCount.get());
-        if(mRealRefCount.decrementAndGet() == 0) {
+        Log.d(TAG,"onDestroy(): ref count = " + sRealmRefCount.get());
+        if(sRealmRefCount.decrementAndGet() == 0) {
             //trimData();
             if (mAllImages != null) {
                 mAllImages.removeAllChangeListeners();

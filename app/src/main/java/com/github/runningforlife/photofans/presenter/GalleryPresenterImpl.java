@@ -66,7 +66,8 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     @Override
     public void loadAllDataAsync() {
         Log.v(TAG,"loadAllDataAsync()");
-        RealmManager.getInstance().queryAllAsync();
+        mRealmMgr.addListener(this);
+        mRealmMgr.queryAllAsync();
     }
 
     @Override
@@ -145,11 +146,9 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
 
     @Override
     public void init() {
-        // start earlier
-        mRealmMgr.addListener(this);
-        mRealmMgr.onStart();
+        //mRealmMgr.onStart();
         mIsRefreshing = false;
-
+        mRealmMgr.onStart();
         mReceiver = new SimpleResultReceiver(new Handler(Looper.myLooper()));
         mReceiver.setReceiver(this);
     }
@@ -157,6 +156,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     @Override
     public void onStart() {
         Log.v(TAG,"onStart()");
+        // start earlier
         mRealmMgr.addListener(this);
     }
 

@@ -47,6 +47,13 @@
             android:label="@string/select_your_favorite_websites">
         </activity>
 
+
+        <activity android:name=".ui.activity.FavorImageActivity"
+            android:label=""
+            android:theme="@style/AppTheme">
+
+        </activity>
+
         <service android:name=".service.ImageRetrieveService">
         </service>
 

@@ -90,13 +90,9 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
             mActionBar.setHomeAsUpIndicator(R.drawable.ic_back_white_24dp);
         }
 
-        initPresenter();
-
         initView();
 
         initActionList();
-        // keep it here to ensure data set is loaded
-        mPresenter.onStart();
 
         mMainHandler = new EventHandler(Looper.getMainLooper());
     }
@@ -105,6 +101,8 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     public void onResume(){
         super.onResume();
         Log.v(TAG,"onResume()");
+        initPresenter();
+        mPresenter.onStart();
 
         setTitle();
     }
@@ -150,7 +148,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mPagerAdapter.notifyDataSetChanged();
         mAdapter.notifyDataSetChanged();
         // current index is changed
-        mCurrentImgIdx = mImgPager.getCurrentItem();
+        mImgPager.setCurrentItem(mCurrentImgIdx);
         mLvImgPreview.smoothScrollToPosition(mCurrentImgIdx);
     }
 
@@ -212,20 +210,22 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
     @Override
     public void removeItemAtPos(int pos) {
-
+        mPresenter.removeItemAtPos(pos);
     }
 
     @Override
     public void onActionClick(String action, int pos) {
         Log.v(TAG,"onActionClick(): action = " + action);
 
+        mCurrentImgIdx = mImgPager.getCurrentItem();
         if(action.equals(ACTION_SAVE.action())){
             saveImage(mCurrentImgIdx);
         }else if(action.equals(ACTION_DELETE.action())){
             // remove image
-            mPresenter.removeItemAtPos(pos);
+            mPresenter.removeItemAtPos(mCurrentImgIdx);
+            //mPresenter.onStart();
         }else if(action.equals(ACTION_FAVOR.action())){
-
+            mPresenter.favorImageAtPos(mCurrentImgIdx);
         }else if(action.equals(ACTION_SHARE.action())){
 
         }
@@ -236,7 +236,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         ft.beginTransaction()
           .detach(ft.findFragmentByTag("ActionList"))
           .commit();
-;
     }
 
     private void initView(){

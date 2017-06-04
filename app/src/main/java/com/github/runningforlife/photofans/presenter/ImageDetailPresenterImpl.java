@@ -9,6 +9,7 @@ import com.github.runningforlife.photofans.loader.GlideLoader;
 import com.github.runningforlife.photofans.loader.GlideLoaderListener;
 import com.github.runningforlife.photofans.model.RealmManager;
 
+import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -73,6 +74,18 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
         });
         GlideLoader.downloadOnly(mContext, mImgList.get(pos).getUrl(), listener,
                 DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    }
+
+    @Override
+    public void favorImageAtPos(int pos) {
+        Log.d(TAG,"favorImageAtPos(): pos = " + pos);
+        Realm r = Realm.getDefaultInstance();
+        r.beginTransaction();
+
+        ImageRealm favor = mImgList.get(pos);
+        favor.setIsFavor(true);
+
+        r.commitTransaction();
     }
 
     @Override

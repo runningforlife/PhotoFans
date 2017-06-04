@@ -31,4 +31,9 @@ public interface ImageDetailPresenter extends Presenter {
      * save image at pos
      */
     void saveImageAtPos(int pos);
+
+    /*
+     * favor image at pos
+     */
+    void favorImageAtPos(int pos);
 }
