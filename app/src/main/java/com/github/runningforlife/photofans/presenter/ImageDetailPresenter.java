@@ -36,4 +36,9 @@ public interface ImageDetailPresenter extends Presenter {
      * favor image at pos
      */
     void favorImageAtPos(int pos);
+
+    /*
+     * set wallpaper
+     */
+    void setWallpaper(int pos);
 }

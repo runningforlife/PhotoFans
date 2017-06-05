@@ -7,6 +7,7 @@ package com.github.runningforlife.photofans.model;
 public enum UserAction {
     SAVE("Save"),
     SHARE("Share"),
+    WALLPAPER("Wallpaper"),
     DELETE("Delete"),
     FAVOR("Favor");
 

@@ -35,4 +35,7 @@
     <string name="max_reserved_images">Max Reserved Images</string>
     <string name="how_many_images_reserved">How Many Images to Be reserved</string>
     <string name="my_favorite_images">My Favorite Images</string>
+    <string name="action_wallpaper">Set to Wallpaper</string>
+    <string name="set_wallpaper_success">Wallpaper Setting Success</string>
+    <string name="set_wallpaper_fail">Fail to Set Wallpaper</string>
 </resources>

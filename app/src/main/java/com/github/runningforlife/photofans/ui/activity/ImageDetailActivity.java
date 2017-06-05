@@ -1,5 +1,7 @@
 package com.github.runningforlife.photofans.ui.activity;
 
+import android.annotation.SuppressLint;
+import android.app.WallpaperManager;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,7 +42,9 @@ import com.github.runningforlife.photofans.ui.fragment.ActionListDialogFragment;
 import com.github.runningforlife.photofans.model.UserAction;
 import com.github.runningforlife.photofans.utils.ToastUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.github.runningforlife.photofans.model.UserAction.*;
 
@@ -66,8 +70,10 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     /**
      * user action to do operations allowed at the images
      */
+    private List<String> mUserActionList;
     private static UserAction ACTION_SHARE = SHARE;
     private static UserAction ACTION_SAVE = SAVE;
+    private static UserAction ACTION_WALLPAPER = WALLPAPER;
     private static UserAction ACTION_FAVOR = FAVOR;
     private static UserAction ACTION_DELETE = DELETE;
 
@@ -153,6 +159,17 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     @Override
+    public void onWallpaperSetDone(boolean isOk) {
+        if(isOk){
+            ToastUtil.showToast(getApplicationContext(),
+                    getString(R.string.set_wallpaper_success));
+        }else{
+            ToastUtil.showToast(getApplicationContext(),
+                    getString(R.string.set_wallpaper_fail));
+        }
+    }
+
+    @Override
     public int getCount() {
         return mPresenter.getItemCount();
     }
@@ -218,16 +235,22 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         Log.v(TAG,"onActionClick(): action = " + action);
 
         mCurrentImgIdx = mImgPager.getCurrentItem();
+
         if(action.equals(ACTION_SAVE.action())){
+            // save image
             saveImage(mCurrentImgIdx);
         }else if(action.equals(ACTION_DELETE.action())){
             // remove image
             mPresenter.removeItemAtPos(mCurrentImgIdx);
-            //mPresenter.onStart();
+            // refresh data at once
+            mPresenter.onStart();
         }else if(action.equals(ACTION_FAVOR.action())){
+            // favor this image
             mPresenter.favorImageAtPos(mCurrentImgIdx);
         }else if(action.equals(ACTION_SHARE.action())){
 
+        }else if(action.equals(ACTION_WALLPAPER.action())){
+            setWallpaper(mCurrentImgIdx);
         }
 
         // hide fragment
@@ -286,15 +309,24 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     private void initActionList(){
+        mUserActionList = new ArrayList<>();
         String share = getString(R.string.action_share);
         String save = getString(R.string.action_save);
+        String wallpaper = getString(R.string.action_wallpaper);
         String delete = getString(R.string.action_delete);
         String favor = getString(R.string.action_favorite);
+
+        mUserActionList.add(share);
+        mUserActionList.add(save);
+        mUserActionList.add(wallpaper);
+        mUserActionList.add(delete);
+        mUserActionList.add(favor);
 
         ACTION_SHARE.setAction(share);
         ACTION_DELETE.setAction(delete);
         ACTION_FAVOR.setAction(favor);
         ACTION_SAVE.setAction(save);
+        ACTION_WALLPAPER.setAction(wallpaper);
     }
 
     private void setTitle(){
@@ -348,9 +380,8 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     private void showActionDialog(){
-        String[] actions = getResources().getStringArray(R.array.detail_action_list);
-
-        ActionListDialogFragment fragment = (ActionListDialogFragment) ActionListDialogFragment.newInstance(Arrays.asList(actions));
+        ActionListDialogFragment fragment = (ActionListDialogFragment)
+                ActionListDialogFragment.newInstance(mUserActionList);
         fragment.setCallback(this);
 
         FragmentManager fm = getSupportFragmentManager();
@@ -366,6 +397,11 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     private void saveImage(int pos){
         Log.v(TAG,"saveImage()");
         mPresenter.saveImageAtPos(pos);
+    }
+
+    private void setWallpaper(int pos){
+        Log.v(TAG,"setWallpaper()");
+        mPresenter.setWallpaper(pos);
     }
 
     private class EventHandler extends Handler{

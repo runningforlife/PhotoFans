@@ -11,4 +11,9 @@ public interface ImageDetailView extends UI{
      */
     void onDataSetChanged();
 
+
+    /*
+     * notify user the result of setting wallpaper
+     */
+    void onWallpaperSetDone(boolean isOk);
 }

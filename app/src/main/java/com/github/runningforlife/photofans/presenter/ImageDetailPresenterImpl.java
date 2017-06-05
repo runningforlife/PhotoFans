@@ -1,5 +1,6 @@
 package com.github.runningforlife.photofans.presenter;
 
+import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -16,6 +17,7 @@ import io.realm.Sort;
 import com.github.runningforlife.photofans.model.ImageRealm;
 import com.github.runningforlife.photofans.ui.ImageDetailView;
 
+import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -67,9 +69,13 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
             @Override
             public void onImageLoadDone(Object o) {
                 Log.d(TAG,"onImageLoadDone()");
-                ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap)o), mImgList.get(pos).getName());
-                r.addCallback(ImageDetailPresenterImpl.this);
-                mExecutor.submit(r);
+                if(o instanceof Bitmap) {
+                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mImgList.get(pos).getName());
+                    r.addCallback(ImageDetailPresenterImpl.this);
+                    mExecutor.submit(r);
+                }else{
+                    mView.onImageSaveDone(null);
+                }
             }
         });
         GlideLoader.downloadOnly(mContext, mImgList.get(pos).getUrl(), listener,
@@ -86,6 +92,32 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
         favor.setIsFavor(true);
 
         r.commitTransaction();
+    }
+
+    @Override
+    public void setWallpaper(final int pos) {
+        Log.v(TAG,"setWallpaper(): pos = " + pos);
+        GlideLoaderListener listener = new GlideLoaderListener(null);
+        listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+            @Override
+            public void onImageLoadDone(Object o) {
+                Log.d(TAG,"onImageLoadDone()");
+                if(o instanceof Bitmap) {
+                    WallpaperManager wpm = (WallpaperManager)mContext.getSystemService(Context.WALLPAPER_SERVICE);
+                    try {
+                        wpm.setBitmap((Bitmap)o);
+                        mView.onWallpaperSetDone(true);
+                    } catch (IOException e) {
+                        mView.onWallpaperSetDone(false);
+                        e.printStackTrace();
+                    }
+                }else{
+                    mView.onWallpaperSetDone(false);
+                }
+            }
+        });
+        GlideLoader.downloadOnly(mContext, mImgList.get(pos).getUrl(), listener,
+                DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
     @Override
