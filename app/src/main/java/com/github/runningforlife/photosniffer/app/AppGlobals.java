@@ -1,0 +1,59 @@
+package com.github.runningforlife.photosniffer.app;
+
+import android.app.Application;
+import android.os.Environment;
+import android.text.TextUtils;
+
+import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.model.ImageRealmMigration;
+
+import java.io.File;
+
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+
+/**
+ * the entry point for the application
+ */
+
+public class AppGlobals extends Application{
+
+    private static final String ROOT_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
+    private static final String PATH_NAME = "photos";
+    private static AppGlobals sInstance;
+    private static String sImagePath;
+
+    public static AppGlobals getInstance(){
+        return sInstance;
+    }
+
+    @Override
+    public void onCreate(){
+        super.onCreate();
+
+        String appName = getString(R.string.app_name);
+
+        Realm.init(this);
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder()
+                .name(appName)
+                .migration(new ImageRealmMigration())
+                .build();
+        Realm.setDefaultConfiguration(realmConfig);
+        // it seems that we should init here
+        sInstance = AppGlobals.this;
+
+        sImagePath = ROOT_PATH + File.separator + appName + File.separator + PATH_NAME;
+        File file = new File(sImagePath);
+        if(!file.exists()) {
+            file.mkdirs();
+        }
+    }
+
+    public String getImagePath(){
+        if(TextUtils.isEmpty(sImagePath)){
+            String appName = getString(R.string.app_name);
+            return ROOT_PATH + File.separator + appName + File.separator + PATH_NAME;
+        }
+        return sImagePath;
+    }
+}

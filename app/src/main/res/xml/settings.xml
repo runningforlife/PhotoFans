@@ -7,14 +7,14 @@
         android:defaultValue="true">
     </SwitchPreference>
 
-    <com.github.runningforlife.photofans.ui.preference.EmptyListPreference
+    <com.github.runningforlife.photosniffer.ui.preference.EmptyListPreference
         android:key="@string/pref_choose_image_source"
         android:title="@string/website_to_download_images"
         android:summary="@string/website_to_download_images"
         android:entries="@array/image_website_name"
         android:entryValues="@array/image_website_url"
         android:defaultValue="@array/default_source_url">
-    </com.github.runningforlife.photofans.ui.preference.EmptyListPreference>
+    </com.github.runningforlife.photosniffer.ui.preference.EmptyListPreference>
 
     <EditTextPreference
         android:key="@string/pref_max_reserved_images"

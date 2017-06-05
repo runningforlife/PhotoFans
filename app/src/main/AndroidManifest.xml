@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.github.runningforlife.photofans">
+    package="com.github.runningforlife.photosniffer">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -10,18 +10,18 @@
 
     <application
         android:allowBackup="true"
-        android:name=".app.AppGlobals"
+        android:name="com.github.runningforlife.photosniffer.app.AppGlobals"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <meta-data android:name="com.github.runningforlife.photofans.glide.DiskStorageModule"
+        <meta-data android:name="com.github.runningforlife.photosniffer.glide.DiskStorageModule"
             android:value="GlideModule">
         </meta-data>
 
         <activity
-            android:name=".ui.activity.GalleryActivity"
+            android:name="com.github.runningforlife.photosniffer.ui.activity.GalleryActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -31,32 +31,32 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.activity.ImageDetailActivity"
+        <activity android:name="com.github.runningforlife.photosniffer.ui.activity.ImageDetailActivity"
             android:theme="@style/AppTheme.NoActionBar.DarkStatusBar"
             android:label=""
-            android:parentActivityName=".ui.activity.GalleryActivity">
+            android:parentActivityName="com.github.runningforlife.photosniffer.ui.activity.GalleryActivity">
 
         </activity>
 
-        <activity android:name=".ui.activity.SettingsActivity"
+        <activity android:name="com.github.runningforlife.photosniffer.ui.activity.SettingsActivity"
             android:theme="@style/AppTheme"
             android:label="@string/action_settings">
 
         </activity>
 
-        <activity android:name=".ui.activity.ImageSourceSelectionActivity"
+        <activity android:name="com.github.runningforlife.photosniffer.ui.activity.ImageSourceSelectionActivity"
             android:theme="@style/AppTheme"
             android:label="@string/select_your_favorite_websites">
         </activity>
 
 
-        <activity android:name=".ui.activity.FavorImageActivity"
+        <activity android:name="com.github.runningforlife.photosniffer.ui.activity.FavorImageActivity"
             android:label=""
             android:theme="@style/AppTheme">
 
         </activity>
 
-        <service android:name=".service.ImageRetrieveService">
+        <service android:name="com.github.runningforlife.photosniffer.service.ImageRetrieveService">
         </service>
 
     </application>
