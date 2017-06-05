@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import com.github.runningforlife.photofans.R;
 import com.github.runningforlife.photofans.loader.GlideLoader;
 import com.github.runningforlife.photofans.loader.GlideLoaderListener;
+import com.github.runningforlife.photofans.utils.MiscUtil;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,6 +49,8 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
         Log.v(TAG,"onBindViewHolder(): position = " + position);
 
         String url = mCallback.getItemAtPos(position).getUrl();
+        // preload
+        MiscUtil.preloadImage(holder.preview);
         GlideLoader.load(mContext,url,new GlideLoaderListener(holder.preview),150,150);
     }
 

@@ -36,9 +36,6 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
     @Override
     public boolean onException(Exception e, String model, com.bumptech.glide.request.target.Target<Bitmap> target, boolean isFirstResource) {
         Log.v(TAG,"onException(): " + e);
-        if(imageView != null) {
-            imageView.setImageDrawable(AppGlobals.getInstance().getDrawable(R.drawable.ic_mood_bad_grey_24dp));
-        }
         if(callback != null){
             callback.onImageLoadDone(e);
         }
@@ -48,6 +45,7 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
     @Override
     public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
         if(imageView != null) {
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setImageBitmap(resource);
         }
         Log.v(TAG,"onResourceReady(): from memory = " + isFromMemoryCache);

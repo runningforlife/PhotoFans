@@ -218,6 +218,8 @@ public class RealmManager implements LifeCycle{
                     .findAllAsync()
                     .sort("mTimeStamp", Sort.DESCENDING);
             mAllUnUsedImages.addChangeListener(mDataSetChangeListener);
+        }else if(mAllUnUsedImages.isValid() && !mAllUnUsedImages.isEmpty()){
+            notify(mAllUnUsedImages);
         }
     }
 

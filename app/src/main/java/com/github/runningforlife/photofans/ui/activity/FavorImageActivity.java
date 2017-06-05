@@ -25,6 +25,7 @@ public class FavorImageActivity  extends BaseActivity{
                    .add(fragment,FavoriteImageFragment.TAG)
                    .commit();
 
+        initToolbar();
     }
 
     private void initToolbar(){

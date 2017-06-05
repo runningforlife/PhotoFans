@@ -194,6 +194,8 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         mRvImgList.setItemAnimator(new DefaultItemAnimator());
 
         mAdapter = new GalleryAdapter(getContext(),this);
+        //adapter has to be set here, if not, refresh layout won't work
+        mRvImgList.setAdapter(mAdapter);
         //mRvImgList.setAdapter(mAdapter);
         mRefresher.setColorSchemeResources(android.R.color.holo_blue_light,
                 android.R.color.holo_orange_light,

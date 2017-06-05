@@ -18,8 +18,6 @@ public class PicassoLoader{
     public static void load(Context context, ImageView iv, String url, int w, int h) {
         Picasso.with(context)
                 .load(url)
-                .placeholder(R.drawable.ic_android_black_150dp)
-                .error(R.drawable.ic_mood_bad_grey_24dp)
                 .resize(w,h)
                 .centerCrop()
                 .into(iv);
@@ -30,8 +28,6 @@ public class PicassoLoader{
         Picasso picasso = builder.listener(new ErrorListener()).build();
 
         picasso.load(url)
-                .placeholder(R.drawable.ic_android_black_150dp)
-                .error(R.drawable.ic_mood_bad_grey_24dp)
                 .centerCrop()
                 .resize(w,h)
                 .into(target);

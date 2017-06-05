@@ -9,7 +9,12 @@ import java.util.List;
  */
 
 public class SourcePageFilter implements PageFilter {
-    private static final List<String> defSourceSite = SharedPrefUtil.getImageSource();
+    private  List<String> defSourceSite;
+
+    SourcePageFilter(){
+        defSourceSite = SharedPrefUtil.getImageSource();
+    }
+
     @Override
     public boolean accept(String url) {
         return defSourceSite.contains(url);

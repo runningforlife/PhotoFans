@@ -16,6 +16,7 @@ import com.github.runningforlife.photofans.app.AppGlobals;
 import com.github.runningforlife.photofans.utils.DisplayUtil;
 
 import com.github.runningforlife.photofans.loader.GlideLoader;
+import com.github.runningforlife.photofans.utils.MiscUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,8 @@ public class ImagePagerAdapter extends PagerAdapter{
                 .inflate(R.layout.item_image_detail,parent,false);
         // start loading
         mCallback.onImageLoadStart(position);
-
+        // preload image
+        MiscUtil.preloadImage(view);
         GlideLoader.load(mContext,new ImageLoaderListener(view,position),mCallback.getItemAtPos(position).getUrl(),
                 DEFAULT_WIDTH,DEFAULT_HEIGHT);
 
@@ -100,7 +102,6 @@ public class ImagePagerAdapter extends PagerAdapter{
         @Override
         public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
             Log.v(TAG,"onException(): " + e);
-            image.setImageDrawable(AppGlobals.getInstance().getResources().getDrawable(R.drawable.ic_mood_bad_grey_24dp));
             mCallback.onImageLoadDone(pos,false);
             return false;
         }
@@ -108,6 +109,7 @@ public class ImagePagerAdapter extends PagerAdapter{
         @Override
         public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
             Log.v(TAG,"onResourceReady(): from memory = " + isFromMemoryCache);
+            image.setScaleType(ImageView.ScaleType.FIT_CENTER);
             image.setImageBitmap(resource);
             mCallback.onImageLoadDone(pos,true);
             return false;

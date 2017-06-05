@@ -17,6 +17,7 @@ import butterknife.ButterKnife;
 import com.github.runningforlife.photofans.loader.GlideLoader;
 import com.github.runningforlife.photofans.model.ImageRealm;
 import com.github.runningforlife.photofans.utils.DisplayUtil;
+import com.github.runningforlife.photofans.utils.MiscUtil;
 
 /**
  * a gallery adapter to bind image data to recycleview
@@ -54,8 +55,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         Log.d(TAG,"onBindViewHolder(): pos = " + position);
 
         if(!TextUtils.isEmpty(url)) {
+            // preload image
+            MiscUtil.preloadImage(vh.img);
             //FIXME: some item is not visible,force to invalidate
-            vh.img.invalidate();
             GlideLoaderListener listener = new GlideLoaderListener(vh.img);
             GlideLoader.load(mContext,url,listener,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
         }else if(getItemCount() > 0){

@@ -21,7 +21,6 @@ public class GlideLoader {
         Glide.with(context)
                 .load(url)
                 .asBitmap()
-                .error(R.drawable.ic_mood_bad_grey_24dp)
                 .listener(listener)
                 .crossFade()
                 .thumbnail((float)0.3)
@@ -33,7 +32,6 @@ public class GlideLoader {
              .load(url)
              .asBitmap()
              .listener(listener)
-             .error(R.drawable.ic_mood_bad_grey_24dp)
              .centerCrop()
              .crossFade()
              .into(w,h);
