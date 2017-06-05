@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
@@ -105,6 +107,10 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     @Override
     public void setRefreshing(boolean enable){
         mRefresher.setRefreshing(enable);
+        if(enable){
+            Window window = getActivity().getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
     }
 
     @Override
@@ -126,6 +132,10 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         }
 
         mCallback.onRefreshDone(isSuccess);
+        // remove keep screen on flag
+        Window window = getActivity().getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
     }
 
     @Override

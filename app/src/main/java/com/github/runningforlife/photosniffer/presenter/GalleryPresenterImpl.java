@@ -102,7 +102,7 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
         }
 
         // notify
-        mRealmMgr.addListener(this);
+        //mRealmMgr.addListener(this);
     }
 
     @Override
