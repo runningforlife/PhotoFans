@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
  * Created by jason on 4/6/17.
  */
 
-public class ImageDetailPresenterImpl implements ImageDetailPresenter {
+public class ImageDetailPresenterImpl extends ImageDetailPresenter {
     private static final String TAG = "ImageDetailPresenter";
 
     private Context mContext;

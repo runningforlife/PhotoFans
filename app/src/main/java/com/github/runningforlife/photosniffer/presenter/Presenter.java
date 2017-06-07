@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.presenter;
 
+import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.model.RealmManager;
 import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 
@@ -19,4 +20,25 @@ public interface Presenter extends RealmManager.RealmDataChangeListener,
      * init presenter
      */
     void init();
+
+
+    /*
+     * get total item
+     */
+    int getItemCount();
+
+    /*
+     * get item at given position
+     */
+    ImageRealm getItemAtPos(int pos);
+
+    /*
+     * remove item at given position
+     */
+    void removeItemAtPos(int pos);
+
+    /*
+     * save bitmap at pos
+     */
+    void saveImageAtPos(int pos);
 }

@@ -20,7 +20,7 @@ import io.realm.RealmResults;
  * presenter to get favor image list
  */
 
-public class FavorImagePresenterImpl implements FavorImagePresenter{
+public class FavorImagePresenterImpl extends FavorImagePresenter{
     private static final String TAG = "FavorImagePresenter";
     private FavorView mView;
     private Context mContext;

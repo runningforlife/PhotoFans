@@ -31,7 +31,8 @@ import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 /**
  * a presenter to bridge UI and data repository
  */
-public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiver.Receiver{
+public class GalleryPresenterImpl extends GalleryPresenter
+        implements SimpleResultReceiver.Receiver{
     private static final String TAG = "GalleryPresenter";
 
     private static final int DEFAULT_RETRIEVED_IMAGES = 10;
@@ -57,13 +58,6 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
         mRealmMgr = RealmManager.getInstance();
         // realm only allow one transaction a time
         mExecutor = Executors.newSingleThreadExecutor();
-    }
-
-    @Override
-    public void loadAllDataAsync() {
-        Log.v(TAG,"loadAllDataAsync()");
-        mRealmMgr.addListener(this);
-        mRealmMgr.queryAllAsync();
     }
 
     @Override
@@ -205,11 +199,6 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     public void onUnusedRealmDataChange(RealmResults<ImageRealm> data) {
         Log.v(TAG, "onUnusedRealmDataChange(): unused url size = " + data.size());
         mUnUsedImages = data;
-    }
-
-    @Override
-    public void onFavorRealmDataChange(RealmResults<ImageRealm> data) {
-
     }
 
     @Override

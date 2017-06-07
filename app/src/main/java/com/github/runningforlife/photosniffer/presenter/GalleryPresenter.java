@@ -2,38 +2,21 @@ package com.github.runningforlife.photosniffer.presenter;
 
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 
+import io.realm.RealmResults;
+
 /**
  * a gallery presenter used to load photo list
  */
 
-public interface GalleryPresenter extends Presenter {
-    /*
-     * load data asynchronously
-     */
-    void loadAllDataAsync();
+public abstract class GalleryPresenter implements Presenter {
 
     /*
      * refresh data(download from network asynchrously)
      */
-    void refresh();
+    public abstract void refresh();
 
-    /*
-     * get total item
-     */
-    int getItemCount();
-
-    /*
-     * get item at given position
-     */
-    ImageRealm getItemAtPos(int pos);
-
-    /*
-     * remove item at given position
-     */
-    void removeItemAtPos(int pos);
-
-    /*
-     * save bitmap at pos
-     */
-    void saveImageAtPos(int pos);
+    @Override
+    public void onFavorRealmDataChange(RealmResults<ImageRealm> data){
+        // keep empty
+    }
 }

@@ -2,33 +2,26 @@ package com.github.runningforlife.photosniffer.presenter;
 
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 
+import io.realm.RealmResults;
+
 /**
  * presenter to get favor image list
  */
 
-public interface FavorImagePresenter extends Presenter{
-    /*
-     * get total item
-     */
-    int getItemCount();
-
-    /*
-     * get item at given position
-     */
-    ImageRealm getItemAtPos(int pos);
-
-    /*
-     * remove item at given position
-     */
-    void removeItemAtPos(int pos);
-
-    /*
-     * save bitmap at pos
-     */
-    void saveImageAtPos(int pos);
+public abstract class FavorImagePresenter implements Presenter{
 
     /*
      * cancel favor an image at pos
      */
-    void cancelFavorAtPos(int pos);
+    public abstract void cancelFavorAtPos(int pos);
+
+    @Override
+    public void onUsedRealmDataChange(RealmResults<ImageRealm> data){
+        // keep empty
+    }
+
+    @Override
+    public void onUnusedRealmDataChange(RealmResults<ImageRealm> data){
+        // keep empty
+    }
 }
