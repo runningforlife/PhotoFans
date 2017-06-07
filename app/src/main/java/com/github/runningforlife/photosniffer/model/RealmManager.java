@@ -27,14 +27,19 @@ public class RealmManager implements LifeCycle{
     private static AtomicInteger sRealmRefCount = new AtomicInteger(0);
     private Realm realm;
     // all the data we have
-    private RealmResults<ImageRealm> mAllImages;
+    private RealmResults<ImageRealm> mAllUsedImages;
     private RealmResults<ImageRealm> mAllUnUsedImages;
+    private RealmResults<ImageRealm> mAllFavorImages;
     // callback to listen realm changes: update or query complete
     private Set<RealmDataChangeListener> mListeners;
-    private RealmDataSetChangeListener mDataSetChangeListener;
+    private UsedRealmDataChangeListener mUsedDataChangeListener;
+    private UnusedRealmDataChangeListener mUnusedDataChangeListener;
+    private FavorRealmDataChangeListener mFavorDataChangeListener;
 
     public interface RealmDataChangeListener{
-        void onRealmDataChange(RealmResults<ImageRealm> data);
+        void onUsedRealmDataChange(RealmResults<ImageRealm> data);
+        void onUnusedRealmDataChange(RealmResults<ImageRealm> data);
+        void onFavorRealmDataChange(RealmResults<ImageRealm> data);
     }
 
     public static RealmManager getInstance() {
@@ -44,7 +49,9 @@ public class RealmManager implements LifeCycle{
     private RealmManager() {
         realm = Realm.getDefaultInstance();
         mListeners = new HashSet<>();
-        mDataSetChangeListener = new RealmDataSetChangeListener();
+        mUsedDataChangeListener = new UsedRealmDataChangeListener();
+        mUnusedDataChangeListener = new UnusedRealmDataChangeListener();
+        mFavorDataChangeListener = new FavorRealmDataChangeListener();
     }
 
     // this should be consistent with UI lifecycle: onCreate() or onStart()
@@ -60,13 +67,17 @@ public class RealmManager implements LifeCycle{
         Log.d(TAG,"onDestroy(): ref count = " + sRealmRefCount.get());
         if(sRealmRefCount.decrementAndGet() == 0) {
             //trimData();
-            if (mAllImages != null) {
-                mAllImages.removeAllChangeListeners();
-                mAllImages = null;
+            if (mAllUsedImages != null) {
+                mAllUsedImages.removeAllChangeListeners();
+                mAllUsedImages = null;
             }
             if (mAllUnUsedImages != null) {
                 mAllUnUsedImages.removeAllChangeListeners();
                 mAllUnUsedImages = null;
+            }
+            if(mAllFavorImages != null){
+                mAllFavorImages.removeAllChangeListeners();
+                mAllFavorImages = null;
             }
             if (realm != null) {
                 realm.close();
@@ -162,13 +173,13 @@ public class RealmManager implements LifeCycle{
     // keep latest images
     public void trimData(){
         int maxImgs = SharedPrefUtil.getMaxReservedImages();
-        if(mAllImages != null && mAllImages.isValid()
-                && mAllImages.isLoaded()){
-            mAllImages.sort("mTimeStamp",Sort.DESCENDING);
+        if(mAllUsedImages != null && mAllUsedImages.isValid()
+                && mAllUsedImages.isLoaded()){
+            mAllUsedImages.sort("mTimeStamp",Sort.DESCENDING);
 
             realm.beginTransaction();
-            for(int i = maxImgs; i < mAllImages.size(); ++i){
-                mAllImages.get(i).deleteFromRealm();
+            for(int i = maxImgs; i < mAllUsedImages.size(); ++i){
+                mAllUsedImages.get(i).deleteFromRealm();
             }
             realm.commitTransaction();
         }
@@ -176,22 +187,19 @@ public class RealmManager implements LifeCycle{
 
     public void addListener(RealmDataChangeListener listener){
         mListeners.add(listener);
-        if(mAllImages != null && !mAllImages.isEmpty()){
-            listener.onRealmDataChange(mAllImages);
+        if(mAllUsedImages != null && mAllUsedImages.isValid()){
+            listener.onUsedRealmDataChange(mAllUsedImages);
+        }
+        if(mAllUnUsedImages != null && mAllUnUsedImages.isValid()){
+            listener.onUnusedRealmDataChange(mAllUnUsedImages);
+        }
+        if(mAllFavorImages != null && mAllFavorImages.isValid()){
+            listener.onFavorRealmDataChange(mAllFavorImages);
         }
     }
 
     public void removeListener(RealmDataChangeListener listener){
         mListeners.remove(listener);
-    }
-
-    private class RealmDataSetChangeListener implements RealmChangeListener<RealmResults<ImageRealm>>{
-        @Override
-        public void onChange(RealmResults<ImageRealm> element) {
-            Log.v(TAG,"onChange(): current image count = " + element.size());
-            //element.sort("mTimeStamp",Sort.DESCENDING);
-            RealmManager.this.notify(element);
-        }
     }
 
     private void query(){
@@ -200,16 +208,17 @@ public class RealmManager implements LifeCycle{
             realm = Realm.getDefaultInstance();
         }
 
-        if (mAllImages == null || !mAllImages.isValid()) {
-            mAllImages = realm.where(ImageRealm.class)
+        if (mAllUsedImages == null || !mAllUsedImages.isValid()) {
+            mAllUsedImages = realm.where(ImageRealm.class)
                     .equalTo("mIsUsed", true)
                     .findAllAsync()
                     .sort("mTimeStamp", Sort.DESCENDING);
-            mAllImages.addChangeListener(mDataSetChangeListener);
-            Log.v(TAG, "query(): image count = " + mAllImages.size());
-            notify(mAllImages);
-        }else if(mAllImages.isValid() && !mAllImages.isEmpty()){
-            notify(mAllImages);
+            mAllUsedImages.addChangeListener(mUsedDataChangeListener);
+            Log.v(TAG, "query(): image count = " + mAllUsedImages.size());
+        }else if(mAllUsedImages.isValid() && !mAllUsedImages.isEmpty()){
+            for(RealmDataChangeListener listener : mListeners){
+                listener.onUsedRealmDataChange(mAllUsedImages);
+            }
         }
 
         if(mAllUnUsedImages == null || !mAllUnUsedImages.isValid()) {
@@ -217,17 +226,56 @@ public class RealmManager implements LifeCycle{
                     .equalTo("mIsUsed", false)
                     .findAllAsync()
                     .sort("mTimeStamp", Sort.DESCENDING);
-            mAllUnUsedImages.addChangeListener(mDataSetChangeListener);
+            mAllUnUsedImages.addChangeListener(mUnusedDataChangeListener);
         }else if(mAllUnUsedImages.isValid() && !mAllUnUsedImages.isEmpty()){
-            notify(mAllUnUsedImages);
+            for(RealmDataChangeListener listener : mListeners){
+                listener.onUnusedRealmDataChange(mAllUnUsedImages);
+            }
+        }
+
+        if(mAllFavorImages == null || !mAllFavorImages.isValid()){
+            mAllFavorImages = realm.where(ImageRealm.class)
+                    .equalTo("mIsFavor",true)
+                    .findAllAsync()
+                    .sort("mTimeStamp",Sort.DESCENDING);
+            mAllFavorImages.addChangeListener(mFavorDataChangeListener);
+        }else if(mAllFavorImages.isValid() && !mAllFavorImages.isEmpty()){
+            for(RealmDataChangeListener listener : mListeners){
+                listener.onFavorRealmDataChange(mAllFavorImages);
+            }
         }
     }
 
-    private void notify(RealmResults<ImageRealm> element){
-        if(mListeners.isEmpty()) return;
+    private class UsedRealmDataChangeListener implements RealmChangeListener<RealmResults<ImageRealm>>{
+        @Override
+        public void onChange(RealmResults<ImageRealm> element) {
+            Log.v(TAG,"onChange(): current used image count = " + element.size());
+            //element.sort("mTimeStamp",Sort.DESCENDING);
+            for(RealmDataChangeListener listener : mListeners){
+                listener.onUsedRealmDataChange(element);
+            }
+        }
+    }
 
-        for (RealmDataChangeListener listener : mListeners) {
-            listener.onRealmDataChange(element);
+    private class UnusedRealmDataChangeListener implements RealmChangeListener<RealmResults<ImageRealm>>{
+
+        @Override
+        public void onChange(RealmResults<ImageRealm> element) {
+            Log.v(TAG,"onChange(): current unused image count = " + element.size());
+            for(RealmDataChangeListener listener : mListeners){
+                listener.onUnusedRealmDataChange(element);
+            }
+        }
+    }
+
+    private class FavorRealmDataChangeListener implements RealmChangeListener<RealmResults<ImageRealm>>{
+
+        @Override
+        public void onChange(RealmResults<ImageRealm> element) {
+            Log.v(TAG,"onChange(): current favor image count = " + element.size());
+            for(RealmDataChangeListener listener : mListeners){
+                listener.onFavorRealmDataChange(element);
+            }
         }
     }
 

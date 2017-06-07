@@ -137,12 +137,25 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
     }
 
     @Override
-    public void onRealmDataChange(RealmResults<ImageRealm> data) {
-        Log.v(TAG,"onRealmDataChange(): data size = " + data.size());
+    public void onUsedRealmDataChange(RealmResults<ImageRealm> data) {
+        Log.v(TAG,"onUsedRealmDataChange(): data size = " + data.size());
         mImgList = data;
         // keep sorted
         sort();
-        mView.onDataSetChanged();
+
+        if(mView != null) {
+            mView.onDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onUnusedRealmDataChange(RealmResults<ImageRealm> data) {
+
+    }
+
+    @Override
+    public void onFavorRealmDataChange(RealmResults<ImageRealm> data) {
+
     }
 
     private void sort(){

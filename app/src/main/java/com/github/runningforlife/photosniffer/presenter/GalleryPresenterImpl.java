@@ -177,8 +177,8 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
     }
 
     @Override
-    public void onRealmDataChange(RealmResults<ImageRealm> data) {
-        Log.v(TAG,"onRealmDataChange(): data size = " + data.size());
+    public void onUsedRealmDataChange(RealmResults<ImageRealm> data) {
+        Log.v(TAG,"onUsedRealmDataChange(): data size = " + data.size());
         // data size is not changed, just return
         if(mPrevImgCount == data.size()) {
             mView.notifyDataChanged();
@@ -187,15 +187,10 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
 
         mPrevImgCount = data.size();
         if(data.size() > 0 && data.size() <= sMaxReservedImg) {
-            if (data.get(0).getUsed()) {
-                mImageList = data;
-                // unsorted: keep list descending sorted
-                sort();
-                mView.notifyDataChanged();
-            } else {
-                Log.v(TAG, "onRealmDataChange(): unused url size = " + data.size());
-                mUnUsedImages = data;
-            }
+            mImageList = data;
+            // unsorted: keep list descending sorted
+            sort();
+            mView.notifyDataChanged();
         }else if(data.size() > sMaxReservedImg){
             mRealmMgr.trimData();
         }
@@ -204,6 +199,17 @@ public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiv
             //mView.onRefreshDone(true);
             mIsRefreshing = false;
         }
+    }
+
+    @Override
+    public void onUnusedRealmDataChange(RealmResults<ImageRealm> data) {
+        Log.v(TAG, "onUnusedRealmDataChange(): unused url size = " + data.size());
+        mUnUsedImages = data;
+    }
+
+    @Override
+    public void onFavorRealmDataChange(RealmResults<ImageRealm> data) {
+
     }
 
     @Override
