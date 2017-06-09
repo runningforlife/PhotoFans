@@ -20,11 +20,13 @@ public class FavorImageActivity  extends BaseActivity{
     public void onCreate(Bundle savedState){
         super.onCreate(savedState);
 
+        setContentView(R.layout.activity_image_favor);
+
         FavoriteImageFragment fragment = FavoriteImageFragment.newInstance();
 
         FragmentManager fragmentMgr = getSupportFragmentManager();
         fragmentMgr.beginTransaction()
-                   .add(fragment,FavoriteImageFragment.TAG)
+                   .add(R.id.fragment_container,fragment,FavoriteImageFragment.TAG)
                    .commit();
 
         initToolbar();

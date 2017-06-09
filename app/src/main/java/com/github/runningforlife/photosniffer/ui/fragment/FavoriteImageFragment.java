@@ -3,6 +3,7 @@ package com.github.runningforlife.photosniffer.ui.fragment;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import com.github.runningforlife.photosniffer.presenter.FavorImagePresenterImpl;
 import com.github.runningforlife.photosniffer.ui.FavorView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.ImageAdapterCallback;
+import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,7 +61,7 @@ public class FavoriteImageFragment extends BaseFragment
     }
 
     private void initView(){
-        GridLayoutManager glm = new GridLayoutManager(getContext(),3);
+        GridLayoutManager glm = new GridLayoutManager(getContext(),2);
         mRcvFavorList.setLayoutManager(glm);
 
         mAdapter = new GalleryAdapter(getContext(),this);
@@ -110,13 +112,21 @@ public class FavoriteImageFragment extends BaseFragment
     @Override
     public void onDataSetChanged() {
         Log.v(TAG,"onDataSetChanged()");
+        if(mRcvFavorList.getAdapter() == null){
+            mRcvFavorList.setAdapter(mAdapter);
+        }
         //mRcvFavorList.invalidate();
+        //FIXME: D/skia: --- decoder->decode returned false
         mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onImageSaveDone(String path) {
-
+        if(TextUtils.isEmpty(path)){
+            ToastUtil.showToast(getContext(),getString(R.string.save_image_fail));
+        }else{
+            ToastUtil.showToast(getContext(),getString(R.string.save_image_Success) + path);
+        }
     }
 
     private void setTitle(){

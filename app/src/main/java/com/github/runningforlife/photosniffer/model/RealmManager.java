@@ -211,6 +211,7 @@ public class RealmManager implements LifeCycle{
         if (mAllUsedImages == null || !mAllUsedImages.isValid()) {
             mAllUsedImages = realm.where(ImageRealm.class)
                     .equalTo("mIsUsed", true)
+                    .equalTo("mIsFavor", false)
                     .findAllAsync()
                     .sort("mTimeStamp", Sort.DESCENDING);
             mAllUsedImages.addChangeListener(mUsedDataChangeListener);

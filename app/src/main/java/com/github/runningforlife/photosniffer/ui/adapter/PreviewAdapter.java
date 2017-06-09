@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.github.runningforlife.photosniffer.R;
@@ -47,6 +48,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
         String url = mCallback.getItemAtPos(position).getUrl();
         // preload
         MiscUtil.preloadImage(holder.preview);
+        holder.preview.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.view_scale_out));
         GlideLoader.load(mContext,url,new GlideLoaderListener(holder.preview),150,150);
     }
 

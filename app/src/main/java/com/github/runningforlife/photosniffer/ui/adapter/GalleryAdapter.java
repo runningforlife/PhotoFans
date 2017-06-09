@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.cache.DiskLruCacheFactory;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 
@@ -59,6 +61,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
             MiscUtil.preloadImage(vh.img);
             //FIXME: some item is not visible,force to invalidate
             GlideLoaderListener listener = new GlideLoaderListener(vh.img);
+            //Glide.clear(vh.img);
             GlideLoader.load(mContext,url,listener,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
         }else if(getItemCount() > 0){
             // remove from the list

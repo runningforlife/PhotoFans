@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -25,6 +26,7 @@ import com.github.runningforlife.photosniffer.ui.GalleryView;
 import com.github.runningforlife.photosniffer.ui.activity.ImageDetailActivity;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.ImageAdapterCallback;
+import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
 import butterknife.BindView;
@@ -43,7 +45,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     private GalleryPresenter mPresenter;
     private GalleryAdapter mAdapter;
     private RefreshCallback mCallback;
-
+    // when refresh, currently keep screen on
 
     public interface RefreshCallback {
         void onRefreshDone(boolean success);
@@ -110,6 +112,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         if(enable){
             Window window = getActivity().getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         }
     }
 
@@ -201,7 +204,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         //LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
         GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(),2, GridLayoutManager.VERTICAL,false);
         mRvImgList.setLayoutManager(gridLayoutMgr);
-        mRvImgList.setItemAnimator(new DefaultItemAnimator());
+        mRvImgList.setItemAnimator(new ScaleInOutItemAnimator());
 
         mAdapter = new GalleryAdapter(getContext(),this);
         //adapter has to be set here, if not, refresh layout won't work

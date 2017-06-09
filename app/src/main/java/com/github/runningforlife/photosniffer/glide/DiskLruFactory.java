@@ -14,7 +14,7 @@ import java.io.File;
 
 public class DiskLruFactory extends DiskLruCacheFactory{
     private static final String TAG = "DiskLru";
-    static final String DISK_CACHE_DIR = "PhotoFans/Pictures/Cache/";
+    static final String DISK_CACHE_DIR = "PhotoSniffer/Pictures/Cache/";
     static final int DISK_CACHE_SIZE = 1024*1024*100;
 
     public DiskLruFactory(Context context) {

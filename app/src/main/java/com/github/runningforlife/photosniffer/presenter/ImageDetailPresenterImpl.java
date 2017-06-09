@@ -148,16 +148,6 @@ public class ImageDetailPresenterImpl extends ImageDetailPresenter {
         }
     }
 
-    @Override
-    public void onUnusedRealmDataChange(RealmResults<ImageRealm> data) {
-
-    }
-
-    @Override
-    public void onFavorRealmDataChange(RealmResults<ImageRealm> data) {
-
-    }
-
     private void sort(){
         mImgList.sort("mTimeStamp", Sort.DESCENDING);
     }

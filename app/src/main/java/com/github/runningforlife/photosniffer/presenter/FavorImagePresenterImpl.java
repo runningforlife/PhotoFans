@@ -91,18 +91,8 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
     }
 
     @Override
-    public void onUsedRealmDataChange(RealmResults<ImageRealm> data) {
-        Log.v(TAG,"onUsedRealmDataChange(): data size = " + data.size());
-    }
-
-    @Override
-    public void onUnusedRealmDataChange(RealmResults<ImageRealm> data) {
-
-    }
-
-    @Override
     public void onFavorRealmDataChange(RealmResults<ImageRealm> data) {
-        Log.v(TAG,"onFavorRealmDataChange()");
+        Log.v(TAG,"onFavorRealmDataChange(): data size = " + data.size());
         mFavorList = data;
 
         if(mView != null) {
