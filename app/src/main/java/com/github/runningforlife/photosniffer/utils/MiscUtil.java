@@ -1,7 +1,11 @@
 package com.github.runningforlife.photosniffer.utils;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.widget.ImageView;
 
@@ -25,7 +29,12 @@ public class MiscUtil {
         iv.setImageDrawable(d);
     }
 
-    public static int ApiLevel(){
-        return Build.VERSION.SDK_INT;
+
+    public static boolean isWifiConnected(Context context){
+        ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+
+        return ni.isConnected() && ni.getType() == ConnectivityManager.TYPE_WIFI;
     }
 }
