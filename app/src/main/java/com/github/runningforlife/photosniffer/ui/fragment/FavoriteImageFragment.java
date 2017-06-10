@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,12 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.presenter.FavorImagePresenter;
 import com.github.runningforlife.photosniffer.presenter.FavorImagePresenterImpl;
 import com.github.runningforlife.photosniffer.ui.FavorView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.ImageAdapterCallback;
+import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
+import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
 import butterknife.BindView;
@@ -28,6 +32,8 @@ import butterknife.ButterKnife;
 public class FavoriteImageFragment extends BaseFragment
         implements ImageAdapterCallback, FavorView{
     public static final String TAG = "FavorImageFragment";
+    private static final int IMAGE_WIDTH = 512;
+    private static final int IMAGE_HEIGHT = (int)(IMAGE_WIDTH*DisplayUtil.getScreenRatio());
     @BindView(R.id.rcv_favor) RecyclerView mRcvFavorList;
     GalleryAdapter mAdapter;
     private FavorImagePresenter mPresenter;
@@ -60,11 +66,22 @@ public class FavoriteImageFragment extends BaseFragment
         setTitle();
     }
 
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+
+        mPresenter.onDestroy();
+    }
+
     private void initView(){
-        GridLayoutManager glm = new GridLayoutManager(getContext(),2);
+        GridLayoutManager glm = new GridLayoutManager(getContext(),3);
         mRcvFavorList.setLayoutManager(glm);
+        mRcvFavorList.setItemAnimator(new ScaleInOutItemAnimator());
 
         mAdapter = new GalleryAdapter(getContext(),this);
+        mAdapter.setImageWidth(IMAGE_HEIGHT);
+        mAdapter.setImageHeight(IMAGE_WIDTH);
+        mAdapter.setImageLoader(Loader.GLIDE);
         mRcvFavorList.setAdapter(mAdapter);
     }
 
@@ -112,9 +129,6 @@ public class FavoriteImageFragment extends BaseFragment
     @Override
     public void onDataSetChanged() {
         Log.v(TAG,"onDataSetChanged()");
-        if(mRcvFavorList.getAdapter() == null){
-            mRcvFavorList.setAdapter(mAdapter);
-        }
         //mRcvFavorList.invalidate();
         //FIXME: D/skia: --- decoder->decode returned false
         mAdapter.notifyDataSetChanged();
@@ -132,6 +146,9 @@ public class FavoriteImageFragment extends BaseFragment
     private void setTitle(){
         String myFavorite = getString(R.string.my_favorite_images) +
                 "(" + mPresenter.getItemCount() + ")";
-        getActivity().setTitle(myFavorite);
+        Activity activity = getActivity();
+        if(activity != null){
+            activity.setTitle(myFavorite);
+        }
     }
 }

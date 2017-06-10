@@ -70,33 +70,33 @@ public class GalleryPresenterImpl extends GalleryPresenter
             mIsRefreshing = true;
             Intent intent = new Intent(mContext, ImageRetrieveService.class);
             intent.putExtra("receiver", mReceiver);
-            intent.putExtra(ImageRetrieveService.EXTRA_MAX_IMAGES, DEFAULT_RETRIEVED_IMAGES);
+            intent.putExtra(ImageRetrieveService.EXTRA_EXPECTED_IMAGES, DEFAULT_RETRIEVED_IMAGES - mUnUsedImages.size());
             mContext.startService(intent);
-        }else{
-            // add to the list
-            Realm realm = Realm.getDefaultInstance();
+            //
+        }
 
-            try {
-                int cn = 0;
-                realm.beginTransaction();
-                for (Iterator iter = mUnUsedImages.iterator();
-                      iter.hasNext() && ++cn <= DEFAULT_RETRIEVED_IMAGES; ) {
-                    ImageRealm item = (ImageRealm) iter.next();
-                    item.setUsed(true);
-                    // update time stamp
-                    item.setTimeStamp(System.currentTimeMillis());
-                }
-                realm.commitTransaction();
-            }finally {
-                realm.close();
+        // add unused to the list
+        Realm realm = Realm.getDefaultInstance();
+        try {
+            int cn = 0;
+            realm.beginTransaction();
+            for (Iterator iter = mUnUsedImages.iterator();
+                 iter.hasNext() && ++cn <= DEFAULT_RETRIEVED_IMAGES; ) {
+                ImageRealm item = (ImageRealm) iter.next();
+                item.setUsed(true);
+                // update time stamp
+                item.setTimeStamp(System.currentTimeMillis());
             }
-
-            mIsRefreshing = false;
-            mView.onRefreshDone(true);
+            realm.commitTransaction();
+        }finally {
+            realm.close();
         }
 
         // notify
-        //mRealmMgr.addListener(this);
+        if(mUnUsedImages.size() >= DEFAULT_RETRIEVED_IMAGES){
+            mIsRefreshing = false;
+            mView.onRefreshDone(true);
+        }
     }
 
     @Override

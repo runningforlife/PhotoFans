@@ -31,7 +31,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private List<ImageRealm> mImgList = new ArrayList<>();
     private List<RetrieveCompleteListener> mListeners;
-    private int mMaxRetrievedImages = DEFAULT_RETRIEVED_IMAGES;
+    private int mExpectedImages;
+    private volatile boolean mIsExpectedDone;
 
     private static HashMap<String,Boolean> sAllPages = new HashMap<>();
     // last url to start this page retrieving
@@ -39,10 +40,10 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private static List<String> sLastUrl;
     @SuppressWarnings("unchecked")
     private SourcePageFilter mPageFilter;
-    private static final int DEFAULT_RETRIEVED_IMAGES = 10;
+    private static final int DEFAULT_RETRIEVED_IMAGES = 20;
 
-    public ImageRetrievePageProcessor(int n){
-        mMaxRetrievedImages = n > 0 ? n : DEFAULT_RETRIEVED_IMAGES;
+    public ImageRetrievePageProcessor(int expected){
+        mExpectedImages = expected;
         mListeners = new ArrayList<>();
         sLastUrl = new ArrayList<>();
         mPageFilter = new SourcePageFilter();
@@ -75,6 +76,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     }
 
     public interface RetrieveCompleteListener{
+        void onExpectedComplete(List<ImageRealm> expected);
         void onRetrieveComplete(List<ImageRealm> data);
     }
 
@@ -97,12 +99,17 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                     retrieveImages(page);
             if(result != null && result.size() > 0) {
                 mImgList.addAll(result);
-                if (mImgList.size() >= mMaxRetrievedImages) {
+                if (mImgList.size() >= mExpectedImages) {
                     // marked part of them as used
-                    for (int i = 0; i < mMaxRetrievedImages; ++i) {
+                    for (int i = 0; i < mExpectedImages; ++i) {
                         mImgList.get(i).setUsed(true);
                     }
-                    notifyListeners();
+                    mIsExpectedDone = true;
+                    notifyExpectedComplete();
+                }
+
+                if(mImgList.size() >= DEFAULT_RETRIEVED_IMAGES){
+                    notifyRetrieveComplete();
                 }
             }
 
@@ -113,7 +120,14 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         }
     }
 
-    private void notifyListeners(){
+    private void notifyExpectedComplete(){
+        // expected number of images is got
+        for (RetrieveCompleteListener listener : mListeners) {
+            listener.onExpectedComplete(mImgList);
+        }
+    }
+
+    private void notifyRetrieveComplete(){
         // notify jobs are done
         for (RetrieveCompleteListener listener : mListeners) {
             listener.onRetrieveComplete(mImgList);

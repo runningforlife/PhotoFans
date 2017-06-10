@@ -49,13 +49,6 @@
             android:label="@string/select_your_favorite_websites">
         </activity>
 
-
-        <activity android:name="com.github.runningforlife.photosniffer.ui.activity.FavorImageActivity"
-            android:label=""
-            android:theme="@style/AppTheme">
-
-        </activity>
-
         <service android:name="com.github.runningforlife.photosniffer.service.ImageRetrieveService">
         </service>
 

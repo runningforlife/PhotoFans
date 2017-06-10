@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.ui.fragment.AllPicturesFragment;
+import com.github.runningforlife.photosniffer.ui.fragment.FavoriteImageFragment;
 
 public class GalleryActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -115,9 +116,9 @@ public class GalleryActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_favorite) {
-            startFavorActivity();
+            startFavorFragment();
         } else if (id == R.id.nav_gallery) {
-            refreshFragment();
+            startGalleryFragment();
         } else if (id == R.id.nav_category) {
 
         } else if (id == R.id.nav_manage) {
@@ -150,10 +151,11 @@ public class GalleryActivity extends AppCompatActivity
         Fragment fragment = fragmentMgr.findFragmentByTag(AllPicturesFragment.TAG);
         if(fragment == null){
             fragment = AllPicturesFragment.newInstance();
-            fragmentMgr.beginTransaction()
-                    .add(R.id.fragment_container,fragment,AllPicturesFragment.TAG)
-                    .commit();
         }
+
+        fragmentMgr.beginTransaction()
+                .replace(R.id.fragment_container,fragment,AllPicturesFragment.TAG)
+                .commit();
     }
 
     private void startSetting(){
@@ -166,26 +168,35 @@ public class GalleryActivity extends AppCompatActivity
     private void setRefreshing(boolean refreshing){
         AllPicturesFragment fragment = (AllPicturesFragment)getSupportFragmentManager().
                 findFragmentByTag(AllPicturesFragment.TAG);
-        if(fragment != null && fragment.isRefreshing()){
+        if(fragment != null && fragment.isRefreshing() && fragment.isVisible()){
             fragment.setRefreshing(refreshing);
         }
     }
 
-    private void startFavorActivity(){
-        Intent intent = new Intent(this,FavorImageActivity.class);
-        startActivity(intent);
-    }
-
-    private void refreshFragment(){
+    private void startFavorFragment(){
         FragmentManager fragmentMgr = getSupportFragmentManager();
-        AllPicturesFragment fragment = (AllPicturesFragment)fragmentMgr.findFragmentByTag(AllPicturesFragment.TAG);
+
+        FavoriteImageFragment fragment = (FavoriteImageFragment) fragmentMgr.findFragmentByTag(FavoriteImageFragment.TAG);
+
         if(fragment == null){
-            fragment = (AllPicturesFragment) AllPicturesFragment.newInstance();
-            fragmentMgr.beginTransaction()
-                    .add(R.id.fragment_container,fragment,AllPicturesFragment.TAG)
-                    .commit();
+            fragment = FavoriteImageFragment.newInstance();
         }
 
-        fragment.notifyDataChanged();
+        fragmentMgr.beginTransaction()
+                .replace(R.id.fragment_container,fragment, FavoriteImageFragment.TAG)
+                .commit();
+
+    }
+
+    private void startGalleryFragment(){
+        FragmentManager fragmentMgr = getSupportFragmentManager();
+        AllPicturesFragment fragment = (AllPicturesFragment)fragmentMgr.findFragmentByTag(AllPicturesFragment.TAG);
+        if(fragment == null) {
+            fragment = (AllPicturesFragment) AllPicturesFragment.newInstance();
+        }
+
+        fragmentMgr.beginTransaction()
+                .replace(R.id.fragment_container,fragment, AllPicturesFragment.TAG)
+                .commit();
     }
 }

@@ -17,6 +17,9 @@ import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
+import com.github.runningforlife.photosniffer.loader.Loader;
+import com.github.runningforlife.photosniffer.loader.PicassoLoader;
+import com.github.runningforlife.photosniffer.loader.PicassoLoaderListener;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
@@ -35,12 +38,31 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     private LayoutInflater mInflater;
     private ImageAdapterCallback mCallback;
     private Context mContext;
+    private int mWidth;
+    private int mHeight;
+    private String mLoader;
 
     public GalleryAdapter(Context context,ImageAdapterCallback callback){
         mCallback = callback;
         mInflater = LayoutInflater.from(context);
         // different device panel size may need different width and height
         mContext = context;
+
+        mWidth = DEFAULT_IMG_WIDTH;
+        mHeight = DEFAULT_IMG_HEIGHT;
+        mLoader = Loader.GLIDE;
+    }
+
+    public void setImageWidth(int w){
+        mWidth = w > 0 ? w : DEFAULT_IMG_WIDTH;
+    }
+
+    public void setImageHeight(int h){
+        mHeight = h > 0 ? h : DEFAULT_IMG_HEIGHT;
+    }
+
+    public void setImageLoader(@Loader.LOADER String loader){
+        mLoader = loader;
     }
 
     @Override
@@ -59,10 +81,15 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         if(!TextUtils.isEmpty(url)) {
             // preload image
             MiscUtil.preloadImage(vh.img);
-            //FIXME: some item is not visible,force to invalidate
-            GlideLoaderListener listener = new GlideLoaderListener(vh.img);
-            //Glide.clear(vh.img);
-            GlideLoader.load(mContext,url,listener,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
+            if (Loader.PICASSO.equals(mLoader)) {
+                PicassoLoader.load(mContext, new PicassoLoaderListener(vh.img), url, mWidth,mHeight);
+            }else{
+                //FIXME: some item is loaded very slowly
+                GlideLoaderListener listener = new GlideLoaderListener(vh.img);
+                //Glide.clear(vh.img);
+                GlideLoader.load(mContext,url,listener,mWidth,mHeight);
+            }
+
         }else if(getItemCount() > 0){
             // remove from the list
             mCallback.removeItemAtPos(position);

@@ -1,6 +1,8 @@
 package com.github.runningforlife.photosniffer.loader;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.ImageView;
@@ -13,12 +15,13 @@ import com.squareup.picasso.Target;
  */
 
 public class PicassoLoader{
+    private static final String TAG = "PicassoLoader";
 
     public static void load(Context context, ImageView iv, String url, int w, int h) {
         Picasso.with(context)
                 .load(url)
                 .resize(w,h)
-                .centerCrop()
+                .fit()
                 .into(iv);
     }
 

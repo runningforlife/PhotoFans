@@ -40,7 +40,7 @@ public class ImageRetrieveService extends Service implements
     // timeout should be less than screen off timing
     private static final long MAX_RETRIEVE_TIMEOUT = 20000;
     // max number of images to be retrieved a time
-    public static final String EXTRA_MAX_IMAGES = "maxImages";
+    public static final String EXTRA_EXPECTED_IMAGES = "maxImages";
 
     private ResultReceiver mReceiver;
     private ImageRetrievePageProcessor mProcessor;
@@ -85,6 +85,17 @@ public class ImageRetrieveService extends Service implements
     }
 
     @Override
+    public void onExpectedComplete(List<ImageRealm> expected) {
+        Log.v(TAG,"onExpectedComplete()");
+        saveToRealm(expected);
+        if(!mServiceHandler.hasMessages(H.EVENT_RETRIEVE_DONE)) {
+            Message msg = mServiceHandler.obtainMessage(H.EVENT_RETRIEVE_DONE);
+            msg.obj = expected.size();
+            msg.sendToTarget();
+        }
+    }
+
+    @Override
     public void onRetrieveComplete(List<ImageRealm> data) {
         Log.v(TAG,"onRetrieveComplete()");
         // remove listener
@@ -92,11 +103,6 @@ public class ImageRetrieveService extends Service implements
         // stop the spider
         //mSpider.close();
         mSpider.stop();
-        if(!mServiceHandler.hasMessages(H.EVENT_RETRIEVE_DONE)) {
-            Message msg = mServiceHandler.obtainMessage(H.EVENT_RETRIEVE_DONE);
-            msg.obj = data.size();
-            msg.sendToTarget();
-        }
 
         saveToRealm(data);
     }
@@ -114,13 +120,15 @@ public class ImageRetrieveService extends Service implements
     }
 
     private void handleIntent(Intent intent) {
-        int max = intent.getIntExtra(EXTRA_MAX_IMAGES,0);
+        int max = intent.getIntExtra(EXTRA_EXPECTED_IMAGES,0);
         mReceiver = intent.getParcelableExtra("receiver");
         if(mReceiver != null) {
             mReceiver.send(ServiceStatus.RUNNING, null);
         }
 
-        startCrawler(max);
+        if(max > 0) {
+            startCrawler(max);
+        }
     }
 
     private void startCrawler(int n){

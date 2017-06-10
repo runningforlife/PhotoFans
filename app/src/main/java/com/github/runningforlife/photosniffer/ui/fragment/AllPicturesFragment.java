@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -83,6 +84,8 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     @Override
     public void onResume(){
         super.onResume();
+
+        setTitle();
         // FIXME: some times, data set seems not loaded in recycle view
         mPresenter.onStart();
     }
@@ -225,5 +228,13 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     private void initPresenter(){
         mPresenter = new GalleryPresenterImpl(getContext(),this);
         mPresenter.init();
+    }
+
+    private void setTitle(){
+        String appName = getString(R.string.app_name);
+        Activity activity = getActivity();
+        if(activity != null){
+            activity.setTitle(appName);
+        }
     }
 }
