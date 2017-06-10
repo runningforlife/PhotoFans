@@ -96,19 +96,6 @@ public class GalleryActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            startSetting();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -170,6 +157,12 @@ public class GalleryActivity extends AppCompatActivity
                 findFragmentByTag(AllPicturesFragment.TAG);
         if(fragment != null && fragment.isRefreshing() && fragment.isVisible()){
             fragment.setRefreshing(refreshing);
+        }
+
+        FavoriteImageFragment fragment1 = (FavoriteImageFragment)getSupportFragmentManager()
+                .findFragmentByTag(FavoriteImageFragment.TAG);
+        if(fragment1 != null && fragment1.isVisible()){
+            fragment1.setRefreshing(refreshing);
         }
     }
 

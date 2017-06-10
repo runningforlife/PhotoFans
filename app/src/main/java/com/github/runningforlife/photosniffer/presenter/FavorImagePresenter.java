@@ -10,6 +10,8 @@ import io.realm.RealmResults;
 
 public abstract class FavorImagePresenter implements Presenter{
 
+
+    public abstract void refresh();
     /*
      * cancel favor an image at pos
      */

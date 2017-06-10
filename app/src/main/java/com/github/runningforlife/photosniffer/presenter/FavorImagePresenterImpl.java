@@ -27,12 +27,14 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
     private RealmManager mRealmMgr;
     private RealmResults<ImageRealm> mFavorList;
     private ExecutorService mExecutor;
+    private boolean mIsRefreshing;
 
     public FavorImagePresenterImpl(Context context, FavorView view){
         mContext = context;
         mView = view;
         mRealmMgr = RealmManager.getInstance();
         mExecutor = Executors.newSingleThreadExecutor();
+        mIsRefreshing = false;
     }
 
     @Override
@@ -73,6 +75,15 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
     }
 
     @Override
+    public void refresh() {
+        Log.v(TAG,"refresh()");
+        mIsRefreshing = true;
+        mRealmMgr.queryAllAsync();
+        mRealmMgr.addListener(this);
+
+    }
+
+    @Override
     public void cancelFavorAtPos(int pos) {
         Log.v(TAG,"cancelFavorAtPos()");
         Realm r =  Realm.getDefaultInstance();
@@ -97,6 +108,11 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
 
         if(mView != null) {
             mView.onDataSetChanged();
+        }
+
+        if(mIsRefreshing && mView != null){
+            mView.onRefreshDone(true);
+            mIsRefreshing = false;
         }
     }
 

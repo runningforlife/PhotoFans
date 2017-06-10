@@ -5,18 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
@@ -110,13 +110,6 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     @Override
     public void setRefreshing(boolean enable){
         mRefresher.setRefreshing(enable);
-        if(enable){
-            PowerManager pm = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
-            WindowManager wm = (WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE);
-            Window window = getActivity().getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        }
     }
 
     @Override
@@ -138,10 +131,6 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         }
 
         mCallback.onRefreshDone(isSuccess);
-        // remove keep screen on flag
-        Window window = getActivity().getWindow();
-        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
     }
 
     @Override
@@ -201,11 +190,39 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id){
+            case R.id.grid_view:
+                GridLayoutManager glm = new GridLayoutManager(getContext(),2);
+                mRvImgList.setLayoutManager(glm);
+                glm.setAutoMeasureEnabled(true);
+                return true;
+            case R.id.list_view:
+                LinearLayoutManager ll = new LinearLayoutManager(getContext());
+                mRvImgList.setLayoutManager(ll);
+                ll.setAutoMeasureEnabled(true);
+                return true;
+            case R.id.stagger_view:
+                StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+                mRvImgList.setLayoutManager(sglm);
+                sglm.setAutoMeasureEnabled(true);
+                return true;
+        }
+
+        mAdapter.notifyDataSetChanged();
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void initView(){
         Log.v(TAG,"initView()");
 
         //LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
         GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(),2, GridLayoutManager.VERTICAL,false);
+        mRvImgList.setHasFixedSize(true);
         mRvImgList.setLayoutManager(gridLayoutMgr);
         mRvImgList.setItemAnimator(new ScaleInOutItemAnimator());
 
@@ -223,7 +240,12 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
                 mPresenter.refresh();
             }
         });
+
+        // option menu
+        setHasOptionsMenu(true);
     }
+
+
 
     private void initPresenter(){
         mPresenter = new GalleryPresenterImpl(getContext(),this);

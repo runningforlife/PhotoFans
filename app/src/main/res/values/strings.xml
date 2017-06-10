@@ -38,4 +38,7 @@
     <string name="action_wallpaper">Set to Wallpaper</string>
     <string name="set_wallpaper_success">Wallpaper Setting Success</string>
     <string name="set_wallpaper_fail">Fail to Set Wallpaper</string>
+    <string name="action_grid_view">Grid View</string>
+    <string name="action_list_view">List View</string>
+    <string name="action_stagger_view">Stagger Grid View</string>
 </resources>

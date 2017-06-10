@@ -2,6 +2,7 @@ package com.github.runningforlife.photosniffer.loader;
 
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -45,6 +46,8 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setImageBitmap(resource);
         }
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
         Log.v(TAG,"onResourceReady(): from memory = " + isFromMemoryCache);
         if(callback != null){
             callback.onImageLoadDone(resource);
