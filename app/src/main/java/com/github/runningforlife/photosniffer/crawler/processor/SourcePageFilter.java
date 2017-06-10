@@ -11,7 +11,7 @@ import java.util.List;
 public class SourcePageFilter implements PageFilter {
     private  List<String> defSourceSite;
 
-    SourcePageFilter(){
+    public SourcePageFilter(){
         defSourceSite = SharedPrefUtil.getImageSource();
     }
 

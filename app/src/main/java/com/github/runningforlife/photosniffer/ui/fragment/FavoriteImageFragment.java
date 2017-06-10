@@ -3,6 +3,8 @@ package com.github.runningforlife.photosniffer.ui.fragment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -32,7 +34,7 @@ import butterknife.ButterKnife;
 public class FavoriteImageFragment extends BaseFragment
         implements ImageAdapterCallback, FavorView{
     public static final String TAG = "FavorImageFragment";
-    private static final int IMAGE_WIDTH = 512;
+    private static final int IMAGE_WIDTH = 1024;
     private static final int IMAGE_HEIGHT = (int)(IMAGE_WIDTH*DisplayUtil.getScreenRatio());
     @BindView(R.id.rcv_favor) RecyclerView mRcvFavorList;
     GalleryAdapter mAdapter;
@@ -74,13 +76,13 @@ public class FavoriteImageFragment extends BaseFragment
     }
 
     private void initView(){
-        GridLayoutManager glm = new GridLayoutManager(getContext(),3);
+        LinearLayoutManager glm = new LinearLayoutManager(getContext());
         mRcvFavorList.setLayoutManager(glm);
         mRcvFavorList.setItemAnimator(new ScaleInOutItemAnimator());
 
         mAdapter = new GalleryAdapter(getContext(),this);
-        mAdapter.setImageWidth(IMAGE_HEIGHT);
-        mAdapter.setImageHeight(IMAGE_WIDTH);
+        mAdapter.setImageWidth(IMAGE_WIDTH);
+        mAdapter.setImageHeight(IMAGE_HEIGHT);
         mAdapter.setImageLoader(Loader.GLIDE);
         mRcvFavorList.setAdapter(mAdapter);
     }

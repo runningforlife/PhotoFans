@@ -12,7 +12,9 @@ public class UrlUtil {
     // get a root url of the give url
     public static String getRootUrl(String url) throws MalformedURLException{
         URL absUrl = new URL(url);
-        String baseUrl = absUrl.getProtocol() + "://" + absUrl.getAuthority();
+        String authority = absUrl.getAuthority();
+        //String[] splits = authority.split("/");
+        String baseUrl = absUrl.getProtocol() + "://" + authority;
 
         return baseUrl;
     }

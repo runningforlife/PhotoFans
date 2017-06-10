@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -46,7 +45,6 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     private GalleryPresenter mPresenter;
     private GalleryAdapter mAdapter;
     private RefreshCallback mCallback;
-    // when refresh, currently keep screen on
 
     public interface RefreshCallback {
         void onRefreshDone(boolean success);
@@ -113,6 +111,8 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     public void setRefreshing(boolean enable){
         mRefresher.setRefreshing(enable);
         if(enable){
+            PowerManager pm = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
+            WindowManager wm = (WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE);
             Window window = getActivity().getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

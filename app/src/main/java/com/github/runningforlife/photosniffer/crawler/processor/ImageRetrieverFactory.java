@@ -71,9 +71,9 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
         List<ImageRealm> imgList = Collections.EMPTY_LIST;
 
         String url = page.getUrl().get();
-        Log.d(TAG,"retrieved page base url = " + url);
         try {
             String baseUrl = UrlUtil.getRootUrl(url);
+            Log.d(TAG,"retrieved page base url = " + baseUrl);
             switch (baseUrl){
                 case URL_FREE_JPG:
                     imgList = retrieve(page,URL_FREE_JPG);

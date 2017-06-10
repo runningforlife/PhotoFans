@@ -13,8 +13,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import io.realm.Realm;
+import io.realm.RealmObject;
 import io.realm.RealmResults;
 
 import com.github.runningforlife.photosniffer.service.MyThreadFactory;
@@ -29,7 +33,6 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000).setTimeOut(10000);
 
-    private List<ImageRealm> mImgList = new ArrayList<>();
     private List<RetrieveCompleteListener> mListeners;
     private int mExpectedImages;
     private volatile boolean mIsExpectedDone;
@@ -38,15 +41,22 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     // last url to start this page retrieving
     private static final int MAX_SEED_URL = 3;
     private static List<String> sLastUrl;
+    private int mCurrentImages;
     @SuppressWarnings("unchecked")
     private SourcePageFilter mPageFilter;
     private static final int DEFAULT_RETRIEVED_IMAGES = 20;
+    // executor server to save data
+    private ExecutorService mExecutor;
 
     public ImageRetrievePageProcessor(int expected){
         mExpectedImages = expected;
         mListeners = new ArrayList<>();
         sLastUrl = new ArrayList<>();
         mPageFilter = new SourcePageFilter();
+        mIsExpectedDone = false;
+        mCurrentImages = 0;
+        mExecutor = Executors.newSingleThreadExecutor(new MyThreadFactory());
+
         loadPages();
     }
 
@@ -76,8 +86,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     }
 
     public interface RetrieveCompleteListener{
-        void onExpectedComplete(List<ImageRealm> expected);
-        void onRetrieveComplete(List<ImageRealm> data);
+        void onExpectedComplete(int imgCount);
+        void onRetrieveComplete(int imgCount);
     }
 
     public void addListener(RetrieveCompleteListener listener){
@@ -88,8 +98,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         mListeners.remove(listener);
     }
 
-    public List<ImageRealm> getImageList(){
-        return mImgList;
+    public int getRetrievedImageCount(){
+        return mCurrentImages;
     }
 
     private void retrieveImages(Page page){
@@ -98,39 +108,42 @@ public class ImageRetrievePageProcessor implements PageProcessor {
             List<ImageRealm> result = ImageRetrieverFactory.getInstance().
                     retrieveImages(page);
             if(result != null && result.size() > 0) {
-                mImgList.addAll(result);
-                if (mImgList.size() >= mExpectedImages) {
-                    // marked part of them as used
-                    for (int i = 0; i < mExpectedImages; ++i) {
-                        mImgList.get(i).setUsed(true);
+                for(ImageRealm img : result){
+                    if(mCurrentImages <= mExpectedImages && !img.getUsed()){
+                        img.setUsed(true);
                     }
+
+                    ++mCurrentImages;
+                }
+
+                mExecutor.submit(new SaveRunnable(result));
+
+                if (mCurrentImages >= mExpectedImages && !mIsExpectedDone) {
                     mIsExpectedDone = true;
                     notifyExpectedComplete();
                 }
 
-                if(mImgList.size() >= DEFAULT_RETRIEVED_IMAGES){
+                if(mCurrentImages >= DEFAULT_RETRIEVED_IMAGES){
                     notifyRetrieveComplete();
                 }
             }
 
             // save to disk
-            MyThreadFactory.getInstance()
-                    .newThread(new SaveRunnable(getPageList(page)))
-                    .start();
+            mExecutor.submit(new SaveRunnable(getPageList(page)));
         }
     }
 
     private void notifyExpectedComplete(){
         // expected number of images is got
         for (RetrieveCompleteListener listener : mListeners) {
-            listener.onExpectedComplete(mImgList);
+            listener.onExpectedComplete(mCurrentImages);
         }
     }
 
     private void notifyRetrieveComplete(){
         // notify jobs are done
         for (RetrieveCompleteListener listener : mListeners) {
-            listener.onRetrieveComplete(mImgList);
+            listener.onRetrieveComplete(mCurrentImages);
         }
     }
 
@@ -183,7 +196,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         }
     }
 
-    private boolean isValidUrl(String url){
+    private boolean isValidPageUrl(String url){
         try {
             String baseUrl = UrlUtil.getRootUrl(url);
             return URLUtil.isValidUrl(baseUrl);
@@ -194,17 +207,15 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     }
 
     private  class SaveRunnable implements  Runnable{
-        private List<VisitedPageInfo> mPage;
+        private List<? extends RealmObject> mData;
 
-        SaveRunnable(List<VisitedPageInfo> page){
-            mPage = page;
+        SaveRunnable(List<? extends RealmObject> data){
+            mData = data;
         }
 
         @Override
         public void run(){
-            Looper.prepare();
-            saveToRealm(mPage);
-            Looper.loop();
+            saveToRealm(mData);
         }
     }
 
@@ -217,7 +228,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
         urlList.add(page.getUrl().get());
         for(String url : urlList){
-            if(!sAllPages.containsKey(url) && isValidUrl(url)) {
+            if(!sAllPages.containsKey(url) && isValidPageUrl(url)) {
                 VisitedPageInfo info = new VisitedPageInfo();
                 info.setUrl(url);
                 if(urlList.indexOf(url) != 0) {
@@ -235,10 +246,10 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         return pageList;
     }
 
-    private void saveToRealm(final List<VisitedPageInfo> page){
-        Log.v(TAG,"saveToRealm(): " + page.size() + " pages is retrieved");
+    private void saveToRealm(final List<? extends RealmObject> data){
+        Log.v(TAG,"saveToRealm(): " + data.size() + " pages is retrieved");
         // save data
         RealmManager.getInstance()
-                .writeAsync(page);
+                .writeAsync(data);
     }
 }

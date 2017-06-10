@@ -1,8 +1,14 @@
 package com.github.runningforlife.photosniffer.crawler;
 
 import android.util.Log;
+import android.webkit.URLUtil;
+
+import com.github.runningforlife.photosniffer.crawler.processor.PageFilter;
+import com.github.runningforlife.photosniffer.crawler.processor.SourcePageFilter;
+import com.github.runningforlife.photosniffer.utils.UrlUtil;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +38,8 @@ public class OkHttpDownloader extends AbstractDownloader {
     private static final String LOG_TAG = "OkHttpDownloader";
 
     private final static String REG_IMAGES = "(?m)(?s)<img\\s+(.*)src\\s*=\\s*\"([^\"]+)\"(.*)(\\.(gif|jpg|png))$";
-
+    // filter url
+    private static PageFilter sPageFilter = new SourcePageFilter();
     @Override
     public Page download(us.codecraft.webmagic.Request request, Task task) {
         Log.v(LOG_TAG,"download()");

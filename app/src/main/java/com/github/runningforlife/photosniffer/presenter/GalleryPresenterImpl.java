@@ -6,12 +6,15 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.model.RealmManager;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,6 +38,8 @@ public class GalleryPresenterImpl extends GalleryPresenter
         implements SimpleResultReceiver.Receiver{
     private static final String TAG = "GalleryPresenter";
 
+    private static final int DEFAULT_RETRIEVE_TIME_OUT = 20000;
+    private static final int DEFAULT_STOP_TIME_OUT = 30000;
     private static final int DEFAULT_RETRIEVED_IMAGES = 10;
     private static final int DEFAULT_WIDTH = 1024;
     private static final int DEFAULT_HEIGHT = (int)(DEFAULT_WIDTH*DisplayUtil.getScreenRatio());
@@ -51,6 +56,8 @@ public class GalleryPresenterImpl extends GalleryPresenter
     private ExecutorService mExecutor;
     private static int sMaxReservedImg = SharedPrefUtil.getMaxReservedImages();
     private int mPrevImgCount;
+    private H mMainHandler;
+
     @SuppressWarnings("unchecked")
     public GalleryPresenterImpl(Context context,GalleryView view){
         mView = view;
@@ -58,6 +65,8 @@ public class GalleryPresenterImpl extends GalleryPresenter
         mRealmMgr = RealmManager.getInstance();
         // realm only allow one transaction a time
         mExecutor = Executors.newSingleThreadExecutor();
+
+        mMainHandler = new H(Looper.myLooper());
     }
 
     @Override
@@ -72,31 +81,44 @@ public class GalleryPresenterImpl extends GalleryPresenter
             intent.putExtra("receiver", mReceiver);
             intent.putExtra(ImageRetrieveService.EXTRA_EXPECTED_IMAGES, DEFAULT_RETRIEVED_IMAGES - mUnUsedImages.size());
             mContext.startService(intent);
-            //
+
+            // timeout message
+            Message msg = mMainHandler.obtainMessage(H.EVENT_RETRIEVE_TIME_OUT);
+            mMainHandler.sendMessageDelayed(msg, DEFAULT_RETRIEVE_TIME_OUT);
+            // stop service
+            Message msg1 = mMainHandler.obtainMessage(H.EVENT_STOP_SERVICE);
+            mMainHandler.sendMessageDelayed(msg1, DEFAULT_STOP_TIME_OUT);
         }
 
-        // add unused to the list
-        Realm realm = Realm.getDefaultInstance();
-        try {
-            int cn = 0;
-            realm.beginTransaction();
-            for (Iterator iter = mUnUsedImages.iterator();
-                 iter.hasNext() && ++cn <= DEFAULT_RETRIEVED_IMAGES; ) {
-                ImageRealm item = (ImageRealm) iter.next();
-                item.setUsed(true);
-                // update time stamp
-                item.setTimeStamp(System.currentTimeMillis());
+        if(mUnUsedImages != null && mUnUsedImages.size() > 0) {
+            // notify
+            if(mUnUsedImages.size() >= DEFAULT_RETRIEVED_IMAGES){
+                mIsRefreshing = false;
+                mView.onRefreshDone(true);
             }
-            realm.commitTransaction();
-        }finally {
-            realm.close();
-        }
+            // add unused to the list
+            Realm realm = Realm.getDefaultInstance();
+            try {
+                int cn = 0;
+                realm.beginTransaction();
+                for (Iterator iter = mUnUsedImages.iterator();
+                     iter.hasNext() && ++cn <= DEFAULT_RETRIEVED_IMAGES; ) {
+                    ImageRealm item = (ImageRealm) iter.next();
+                    item.setUsed(true);
+                    // update time stamp
+                    item.setTimeStamp(System.currentTimeMillis());
+                }
+                realm.commitTransaction();
+            } finally {
+                realm.close();
+            }
 
-        // notify
-        if(mUnUsedImages.size() >= DEFAULT_RETRIEVED_IMAGES){
-            mIsRefreshing = false;
-            mView.onRefreshDone(true);
+        }else if(!mIsRefreshing){
+            // ah, something wrong
+            mView.onRefreshDone(false);
         }
+        // when refresh, currently keep screen on
+        wakeup(DEFAULT_RETRIEVE_TIME_OUT);
     }
 
     @Override
@@ -174,10 +196,10 @@ public class GalleryPresenterImpl extends GalleryPresenter
     public void onUsedRealmDataChange(RealmResults<ImageRealm> data) {
         Log.v(TAG,"onUsedRealmDataChange(): data size = " + data.size());
         // data size is not changed, just return
-        if(mPrevImgCount == data.size()) {
+/*        if(mPrevImgCount == data.size()) {
             mView.notifyDataChanged();
             return;
-        }
+        }*/
 
         mPrevImgCount = data.size();
         if(data.size() > 0 && data.size() <= sMaxReservedImg) {
@@ -187,11 +209,6 @@ public class GalleryPresenterImpl extends GalleryPresenter
             mView.notifyDataChanged();
         }else if(data.size() > sMaxReservedImg){
             mRealmMgr.trimData();
-        }
-
-        if (mIsRefreshing) {
-            //mView.onRefreshDone(true);
-            mIsRefreshing = false;
         }
     }
 
@@ -213,8 +230,11 @@ public class GalleryPresenterImpl extends GalleryPresenter
                 break;
             case ServiceStatus.SUCCESS:
                 Log.v(TAG,"image retrieve success");
-                mView.onRefreshDone(true);
+                if(mIsRefreshing) {
+                    mView.onRefreshDone(true);
+                }
                 mIsRefreshing = false;
+                removeMessageIfNeeded();
                 // save to realm
                 break;
         }
@@ -225,14 +245,64 @@ public class GalleryPresenterImpl extends GalleryPresenter
     }
 
     private void stopRetrieveIfNeeded(){
-        mIsRefreshing = false;
         // try to stop service firstly
         Intent intent = new Intent(mContext,ImageRetrieveService.class);
         mContext.stopService(intent);
     }
 
+    private void removeMessageIfNeeded(){
+        mMainHandler.removeMessages(H.EVENT_RETRIEVE_TIME_OUT);
+        mMainHandler.removeMessages(H.EVENT_STOP_SERVICE);
+    }
+
     @Override
     public void onImageSaveDone(String path) {
         mView.onImageSaveDone(path);
+    }
+
+    private void wakeup(long time){
+        String pmName = "android.os.PowerManager";
+        String wakeup = "wakeUp";
+        try {
+            Class cl = Class.forName(pmName);
+            Method m = cl.getMethod(wakeup,Long.class);
+            m.invoke(cl.newInstance(), time);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private final class  H extends Handler{
+
+        static final int EVENT_RETRIEVE_TIME_OUT = 1;
+        static final int EVENT_STOP_SERVICE = 2;
+
+        public H(Looper looper){
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg){
+
+            int w = msg.what;
+
+            switch (w){
+                case EVENT_RETRIEVE_TIME_OUT:
+                    mView.onRefreshDone(true);
+                    mIsRefreshing = false;
+                    break;
+                case EVENT_STOP_SERVICE:
+                    stopRetrieveIfNeeded();
+                    break;
+            }
+        }
     }
 }
