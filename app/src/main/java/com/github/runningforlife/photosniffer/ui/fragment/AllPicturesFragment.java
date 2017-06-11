@@ -2,11 +2,13 @@ package com.github.runningforlife.photosniffer.ui.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -134,6 +136,40 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     }
 
     @Override
+    public void onNetworkDisconnect() {
+        Log.v(TAG,"onNetworkDisconnect()");
+        if(mRefresher.isRefreshing()){
+            mRefresher.setRefreshing(false);
+        }
+        ToastUtil.showToast(getContext(),getString(R.string.network_not_connected));
+    }
+
+    @Override
+    public void onMobileConnected() {
+        Log.d(TAG,"onMobileConnected()");
+        if(mRefresher.isRefreshing()){
+            mRefresher.setRefreshing(false);
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        builder.setTitle(R.string.network_mobile_connected)
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // nothing to do
+                        dialog.dismiss();
+                    }
+                })
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mRefresher.setRefreshing(true);
+                        mPresenter.refreshAnyway();
+                    }
+                }).show();
+    }
+
+    @Override
     public void onItemClicked(int pos,String adapter) {
         Log.v(TAG,"onItemClick(): pos = " + pos);
 
@@ -199,11 +235,13 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
                 GridLayoutManager glm = new GridLayoutManager(getContext(),2);
                 mRvImgList.setLayoutManager(glm);
                 glm.setAutoMeasureEnabled(true);
+                mAdapter.setLayoutManager(GridManager);
                 return true;
             case R.id.list_view:
                 LinearLayoutManager ll = new LinearLayoutManager(getContext());
                 mRvImgList.setLayoutManager(ll);
                 ll.setAutoMeasureEnabled(true);
+                mAdapter.setLayoutManager(LinearManager);
                 return true;
             case R.id.stagger_view:
                 StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
@@ -212,6 +250,8 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
                 return true;
         }
 
+        //mRvImgList.invalidate();
+        mRvImgList.removeAllViews();
         mAdapter.notifyDataSetChanged();
 
         return super.onOptionsItemSelected(item);
@@ -227,8 +267,8 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         mRvImgList.setItemAnimator(new ScaleInOutItemAnimator());
 
         mAdapter = new GalleryAdapter(getContext(),this);
-        mAdapter.setImageWidth(IMAGE_WIDTH);
-        mAdapter.setImageHeight(IMAGE_HEIGHT);
+/*        mAdapter.setImageWidth(IMAGE_WIDTH);
+        mAdapter.setImageHeight(IMAGE_HEIGHT);*/
         //adapter has to be set here, if not, refresh layout won't work
         mRvImgList.setAdapter(mAdapter);
         //mRvImgList.setAdapter(mAdapter);

@@ -15,6 +15,8 @@ public abstract class GalleryPresenter implements Presenter {
      */
     public abstract void refresh();
 
+    public abstract void refreshAnyway();
+
     @Override
     public void onFavorRealmDataChange(RealmResults<ImageRealm> data){
         // keep empty

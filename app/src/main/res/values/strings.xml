@@ -41,4 +41,8 @@
     <string name="action_grid_view">Grid View</string>
     <string name="action_list_view">List View</string>
     <string name="action_stagger_view">Stagger Grid View</string>
+    <string name="network_not_connected">Network is not connected</string>
+    <string name="network_mobile_connected">Network is mobile, do you want to continue?</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
 </resources>

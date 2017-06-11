@@ -7,9 +7,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.PowerManager;
 import android.util.Log;
 
+import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.model.RealmManager;
@@ -28,6 +28,7 @@ import com.github.runningforlife.photosniffer.service.ServiceStatus;
 import com.github.runningforlife.photosniffer.service.SimpleResultReceiver;
 import com.github.runningforlife.photosniffer.ui.GalleryView;
 import com.github.runningforlife.photosniffer.utils.DisplayUtil;
+import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 /**
@@ -72,6 +73,18 @@ public class GalleryPresenterImpl extends GalleryPresenter
     public void refresh() {
         Log.v(TAG,"refresh()");
 
+        if(!MiscUtil.isConnected(mContext)){
+            mView.onNetworkDisconnect();
+        }else if(MiscUtil.isMobileConnected(mContext)) {
+            mView.onMobileConnected();
+        }else{
+            refreshAnyway();
+        }
+    }
+
+    @Override
+    public void refreshAnyway(){
+        Log.v(TAG,"refreshAnyway()");
         stopRetrieveIfNeeded();
 
         if(mUnUsedImages == null || mUnUsedImages.size() < DEFAULT_RETRIEVED_IMAGES) {
