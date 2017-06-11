@@ -7,14 +7,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.PowerManager;
 import android.util.Log;
 
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.model.RealmManager;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -100,15 +99,15 @@ public class GalleryPresenterImpl extends GalleryPresenter
             Realm realm = Realm.getDefaultInstance();
             try {
                 int cn = 0;
-                realm.beginTransaction();
                 for (Iterator iter = mUnUsedImages.iterator();
                      iter.hasNext() && ++cn <= DEFAULT_RETRIEVED_IMAGES; ) {
-                    ImageRealm item = (ImageRealm) iter.next();
+                    realm.beginTransaction();
+                    final ImageRealm item = (ImageRealm) iter.next();
                     item.setUsed(true);
                     // update time stamp
                     item.setTimeStamp(System.currentTimeMillis());
+                    realm.commitTransaction();
                 }
-                realm.commitTransaction();
             } finally {
                 realm.close();
             }
@@ -117,8 +116,6 @@ public class GalleryPresenterImpl extends GalleryPresenter
             // ah, something wrong
             mView.onRefreshDone(false);
         }
-        // when refresh, currently keep screen on
-        wakeup(DEFAULT_RETRIEVE_TIME_OUT);
     }
 
     @Override
@@ -182,6 +179,8 @@ public class GalleryPresenterImpl extends GalleryPresenter
     @Override
     public void onDestroy() {
         Log.v(TAG,"onDestroy()");
+        //releaseWakeLock();
+
         mRealmMgr.removeListener(this);
         //mView = null;
         mRealmMgr.onDestroy();
@@ -195,19 +194,18 @@ public class GalleryPresenterImpl extends GalleryPresenter
     @Override
     public void onUsedRealmDataChange(RealmResults<ImageRealm> data) {
         Log.v(TAG,"onUsedRealmDataChange(): data size = " + data.size());
-        // data size is not changed, just return
-/*        if(mPrevImgCount == data.size()) {
-            mView.notifyDataChanged();
-            return;
-        }*/
+
+        if(mPrevImgCount != data.size()) {
+            //releaseWakeLock();
+        }
 
         mPrevImgCount = data.size();
-        if(data.size() > 0 && data.size() <= sMaxReservedImg) {
-            mImageList = data;
-            // unsorted: keep list descending sorted
-            sort();
-            mView.notifyDataChanged();
-        }else if(data.size() > sMaxReservedImg){
+        mImageList = data;
+        // unsorted: keep list descending sorted
+        sort();
+        mView.notifyDataChanged();
+
+        if(data.size() > sMaxReservedImg){
             mRealmMgr.trimData();
         }
     }
@@ -227,6 +225,7 @@ public class GalleryPresenterImpl extends GalleryPresenter
             case ServiceStatus.ERROR:
                 mView.onRefreshDone(false);
                 mIsRefreshing = false;
+                //releaseWakeLock();
                 break;
             case ServiceStatus.SUCCESS:
                 Log.v(TAG,"image retrieve success");
@@ -235,7 +234,7 @@ public class GalleryPresenterImpl extends GalleryPresenter
                 }
                 mIsRefreshing = false;
                 removeMessageIfNeeded();
-                // save to realm
+                //releaseWakeLock();
                 break;
         }
     }
@@ -258,26 +257,6 @@ public class GalleryPresenterImpl extends GalleryPresenter
     @Override
     public void onImageSaveDone(String path) {
         mView.onImageSaveDone(path);
-    }
-
-    private void wakeup(long time){
-        String pmName = "android.os.PowerManager";
-        String wakeup = "wakeUp";
-        try {
-            Class cl = Class.forName(pmName);
-            Method m = cl.getMethod(wakeup,Long.class);
-            m.invoke(cl.newInstance(), time);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
     }
 
     private final class  H extends Handler{
