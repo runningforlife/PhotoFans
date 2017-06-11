@@ -13,10 +13,12 @@ import android.widget.ImageView;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
+
+import static com.github.runningforlife.photosniffer.loader.Loader.*;
+
 
 /**
  * image pager adapter
@@ -25,8 +27,6 @@ import com.github.runningforlife.photosniffer.utils.MiscUtil;
 public class ImagePagerAdapter extends PagerAdapter{
     public static final String TAG = "ImagePageAdapter";
 
-    private static final int DEFAULT_WIDTH = 1024;
-    private static final int DEFAULT_HEIGHT = (int)(DEFAULT_WIDTH/ DisplayUtil.getScreenRatio());
     private Context mContext;
     private ImageAdapterCallback mCallback;
 
@@ -57,7 +57,7 @@ public class ImagePagerAdapter extends PagerAdapter{
         // preload image
         MiscUtil.preloadImage(view);
         GlideLoader.load(mContext,new ImageLoaderListener(view,position),mCallback.getItemAtPos(position).getUrl(),
-                DEFAULT_WIDTH,DEFAULT_HEIGHT);
+                DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override

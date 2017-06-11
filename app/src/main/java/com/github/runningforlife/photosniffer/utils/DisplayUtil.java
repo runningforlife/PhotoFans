@@ -41,4 +41,16 @@ public class DisplayUtil {
 
         return (int)(px/scale + 0.5f);
     }
+
+    public static boolean isDeviceHighPerf(){
+        DisplayMetrics metrics = new DisplayMetrics();
+
+        Context context = AppGlobals.getInstance();
+
+        WindowManager winMgr = (WindowManager)context
+                .getSystemService(Context.WINDOW_SERVICE);
+        winMgr.getDefaultDisplay().getMetrics(metrics);
+
+        return metrics.densityDpi >= DisplayMetrics.DENSITY_XHIGH;
+    }
 }

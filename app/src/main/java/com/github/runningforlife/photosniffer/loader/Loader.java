@@ -2,6 +2,8 @@ package com.github.runningforlife.photosniffer.loader;
 
 import android.support.annotation.StringDef;
 
+import com.github.runningforlife.photosniffer.utils.DisplayUtil;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -17,4 +19,9 @@ public interface Loader {
 
     String PICASSO = "picasso";
     String GLIDE = "glide";
+
+    // use DPI instead of px
+    int DEFAULT_IMG_WIDTH = (DisplayUtil.getScreenDimen().widthPixels);
+    int DEFAULT_IMG_HEIGHT = (int)(DEFAULT_IMG_WIDTH*DisplayUtil.getScreenRatio());
+
 }

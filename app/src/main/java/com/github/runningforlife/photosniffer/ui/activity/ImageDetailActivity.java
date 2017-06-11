@@ -127,6 +127,15 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+
+        if(mCpvLoad.isActivated()){
+            mCpvLoad.stopAnimation();
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item){
 
         int id = item.getItemId();

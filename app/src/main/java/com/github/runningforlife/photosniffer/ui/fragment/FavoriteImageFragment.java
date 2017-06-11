@@ -36,8 +36,6 @@ import butterknife.ButterKnife;
 public class FavoriteImageFragment extends BaseFragment
         implements ImageAdapterCallback, FavorView{
     public static final String TAG = "FavorImageFragment";
-    private static final int IMAGE_WIDTH = 1024;
-    private static final int IMAGE_HEIGHT = (int)(IMAGE_WIDTH*DisplayUtil.getScreenRatio());
     @BindView(R.id.rcv_favor) RecyclerView mRcvFavorList;
     @BindView(R.id.srl_favor_refresh) SwipeRefreshLayout mSrlRefresh;
     GalleryAdapter mAdapter;

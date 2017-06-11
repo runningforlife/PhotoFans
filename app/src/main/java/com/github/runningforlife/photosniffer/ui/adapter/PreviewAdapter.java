@@ -14,10 +14,14 @@ import android.widget.ImageView;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
+import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.github.runningforlife.photosniffer.loader.Loader.*;
+
 
 /**
  * preview adapter to show list of pictures
@@ -25,6 +29,9 @@ import butterknife.ButterKnife;
 
 public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageViewHolder> {
     public static final String TAG = "PreviewAdapter";
+
+    private static final int DEFAULT_IMAGE_WIDTH = DEFAULT_IMG_WIDTH/8;
+    private static final int DEFAULT_IMAGE_HEIGHT = (int)(200*DisplayUtil.getScreenRatio());
 
     private Context mContext;
     private ImageAdapterCallback mCallback;
@@ -49,7 +56,11 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
         // preload
         MiscUtil.preloadImage(holder.preview);
         holder.preview.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.view_scale_out));
-        GlideLoader.load(mContext,url,new GlideLoaderListener(holder.preview),150,150);
+        GlideLoaderListener listener = new GlideLoaderListener(holder.preview);
+        listener.setReqWidth(DEFAULT_IMAGE_WIDTH);
+        listener.setReqHeight(DEFAULT_IMAGE_HEIGHT);
+        GlideLoader.load(mContext,url, listener,
+                DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
     }
 
     @Override

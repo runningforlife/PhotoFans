@@ -9,8 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.cache.DiskLruCacheFactory;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 
@@ -21,8 +19,9 @@ import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.loader.PicassoLoader;
 import com.github.runningforlife.photosniffer.loader.PicassoLoaderListener;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
-import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
+
+import static com.github.runningforlife.photosniffer.loader.Loader.*;
 
 /**
  * a gallery adapter to bind image data to recycleview
@@ -30,10 +29,6 @@ import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoViewHolder>{
     private static final String TAG = "GalleryAdapter";
-
-    private static final int DEFAULT_IMG_WIDTH = 1024;
-    private static final int DEFAULT_IMG_HEIGHT = (int)(DEFAULT_IMG_WIDTH*DisplayUtil.getScreenRatio());
-
     @SuppressWarnings("unchecked")
     private LayoutInflater mInflater;
     private ImageAdapterCallback mCallback;
@@ -48,17 +43,15 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         // different device panel size may need different width and height
         mContext = context;
 
-        mWidth = DEFAULT_IMG_WIDTH;
-        mHeight = DEFAULT_IMG_HEIGHT;
         mLoader = Loader.GLIDE;
     }
 
     public void setImageWidth(int w){
-        mWidth = w > 0 ? w : DEFAULT_IMG_WIDTH;
+        mWidth = w;
     }
 
     public void setImageHeight(int h){
-        mHeight = h > 0 ? h : DEFAULT_IMG_HEIGHT;
+        mHeight = h;
     }
 
     public void setImageLoader(@Loader.LOADER String loader){
@@ -82,12 +75,18 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
             // preload image
             MiscUtil.preloadImage(vh.img);
             if (Loader.PICASSO.equals(mLoader)) {
-                PicassoLoader.load(mContext, new PicassoLoaderListener(vh.img), url, mWidth,mHeight);
+                PicassoLoader.load(mContext, new PicassoLoaderListener(vh.img), url,
+                        DEFAULT_IMG_WIDTH,DEFAULT_IMG_WIDTH);
             }else{
                 //FIXME: some item is loaded very slowly
                 GlideLoaderListener listener = new GlideLoaderListener(vh.img);
+                if(mWidth > 0 && mHeight > 0 &&
+                        mWidth != DEFAULT_IMG_WIDTH && mHeight != DEFAULT_IMG_HEIGHT) {
+                    listener.setReqWidth(mWidth);
+                    listener.setReqHeight(mHeight);
+                }
                 //Glide.clear(vh.img);
-                GlideLoader.load(mContext,url,listener,mWidth,mHeight);
+                GlideLoader.load(mContext,url,listener,DEFAULT_IMG_WIDTH,DEFAULT_IMG_WIDTH);
             }
 
         }else if(getItemCount() > 0){
