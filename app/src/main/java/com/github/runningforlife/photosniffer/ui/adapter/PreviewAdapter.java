@@ -60,7 +60,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
         listener.setReqWidth(DEFAULT_IMAGE_WIDTH);
         listener.setReqHeight(DEFAULT_IMAGE_HEIGHT);
         GlideLoader.load(mContext,url, listener,
-                DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
+                DEFAULT_IMAGE_MEDIUM_WIDTH,DEFAULT_IMAGE_MEDIUM_WIDTH);
     }
 
     @Override

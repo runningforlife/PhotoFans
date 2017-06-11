@@ -74,6 +74,8 @@ public class ImageRetrieveService extends Service implements
     public void onDestroy(){
         Log.v(TAG,"onDestroy()");
 
+        mProcessor.stopGracefully();
+
         sendResult(mProcessor.getRetrievedImageCount());
 
         mProcessor.removeListener(this);

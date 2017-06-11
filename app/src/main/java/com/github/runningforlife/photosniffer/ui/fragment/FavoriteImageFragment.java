@@ -84,8 +84,8 @@ public class FavoriteImageFragment extends BaseFragment
         mRcvFavorList.setItemAnimator(new ScaleInOutItemAnimator());
 
         mAdapter = new GalleryAdapter(getContext(),this);
-        mAdapter.setImageWidth(IMAGE_WIDTH);
-        mAdapter.setImageHeight(IMAGE_HEIGHT);
+/*        mAdapter.setImageWidth(IMAGE_WIDTH);
+        mAdapter.setImageHeight(IMAGE_HEIGHT);*/
         mAdapter.setImageLoader(Loader.GLIDE);
         mRcvFavorList.setAdapter(mAdapter);
 
@@ -193,6 +193,7 @@ public class FavoriteImageFragment extends BaseFragment
                 return true;
         }
 
+        mRcvFavorList.removeAllViews();
         mAdapter.notifyDataSetChanged();
 
         return super.onOptionsItemSelected(item);

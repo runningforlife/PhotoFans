@@ -1,6 +1,7 @@
 package com.github.runningforlife.photosniffer.ui.adapter;
 
 import android.content.Context;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,6 +23,7 @@ import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import static com.github.runningforlife.photosniffer.loader.Loader.*;
+import static com.github.runningforlife.photosniffer.ui.fragment.BaseFragment.*;
 
 /**
  * a gallery adapter to bind image data to recycleview
@@ -36,6 +38,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     private int mWidth;
     private int mHeight;
     private String mLoader;
+    private String mLayoutMgr;
 
     public GalleryAdapter(Context context,ImageAdapterCallback callback){
         mCallback = callback;
@@ -44,6 +47,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         mContext = context;
 
         mLoader = Loader.GLIDE;
+
+        mLayoutMgr = GridManager;
     }
 
     public void setImageWidth(int w){
@@ -52,6 +57,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
     public void setImageHeight(int h){
         mHeight = h;
+    }
+
+    public void setLayoutManager(@RecycleLayout String layoutManager){
+        mLayoutMgr = layoutManager;
     }
 
     public void setImageLoader(@Loader.LOADER String loader){
@@ -72,11 +81,15 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         Log.d(TAG,"onBindViewHolder(): pos = " + position);
 
         if(!TextUtils.isEmpty(url)) {
+            if(LinearManager.equals(mLayoutMgr)){
+                vh.img.setMinimumHeight((int) mContext.getResources().
+                        getDimension(R.dimen.list_view_image_min_height));
+            }
             // preload image
             MiscUtil.preloadImage(vh.img);
             if (Loader.PICASSO.equals(mLoader)) {
                 PicassoLoader.load(mContext, new PicassoLoaderListener(vh.img), url,
-                        DEFAULT_IMG_WIDTH,DEFAULT_IMG_WIDTH);
+                        DEFAULT_IMAGE_MEDIUM_WIDTH,DEFAULT_IMAGE_MEDIUM_HEIGHT);
             }else{
                 //FIXME: some item is loaded very slowly
                 GlideLoaderListener listener = new GlideLoaderListener(vh.img);
@@ -85,8 +98,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                     listener.setReqWidth(mWidth);
                     listener.setReqHeight(mHeight);
                 }
-                //Glide.clear(vh.img);
-                GlideLoader.load(mContext,url,listener,DEFAULT_IMG_WIDTH,DEFAULT_IMG_WIDTH);
+                GlideLoader.load(mContext,url,listener,DEFAULT_IMAGE_MEDIUM_WIDTH,
+                        DEFAULT_IMAGE_MEDIUM_HEIGHT);
             }
 
         }else if(getItemCount() > 0){

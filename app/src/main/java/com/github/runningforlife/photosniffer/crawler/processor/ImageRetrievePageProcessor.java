@@ -102,6 +102,10 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         return mCurrentImages;
     }
 
+    public void stopGracefully(){
+        mExecutor.shutdown();
+    }
+
     private void retrieveImages(Page page){
 
         if(!isVisited(page) && isValidPage(page)) {

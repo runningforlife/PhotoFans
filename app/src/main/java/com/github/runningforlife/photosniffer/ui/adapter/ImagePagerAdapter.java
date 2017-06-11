@@ -33,7 +33,6 @@ public class ImagePagerAdapter extends PagerAdapter{
     public ImagePagerAdapter(Context context, ImageAdapterCallback callback){
         mCallback = callback;
         mContext = context;
-        //mAllImages = new ArrayList<>(mCallback.getCount());
     }
 
     @Override

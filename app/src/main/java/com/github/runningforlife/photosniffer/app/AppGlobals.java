@@ -78,7 +78,9 @@ public class AppGlobals extends Application{
         @Override
         public void uncaughtException(Thread t, Throwable e) {
             if(MiscUtil.isWifiConnected(getApplicationContext())){
-                // upload to cloud storage
+                // FIXME:upload to cloud storage
+                new Thread(new FileSaveRunnable(getLogFile(),e))
+                        .start();
             }else{
                 new Thread(new FileSaveRunnable(getLogFile(),e))
                         .start();
