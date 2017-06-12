@@ -5,8 +5,10 @@ import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
 
+import com.avos.avoscloud.AVOSCloud;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.model.ImageRealmMigration;
+import com.github.runningforlife.photosniffer.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.io.File;
@@ -30,6 +32,8 @@ public class AppGlobals extends Application{
     private static final String ROOT_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
     private static final String PATH_NAME = "photos";
     private static final String PATH_CRASH_LOG = "log";
+    private static final String LEAN_CLOUD_APP_ID = "Pivxf9C9FGTTHtyg7QXI1ICI-gzGzoHsz";
+    private static final String LEAN_CLOUD_APP_KEY = "KCjSyXjVTA9mCIJVs7tDVkGS";
     private static AppGlobals sInstance;
     private static String sImagePath;
 
@@ -59,12 +63,13 @@ public class AppGlobals extends Application{
         }
 
         initExceptionHandler();
+
+        initLeanCloud();
     }
 
     public String getImagePath(){
         if(TextUtils.isEmpty(sImagePath)){
-            String appName = getString(R.string.app_name);
-            return ROOT_PATH + File.separator + appName + File.separator + PATH_NAME;
+            return getRootDir() + PATH_NAME;
         }
         return sImagePath;
     }
@@ -78,22 +83,16 @@ public class AppGlobals extends Application{
         @Override
         public void uncaughtException(Thread t, Throwable e) {
             if(MiscUtil.isWifiConnected(getApplicationContext())){
-                // FIXME:upload to cloud storage
-                new Thread(new FileSaveRunnable(getLogFile(),e))
-                        .start();
+                saveLogToCloud(e);
             }else{
                 new Thread(new FileSaveRunnable(getLogFile(),e))
                         .start();
             }
         }
 
-        private String buildLogFileName(){
-            return "log_" + System.currentTimeMillis() + ".txt";
-        }
-
         private File getLogFile(){
             // save to path
-            String logPath = PATH_NAME + File.separator + PATH_CRASH_LOG;
+            String logPath = getRootDir() + PATH_CRASH_LOG;
             File path = new File(logPath);
             if(!path.exists()){
                 path.mkdirs();
@@ -111,6 +110,27 @@ public class AppGlobals extends Application{
 
             return file;
         }
+    }
+
+    private void initLeanCloud(){
+        AVOSCloud.initialize(this, LEAN_CLOUD_APP_ID, LEAN_CLOUD_APP_KEY);
+    }
+
+    private String buildLogFileName(){
+        return "log_" + System.currentTimeMillis() + ".txt";
+    }
+
+    private void saveLogToCloud(Throwable e){
+        LeanCloudManager cloud = LeanCloudManager.getInstance();
+        String fileName = buildLogFileName();
+        StringBuilder data = new StringBuilder();
+        data.append("date: " + new Date());
+        data.append("\n");
+        data.append("device fingerprint: " + Build.FINGERPRINT);
+        data.append("\n");
+        data.append(e.toString());
+
+        cloud.saveFile(fileName, data.toString());
     }
 
     private class FileSaveRunnable implements Runnable{
@@ -145,5 +165,10 @@ public class AppGlobals extends Application{
                 e.printStackTrace();
             }
         }
+    }
+
+    private String getRootDir(){
+        String appName = getString(R.string.app_name);
+        return ROOT_PATH + File.separator + appName + File.separator;
     }
 }
