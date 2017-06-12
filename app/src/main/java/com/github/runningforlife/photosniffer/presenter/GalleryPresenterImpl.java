@@ -54,7 +54,6 @@ public class GalleryPresenterImpl extends GalleryPresenter
     private SimpleResultReceiver mReceiver;
     private RealmManager mRealmMgr;
     private ExecutorService mExecutor;
-    private static int sMaxReservedImg = SharedPrefUtil.getMaxReservedImages();
     private int mPrevImgCount;
     private H mMainHandler;
 
@@ -91,7 +90,12 @@ public class GalleryPresenterImpl extends GalleryPresenter
             mIsRefreshing = true;
             Intent intent = new Intent(mContext, ImageRetrieveService.class);
             intent.putExtra("receiver", mReceiver);
-            intent.putExtra(ImageRetrieveService.EXTRA_EXPECTED_IMAGES, DEFAULT_RETRIEVED_IMAGES - mUnUsedImages.size());
+            if(mUnUsedImages != null) {
+                intent.putExtra(ImageRetrieveService.EXTRA_EXPECTED_IMAGES,
+                        DEFAULT_RETRIEVED_IMAGES - mUnUsedImages.size());
+            }else{
+                intent.putExtra(ImageRetrieveService.EXTRA_EXPECTED_IMAGES, DEFAULT_RETRIEVED_IMAGES);
+            }
             mContext.startService(intent);
 
             // timeout message
@@ -109,7 +113,8 @@ public class GalleryPresenterImpl extends GalleryPresenter
                 mView.onRefreshDone(true);
             }
             // add unused to the list
-            Realm realm = Realm.getDefaultInstance();
+            mRealmMgr.markUnusedRealm(DEFAULT_RETRIEVED_IMAGES);
+/*            Realm realm = Realm.getDefaultInstance();
             try {
                 int cn = 0;
                 for (Iterator iter = mUnUsedImages.iterator();
@@ -123,7 +128,7 @@ public class GalleryPresenterImpl extends GalleryPresenter
                 }
             } finally {
                 realm.close();
-            }
+            }*/
 
         }else if(!mIsRefreshing){
             // ah, something wrong
@@ -218,7 +223,8 @@ public class GalleryPresenterImpl extends GalleryPresenter
         sort();
         mView.notifyDataChanged();
 
-        if(data.size() > sMaxReservedImg){
+        int maxReservedImage = SharedPrefUtil.getMaxReservedImages();
+        if(data.size() > maxReservedImage){
             mRealmMgr.trimData();
         }
     }

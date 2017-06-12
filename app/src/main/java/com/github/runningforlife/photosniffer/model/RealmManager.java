@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
+import io.realm.RealmAsyncTask;
 import io.realm.RealmChangeListener;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
@@ -35,6 +36,8 @@ public class RealmManager implements LifeCycle{
     private UsedRealmDataChangeListener mUsedDataChangeListener;
     private UnusedRealmDataChangeListener mUnusedDataChangeListener;
     private FavorRealmDataChangeListener mFavorDataChangeListener;
+    // async task
+    private RealmAsyncTask mAsyncTask;
 
     public interface RealmDataChangeListener{
         void onUsedRealmDataChange(RealmResults<ImageRealm> data);
@@ -85,6 +88,10 @@ public class RealmManager implements LifeCycle{
             }
         }
         mListeners.clear();
+        // cancel transaction
+        if(mAsyncTask != null && !mAsyncTask.isCancelled()){
+            mAsyncTask.cancel();
+        }
     }
 
     //Note: Realm objects can only be accessed on the thread they were created
@@ -172,16 +179,48 @@ public class RealmManager implements LifeCycle{
 
     // keep latest images
     public void trimData(){
-        int maxImgs = SharedPrefUtil.getMaxReservedImages();
-        if(mAllUsedImages != null && mAllUsedImages.isValid()
-                && mAllUsedImages.isLoaded()){
+        final int maxImgs = SharedPrefUtil.getMaxReservedImages();
+        if(mAllUsedImages != null && mAllUsedImages.isValid()){
             mAllUsedImages.sort("mTimeStamp",Sort.DESCENDING);
 
-            realm.beginTransaction();
-            for(int i = maxImgs; i < mAllUsedImages.size(); ++i){
-                mAllUsedImages.get(i).deleteFromRealm();
-            }
-            realm.commitTransaction();
+            mAsyncTask = realm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    RealmResults<ImageRealm> used = realm.where(ImageRealm.class)
+                            .equalTo("mIsUsed", true)
+                            .findAllSorted("mTimeStamp",Sort.DESCENDING);
+                    for(int i = maxImgs; i < used.size(); ++i){
+                        // realm object cannot be accessed by multiple threads
+                        ImageRealm item = used.get(i);
+                        item.deleteFromRealm();
+                    }
+                }
+            });
+        }
+    }
+
+    // mark unused images to used
+    public void markUnusedRealm(final int number){
+        if(mAllUnUsedImages == null || !mAllUnUsedImages.isValid()){
+            mAllUnUsedImages = realm.where(ImageRealm.class)
+                    .equalTo("mIsUsed", false)
+                    .findAllAsync()
+                    .sort("mTimeStamp", Sort.DESCENDING);
+            mAllUnUsedImages.addChangeListener(mUnusedDataChangeListener);
+        }else{
+            mAsyncTask = realm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    RealmResults<ImageRealm> unused = realm.where(ImageRealm.class)
+                            .equalTo("mIsUsed", false)
+                            .findAll();
+                    for(int i = 0; i < number && i < unused.size(); ++i){
+                        ImageRealm item = unused.get(i);
+                        item.setUsed(true);
+                        item.setTimeStamp(System.currentTimeMillis());
+                    }
+                }
+            });
         }
     }
 

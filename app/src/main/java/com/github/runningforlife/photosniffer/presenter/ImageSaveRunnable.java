@@ -43,12 +43,13 @@ public class ImageSaveRunnable implements Runnable{
         ThreadUtil.start();
         Context context = AppGlobals.getInstance().getApplicationContext();
         try {
-            String filePath = BitmapUtil.saveToFile(bitmap,AppGlobals.getInstance().getImagePath(),name);
+            String imageDir = AppGlobals.getInstance().getImagePath();
+            String filePath = BitmapUtil.saveToFile(bitmap, imageDir,name);
             MediaStoreUtil.addImageToGallery(context,new File(filePath));
             //String path = MediaStoreUtil.addImageToGallery(context, bitmap, name);
             Log.d(TAG,"saving image takes " + ThreadUtil.getElapse() + "ms");
             if(callback != null){
-                callback.onImageSaveDone(filePath);
+                callback.onImageSaveDone(imageDir);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
