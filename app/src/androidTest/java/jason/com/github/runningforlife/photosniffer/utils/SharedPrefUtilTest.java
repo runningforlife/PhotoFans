@@ -43,7 +43,7 @@ public class SharedPrefUtilTest {
         String key = context.getString(R.string.pref_wifi_download);
         assertNotNull("checking wifi download key",key);
 
-        boolean isWifiMode = SharedPrefUtil.getWifiDownloadMode(context,key);
+        boolean isWifiMode = SharedPrefUtil.isWifiOnlyDownloadMode(context,key);
         assertEquals("checking wifi download mode",isWifiMode,true);
     }
 
@@ -52,7 +52,7 @@ public class SharedPrefUtilTest {
         String key = context.getString(R.string.pref_max_reserved_images);
         assertNotNull("checking max reserved images", key);
 
-        int val = SharedPrefUtil.getMaxReservedImages(context,key,101);
+        int val = SharedPrefUtil.getMaxReservedImages(context);
         assertNotEquals("checking max reserved images number",val,101);
     }
 

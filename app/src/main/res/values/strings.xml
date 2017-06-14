@@ -45,4 +45,13 @@
     <string name="network_mobile_connected">Network is mobile, do you want to continue?</string>
     <string name="cancel">Cancel</string>
     <string name="ok">Ok</string>
+    <string name="Wallpaper">Wallpaper</string>
+    <string name="want_to_clear_cache">Do you want to clear the caches?</string>
+    <string name="clear_image_caches">clear all the caches</string>
+    <string name="pref_give_your_advice">key_give_your_advice</string>
+    <string name="give_your_advice">Please give us your advice</string>
+    <string name="thanks_for_your_advice">Thanks for your advices</string>
+    <string name="write_down_your_advice">Please write down your advices</string>
+    <string name="pref_automatic_wallpaper">Enable Automatic Wallpaper</string>
+    <string name="enable_automatic_wallpaper">Enable Automatic Wallpaper</string>
 </resources>

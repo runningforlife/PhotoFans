@@ -78,6 +78,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             String data = sharedPreferences.getString(key,"");
             if(!TextUtils.isEmpty(data)) {
                 uploadAdviceToCloud(data);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(key,"");
             }
         }
     }

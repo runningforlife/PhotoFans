@@ -34,7 +34,8 @@ public class SharedPrefUtil {
         }
     }
 
-    public static boolean getWifiDownloadMode(Context context, String key){
+    public static boolean isWifiOnlyDownloadMode(Context context){
+        String key = context.getString(R.string.pref_wifi_download);
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 
         return pref.getBoolean(key, true);

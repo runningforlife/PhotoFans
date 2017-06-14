@@ -9,16 +9,13 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
-import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.model.RealmManager;
 
-import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -74,7 +71,8 @@ public class GalleryPresenterImpl extends GalleryPresenter
 
         if(!MiscUtil.isConnected(mContext)){
             mView.onNetworkDisconnect();
-        }else if(MiscUtil.isMobileConnected(mContext)) {
+        }else if(MiscUtil.isMobileConnected(mContext)
+                && SharedPrefUtil.isWifiOnlyDownloadMode(mContext)) {
             mView.onMobileConnected();
         }else{
             refreshAnyway();
@@ -114,21 +112,6 @@ public class GalleryPresenterImpl extends GalleryPresenter
             }
             // add unused to the list
             mRealmMgr.markUnusedRealm(DEFAULT_RETRIEVED_IMAGES);
-/*            Realm realm = Realm.getDefaultInstance();
-            try {
-                int cn = 0;
-                for (Iterator iter = mUnUsedImages.iterator();
-                     iter.hasNext() && ++cn <= DEFAULT_RETRIEVED_IMAGES; ) {
-                    realm.beginTransaction();
-                    final ImageRealm item = (ImageRealm) iter.next();
-                    item.setUsed(true);
-                    // update time stamp
-                    item.setTimeStamp(System.currentTimeMillis());
-                    realm.commitTransaction();
-                }
-            } finally {
-                realm.close();
-            }*/
 
         }else if(!mIsRefreshing){
             // ah, something wrong
