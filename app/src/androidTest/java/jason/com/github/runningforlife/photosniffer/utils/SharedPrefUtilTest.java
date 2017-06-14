@@ -43,7 +43,7 @@ public class SharedPrefUtilTest {
         String key = context.getString(R.string.pref_wifi_download);
         assertNotNull("checking wifi download key",key);
 
-        boolean isWifiMode = SharedPrefUtil.isWifiOnlyDownloadMode(context,key);
+        boolean isWifiMode = SharedPrefUtil.isWifiOnlyDownloadMode(context);
         assertEquals("checking wifi download mode",isWifiMode,true);
     }
 
