@@ -209,8 +209,7 @@ public class FavoriteImageFragment extends BaseFragment
     }
 
     private void setTitle(){
-        String myFavorite = getString(R.string.my_favorite_images) +
-                "(" + mPresenter.getItemCount() + ")";
+        String myFavorite = getString(R.string.my_favorite_images);
         Activity activity = getActivity();
         if(activity != null){
             activity.setTitle(myFavorite);

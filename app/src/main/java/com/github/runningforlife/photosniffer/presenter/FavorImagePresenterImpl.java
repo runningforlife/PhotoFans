@@ -102,8 +102,8 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
     }
 
     @Override
-    public void onFavorRealmDataChange(RealmResults<ImageRealm> data) {
-        Log.v(TAG,"onFavorRealmDataChange(): data size = " + data.size());
+    public void onFavorDataChange(RealmResults<ImageRealm> data) {
+        Log.v(TAG,"onFavorDataChange(): data size = " + data.size());
         mFavorList = data;
 
         if(mView != null) {
@@ -114,6 +114,11 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
             mView.onRefreshDone(true);
             mIsRefreshing = false;
         }
+    }
+
+    @Override
+    public void onWallpaperDataChange(RealmResults<ImageRealm> data) {
+
     }
 
     @Override

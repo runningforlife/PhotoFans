@@ -55,7 +55,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         mPageFilter = new SourcePageFilter();
         mIsExpectedDone = false;
         mCurrentImages = 0;
-        mExecutor = Executors.newSingleThreadExecutor(new MyThreadFactory());
+        mExecutor = Executors.newFixedThreadPool(2,new MyThreadFactory());
 
         loadPages();
     }

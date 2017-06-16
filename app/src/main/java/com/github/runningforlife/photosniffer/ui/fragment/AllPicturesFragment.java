@@ -86,7 +86,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         super.onResume();
 
         setTitle();
-        // FIXME: some times, data set seems not loaded in recycle view
+        mRvImgList.removeAllViews();
         mPresenter.onStart();
     }
 
@@ -267,11 +267,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         mRvImgList.setItemAnimator(new ScaleInOutItemAnimator());
 
         mAdapter = new GalleryAdapter(getContext(),this);
-/*        mAdapter.setImageWidth(IMAGE_WIDTH);
-        mAdapter.setImageHeight(IMAGE_HEIGHT);*/
-        //adapter has to be set here, if not, refresh layout won't work
         mRvImgList.setAdapter(mAdapter);
-        //mRvImgList.setAdapter(mAdapter);
         mRefresher.setColorSchemeResources(android.R.color.holo_blue_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_orange_dark);

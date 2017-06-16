@@ -193,12 +193,8 @@ public class GalleryPresenterImpl extends GalleryPresenter
     }
 
     @Override
-    public void onUsedRealmDataChange(RealmResults<ImageRealm> data) {
-        Log.v(TAG,"onUsedRealmDataChange(): data size = " + data.size());
-
-        if(mPrevImgCount != data.size()) {
-            //releaseWakeLock();
-        }
+    public void onUsedDataChange(RealmResults<ImageRealm> data) {
+        Log.v(TAG,"onUsedDataChange(): data size = " + data.size());
 
         mPrevImgCount = data.size();
         mImageList = data;
@@ -213,8 +209,8 @@ public class GalleryPresenterImpl extends GalleryPresenter
     }
 
     @Override
-    public void onUnusedRealmDataChange(RealmResults<ImageRealm> data) {
-        Log.v(TAG, "onUnusedRealmDataChange(): unused url size = " + data.size());
+    public void onUnusedDataChange(RealmResults<ImageRealm> data) {
+        Log.v(TAG, "onUnusedDataChange(): unused url size = " + data.size());
         mUnUsedImages = data;
     }
 

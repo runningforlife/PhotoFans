@@ -20,12 +20,18 @@ public abstract class ImageDetailPresenter implements Presenter {
     public abstract void setWallpaper(int pos);
 
     @Override
-    public void onUnusedRealmDataChange(RealmResults<ImageRealm> data){
+    public void onUnusedDataChange(RealmResults<ImageRealm> data){
         // keep empty
     }
 
     @Override
-    public void onFavorRealmDataChange(RealmResults<ImageRealm> data){
+    public void onFavorDataChange(RealmResults<ImageRealm> data){
         // keep empty
+    }
+
+
+    @Override
+    public void onWallpaperDataChange(RealmResults<ImageRealm> data) {
+        // not care
     }
 }

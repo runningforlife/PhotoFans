@@ -84,31 +84,10 @@ public class AppGlobals extends Application{
         public void uncaughtException(Thread t, Throwable e) {
             if(MiscUtil.isWifiConnected(getApplicationContext())){
                 saveLogToCloud(e);
+                saveLogToDisk(e);
             }else{
-                new Thread(new FileSaveRunnable(getLogFile(),e))
-                        .start();
+                saveLogToDisk(e);
             }
-        }
-
-        private File getLogFile(){
-            // save to path
-            String logPath = getRootDir() + PATH_CRASH_LOG;
-            File path = new File(logPath);
-            if(!path.exists()){
-                path.mkdirs();
-            }
-
-            File file = new File(path,buildLogFileName());
-            if(!file.exists()){
-                try {
-                    file.createNewFile();
-                    return file;
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-
-            return file;
         }
     }
 
@@ -118,6 +97,33 @@ public class AppGlobals extends Application{
 
     private String buildLogFileName(){
         return "log_" + System.currentTimeMillis() + ".txt";
+    }
+
+    private File getLogFile(){
+        // save to path
+        String logPath = getRootDir() + PATH_CRASH_LOG;
+        File path = new File(logPath);
+        if(!path.exists()){
+            path.mkdirs();
+        }
+
+        File file = new File(path,buildLogFileName());
+        if(!file.exists()){
+            try {
+                //FIXME: check permission
+                file.createNewFile();
+                return file;
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+
+        return file;
+    }
+
+    private void saveLogToDisk(Throwable t){
+        new Thread(new FileSaveRunnable(getLogFile(),t))
+                .start();
     }
 
     private void saveLogToCloud(Throwable e){
@@ -152,7 +158,7 @@ public class AppGlobals extends Application{
                 pw.println("LOG Date: " + df.format(new Date()));
                 pw.println("Device FingerPrint: " + Build.FINGERPRINT);
                 pw.println();
-                pw.print(throwable.toString());
+                throwable.printStackTrace(pw);
 
                 pw.flush();
                 fos.flush();

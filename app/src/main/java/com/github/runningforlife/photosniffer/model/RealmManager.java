@@ -1,11 +1,15 @@
 package com.github.runningforlife.photosniffer.model;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.github.runningforlife.photosniffer.presenter.LifeCycle;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,21 +32,24 @@ public class RealmManager implements LifeCycle{
     private static AtomicInteger sRealmRefCount = new AtomicInteger(0);
     private Realm realm;
     // all the data we have
-    private RealmResults<ImageRealm> mAllUsedImages;
-    private RealmResults<ImageRealm> mAllUnUsedImages;
-    private RealmResults<ImageRealm> mAllFavorImages;
+    private RealmResults<ImageRealm> mAllUsed;
+    private RealmResults<ImageRealm> mAllUnUsed;
+    private RealmResults<ImageRealm> mAllFavor;
+    private RealmResults<ImageRealm> mAllWallpaper;
     // callback to listen realm changes: update or query complete
     private Set<RealmDataChangeListener> mListeners;
     private UsedRealmDataChangeListener mUsedDataChangeListener;
     private UnusedRealmDataChangeListener mUnusedDataChangeListener;
     private FavorRealmDataChangeListener mFavorDataChangeListener;
+    private WallpaperDataChangeListener mWallpaperDataChangeListener;
     // async task
     private RealmAsyncTask mAsyncTask;
 
     public interface RealmDataChangeListener{
-        void onUsedRealmDataChange(RealmResults<ImageRealm> data);
-        void onUnusedRealmDataChange(RealmResults<ImageRealm> data);
-        void onFavorRealmDataChange(RealmResults<ImageRealm> data);
+        void onUsedDataChange(RealmResults<ImageRealm> data);
+        void onUnusedDataChange(RealmResults<ImageRealm> data);
+        void onFavorDataChange(RealmResults<ImageRealm> data);
+        void onWallpaperDataChange(RealmResults<ImageRealm> data);
     }
 
     public static RealmManager getInstance() {
@@ -55,6 +62,7 @@ public class RealmManager implements LifeCycle{
         mUsedDataChangeListener = new UsedRealmDataChangeListener();
         mUnusedDataChangeListener = new UnusedRealmDataChangeListener();
         mFavorDataChangeListener = new FavorRealmDataChangeListener();
+        mWallpaperDataChangeListener = new WallpaperDataChangeListener();
     }
 
     // this should be consistent with UI lifecycle: onCreate() or onStart()
@@ -70,17 +78,17 @@ public class RealmManager implements LifeCycle{
         Log.d(TAG,"onDestroy(): ref count = " + sRealmRefCount.get());
         if(sRealmRefCount.decrementAndGet() == 0) {
             //trimData();
-            if (mAllUsedImages != null) {
-                mAllUsedImages.removeAllChangeListeners();
-                mAllUsedImages = null;
+            if (mAllUsed != null) {
+                mAllUsed.removeAllChangeListeners();
+                mAllUsed = null;
             }
-            if (mAllUnUsedImages != null) {
-                mAllUnUsedImages.removeAllChangeListeners();
-                mAllUnUsedImages = null;
+            if (mAllUnUsed != null) {
+                mAllUnUsed.removeAllChangeListeners();
+                mAllUnUsed = null;
             }
-            if(mAllFavorImages != null){
-                mAllFavorImages.removeAllChangeListeners();
-                mAllFavorImages = null;
+            if(mAllFavor != null){
+                mAllFavor.removeAllChangeListeners();
+                mAllFavor = null;
             }
             if (realm != null) {
                 realm.close();
@@ -180,33 +188,40 @@ public class RealmManager implements LifeCycle{
     // keep latest images
     public void trimData(){
         final int maxImgs = SharedPrefUtil.getMaxReservedImages();
-        if(mAllUsedImages != null && mAllUsedImages.isValid()){
-            mAllUsedImages.sort("mTimeStamp",Sort.DESCENDING);
-
-            mAsyncTask = realm.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    RealmResults<ImageRealm> used = realm.where(ImageRealm.class)
-                            .equalTo("mIsUsed", true)
-                            .findAllSorted("mTimeStamp",Sort.DESCENDING);
-                    for(int i = maxImgs; i < used.size(); ++i){
-                        // realm object cannot be accessed by multiple threads
-                        ImageRealm item = used.get(i);
-                        item.deleteFromRealm();
+        mAllUsed.removeChangeListener(mUsedDataChangeListener);
+        new Handler(Looper.myLooper())
+                .postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // add listener
+                        mAllUsed.addChangeListener(mUsedDataChangeListener);
                     }
+                },10);
+        // delete item
+        mAsyncTask = realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmResults<ImageRealm> used = realm.where(ImageRealm.class)
+                        .equalTo("mIsUsed", true)
+                        .findAllSorted("mTimeStamp",Sort.ASCENDING);
+                int total = used.size();
+                for(int i = 0; i <  total - maxImgs; ++i){
+                    // realm object cannot be accessed by multiple threads
+                    ImageRealm item = used.get(i);
+                    item.deleteFromRealm();
                 }
-            });
-        }
+            }
+        });
     }
 
     // mark unused images to used
     public void markUnusedRealm(final int number){
-        if(mAllUnUsedImages == null || !mAllUnUsedImages.isValid()){
-            mAllUnUsedImages = realm.where(ImageRealm.class)
+        if(mAllUnUsed == null || !mAllUnUsed.isValid()){
+            mAllUnUsed = realm.where(ImageRealm.class)
                     .equalTo("mIsUsed", false)
                     .findAllAsync()
                     .sort("mTimeStamp", Sort.DESCENDING);
-            mAllUnUsedImages.addChangeListener(mUnusedDataChangeListener);
+            mAllUnUsed.addChangeListener(mUnusedDataChangeListener);
         }else{
             mAsyncTask = realm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
@@ -214,7 +229,7 @@ public class RealmManager implements LifeCycle{
                     RealmResults<ImageRealm> unused = realm.where(ImageRealm.class)
                             .equalTo("mIsUsed", false)
                             .findAll();
-                    for(int i = 0; i < number && i < unused.size(); ++i){
+                    for (int i = 0; i < number && i < unused.size(); ++i) {
                         ImageRealm item = unused.get(i);
                         item.setUsed(true);
                         item.setTimeStamp(System.currentTimeMillis());
@@ -224,16 +239,33 @@ public class RealmManager implements LifeCycle{
         }
     }
 
+    public void setWallpaper(final String url){
+        if(TextUtils.isEmpty(url)) return;
+
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                ImageRealm item = realm.where(ImageRealm.class)
+                        .equalTo("mUrl", url)
+                        .findFirst();
+                item.setIsWallpaper(true);
+            }
+        });
+    }
+
     public void addListener(RealmDataChangeListener listener){
         mListeners.add(listener);
-        if(mAllUsedImages != null && mAllUsedImages.isValid()){
-            listener.onUsedRealmDataChange(mAllUsedImages);
+        if(mAllUsed != null && mAllUsed.isValid()){
+            listener.onUsedDataChange(mAllUsed);
         }
-        if(mAllUnUsedImages != null && mAllUnUsedImages.isValid()){
-            listener.onUnusedRealmDataChange(mAllUnUsedImages);
+        if(mAllUnUsed != null && mAllUnUsed.isValid()){
+            listener.onUnusedDataChange(mAllUnUsed);
         }
-        if(mAllFavorImages != null && mAllFavorImages.isValid()){
-            listener.onFavorRealmDataChange(mAllFavorImages);
+        if(mAllFavor != null && mAllFavor.isValid()){
+            listener.onFavorDataChange(mAllFavor);
+        }
+        if(mAllWallpaper != null && mAllWallpaper.isValid()){
+            listener.onWallpaperDataChange(mAllWallpaper);
         }
     }
 
@@ -247,41 +279,52 @@ public class RealmManager implements LifeCycle{
             realm = Realm.getDefaultInstance();
         }
 
-        if (mAllUsedImages == null || !mAllUsedImages.isValid()) {
-            mAllUsedImages = realm.where(ImageRealm.class)
+        if (mAllUsed == null || !mAllUsed.isValid()) {
+            mAllUsed = realm.where(ImageRealm.class)
                     .equalTo("mIsUsed", true)
                     .equalTo("mIsFavor", false)
                     .findAllAsync()
                     .sort("mTimeStamp", Sort.DESCENDING);
-            mAllUsedImages.addChangeListener(mUsedDataChangeListener);
-            Log.v(TAG, "query(): image count = " + mAllUsedImages.size());
-        }else if(mAllUsedImages.isValid() && !mAllUsedImages.isEmpty()){
+            mAllUsed.addChangeListener(mUsedDataChangeListener);
+            Log.v(TAG, "query(): image count = " + mAllUsed.size());
+        }else if(mAllUsed.isValid() && !mAllUsed.isEmpty()){
             for(RealmDataChangeListener listener : mListeners){
-                listener.onUsedRealmDataChange(mAllUsedImages);
+                listener.onUsedDataChange(mAllUsed);
             }
         }
 
-        if(mAllUnUsedImages == null || !mAllUnUsedImages.isValid()) {
-            mAllUnUsedImages = realm.where(ImageRealm.class)
+        if(mAllUnUsed == null || !mAllUnUsed.isValid()) {
+            mAllUnUsed = realm.where(ImageRealm.class)
                     .equalTo("mIsUsed", false)
                     .findAllAsync()
                     .sort("mTimeStamp", Sort.DESCENDING);
-            mAllUnUsedImages.addChangeListener(mUnusedDataChangeListener);
-        }else if(mAllUnUsedImages.isValid() && !mAllUnUsedImages.isEmpty()){
+            mAllUnUsed.addChangeListener(mUnusedDataChangeListener);
+        }else if(mAllUnUsed.isValid() && !mAllUnUsed.isEmpty()){
             for(RealmDataChangeListener listener : mListeners){
-                listener.onUnusedRealmDataChange(mAllUnUsedImages);
+                listener.onUnusedDataChange(mAllUnUsed);
             }
         }
 
-        if(mAllFavorImages == null || !mAllFavorImages.isValid()){
-            mAllFavorImages = realm.where(ImageRealm.class)
+        if(mAllFavor == null || !mAllFavor.isValid()){
+            mAllFavor = realm.where(ImageRealm.class)
                     .equalTo("mIsFavor",true)
                     .findAllAsync()
                     .sort("mTimeStamp",Sort.DESCENDING);
-            mAllFavorImages.addChangeListener(mFavorDataChangeListener);
-        }else if(mAllFavorImages.isValid() && !mAllFavorImages.isEmpty()){
+            mAllFavor.addChangeListener(mFavorDataChangeListener);
+        }else if(mAllFavor.isValid() && !mAllFavor.isEmpty()){
             for(RealmDataChangeListener listener : mListeners){
-                listener.onFavorRealmDataChange(mAllFavorImages);
+                listener.onFavorDataChange(mAllFavor);
+            }
+        }
+
+        if(mAllWallpaper == null || !mAllWallpaper.isValid()){
+            mAllWallpaper = realm.where(ImageRealm.class)
+                    .equalTo("mIsWallpaper", true)
+                    .findAllAsync();
+            mAllWallpaper.addChangeListener(mWallpaperDataChangeListener);
+        }else if(mAllWallpaper.isValid()){
+            for(RealmDataChangeListener listener : mListeners){
+                listener.onWallpaperDataChange(mAllWallpaper);
             }
         }
     }
@@ -292,7 +335,7 @@ public class RealmManager implements LifeCycle{
             Log.v(TAG,"onChange(): current used image count = " + element.size());
             //element.sort("mTimeStamp",Sort.DESCENDING);
             for(RealmDataChangeListener listener : mListeners){
-                listener.onUsedRealmDataChange(element);
+                listener.onUsedDataChange(element);
             }
         }
     }
@@ -303,7 +346,7 @@ public class RealmManager implements LifeCycle{
         public void onChange(RealmResults<ImageRealm> element) {
             Log.v(TAG,"onChange(): current unused image count = " + element.size());
             for(RealmDataChangeListener listener : mListeners){
-                listener.onUnusedRealmDataChange(element);
+                listener.onUnusedDataChange(element);
             }
         }
     }
@@ -314,7 +357,18 @@ public class RealmManager implements LifeCycle{
         public void onChange(RealmResults<ImageRealm> element) {
             Log.v(TAG,"onChange(): current favor image count = " + element.size());
             for(RealmDataChangeListener listener : mListeners){
-                listener.onFavorRealmDataChange(element);
+                listener.onFavorDataChange(element);
+            }
+        }
+    }
+
+
+    private class WallpaperDataChangeListener implements RealmChangeListener<RealmResults<ImageRealm>>{
+
+        @Override
+        public void onChange(RealmResults<ImageRealm> element) {
+            for(RealmDataChangeListener listener : mListeners){
+                listener.onWallpaperDataChange(element);
             }
         }
     }

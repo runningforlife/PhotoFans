@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.ui.fragment.AllPicturesFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FavoriteImageFragment;
+import com.github.runningforlife.photosniffer.ui.fragment.WallPaperFragment;
 
 public class GalleryActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -106,12 +107,10 @@ public class GalleryActivity extends AppCompatActivity
             startFavorFragment();
         } else if (id == R.id.nav_gallery) {
             startGalleryFragment();
-        } else if (id == R.id.nav_category) {
-
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_wallpaper) {
+            startWallpaperFragment();
+        } else if (id == R.id.nav_settings) {
             startSetting();
-        } else if (id == R.id.nav_share) {
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -190,6 +189,18 @@ public class GalleryActivity extends AppCompatActivity
 
         fragmentMgr.beginTransaction()
                 .replace(R.id.fragment_container,fragment, AllPicturesFragment.TAG)
+                .commit();
+    }
+
+    private void startWallpaperFragment(){
+        FragmentManager fragmentMgr = getSupportFragmentManager();
+        WallPaperFragment fragment = (WallPaperFragment)fragmentMgr.findFragmentByTag(WallPaperFragment.TAG);
+        if(fragment == null){
+            fragment = WallPaperFragment.newInstance();
+        }
+
+        fragmentMgr.beginTransaction()
+                .replace(R.id.fragment_container, fragment, WallPaperFragment.TAG)
                 .commit();
     }
 }

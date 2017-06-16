@@ -18,12 +18,12 @@ public abstract class FavorImagePresenter implements Presenter{
     public abstract void cancelFavorAtPos(int pos);
 
     @Override
-    public void onUsedRealmDataChange(RealmResults<ImageRealm> data){
+    public void onUsedDataChange(RealmResults<ImageRealm> data){
         // keep empty
     }
 
     @Override
-    public void onUnusedRealmDataChange(RealmResults<ImageRealm> data){
+    public void onUnusedDataChange(RealmResults<ImageRealm> data){
         // keep empty
     }
 }

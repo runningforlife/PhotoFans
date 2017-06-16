@@ -14,9 +14,8 @@ public class ImageRealmMigration implements RealmMigration{
         RealmSchema schema = realm.getSchema();
 
         if(oldVersion == 0){
-            // add new field
             schema.get("ImageRealm")
-                    .addField("mIsFavor",Boolean.class);
+                    .addField("mIsWallpaper",Boolean.class);
             ++oldVersion;
         }
     }

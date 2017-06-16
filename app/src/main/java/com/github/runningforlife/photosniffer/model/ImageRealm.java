@@ -18,6 +18,7 @@ public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
     private long mTimeStamp;
     private boolean mIsUsed;
     private boolean mIsFavor;
+    private boolean mIsWallpaper;
 
     public void setUrl(String url){
         mUrl = url;
@@ -57,6 +58,14 @@ public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
 
     public void setIsFavor(boolean isFavor){
         mIsFavor = isFavor;
+    }
+
+    public void setIsWallpaper(boolean isWallpaper){
+        mIsWallpaper = isWallpaper;
+    }
+
+    public boolean getIsWallpaper(){
+        return mIsWallpaper;
     }
 
     @Override

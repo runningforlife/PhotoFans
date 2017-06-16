@@ -105,6 +105,8 @@ public class ImageDetailPresenterImpl extends ImageDetailPresenter {
                     try {
                         wpm.setBitmap((Bitmap)o);
                         mView.onWallpaperSetDone(true);
+                        // mark it as wall paper
+                        mRealmMgr.setWallpaper(mImgList.get(pos).getUrl());
                     } catch (IOException e) {
                         mView.onWallpaperSetDone(false);
                         e.printStackTrace();
@@ -137,8 +139,8 @@ public class ImageDetailPresenterImpl extends ImageDetailPresenter {
     }
 
     @Override
-    public void onUsedRealmDataChange(RealmResults<ImageRealm> data) {
-        Log.v(TAG,"onUsedRealmDataChange(): data size = " + data.size());
+    public void onUsedDataChange(RealmResults<ImageRealm> data) {
+        Log.v(TAG,"onUsedDataChange(): data size = " + data.size());
         mImgList = data;
         // keep sorted
         sort();

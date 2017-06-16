@@ -29,7 +29,6 @@ public class MiscUtil {
         iv.setImageDrawable(d);
     }
 
-
     public static boolean isConnected(Context context){
         ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
