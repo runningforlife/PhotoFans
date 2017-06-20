@@ -1,14 +1,30 @@
 package com.github.runningforlife.photosniffer.app;
 
+import android.annotation.TargetApi;
 import android.app.Application;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.ContentObserver;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
+import android.net.NetworkRequest;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 
 import com.avos.avoscloud.AVOSCloud;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.model.ImageRealmMigration;
 import com.github.runningforlife.photosniffer.remote.LeanCloudManager;
+import com.github.runningforlife.photosniffer.service.MyThreadFactory;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.io.File;
@@ -17,7 +33,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import io.realm.Realm;
@@ -36,6 +51,8 @@ public class AppGlobals extends Application{
     private static final String LEAN_CLOUD_APP_KEY = "KCjSyXjVTA9mCIJVs7tDVkGS";
     private static AppGlobals sInstance;
     private static String sImagePath;
+    // wifi state receiver
+    private WifiStateReceiver mWifiStateReceiver;
 
     public static AppGlobals getInstance(){
         return sInstance;
@@ -67,6 +84,20 @@ public class AppGlobals extends Application{
         initLeanCloud();
     }
 
+    @Override
+    public void onTrimMemory(int level){
+        super.onTrimMemory(level);
+
+        unRegisterWifiStateReceiver();
+    }
+
+    @Override
+    public void onLowMemory(){
+        super.onLowMemory();
+
+        unRegisterWifiStateReceiver();
+    }
+
     public String getImagePath(){
         if(TextUtils.isEmpty(sImagePath)){
             return getRootDir() + PATH_NAME;
@@ -82,12 +113,7 @@ public class AppGlobals extends Application{
 
         @Override
         public void uncaughtException(Thread t, Throwable e) {
-            if(MiscUtil.isWifiConnected(getApplicationContext())){
-                saveLogToCloud(e);
-                saveLogToDisk(e);
-            }else{
-                saveLogToDisk(e);
-            }
+            saveLog(e);
         }
     }
 
@@ -121,22 +147,9 @@ public class AppGlobals extends Application{
         return file;
     }
 
-    private void saveLogToDisk(Throwable t){
+    private void saveLog(Throwable t){
         new Thread(new FileSaveRunnable(getLogFile(),t))
                 .start();
-    }
-
-    private void saveLogToCloud(Throwable e){
-        LeanCloudManager cloud = LeanCloudManager.getInstance();
-        String fileName = buildLogFileName();
-        StringBuilder data = new StringBuilder();
-        data.append("date: " + new Date());
-        data.append("\n");
-        data.append("device fingerprint: " + Build.FINGERPRINT);
-        data.append("\n");
-        data.append(e.toString());
-
-        cloud.saveFile(fileName, data.toString());
     }
 
     private class FileSaveRunnable implements Runnable{
@@ -170,11 +183,72 @@ public class AppGlobals extends Application{
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            // save to cloud if wifi available
+            if (MiscUtil.isWifiConnected(getApplicationContext())) {
+                saveLogToCloud(file);
+            }else{
+                // waiting for wifi
+                waitForWifi();
+            }
         }
     }
 
     private String getRootDir(){
         String appName = getString(R.string.app_name);
         return ROOT_PATH + File.separator + appName + File.separator;
+    }
+
+    private void uploadLogToCloud(){
+        String logPath = getRootDir() + PATH_CRASH_LOG;
+        File file = new File(logPath);
+        if(file.exists()){
+            File[] logs = file.listFiles();
+            for(File log : logs){
+                if(log.isFile()){
+                    saveLogToCloud(log);
+                }
+            }
+        }
+    }
+
+    private void saveLogToCloud(File file){
+        LeanCloudManager cloudManager = LeanCloudManager.getInstance();
+        cloudManager.saveFile(file);
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    private void waitForWifi(){
+        registerWifiStateReceiver();
+    }
+
+    private void registerWifiStateReceiver(){
+        mWifiStateReceiver = new WifiStateReceiver();
+        registerReceiver(mWifiStateReceiver,
+                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    private void unRegisterWifiStateReceiver(){
+        if(mWifiStateReceiver != null){
+            unregisterReceiver(mWifiStateReceiver);
+        }
+    }
+
+    private class WifiStateReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager cm = (ConnectivityManager)context.getSystemService(CONNECTIVITY_SERVICE);
+            NetworkInfo network = cm.getActiveNetworkInfo();
+            if(network.isConnected() &&
+                    network.getType() == ConnectivityManager.TYPE_WIFI){
+                MyThreadFactory.getInstance().
+                        newThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        uploadLogToCloud();
+                    }
+                }).start();
+            }
+        }
     }
 }

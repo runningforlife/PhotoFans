@@ -9,6 +9,8 @@ import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.BuildConfig;
 import com.avos.avoscloud.SaveCallback;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
@@ -28,18 +30,38 @@ public class LeanCloudManager implements CloudApi{
     @Override
     public void saveFile(String name,String data) {
         Log.v(TAG, "saveFile()");
+        AVFile file = new AVFile(name, data.getBytes());
+        file.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(AVException e) {
+                if(e != null){
+                    Log.d(TAG,"saveFile(): fail");
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void saveFile(final File file) {
+        Log.v(TAG,"saveFile()");
+        String name = "log_" + System.currentTimeMillis() + ".txt";
         try {
-            AVFile file = new AVFile(name, data.getBytes("UTF-8"));
-            file.saveInBackground(new SaveCallback() {
+            AVFile cf = AVFile.withAbsoluteLocalPath(name, file.getAbsolutePath());
+            cf.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(AVException e) {
                     if(e != null){
                         Log.d(TAG,"saveFile(): fail");
                         e.printStackTrace();
                     }
+                    // delete file
+                    if(file.exists()){
+                        file.delete();
+                    }
                 }
             });
-        } catch (UnsupportedEncodingException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
