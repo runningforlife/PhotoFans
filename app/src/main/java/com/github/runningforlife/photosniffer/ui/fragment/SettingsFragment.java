@@ -29,8 +29,6 @@ import io.realm.RealmResults;
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "SettingsFragment";
 
-    public static final String ALARM_AUTO_WALLPAPER = "com.github.runningforlife.AUTO_WALLPAPER";
-
     @Override
     public void onCreate(Bundle savedState){
         super.onCreate(savedState);
@@ -62,7 +60,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         String keyImgSrc = getString(R.string.pref_choose_image_source);
         String keyAdvice = getString(R.string.pref_give_your_advice);
-        String keyAutoWallpaper = getString(R.string.pref_automatic_wallpaper);
 
         if(key.equals(keyImgSrc)) {
             Set<String> src = sharedPreferences.getStringSet(key,null);
@@ -88,20 +85,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 uploadAdviceToCloud(data);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(key,"");
-            }
-        }else if(keyAutoWallpaper.equals(key)){
-            boolean isAuto = sharedPreferences.getBoolean(key,false);
-            if(isAuto){
-                // start a alarm to enable automatic wallpaper setting
-                Intent intent = new Intent(ALARM_AUTO_WALLPAPER);
-                PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, intent,
-                        PendingIntent.FLAG_CANCEL_CURRENT);
-                AlarmManager alarmMgr = (AlarmManager) getActivity()
-                        .getSystemService(Context.ALARM_SERVICE);
-
-                alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
-                        System.currentTimeMillis() + 10,6*1000*1000, pi);
-
             }
         }
     }

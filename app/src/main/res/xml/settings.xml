@@ -14,6 +14,12 @@
         android:defaultValue="false">
     </SwitchPreference>
 
+    <EditTextPreference
+        android:key="@string/key_auto_wallpaper_setting_interval"
+        android:defaultValue="@integer/auto_wallpaper_interval">
+
+    </EditTextPreference>
+
     <com.github.runningforlife.photosniffer.ui.preference.EmptyListPreference
         android:key="@string/pref_choose_image_source"
         android:title="@string/website_to_download_images"

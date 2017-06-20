@@ -21,6 +21,8 @@ public abstract class WallpaperPresenter implements Presenter{
 
     public abstract void refresh();
 
+    public abstract void setWallpaper();
+
     @Override
     public void onUnusedDataChange(RealmResults<ImageRealm> data){
         // keep empty

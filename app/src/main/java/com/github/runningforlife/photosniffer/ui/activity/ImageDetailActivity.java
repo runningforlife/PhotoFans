@@ -371,7 +371,12 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         @Override
         public void onPageScrollStateChanged(int state) {
-            // do nothing
+            // FIXME:java.lang.IllegalStateException: The application's PagerAdapter changed the adapter's contents
+            //without calling PagerAdapter#notifyDataSetChanged!
+            //Expected adapter item count: 101, found: 99
+            if(state == ViewPager.SCROLL_STATE_IDLE){
+                mPagerAdapter.notifyDataSetChanged();
+            }
         }
     }
 

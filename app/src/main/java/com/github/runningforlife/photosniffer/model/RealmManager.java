@@ -90,6 +90,10 @@ public class RealmManager implements LifeCycle{
                 mAllFavor.removeAllChangeListeners();
                 mAllFavor = null;
             }
+            if(mAllWallpaper != null){
+                mAllWallpaper.removeAllChangeListeners();
+                mAllWallpaper = null;
+            }
             if (realm != null) {
                 realm.close();
                 realm = null;
@@ -283,6 +287,7 @@ public class RealmManager implements LifeCycle{
             mAllUsed = realm.where(ImageRealm.class)
                     .equalTo("mIsUsed", true)
                     .equalTo("mIsFavor", false)
+                    .equalTo("mIsWallpaper", false)
                     .findAllAsync()
                     .sort("mTimeStamp", Sort.DESCENDING);
             mAllUsed.addChangeListener(mUsedDataChangeListener);
@@ -308,6 +313,7 @@ public class RealmManager implements LifeCycle{
         if(mAllFavor == null || !mAllFavor.isValid()){
             mAllFavor = realm.where(ImageRealm.class)
                     .equalTo("mIsFavor",true)
+                    .equalTo("mIsWallpaper", false)
                     .findAllAsync()
                     .sort("mTimeStamp",Sort.DESCENDING);
             mAllFavor.addChangeListener(mFavorDataChangeListener);
@@ -361,7 +367,6 @@ public class RealmManager implements LifeCycle{
             }
         }
     }
-
 
     private class WallpaperDataChangeListener implements RealmChangeListener<RealmResults<ImageRealm>>{
 
