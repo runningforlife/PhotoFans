@@ -36,7 +36,7 @@ public class GalleryPresenterImpl extends GalleryPresenter
     private static final String TAG = "GalleryPresenter";
 
     private static final int DEFAULT_RETRIEVE_TIME_OUT = 20000;
-    private static final int DEFAULT_STOP_TIME_OUT = 30000;
+    private static final int DEFAULT_STOP_TIME_OUT = 40000;
     private static final int DEFAULT_RETRIEVED_IMAGES = 10;
     private static final int DEFAULT_WIDTH = 1024;
     private static final int DEFAULT_HEIGHT = (int)(DEFAULT_WIDTH*DisplayUtil.getScreenRatio());
