@@ -55,4 +55,11 @@
         android:maxLines="2">
     </EditTextPreference>
 
+    <com.github.runningforlife.photosniffer.ui.preference.MessagePreference
+        android:dialogTitle="@string/copyright_declaration"
+        android:dialogMessage="@string/my_copyright_declaration"
+        android:title="@string/check_copyright_notes"
+        android:summary="@string/check_copyright_notes">
+    </com.github.runningforlife.photosniffer.ui.preference.MessagePreference>
+
 </PreferenceScreen>

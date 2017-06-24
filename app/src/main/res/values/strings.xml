@@ -1,11 +1,11 @@
 <resources xmlns:android="http://schemas.android.com/tools">
     <string name="app_name">PhotoSniffer</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-    <string name="photo">Photo</string>
+    <string name="photo" translatable="false">Photo</string>
     <string name="refresh_success">Success to Refresh Data</string>
     <string name="refresh_error">Fail to Refresh Data</string>
     <string name="gallery">All Pictures</string>
@@ -17,17 +17,17 @@
     <string name="action_delete">Delete</string>
     <string name="action_share">Share</string>
     <string name="action_favorite">Favor</string>
-    <string name="pref_wifi_download">pref_wifi_only_download</string>
+    <string name="pref_wifi_download" translatable="false">pref_wifi_only_download</string>
     <string name="way_to_download_images">The way to download images</string>
     <string name="wifi_only_download">Download Images only wifi-connected</string>
     <string name="website_to_download_images">Websites to download images</string>
     <string name="select_your_favorite_websites">Choose the Websites you like</string>
     <string name="mottos_for_every_day">Every Day Mottos</string>
-    <string name="pref_choose_image_source">key_choose_image_source</string>
+    <string name="pref_choose_image_source" translatable="false">key_choose_image_source</string>
     <string name="action_more">Check More</string>
     <string name="save_image_Success">Image Saved To </string>
     <string name="save_image_fail">Fail to Save Image</string>
-    <string name="pref_max_reserved_images">Max Reserved Images</string>
+    <string name="pref_max_reserved_images" translatable="false">Max Reserved Images</string>
     <string name="max_reserved_images">Max Reserved Images</string>
     <string name="how_many_images_reserved">How Many Images to Be reserved</string>
     <string name="my_favorite_images">My Favorite Images</string>
@@ -44,17 +44,21 @@
     <string name="Wallpaper">Wallpaper</string>
     <string name="want_to_clear_cache">Do you want to clear the caches?</string>
     <string name="clear_image_caches">clear all the caches</string>
-    <string name="pref_give_your_advice">key_give_your_advice</string>
+    <string name="pref_give_your_advice" translatable="false">key_give_your_advice</string>
     <string name="give_your_advice">Please give us your advice</string>
     <string name="thanks_for_your_advice">Thanks for your advices</string>
     <string name="write_down_your_advice">Please write down your advices</string>
-    <string name="pref_automatic_wallpaper">Enable Automatic Wallpaper</string>
+    <string name="pref_automatic_wallpaper" translatable="false">Enable Automatic Wallpaper</string>
     <string name="enable_automatic_wallpaper">Enable Automatic Wallpaper</string>
     <string name="set_wallpaper">Wallpaper Setting</string>
-    <string name="key_auto_wallpaper_setting_interval">pref_auto_wallpaper_interval</string>
+    <string name="key_auto_wallpaper_setting_interval" translatable="false">pref_auto_wallpaper_interval</string>
     <string name="set_auto_wallpaper_interval">Set Auto Wallpaper Interval</string>
-    <string name="pref_pola_latest_collections_number">pola_latest_collections_number</string>
-    <string name="pref_auto_wallpaper_interval">pref_auto_wallpaper_time_interval</string>
-    <string name="pref_new_user">pref_new_user</string>
+    <string name="pref_pola_latest_collections_number" translatable="false">pola_latest_collections_number</string>
+    <string name="pref_auto_wallpaper_interval" translatable="false">pref_auto_wallpaper_time_interval</string>
+    <string name="pref_new_user" translatable="false">pref_new_user</string>
     <string name="share">Share</string>
+    <string name="my_copyright_declaration">All those pictures are free. Please do not use them
+    for any commercial usage. Any problems, please send email wlh2119@gmail.com</string>
+    <string name="check_copyright_notes">Check Copyright Notes</string>
+    <string name="copyright_declaration">Copytright Declaration</string>
 </resources>
