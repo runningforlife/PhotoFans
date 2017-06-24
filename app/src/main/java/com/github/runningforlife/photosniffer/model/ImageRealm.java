@@ -82,8 +82,7 @@ public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
             return false;
         }
 
-        return this == o || (this.mName.equals(((ImageRealm)o).mName)
-                && this.mUrl.equals(((ImageRealm)o).mUrl));
+        return this == o || this.mUrl.equals(((ImageRealm)o).mUrl);
     }
 
     @Override

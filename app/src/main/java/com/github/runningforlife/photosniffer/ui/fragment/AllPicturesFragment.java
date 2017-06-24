@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
@@ -44,6 +45,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
 
     @BindView(R.id.rcv_gallery) RecyclerView mRvImgList;
     @BindView(R.id.srl_refresh) SwipeRefreshLayout mRefresher;
+    @BindView(R.id.wv_page) WebView mWvPage;
     private GalleryPresenter mPresenter;
     private GalleryAdapter mAdapter;
     private RefreshCallback mCallback;
@@ -120,7 +122,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         if(mRvImgList.getAdapter() == null){
             mRvImgList.setAdapter(mAdapter);
         }
-        mRvImgList.invalidate();
+        //mRvImgList.invalidate();
         mAdapter.notifyDataSetChanged();
     }
 
@@ -288,6 +290,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     private void initPresenter(){
         mPresenter = new GalleryPresenterImpl(getContext(),this);
         mPresenter.init();
+        mPresenter.setWebView(mWvPage);
     }
 
     private void setTitle(){

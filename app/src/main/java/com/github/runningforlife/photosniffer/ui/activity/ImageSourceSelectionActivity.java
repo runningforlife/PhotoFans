@@ -133,14 +133,14 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
             for (String url : src) {
                 if(!allUrls.contains(url)){
                     VisitedPageInfo pageInfo = new VisitedPageInfo(url);
-                    helper.writeAsync(pageInfo);
+                    helper.savePageAsync(pageInfo);
                 }
             }
         }else{
             // save it to data base
             for(String url : src){
                 VisitedPageInfo pageInfo = new VisitedPageInfo(url);
-                helper.writeAsync(pageInfo);
+                helper.savePageAsync(pageInfo);
             }
         }
 

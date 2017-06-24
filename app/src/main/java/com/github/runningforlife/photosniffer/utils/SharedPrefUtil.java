@@ -41,19 +41,65 @@ public class SharedPrefUtil {
         return pref.getBoolean(key, true);
     }
 
-    public static int getMaxReservedImages(Context context){
-        String key = context.getString(R.string.pref_max_reserved_images);
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-
-        return Integer.parseInt(pref.getString(key,"100"));
-    }
-
-    public static int getMaxReservedImages(){
+    public static String getString(String key, String val){
         Context context = AppGlobals.getInstance();
-        String key = context.getString(R.string.pref_max_reserved_images);
         SharedPreferences pref = PreferenceManager.
                 getDefaultSharedPreferences(context);
 
-        return Integer.parseInt(pref.getString(key,"100"));
+        return pref.getString(key, val);
+    }
+
+    public static boolean getBoolean(String key, boolean def){
+        Context context = AppGlobals.getInstance();
+        SharedPreferences pref = PreferenceManager.
+                getDefaultSharedPreferences(context);
+
+        return pref.getBoolean(key, def);
+    }
+
+    public static void putBoolean(String key, boolean val){
+        Context context = AppGlobals.getInstance();
+        SharedPreferences pref = PreferenceManager.
+                getDefaultSharedPreferences(context);
+
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putBoolean(key,val)
+                .apply();
+    }
+
+    public static void putInt(String key, int n){
+        Context context = AppGlobals.getInstance();
+        SharedPreferences pref = PreferenceManager.
+                getDefaultSharedPreferences(context);
+
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt(key, n);
+        editor.apply();
+    }
+
+    public static int getInt(String key, int def){
+        Context context = AppGlobals.getInstance();
+        SharedPreferences pref = PreferenceManager.
+                getDefaultSharedPreferences(context);
+
+        return pref.getInt(key, def);
+    }
+
+    public static void putLong(String key, long value){
+        Context context = AppGlobals.getInstance();
+        SharedPreferences pref = PreferenceManager.
+                getDefaultSharedPreferences(context);
+
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putLong(key, value);
+        editor.apply();
+    }
+
+    public static long getLong(String key, long def){
+        Context context = AppGlobals.getInstance();
+        SharedPreferences pref = PreferenceManager.
+                getDefaultSharedPreferences(context);
+
+        return pref.getLong(key,def);
     }
 }

@@ -6,4 +6,6 @@ package com.github.runningforlife.photosniffer.ui;
 
 public interface WallpaperView extends UI{
     void onDataSetChanged();
+
+    void onRefreshDone(boolean isSuccess);
 }

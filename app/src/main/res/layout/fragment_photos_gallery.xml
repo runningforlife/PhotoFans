@@ -2,7 +2,7 @@
 <android.support.v4.widget.SwipeRefreshLayout
     android:id="@+id/srl_refresh"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:keepScreenOn="true"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -14,5 +14,11 @@
         android:layoutAnimation="@anim/anim_rcv_layout"
         android:background="@color/colorLightGrey">
     </android.support.v7.widget.RecyclerView>
+
+    <WebView android:id="@+id/wv_page"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible">
+    </WebView>
 
 </android.support.v4.widget.SwipeRefreshLayout>

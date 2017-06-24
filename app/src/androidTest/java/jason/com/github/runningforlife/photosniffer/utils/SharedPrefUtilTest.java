@@ -52,7 +52,7 @@ public class SharedPrefUtilTest {
         String key = context.getString(R.string.pref_max_reserved_images);
         assertNotNull("checking max reserved images", key);
 
-        int val = SharedPrefUtil.getMaxReservedImages(context);
+        int val = SharedPrefUtil.getInt(key, 100);
         assertNotEquals("checking max reserved images number",val,101);
     }
 

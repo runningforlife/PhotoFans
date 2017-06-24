@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.ui.UI;
+import com.github.runningforlife.photosniffer.ui.WallpaperView;
 
 import io.realm.RealmResults;
 
@@ -22,6 +23,8 @@ public abstract class WallpaperPresenter implements Presenter{
     public abstract void refresh();
 
     public abstract void setWallpaper();
+
+    public abstract void setView(WallpaperView view);
 
     @Override
     public void onUnusedDataChange(RealmResults<ImageRealm> data){

@@ -63,9 +63,11 @@ public class MessagePreference extends DialogPreference {
 
         @Override
         public void run() {
-            File[] all = file.listFiles();
-            for(File file : all){
-                file.delete();
+            if(file != null) {
+                File[] all = file.listFiles();
+                for (File file : all) {
+                    file.delete();
+                }
             }
         }
     }

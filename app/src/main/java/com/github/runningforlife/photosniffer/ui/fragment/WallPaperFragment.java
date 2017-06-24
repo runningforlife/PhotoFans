@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -34,7 +35,7 @@ import butterknife.ButterKnife;
  */
 
 public class WallPaperFragment extends BaseFragment
-        implements ImageAdapterCallback, WallpaperView, SharedPreferences.OnSharedPreferenceChangeListener{
+        implements ImageAdapterCallback, WallpaperView{
     public static final String TAG = "WallpaperFragment";
     public static final String ALARM_AUTO_WALLPAPER = "com.github.runningforlife.AUTO_WALLPAPER";
 
@@ -42,7 +43,6 @@ public class WallPaperFragment extends BaseFragment
     SwipeRefreshLayout mSrlRefresh;
     @BindView(R.id.rcv_gallery)
     RecyclerView mRcvWallpaper;
-    private static WallpaperAlarmReceiver mAlarmReceiver;
 
     private GalleryAdapter mAdapter;
     private WallpaperPresenter mPresenter;
@@ -72,8 +72,6 @@ public class WallPaperFragment extends BaseFragment
         mPresenter.onStart();
 
         setTitle();
-
-        registerPrefChangeListener();
     }
 
     @Override
@@ -118,6 +116,13 @@ public class WallPaperFragment extends BaseFragment
     }
 
     @Override
+    public void onRefreshDone(boolean isSuccess) {
+        if(mSrlRefresh.isRefreshing()){
+            mSrlRefresh.setRefreshing(false);
+        }
+    }
+
+    @Override
     public void onImageSaveDone(String path) {
 
     }
@@ -143,7 +148,8 @@ public class WallPaperFragment extends BaseFragment
     }
 
     private void initPresenter(){
-        mPresenter = new WallpaperPresenterImpl(getContext(), this);
+        mPresenter = new WallpaperPresenterImpl(getContext());
+        mPresenter.setView(this);
         mPresenter.init();
     }
 
@@ -155,75 +161,7 @@ public class WallPaperFragment extends BaseFragment
         }
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        String keyAutoWallpaper = getString(R.string.pref_automatic_wallpaper);
-        boolean isAuto = sharedPreferences.getBoolean(keyAutoWallpaper, false);
-        if(keyAutoWallpaper.equals(key)){
-            if(isAuto) {
-                registerAlarmReceiver();
-                startAutoWallpaperAlarm();
-            }else{
-                cancelAutoWallpaperAlarm();
-                unRegisterAlarmReceiver();
-            }
-        }
-    }
-
-    private void registerPrefChangeListener(){
-        SharedPreferences sharePref = PreferenceManager.
-                getDefaultSharedPreferences(getContext());
-        sharePref.registerOnSharedPreferenceChangeListener(this);
-    }
-
-    private void registerAlarmReceiver(){
-        mAlarmReceiver = new WallpaperAlarmReceiver();
-        getContext().registerReceiver(mAlarmReceiver,
-                new IntentFilter(ALARM_AUTO_WALLPAPER));
-    }
-
-    private void unRegisterAlarmReceiver(){
-        getContext().unregisterReceiver(mAlarmReceiver);
-    }
-
-    private void startAutoWallpaperAlarm(){
-        // start a alarm to enable automatic wallpaper setting
-        Intent intent = new Intent(ALARM_AUTO_WALLPAPER);
-        PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, intent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager alarmMgr = (AlarmManager) getActivity()
-                .getSystemService(Context.ALARM_SERVICE);
-
-        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis() + 10,6*1000*1000, pi);
-    }
-
-    private void cancelAutoWallpaperAlarm(){
-        AlarmManager alarmMgr = (AlarmManager) getActivity()
-                .getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(ALARM_AUTO_WALLPAPER);
-        PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, intent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
-        alarmMgr.cancel(pi);
-    }
 
 
-    private class WallpaperAlarmReceiver extends BroadcastReceiver{
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.v(TAG,"onReceive()");
-            String action = intent.getAction();
-            if(ALARM_AUTO_WALLPAPER.equals(action)){
-                if(mPresenter == null){
-                    mPresenter = new WallpaperPresenterImpl(getContext(),
-                            WallPaperFragment.this);
-                    mPresenter.init();
-                    mPresenter.onStart();
-                }
-
-                mPresenter.setWallpaper();
-            }
-        }
-    }
 }

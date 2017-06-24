@@ -43,4 +43,13 @@ public class VisitedPageInfo extends RealmObject {
     public boolean getIsVisited(){
         return mIsVisited;
     }
+
+    @Override
+    public boolean equals(Object o){
+        if(!(o instanceof  VisitedPageInfo)){
+            return false;
+        }
+
+        return this == o || (this.mUrl.equals(((VisitedPageInfo)o).mUrl));
+    }
 }

@@ -1,6 +1,5 @@
 package com.github.runningforlife.photosniffer.crawler.processor;
 
-import android.os.Looper;
 import android.util.Log;
 import android.webkit.URLUtil;
 
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -120,7 +118,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                     ++mCurrentImages;
                 }
 
-                mExecutor.submit(new SaveRunnable(result));
+                mExecutor.submit(new SaveRunnable(result,
+                        ImageRealm.class.getSimpleName()));
 
                 if (mCurrentImages >= mExpectedImages && !mIsExpectedDone) {
                     mIsExpectedDone = true;
@@ -133,7 +132,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
             }
 
             // save to disk
-            mExecutor.submit(new SaveRunnable(getPageList(page)));
+            mExecutor.submit(new SaveRunnable(getPageList(page),
+                    VisitedPageInfo.class.getSimpleName()));
         }
     }
 
@@ -211,15 +211,23 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     }
 
     private  class SaveRunnable implements  Runnable{
-        private List<? extends RealmObject> mData;
+        private List<? extends RealmObject> data;
+        private String type;
 
-        SaveRunnable(List<? extends RealmObject> data){
-            mData = data;
+        SaveRunnable(List<? extends RealmObject> data, String type){
+            this.data = data;
+            this.type = type;
         }
 
         @Override
         public void run(){
-            saveToRealm(mData);
+            RealmManager rm = RealmManager.getInstance();
+            if(ImageRealm.class.getSimpleName().equals(type)){
+                rm.saveImageRealmAsync((List<ImageRealm>) data);
+            }
+            else if(VisitedPageInfo.class.getSimpleName().equals(type)){
+                rm.savePageAsync((List<VisitedPageInfo>) data);
+            }
         }
     }
 
@@ -248,12 +256,5 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         }
 
         return pageList;
-    }
-
-    private void saveToRealm(final List<? extends RealmObject> data){
-        Log.v(TAG,"saveToRealm(): " + data.size() + " pages is retrieved");
-        // save data
-        RealmManager.getInstance()
-                .writeAsync(data);
     }
 }

@@ -1,9 +1,15 @@
 package com.github.runningforlife.photosniffer.crawler.processor;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
+import com.github.runningforlife.photosniffer.app.AppGlobals;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 
 import org.jsoup.nodes.Document;
@@ -47,6 +53,7 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
         sImgSource.put(URL_VISUAL_HUNT,REG_VISUAL_HUNG);
         sImgSource.put(URL_YOUWU,REG_YOUWU);
         sImgSource.put(URL_MM,REG_MM);
+        sImgSource.put(URL_POLA, REG_POLA);
 
         sImageUrlStart.put(URL_ALBUM,ALBUM_IMAGE_START);
         sImageUrlStart.put(URL_PIXBABY,PIXABAY_IMAGE_START);
@@ -57,6 +64,7 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
         sImageUrlStart.put(URL_MM,MM_IMAGE_START);
         sImageUrlStart.put(URL_FREE_JPG,FREEJPG_IMAGE_START);
         sImageUrlStart.put(URL_VISUAL_HUNT,VH_IMAGE_START);
+        sImageUrlStart.put(URL_POLA, POLA_IMAGE_START);
     }
 
     public static ImageRetrieverFactory getInstance(){

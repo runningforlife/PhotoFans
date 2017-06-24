@@ -53,6 +53,14 @@
         <service android:name="com.github.runningforlife.photosniffer.service.ImageRetrieveService">
         </service>
 
+        <receiver android:name=".ui.receiver.WallpaperAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.github.runningforlife.AUTO_WALLPAPER"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

@@ -1,10 +1,13 @@
 package com.github.runningforlife.photosniffer.model;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.app.AppGlobals;
 import com.github.runningforlife.photosniffer.presenter.LifeCycle;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
@@ -107,18 +110,22 @@ public class RealmManager implements LifeCycle{
     }
 
     //Note: Realm objects can only be accessed on the thread they were created
-    public void writeAsync(final RealmObject info) {
+    public void savePageAsync(final VisitedPageInfo info) {
         Realm r = Realm.getDefaultInstance();
         try {
             r.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    realm.copyToRealmOrUpdate(info);
+                    RealmResults<VisitedPageInfo> all = realm.where(VisitedPageInfo.class)
+                            .findAll();
+                    if(!all.contains(info)) {
+                        realm.copyToRealmOrUpdate(info);
+                    }
                 }
             }, new Realm.Transaction.OnSuccess() {
                 @Override
                 public void onSuccess() {
-                    Log.v(TAG,"writeAsync(): success");
+                    Log.v(TAG,"savePageAsync(): success");
                     //cannot access from this thread
                     //trimData();
                 }
@@ -134,7 +141,8 @@ public class RealmManager implements LifeCycle{
         }
     }
 
-    public void writeAsync(final List<? extends RealmObject> data) {
+    public void saveImageRealmAsync(final List<ImageRealm> data){
+        Log.v(TAG,"saveImageRealmAsync()");
         if(data == null || data.size() <= 0) return;
         Realm r = Realm.getDefaultInstance();
         try {
@@ -142,12 +150,45 @@ public class RealmManager implements LifeCycle{
                 @Override
                 public void execute(Realm realm) {
                     Log.v(TAG, "execute(): saved data size = " + data.size());
-                    realm.copyToRealmOrUpdate(data);
+                    RealmResults<ImageRealm> all = realm.where(ImageRealm.class)
+                            .findAll();
+                    for(ImageRealm ir : data) {
+                        if(!all.contains(ir)) {
+                            realm.copyToRealmOrUpdate(data);
+                        }
+                    }
                 }
             }, new Realm.Transaction.OnSuccess() {
                 @Override
                 public void onSuccess() {
-                    Log.v(TAG,"writeAsync(): success");
+                    Log.v(TAG,"savePageAsync(): success");
+                }
+            });
+        }finally {
+            r.close();
+        }
+    }
+
+    public void savePageAsync(final List<VisitedPageInfo> data) {
+        if(data == null || data.size() <= 0) return;
+        Realm r = Realm.getDefaultInstance();
+        try {
+            r.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Log.v(TAG, "execute(): saved data size = " + data.size());
+                    RealmResults<VisitedPageInfo> all = realm.where(VisitedPageInfo.class)
+                            .findAll();
+                    for(VisitedPageInfo page : data) {
+                        if(!all.contains(page)) {
+                            realm.copyToRealmOrUpdate(data);
+                        }
+                    }
+                }
+            }, new Realm.Transaction.OnSuccess() {
+                @Override
+                public void onSuccess() {
+                    Log.v(TAG,"savePageAsync(): success");
                 }
             });
         }finally {
@@ -190,8 +231,7 @@ public class RealmManager implements LifeCycle{
     }
 
     // keep latest images
-    public void trimData(){
-        final int maxImgs = SharedPrefUtil.getMaxReservedImages();
+    public void trimData(final int maxImgs){
         mAllUsed.removeChangeListener(mUsedDataChangeListener);
         new Handler(Looper.myLooper())
                 .postDelayed(new Runnable() {

@@ -2,6 +2,7 @@
 <resources>
 
     <string-array name="image_website_url">
+        <item>http://www.polayoutu.com</item>
         <item>http://en.freejpg.com.ar</item>
         <item>https://www.pexels.com</item>
         <item>http://albumarium.com</item>
@@ -14,6 +15,7 @@
     </string-array>
 
     <string-array name="image_website_name">
+        <item>Pola Youtu</item>
         <item>Free JPG</item>
         <item>Pexels</item>
         <item>Albumarium</item>
@@ -26,9 +28,24 @@
     </string-array>
 
     <string-array name="default_source_url">
+        <item>http://www.polayoutu.com</item>
         <item>http://www.mmjpg.com</item>
         <item>http://www.youwu.cc</item>
         <item>http://publicdomainarchive.com</item>
+    </string-array>
+
+    <string-array name="auto_wallpaper_interval">
+        <item>every hour</item>
+        <item>every 3hr</item>
+        <item>every half day</item>
+        <item>every day</item>
+    </string-array>
+
+    <string-array name="auto_wallpaper_interval_values">
+        <item>3600000</item>
+        <item>10800000</item>
+        <item>43200000</item>
+        <item>86400000</item>
     </string-array>
 
 </resources>

@@ -28,10 +28,14 @@ public class WallpaperPresenterImpl extends WallpaperPresenter{
     private RealmManager mRealmMgr;
     private RealmResults<ImageRealm> mWallpaper;
 
-    public WallpaperPresenterImpl(Context context, WallpaperView view){
+    public WallpaperPresenterImpl(Context context){
         mContext = context;
-        mView = view;
         mRealmMgr = RealmManager.getInstance();
+    }
+
+    @Override
+    public void setView(WallpaperView view){
+        mView = view;
     }
 
     @Override
@@ -72,6 +76,8 @@ public class WallpaperPresenterImpl extends WallpaperPresenter{
         mWallpaper = data;
 
         mView.onDataSetChanged();
+
+        mView.onRefreshDone(true);
     }
 
     @Override

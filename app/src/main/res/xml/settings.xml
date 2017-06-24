@@ -14,11 +14,15 @@
         android:defaultValue="false">
     </SwitchPreference>
 
-    <EditTextPreference
+    <ListPreference
         android:key="@string/key_auto_wallpaper_setting_interval"
+        android:title="@string/set_auto_wallpaper_interval"
+        android:summary="@string/set_auto_wallpaper_interval"
+        android:dialogTitle="@string/set_auto_wallpaper_interval"
+        android:entries="@array/auto_wallpaper_interval"
+        android:entryValues="@array/auto_wallpaper_interval_values"
         android:defaultValue="@integer/auto_wallpaper_interval">
-
-    </EditTextPreference>
+    </ListPreference>
 
     <com.github.runningforlife.photosniffer.ui.preference.EmptyListPreference
         android:key="@string/pref_choose_image_source"
@@ -33,7 +37,8 @@
         android:key="@string/pref_max_reserved_images"
         android:title="@string/max_reserved_images"
         android:summary="@string/how_many_images_reserved"
-        android:defaultValue="@integer/max_reserved_image_number">
+        android:defaultValue="@integer/max_reserved_image_number"
+        android:inputType="numberDecimal">
     </EditTextPreference>
 
     <com.github.runningforlife.photosniffer.ui.preference.MessagePreference

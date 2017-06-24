@@ -3,16 +3,28 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
+import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
+import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
+import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.model.RealmManager;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,6 +33,7 @@ import io.realm.Sort;
 
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.service.ImageRetrieveService;
+import com.github.runningforlife.photosniffer.service.MyThreadFactory;
 import com.github.runningforlife.photosniffer.service.ServiceStatus;
 import com.github.runningforlife.photosniffer.service.SimpleResultReceiver;
 import com.github.runningforlife.photosniffer.ui.GalleryView;
@@ -38,8 +51,6 @@ public class GalleryPresenterImpl extends GalleryPresenter
     private static final int DEFAULT_RETRIEVE_TIME_OUT = 20000;
     private static final int DEFAULT_STOP_TIME_OUT = 40000;
     private static final int DEFAULT_RETRIEVED_IMAGES = 10;
-    private static final int DEFAULT_WIDTH = 1024;
-    private static final int DEFAULT_HEIGHT = (int)(DEFAULT_WIDTH*DisplayUtil.getScreenRatio());
 
     private Context mContext;
     private GalleryView mView;
@@ -51,8 +62,8 @@ public class GalleryPresenterImpl extends GalleryPresenter
     private SimpleResultReceiver mReceiver;
     private RealmManager mRealmMgr;
     private ExecutorService mExecutor;
-    private int mPrevImgCount;
     private H mMainHandler;
+    private WebView mWvPage;
 
     @SuppressWarnings("unchecked")
     public GalleryPresenterImpl(Context context,GalleryView view){
@@ -83,6 +94,8 @@ public class GalleryPresenterImpl extends GalleryPresenter
     public void refreshAnyway(){
         Log.v(TAG,"refreshAnyway()");
         stopRetrieveIfNeeded();
+
+        loadPolaPageIfNeeded();
 
         if(mUnUsedImages == null || mUnUsedImages.size() < DEFAULT_RETRIEVED_IMAGES) {
             mIsRefreshing = true;
@@ -116,6 +129,18 @@ public class GalleryPresenterImpl extends GalleryPresenter
         }else if(!mIsRefreshing){
             // ah, something wrong
             mView.onRefreshDone(false);
+        }
+    }
+
+    @Override
+    public void setWebView(WebView webView) {
+        mWvPage = webView;
+
+        if(mWvPage != null){
+            WebSettings settings = mWvPage.getSettings();
+            //settings.setJavaScriptEnabled(true);
+            settings.setDomStorageEnabled(true);
+            settings.setAllowContentAccess(true);
         }
     }
 
@@ -155,8 +180,17 @@ public class GalleryPresenterImpl extends GalleryPresenter
                     mExecutor.submit(r);
                 }
             });
-            GlideLoader.downloadOnly(mContext, mImageList.get(pos).getUrl(), listener,
-                    DEFAULT_WIDTH, DEFAULT_HEIGHT);
+
+            String imgUrl = mImageList.get(pos).getUrl();
+            if(imgUrl.endsWith(ImageSource.POLA_IMAGE_END)){
+                final String newUrl = imgUrl.substring(0, imgUrl.lastIndexOf("/")+1) +
+                        ImageSource.POLA_FULL_IMAGE_END;
+                GlideLoader.downloadOnly(mContext, newUrl, listener,
+                        Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+            }else {
+                GlideLoader.downloadOnly(mContext, imgUrl, listener,
+                        Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+            }
         }
     }
 
@@ -185,26 +219,29 @@ public class GalleryPresenterImpl extends GalleryPresenter
         mRealmMgr.removeListener(this);
         //mView = null;
         mRealmMgr.onDestroy();
-        mReceiver.setReceiver(null);
         // stop service
         stopRetrieveIfNeeded();
         // shut down thread pool
         mExecutor.shutdown();
+        mReceiver.setReceiver(null);
+
+        mWvPage.loadUrl(null);
+        mWvPage = null;
     }
 
     @Override
     public void onUsedDataChange(RealmResults<ImageRealm> data) {
         Log.v(TAG,"onUsedDataChange(): data size = " + data.size());
 
-        mPrevImgCount = data.size();
         mImageList = data;
         // unsorted: keep list descending sorted
         sort();
         mView.notifyDataChanged();
 
-        int maxReservedImage = SharedPrefUtil.getMaxReservedImages();
+        String key = mContext.getString(R.string.pref_max_reserved_images);
+        int maxReservedImage = Integer.parseInt(SharedPrefUtil.getString(key, "100"));
         if(data.size() > maxReservedImage){
-            mRealmMgr.trimData();
+            mRealmMgr.trimData(maxReservedImage);
         }
     }
 
@@ -221,8 +258,10 @@ public class GalleryPresenterImpl extends GalleryPresenter
                 Log.v(TAG,"image retrieve starting");
                 break;
             case ServiceStatus.ERROR:
-                mView.onRefreshDone(false);
-                mIsRefreshing = false;
+                if(mIsRefreshing) {
+                    mView.onRefreshDone(false);
+                    mIsRefreshing = false;
+                }
                 //releaseWakeLock();
                 break;
             case ServiceStatus.SUCCESS:
@@ -252,6 +291,106 @@ public class GalleryPresenterImpl extends GalleryPresenter
         mMainHandler.removeMessages(H.EVENT_STOP_SERVICE);
     }
 
+    // using webview to load pola youtu
+    private void loadPolaPageIfNeeded(){
+        final List<String> webSrc = SharedPrefUtil.getImageSource();
+        String polaUrl = ImageSource.URL_POLA;
+        if(webSrc != null && webSrc.contains(polaUrl)){
+            //mWvPage.addJavascriptInterface(new WebViewJsInterface(), "HtmlViewer");
+            mWvPage.setWebViewClient(new WebViewClient(){
+
+                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest request) {
+                    webView.loadUrl(request.getUrl().toString());
+                    return true;
+                }
+
+                @Override
+                public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                    Log.v(TAG,"onPageStarted()");
+                    view.pageDown(true);
+                }
+
+                @Override
+                public void onLoadResource(WebView view, String url) {
+                    Log.v(TAG,"onLoadResource(): url = " + url);
+
+                    String key = mContext.getString(R.string.pref_pola_latest_collections_number);
+                    int current = SharedPrefUtil.getInt(key,50);
+                    if(url != null && url.endsWith("thumb.jpg")){
+
+                        int collections = getLatestCollectionsNumber(url);
+                        if(collections > current){
+                            SharedPrefUtil.putInt(key, collections);
+                            current = collections;
+                        }
+
+                        saveAllPolaUrls(url, current);
+                    }else{
+                        saveAllPolaUrls(ImageSource.POLA_IMAGE_START, current);
+                    }
+                }
+
+                @Override
+                public void onPageFinished(WebView view, String url) {
+                    Log.v(TAG,"onPageFinished()");
+                    view.pageDown(true);
+/*                    view.loadUrl("javascript:window.HtmlViewer.retrieveHtml" +
+                            "('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");*/
+                }
+            });
+            mWvPage.loadUrl(polaUrl);
+        }
+    }
+
+    private int getLatestCollectionsNumber(String url){
+        if(TextUtils.isEmpty(url)) return 50;
+
+        String sub = url.substring(ImageSource.POLA_IMAGE_START.length()+1);
+        String[] splits = sub.split("/");
+
+        return Integer.parseInt(splits[0]);
+    }
+
+    private void saveAllPolaUrls(final String url, final int collections){
+        if(!url.startsWith(ImageSource.POLA_IMAGE_START)) return;
+
+        MyThreadFactory.getInstance().newThread(new Runnable() {
+            @Override
+            public void run() {
+                List<ImageRealm> pola = new ArrayList<>();
+
+                for(int c = 1; c < collections; ++c) {
+                    for(int n = 1; n <= ImageSource.POLA_IMAGE_NUMBER_PER_COLLECTION; ++n) {
+                        ImageRealm ir = new ImageRealm();
+                        ir.setUrl(buildPolaImageUrl(c,n,ImageSource.POLA_IMAGE_END));
+                        ir.setIsFavor(false);
+                        ir.setIsWallpaper(false);
+                        ir.setTimeStamp(System.currentTimeMillis());
+                        ir.setUsed(false);
+                        ir.setName("unknown");
+                        pola.add(ir);
+                    }
+                }
+
+                mRealmMgr.saveImageRealmAsync(pola);
+            }
+        }).start();
+    }
+
+    private String buildPolaImageUrl(int collection, int number, String end){
+        StringBuilder builder = new StringBuilder(ImageSource.POLA_IMAGE_START);
+        builder.append("/")
+                .append(collection)
+                .append("/")
+                .append(number)
+                .append("/")
+                .append(end);
+
+        return builder.toString();
+    }
+
     @Override
     public void onImageSaveDone(String path) {
         mView.onImageSaveDone(path);
@@ -278,6 +417,9 @@ public class GalleryPresenterImpl extends GalleryPresenter
                     break;
                 case EVENT_STOP_SERVICE:
                     stopRetrieveIfNeeded();
+                    if(mIsRefreshing){
+                        mView.onRefreshDone(false);
+                    }
                     break;
             }
         }
