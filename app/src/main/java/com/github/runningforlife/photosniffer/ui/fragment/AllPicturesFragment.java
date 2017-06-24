@@ -285,8 +285,6 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         setHasOptionsMenu(true);
     }
 
-
-
     private void initPresenter(){
         mPresenter = new GalleryPresenterImpl(getContext(),this);
         mPresenter.init();

@@ -2,14 +2,15 @@ package com.github.runningforlife.photosniffer.loader;
 
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.app.AppGlobals;
 import com.github.runningforlife.photosniffer.utils.BitmapUtil;
-import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 
 /**
  * Glide loader complete listener
@@ -64,12 +65,14 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
             }else{
                 imageView.setImageBitmap(resource);
             }
+            imageView.startAnimation(
+                    AnimationUtils.loadAnimation(AppGlobals.getInstance(), R.anim.anim_view_alpha));
         }
 
         Log.d(TAG,"onResourceReady(): from memory = " + isFromMemoryCache);
         if(callback != null){
             callback.onImageLoadDone(resource);
         }
-        return false;
+        return true;
     }
 }

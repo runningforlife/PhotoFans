@@ -41,7 +41,7 @@ public class ActionListDialogFragment extends DialogFragment{
     public static DialogFragment newInstance(List<String> actions){
         ActionListDialogFragment fragment = new ActionListDialogFragment();
         Bundle args = new Bundle();
-        args.putStringArrayList("action_list", new ArrayList<String>(actions));
+        args.putStringArrayList("action_list", new ArrayList<>(actions));
 
         fragment.setArguments(args);
 
@@ -55,7 +55,8 @@ public class ActionListDialogFragment extends DialogFragment{
     @Override
     public void onResume(){
         super.onResume();
-        Log.v(TAG,"onStart()");
+        Log.v(TAG,"onResume()");
+
         initDialogWindow(getDialog());
     }
 

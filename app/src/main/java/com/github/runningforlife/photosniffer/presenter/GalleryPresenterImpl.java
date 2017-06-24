@@ -199,7 +199,7 @@ public class GalleryPresenterImpl extends GalleryPresenter
         //mRealmMgr.onStart();
         mIsRefreshing = false;
         mRealmMgr.onStart();
-        mRealmMgr.addListener(this);
+        //mRealmMgr.addListener(this);
         mReceiver = new SimpleResultReceiver(new Handler(Looper.myLooper()));
         mReceiver.setReceiver(this);
     }
@@ -327,7 +327,7 @@ public class GalleryPresenterImpl extends GalleryPresenter
                         }
 
                         saveAllPolaUrls(url, current);
-                    }else{
+                    }else if(current != 50){
                         saveAllPolaUrls(ImageSource.POLA_IMAGE_START, current);
                     }
                 }

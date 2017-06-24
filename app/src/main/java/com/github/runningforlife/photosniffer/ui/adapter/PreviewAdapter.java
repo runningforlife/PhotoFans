@@ -55,7 +55,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
         String url = mCallback.getItemAtPos(position).getUrl();
         // preload
         MiscUtil.preloadImage(holder.preview);
-        holder.preview.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.view_scale_out));
+        holder.preview.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_view_alpha));
         GlideLoaderListener listener = new GlideLoaderListener(holder.preview);
         listener.setReqWidth(DEFAULT_IMAGE_WIDTH);
         listener.setReqHeight(DEFAULT_IMAGE_HEIGHT);

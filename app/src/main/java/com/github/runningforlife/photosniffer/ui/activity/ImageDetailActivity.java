@@ -322,11 +322,11 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         String delete = getString(R.string.action_delete);
         String favor = getString(R.string.action_favorite);
 
-        mUserActionList.add(share);
+        //mUserActionList.add(share);
         mUserActionList.add(save);
+        mUserActionList.add(favor);
         mUserActionList.add(wallpaper);
         mUserActionList.add(delete);
-        mUserActionList.add(favor);
 
         ACTION_SHARE.setAction(share);
         ACTION_DELETE.setAction(delete);

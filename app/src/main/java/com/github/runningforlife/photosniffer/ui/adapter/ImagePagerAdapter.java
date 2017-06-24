@@ -55,6 +55,7 @@ public class ImagePagerAdapter extends PagerAdapter{
         mCallback.onImageLoadStart(position);
         // preload image
         MiscUtil.preloadImage(view);
+        view.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_scale_out));
         GlideLoader.load(mContext,new ImageLoaderListener(view,position),mCallback.getItemAtPos(position).getUrl(),
                 DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
 
@@ -76,7 +77,6 @@ public class ImagePagerAdapter extends PagerAdapter{
                 return true;
             }
         });
-        view.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.view_scale_out));
         parent.addView(view);
         return view;
     }
@@ -107,6 +107,7 @@ public class ImagePagerAdapter extends PagerAdapter{
         public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
             Log.v(TAG,"onResourceReady(): from memory = " + isFromMemoryCache);
             image.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            //image.startAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_scale_out));
             image.setImageBitmap(resource);
             mCallback.onImageLoadDone(pos,true);
             return false;

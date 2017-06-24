@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="temp_remove_url">
+        <item>http://publicdomainarchive.com</item>
+        <item>http://albumarium.com</item>
+    </string-array>
 
     <string-array name="image_website_url">
         <item>http://www.polayoutu.com</item>
         <item>http://en.freejpg.com.ar</item>
         <item>https://www.pexels.com</item>
-        <item>http://albumarium.com</item>
         <item>https://visualhunt.com</item>
         <item>https://pixabay.com</item>
-        <item>http://publicdomainarchive.com</item>
         <item>http://www.vcg.com</item>
         <item>http://www.youwu.cc</item>
         <item>http://www.mmjpg.com</item>
@@ -18,10 +20,8 @@
         <item>Pola Youtu</item>
         <item>Free JPG</item>
         <item>Pexels</item>
-        <item>Albumarium</item>
         <item>Visual Hunt</item>
         <item>Pixabay</item>
-        <item>Public Domain Archive</item>
         <item>Visual China</item>
         <item>You Wu</item>
         <item>MM JPG</item>
@@ -29,9 +29,7 @@
 
     <string-array name="default_source_url">
         <item>http://www.polayoutu.com</item>
-        <item>http://www.mmjpg.com</item>
-        <item>http://www.youwu.cc</item>
-        <item>http://publicdomainarchive.com</item>
+        <item>http://en.freejpg.com.ar</item>
     </string-array>
 
     <string-array name="auto_wallpaper_interval">

@@ -6,10 +6,7 @@
     <ListView android:id="@+id/lv_actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:dividerHeight="1dp"
-        android:divider="@color/colorLightGrey"
         android:scrollbars="none">
-
     </ListView>
 
 </LinearLayout>

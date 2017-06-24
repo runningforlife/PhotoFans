@@ -24,6 +24,8 @@ public abstract class WallpaperPresenter implements Presenter{
 
     public abstract void setWallpaper();
 
+    public abstract void setWallpaperAtPos(int pos);
+
     public abstract void setView(WallpaperView view);
 
     @Override

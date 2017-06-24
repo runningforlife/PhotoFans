@@ -135,4 +135,9 @@ public class WallpaperPresenterImpl extends WallpaperPresenter{
                 Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
     }
 
+    @Override
+    public void setWallpaperAtPos(int pos) {
+
+    }
+
 }

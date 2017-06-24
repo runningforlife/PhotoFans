@@ -20,6 +20,8 @@ import com.github.runningforlife.photosniffer.ui.activity.ImageSourceSelectionAc
  */
 
 public class EmptyListPreference extends MultiSelectListPreference{
+    private static final String TEMP_REMOVE_YW = "http://www.youwu.cc";
+    private static final String TEMP_REMOVE_MM = "http://www.mmjpg.com";
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public EmptyListPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -47,8 +49,12 @@ public class EmptyListPreference extends MultiSelectListPreference{
 
         List<ImageWebSite> sources = new ArrayList<>(sourceName.length);
         for(int i = 0; i < sourceName.length; ++i){
-            ImageWebSite src = new ImageWebSite(sourceName[i].toString(),sourceUrl[i].toString());
-            sources.add(src);
+            String src = sourceUrl[i].toString();
+            if(!(src.equals(TEMP_REMOVE_MM) ||
+                    src.equals(TEMP_REMOVE_YW))) {
+                ImageWebSite iw = new ImageWebSite(sourceName[i].toString(), sourceUrl[i].toString());
+                sources.add(iw);
+            }
         }
 
         Intent intent = new Intent(getContext(), ImageSourceSelectionActivity.class);
