@@ -55,10 +55,6 @@ public class LeanCloudManager implements CloudApi{
                         Log.d(TAG,"saveFile(): fail");
                         e.printStackTrace();
                     }
-                    // delete file
-                    if(file.exists()){
-                        file.delete();
-                    }
                 }
             });
         } catch (FileNotFoundException e) {
@@ -75,6 +71,19 @@ public class LeanCloudManager implements CloudApi{
         ao.put("device", Build.MODEL);
         ao.put("os version", Build.VERSION.RELEASE);
         ao.put("advice", advice);
+
+        ao.saveInBackground();
+    }
+
+    @Override
+    public void newUser(String info) {
+        Log.v(TAG,"newUser()");
+
+        AVObject ao = new AVObject(("UserInfo"));
+        ao.put("brand", Build.BRAND);
+        ao.put("device", Build.MODEL);
+        ao.put("os version", Build.VERSION.RELEASE);
+        ao.put("device fingerprint", info);
 
         ao.saveInBackground();
     }

@@ -18,7 +18,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.avos.avoscloud.AVOSCloud;
 import com.github.runningforlife.photosniffer.R;
@@ -26,14 +28,17 @@ import com.github.runningforlife.photosniffer.model.ImageRealmMigration;
 import com.github.runningforlife.photosniffer.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.service.MyThreadFactory;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
+import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -43,6 +48,7 @@ import io.realm.RealmConfiguration;
  */
 
 public class AppGlobals extends Application{
+    private static final String TAG = "AppGlobal";
 
     private static final String ROOT_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
     private static final String PATH_NAME = "photos";
@@ -82,6 +88,8 @@ public class AppGlobals extends Application{
         initExceptionHandler();
 
         initLeanCloud();
+
+        saveUserInfo();
     }
 
     @Override
@@ -107,14 +115,6 @@ public class AppGlobals extends Application{
 
     private void initExceptionHandler(){
         Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
-    }
-
-    private class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler{
-
-        @Override
-        public void uncaughtException(Thread t, Throwable e) {
-            saveLog(e);
-        }
     }
 
     private void initLeanCloud(){
@@ -167,7 +167,7 @@ public class AppGlobals extends Application{
                 FileOutputStream fos = new FileOutputStream(file);
                 PrintWriter pw = new PrintWriter(fos);
 
-                DateFormat df = DateFormat.getDateInstance();
+                DateFormat df = DateFormat.getDateInstance(DateFormat.FULL, Locale.US);
                 pw.println("LOG Date: " + df.format(new Date()));
                 pw.println("Device FingerPrint: " + Build.FINGERPRINT);
                 pw.println();
@@ -212,24 +212,46 @@ public class AppGlobals extends Application{
     }
 
     private void saveLogToCloud(File file){
+        if(file.length() <= 0) return;
+
         LeanCloudManager cloudManager = LeanCloudManager.getInstance();
         cloudManager.saveFile(file);
+        // delete file
+        if(file.exists()){
+            file.delete();
+        }
+    }
+
+    private void saveUserInfo(){
+        ConnectivityManager cm = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+
+        String key = getString(R.string.pref_new_user);
+        boolean isNewUser = SharedPrefUtil.getBoolean(key, true);
+        if(isNewUser && ni.isConnected()){
+            LeanCloudManager cloud = LeanCloudManager.getInstance();
+            cloud.newUser(Build.FINGERPRINT);
+            SharedPrefUtil.putBoolean(key, false);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private void waitForWifi(){
+        Log.v(TAG,"waitForWifi()");
         registerWifiStateReceiver();
     }
 
     private void registerWifiStateReceiver(){
         mWifiStateReceiver = new WifiStateReceiver();
-        registerReceiver(mWifiStateReceiver,
+        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(this);
+        lbm.registerReceiver(mWifiStateReceiver,
                 new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     private void unRegisterWifiStateReceiver(){
         if(mWifiStateReceiver != null){
-            unregisterReceiver(mWifiStateReceiver);
+            LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(this);
+            lbm.unregisterReceiver(mWifiStateReceiver);
         }
     }
 
@@ -249,6 +271,15 @@ public class AppGlobals extends Application{
                     }
                 }).start();
             }
+        }
+    }
+
+
+    private class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler{
+
+        @Override
+        public void uncaughtException(Thread t, Throwable e) {
+            saveLog(e);
         }
     }
 }
