@@ -1,23 +1,16 @@
 package com.github.runningforlife.photosniffer.app;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.ContentObserver;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkInfo;
-import android.net.NetworkRequest;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
-import android.provider.Settings;
-import android.support.annotation.RequiresApi;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -31,7 +24,6 @@ import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -80,10 +72,6 @@ public class AppGlobals extends Application{
         sInstance = AppGlobals.this;
 
         sImagePath = ROOT_PATH + File.separator + appName + File.separator + PATH_NAME;
-        File file = new File(sImagePath);
-        if(!file.exists()) {
-            file.mkdirs();
-        }
 
         initExceptionHandler();
 
@@ -136,7 +124,6 @@ public class AppGlobals extends Application{
         File file = new File(path,buildLogFileName());
         if(!file.exists()){
             try {
-                //FIXME: check permission
                 file.createNewFile();
                 return file;
             } catch (IOException e1) {

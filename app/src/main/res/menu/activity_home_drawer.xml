@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="single"
+        android:id="@+id/group_view">
 
         <item
             android:id="@+id/nav_gallery"
@@ -10,24 +11,19 @@
 
         <item
             android:id="@+id/nav_favorite"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_favorite_black_24dp"
             android:title="@string/favorite" />
 
         <item
-            android:id="@+id/nav_category"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/category" />
-
-        <item
-            android:id="@+id/nav_share"
-            android:icon="@drawable/ic_menu_share"
-            android:title="@string/share" />
+            android:id="@+id/nav_wallpaper"
+            android:icon="@drawable/ic_wallpaper_black_24dp"
+            android:title="@string/Wallpaper" />
     </group>
 
-    <group>
+    <group android:id="@+id/group_manage">
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/tools" />
     </group>
 

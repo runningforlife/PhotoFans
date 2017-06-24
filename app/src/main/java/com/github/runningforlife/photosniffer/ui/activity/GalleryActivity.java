@@ -1,10 +1,14 @@
 package com.github.runningforlife.photosniffer.ui.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,11 +25,14 @@ import com.github.runningforlife.photosniffer.ui.fragment.AllPicturesFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FavoriteImageFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.WallPaperFragment;
 
-public class GalleryActivity extends AppCompatActivity
+import java.io.File;
+
+public class GalleryActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        AllPicturesFragment.RefreshCallback {
+        AllPicturesFragment.RefreshCallback,ActivityCompat.OnRequestPermissionsResultCallback{
 
     private static final String TAG = "GalleryActivity";
+    final static int MY_STORAGE_PERMISSION_REQUEST = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +80,8 @@ public class GalleryActivity extends AppCompatActivity
     @Override
     public void onResume(){
         super.onResume();
+
+        checkStoragePermission();
     }
 
     @Override
@@ -128,6 +137,24 @@ public class GalleryActivity extends AppCompatActivity
         }else{
             Toast.makeText(getApplicationContext(),R.string.refresh_error,Toast.LENGTH_SHORT)
                     .show();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_STORAGE_PERMISSION_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    makeAppDir();
+                } else {
+                    Log.v(TAG,"fail to request storage permission");
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+            }
         }
     }
 
@@ -202,5 +229,26 @@ public class GalleryActivity extends AppCompatActivity
         fragmentMgr.beginTransaction()
                 .replace(R.id.fragment_container, fragment, WallPaperFragment.TAG)
                 .commit();
+    }
+
+    private void makeAppDir(){
+        String appName = getString(R.string.app_name);
+        String imgPath = ROOT_PATH + File.separator + appName + File.separator + PATH_NAME;
+        File file = new File(imgPath);
+        if(!file.exists()) {
+            file.mkdirs();
+        }
+    }
+
+    private void checkStoragePermission(){
+        Log.v(TAG,"checkStoragePermission()");
+        if(ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            ActivityCompat.requestPermissions(this,permissions, MY_STORAGE_PERMISSION_REQUEST);
+        }else{
+            makeAppDir();
+        }
     }
 }
