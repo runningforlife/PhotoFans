@@ -92,6 +92,9 @@ public class GalleryPresenterImpl extends GalleryPresenter
     @Override
     public void refreshAnyway(){
         Log.v(TAG,"refreshAnyway()");
+        // in case of no callback
+        mRealmMgr.addListener(this);
+
         stopRetrieveIfNeeded();
 
         loadPolaPageIfNeeded();
