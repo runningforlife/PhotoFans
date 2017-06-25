@@ -135,5 +135,6 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
     @Override
     public void onDestroy() {
         mRealmMgr.onDestroy();
+        mRealmMgr.removeListener(this);
     }
 }

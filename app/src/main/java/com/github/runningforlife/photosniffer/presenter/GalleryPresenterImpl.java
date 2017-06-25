@@ -37,7 +37,6 @@ import com.github.runningforlife.photosniffer.service.MyThreadFactory;
 import com.github.runningforlife.photosniffer.service.ServiceStatus;
 import com.github.runningforlife.photosniffer.service.SimpleResultReceiver;
 import com.github.runningforlife.photosniffer.ui.GalleryView;
-import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
@@ -196,7 +195,6 @@ public class GalleryPresenterImpl extends GalleryPresenter
 
     @Override
     public void init() {
-        //mRealmMgr.onStart();
         mIsRefreshing = false;
         mRealmMgr.onStart();
         //mRealmMgr.addListener(this);
@@ -295,7 +293,14 @@ public class GalleryPresenterImpl extends GalleryPresenter
     private void loadPolaPageIfNeeded(){
         final List<String> webSrc = SharedPrefUtil.getImageSource();
         String polaUrl = ImageSource.URL_POLA;
+
         if(webSrc != null && webSrc.contains(polaUrl)){
+            String polaRetrieved = mContext.getString(R.string.pref_pola_retrieved);
+            boolean isPolaRetrieved = SharedPrefUtil.getBoolean(polaRetrieved, false);
+            if(!isPolaRetrieved){
+                saveAllPolaUrls(polaUrl, 1, 50);
+                SharedPrefUtil.putBoolean(polaRetrieved, true);
+            }
             //mWvPage.addJavascriptInterface(new WebViewJsInterface(), "HtmlViewer");
             mWvPage.setWebViewClient(new WebViewClient(){
 
@@ -318,17 +323,15 @@ public class GalleryPresenterImpl extends GalleryPresenter
 
                     String key = mContext.getString(R.string.pref_pola_latest_collections_number);
                     int current = SharedPrefUtil.getInt(key,50);
+
                     if(url != null && url.endsWith("thumb.jpg")){
 
                         int collections = getLatestCollectionsNumber(url);
                         if(collections > current){
                             SharedPrefUtil.putInt(key, collections);
                             current = collections;
+                            saveAllPolaUrls(url, collections +1, current);
                         }
-
-                        saveAllPolaUrls(url, current);
-                    }else if(current != 50){
-                        saveAllPolaUrls(ImageSource.POLA_IMAGE_START, current);
                     }
                 }
 
@@ -353,15 +356,14 @@ public class GalleryPresenterImpl extends GalleryPresenter
         return Integer.parseInt(splits[0]);
     }
 
-    private void saveAllPolaUrls(final String url, final int collections){
-        if(!url.startsWith(ImageSource.POLA_IMAGE_START)) return;
+    private void saveAllPolaUrls(final String url, final int start, final int end){
 
         MyThreadFactory.getInstance().newThread(new Runnable() {
             @Override
             public void run() {
                 List<ImageRealm> pola = new ArrayList<>();
 
-                for(int c = 1; c < collections; ++c) {
+                for(int c = start; c <= end; ++c) {
                     for(int n = 1; n <= ImageSource.POLA_IMAGE_NUMBER_PER_COLLECTION; ++n) {
                         ImageRealm ir = new ImageRealm();
                         ir.setUrl(buildPolaImageUrl(c,n,ImageSource.POLA_IMAGE_END));

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -237,12 +238,14 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
                 GridLayoutManager glm = new GridLayoutManager(getContext(),2);
                 mRvImgList.setLayoutManager(glm);
                 glm.setAutoMeasureEnabled(true);
+                glm.setSmoothScrollbarEnabled(true);
                 mAdapter.setLayoutManager(GridManager);
                 return true;
             case R.id.list_view:
                 LinearLayoutManager ll = new LinearLayoutManager(getContext());
                 mRvImgList.setLayoutManager(ll);
                 ll.setAutoMeasureEnabled(true);
+                ll.setSmoothScrollbarEnabled(true);
                 mAdapter.setLayoutManager(LinearManager);
                 return true;
             case R.id.stagger_view:
@@ -264,6 +267,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
 
         //LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
         GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(),2, GridLayoutManager.VERTICAL,false);
+        gridLayoutMgr.setSmoothScrollbarEnabled(true);
         mRvImgList.setHasFixedSize(true);
         mRvImgList.setLayoutManager(gridLayoutMgr);
         mRvImgList.setItemAnimator(new ScaleInOutItemAnimator());

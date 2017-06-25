@@ -139,8 +139,7 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
                     url = imgSrc + relUrl;
                 }
                 // check the image url
-                if(!URLUtil.isValidUrl(url) || !url.startsWith(imgSrc)
-                        || !checkImageUrlStart(url,imgSrc)){
+                if(!URLUtil.isValidUrl(url)|| !checkImageUrlStart(url,imgSrc)){
                     continue;
                 }
 

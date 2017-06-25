@@ -201,13 +201,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     }
 
     private boolean isValidPageUrl(String url){
-        try {
-            String baseUrl = UrlUtil.getRootUrl(url);
-            return URLUtil.isValidUrl(baseUrl);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return URLUtil.isValidUrl(url);
     }
 
     private  class SaveRunnable implements  Runnable{

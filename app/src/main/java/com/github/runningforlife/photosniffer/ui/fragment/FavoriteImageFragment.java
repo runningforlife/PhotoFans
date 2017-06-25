@@ -77,10 +77,15 @@ public class FavoriteImageFragment extends BaseFragment
     }
 
     private void initView(){
+/*
         LinearLayoutManager ll = new LinearLayoutManager(getContext());
         ll.setAutoMeasureEnabled(true);
+*/
+
+        GridLayoutManager glm = new GridLayoutManager(getContext(), 2);
+        glm.setAutoMeasureEnabled(true);
         mRcvFavorList.setHasFixedSize(true);
-        mRcvFavorList.setLayoutManager(ll);
+        mRcvFavorList.setLayoutManager(glm);
         mRcvFavorList.setItemAnimator(new ScaleInOutItemAnimator());
 
         mAdapter = new GalleryAdapter(getContext(),this);
@@ -142,7 +147,6 @@ public class FavoriteImageFragment extends BaseFragment
     @Override
     public void onDataSetChanged() {
         Log.v(TAG,"onDataSetChanged()");
-        //mRcvFavorList.invalidate();
         //FIXME: D/skia: --- decoder->decode returned false
         mRcvFavorList.invalidate();
         mAdapter.notifyDataSetChanged();
