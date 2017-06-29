@@ -1,7 +1,9 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,17 +19,25 @@ import android.view.ViewGroup;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
+import com.github.runningforlife.photosniffer.model.UserAction;
 import com.github.runningforlife.photosniffer.presenter.FavorImagePresenter;
 import com.github.runningforlife.photosniffer.presenter.FavorImagePresenterImpl;
 import com.github.runningforlife.photosniffer.ui.FavorView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.ImageAdapterCallback;
 import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
-import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.github.runningforlife.photosniffer.model.UserAction.DELETE;
+import static com.github.runningforlife.photosniffer.model.UserAction.FAVOR;
+import static com.github.runningforlife.photosniffer.model.UserAction.SAVE;
+import static com.github.runningforlife.photosniffer.model.UserAction.WALLPAPER;
 
 /**
  * a fragment containing all favorite images
@@ -36,10 +46,16 @@ import butterknife.ButterKnife;
 public class FavoriteImageFragment extends BaseFragment
         implements ImageAdapterCallback, FavorView{
     public static final String TAG = "FavorImageFragment";
-    @BindView(R.id.rcv_favor) RecyclerView mRcvFavorList;
-    @BindView(R.id.srl_favor_refresh) SwipeRefreshLayout mSrlRefresh;
+    @BindView(R.id.rcv_img_list) RecyclerView mRcvFavorList;
+    @BindView(R.id.refresh) SwipeRefreshLayout mSrlRefresh;
     GalleryAdapter mAdapter;
     private FavorImagePresenter mPresenter;
+
+    private List<String> mUserActionList;
+    private int mCurrentPos;
+
+
+    private ItemClickListener mListener;
 
     public static FavoriteImageFragment newInstance(){
         return new FavoriteImageFragment();
@@ -59,10 +75,27 @@ public class FavoriteImageFragment extends BaseFragment
         return root;
     }
 
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+
+        Log.v(TAG,"onAttach()");
+        try {
+            mListener = (ItemClickListener)context;
+        } catch (ClassCastException e){
+            Log.e(TAG,"parent activity must implement ItemClickListener");
+            mListener = null;
+        }
+    }
+
 
     @Override
     public void onResume(){
         super.onResume();
+
+        if(mListener != null) {
+            mListener.onFragmentAttached();
+        }
 
         mPresenter.onStart();
 
@@ -77,20 +110,15 @@ public class FavoriteImageFragment extends BaseFragment
     }
 
     private void initView(){
-/*
-        LinearLayoutManager ll = new LinearLayoutManager(getContext());
-        ll.setAutoMeasureEnabled(true);
-*/
-
         GridLayoutManager glm = new GridLayoutManager(getContext(), 2);
         glm.setAutoMeasureEnabled(true);
         mRcvFavorList.setHasFixedSize(true);
         mRcvFavorList.setLayoutManager(glm);
         mRcvFavorList.setItemAnimator(new ScaleInOutItemAnimator());
+        // restore back ground
+        mRcvFavorList.setBackgroundResource(R.color.colorLightGrey);
 
         mAdapter = new GalleryAdapter(getContext(),this);
-/*        mAdapter.setImageWidth(IMAGE_WIDTH);
-        mAdapter.setImageHeight(IMAGE_HEIGHT);*/
         mAdapter.setImageLoader(Loader.GLIDE);
         mRcvFavorList.setAdapter(mAdapter);
 
@@ -121,12 +149,17 @@ public class FavoriteImageFragment extends BaseFragment
 
     @Override
     public void onItemClicked(int pos, String adapter) {
+        Log.v(TAG,"onItemClicked(): pos = " + pos);
 
+        if(mListener != null){
+            mListener.onItemClick(pos, mPresenter.getItemAtPos(pos).getUrl());
+        }
     }
 
     @Override
     public void onItemLongClicked(int pos, String adapter) {
-
+        Log.v(TAG,"onItemLongClicked()");
+        mCurrentPos = pos;
     }
 
     @Override
@@ -219,7 +252,6 @@ public class FavoriteImageFragment extends BaseFragment
             activity.setTitle(myFavorite);
         }
     }
-
 
     private void initPresenter(){
         mPresenter = new FavorImagePresenterImpl(getContext(),this);

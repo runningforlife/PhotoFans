@@ -353,7 +353,6 @@ public class RealmManager implements LifeCycle{
         if(mAllFavor == null || !mAllFavor.isValid()){
             mAllFavor = realm.where(ImageRealm.class)
                     .equalTo("mIsFavor",true)
-                    .equalTo("mIsWallpaper", false)
                     .findAllAsync()
                     .sort("mTimeStamp",Sort.DESCENDING);
             mAllFavor.addChangeListener(mFavorDataChangeListener);

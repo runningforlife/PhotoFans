@@ -1,16 +1,21 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
@@ -34,26 +39,18 @@ import butterknife.ButterKnife;
  */
 
 public class WallPaperFragment extends BaseFragment
-        implements ImageAdapterCallback, WallpaperView,
-        FullScreenImageFragment.ItemLongClickedListener,
-        ActionListDialogFragment.ActionCallback{
+        implements ImageAdapterCallback, WallpaperView{
     public static final String TAG = "WallpaperFragment";
     public static final String ALARM_AUTO_WALLPAPER = "com.github.runningforlife.AUTO_WALLPAPER";
 
-    @BindView(R.id.srl_refresh)
+    @BindView(R.id.refresh)
     SwipeRefreshLayout mSrlRefresh;
-    @BindView(R.id.rcv_gallery)
+    @BindView(R.id.rcv_img_list)
     RecyclerView mRcvWallpaper;
 
     private GalleryAdapter mAdapter;
     private WallpaperPresenter mPresenter;
-
-    private List<String> mUserActionList;
-    private int mCurrentPos;
-    private static UserAction ACTION_SAVE = SAVE;
-    private static UserAction ACTION_FAVOR = FAVOR;
-    private static UserAction ACTION_WALLPAPER = WALLPAPER;
-    private static UserAction ACTION_DELETE = DELETE;
+    private ItemClickListener mListener;
 
     public static WallPaperFragment newInstance(){
         return new WallPaperFragment();
@@ -62,7 +59,7 @@ public class WallPaperFragment extends BaseFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedState){
 
-        View root = inflater.inflate(R.layout.fragment_photos_gallery, parent, false);
+        View root = inflater.inflate(R.layout.fragment_favor_image, parent, false);
 
         ButterKnife.bind(this, root);
 
@@ -70,18 +67,73 @@ public class WallPaperFragment extends BaseFragment
 
         initPresenter();
 
-        initActionList();
+        //registerActionMenu();
 
         return root;
+    }
+
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+
+        Log.v(TAG,"onAttach()");
+        try {
+            mListener = (ItemClickListener)context;
+            //mListener.onFragmentAttached();
+        }catch (ClassCastException e){
+            Log.e(TAG,"parent activity must implement ItemClickListener");
+            mListener = null;
+        }
     }
 
     @Override
     public void onResume(){
         super.onResume();
 
+        if(mListener != null){
+            mListener.onFragmentAttached();
+        }
+
         mPresenter.onStart();
 
         setTitle();
+
+        registerActionMenu(mRcvWallpaper);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo info){
+        super.onCreateContextMenu(menu, v, info);
+        Log.v(TAG,"onCreateContextMenu()");
+        MenuInflater inflater = getActivity().getMenuInflater();
+
+        inflater.inflate(R.menu.menu_context_choice, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item){
+        Log.v(TAG,"onContextItemSelected()");
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+
+        switch (item.getItemId()){
+            case R.id.menu_save:
+                break;
+            case R.id.menu_wallpaper:
+                break;
+            case R.id.menu_delete:
+                break;
+            default:
+                break;
+        }
+
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+
+        mPresenter.onDestroy();
     }
 
     @Override
@@ -97,15 +149,19 @@ public class WallPaperFragment extends BaseFragment
     @Override
     public void onItemClicked(int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
-        mCurrentPos = pos;
-        //showFullScreenImage(pos);
+        if(mListener != null){
+            mListener.onItemClick(pos, mPresenter.getItemAtPos(pos).getUrl());
+        }
     }
 
     @Override
     public void onItemLongClicked(int pos, String adapter) {
         Log.v(TAG,"onItemLongClicked(): pos " + pos);
-        mCurrentPos = pos;
-        showActionListFragment();
+
+        View view = mRcvWallpaper.getChildAt(pos);
+        if(view != null){
+            //registerActionMenu(view);
+        }
     }
 
     @Override
@@ -175,78 +231,8 @@ public class WallPaperFragment extends BaseFragment
         }
     }
 
-
-    private void showFullScreenImage(int pos){
-        String url = mPresenter.getItemAtPos(pos).getUrl();
-        FullScreenImageFragment fragment = FullScreenImageFragment.newInstance(url);
-
-        FragmentManager fragmentMgr = getActivity().getSupportFragmentManager();
-        fragmentMgr.beginTransaction()
-                .replace(android.R.id.content, fragment, FullScreenImageFragment.TAG)
-                .commit();
-    }
-
-    private void showActionListFragment(){
-        FragmentManager fragmentMgr = getActivity().getSupportFragmentManager();
-
-        ActionListDialogFragment fragment = (ActionListDialogFragment) ActionListDialogFragment.newInstance(mUserActionList);
-
-        fragmentMgr.beginTransaction()
-                .replace(R.id.fragment_container, fragment, AllPicturesFragment.TAG)
-                .commit();
-    }
-
-    @Override
-    public void onImageLongClicked(String url) {
-        Log.v(TAG,"onImageLongClicked()");
-
-        showActionListFragment();
-    }
-
-    private void initActionList(){
-        mCurrentPos = -1;
-
-        mUserActionList = new ArrayList<>();
-        //String share = getString(R.string.action_share);
-        String save = getString(R.string.action_save);
-        String wallpaper = getString(R.string.action_wallpaper);
-        String delete = getString(R.string.action_delete);
-        String favor = getString(R.string.action_favorite);
-
-        //mUserActionList.add(share);
-        mUserActionList.add(save);
-        mUserActionList.add(wallpaper);
-        mUserActionList.add(delete);
-        mUserActionList.add(favor);
-
-        ACTION_DELETE.setAction(delete);
-        ACTION_FAVOR.setAction(favor);
-        ACTION_SAVE.setAction(save);
-        ACTION_WALLPAPER.setAction(wallpaper);
-    }
-
-    @Override
-    public void onActionClick(String action, int pos) {
-        Log.v(TAG,"onActionClick(): action = " + action);
-
-        if(action.equals(ACTION_SAVE.action())){
-            // save image
-            if(mCurrentPos != -1) {
-                mPresenter.saveImageAtPos(mCurrentPos);
-            }
-        }else if(action.equals(ACTION_DELETE.action())){
-            // remove image
-            if(mCurrentPos != -1) {
-                mPresenter.removeItemAtPos(mCurrentPos);
-                // refresh data at once
-                mPresenter.onStart();
-            }
-        }else if(action.equals(ACTION_FAVOR.action())){
-            // favor this image
-        }else if(action.equals(ACTION_WALLPAPER.action())){
-            if(mCurrentPos != -1){
-                mPresenter.setWallpaperAtPos(mCurrentPos);
-            }
-        }
+    private void registerActionMenu(View view){
+        Log.v(TAG,"registerActionMenu()");
+        registerForContextMenu(view);
     }
 }

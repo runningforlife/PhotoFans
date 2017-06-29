@@ -134,6 +134,16 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                     }
                 }
             });
+
+/*            root.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if(mCallback != null){
+                        mCallback.onItemLongClicked(getAdapterPosition(), TAG);
+                    }
+                    return false;
+                }
+            });*/
         }
     }
 }

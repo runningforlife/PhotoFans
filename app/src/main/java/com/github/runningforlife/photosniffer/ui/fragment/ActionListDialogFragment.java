@@ -27,7 +27,7 @@ import java.util.List;
  */
 
 public class ActionListDialogFragment extends DialogFragment{
-    private static final String TAG = "ActionList";
+    public static final String TAG = "ActionList";
     private List<String> mActionList;
     private ActionCallback mCb;
 

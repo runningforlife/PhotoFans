@@ -6,14 +6,18 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,24 +26,33 @@ import android.widget.Toast;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.ui.fragment.AllPicturesFragment;
+import com.github.runningforlife.photosniffer.ui.fragment.BaseFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FavoriteImageFragment;
+import com.github.runningforlife.photosniffer.ui.fragment.FullScreenImageFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.WallPaperFragment;
 
 import java.io.File;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class GalleryActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        AllPicturesFragment.RefreshCallback,ActivityCompat.OnRequestPermissionsResultCallback{
+        AllPicturesFragment.RefreshCallback,ActivityCompat.OnRequestPermissionsResultCallback,
+        BaseFragment.ItemClickListener{
 
     private static final String TAG = "GalleryActivity";
     final static int MY_STORAGE_PERMISSION_REQUEST = 100;
+
+    @BindView(R.id.toolbar) Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
+
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -125,6 +138,31 @@ public class GalleryActivity extends BaseActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+    @Override
+    public void onItemClick(int pos, String url) {
+        Log.v(TAG,"onItemClick(): pos = " + pos);
+        if(!TextUtils.isEmpty(url)) {
+            ActionBar toolbar = getSupportActionBar();
+            if(toolbar != null) {
+                toolbar.hide();
+            }
+
+            showFullscreenFragment(url);
+        }else{
+            Log.e(TAG,"onItemClick(): url is empty");
+        }
+    }
+
+    @Override
+    public void onFragmentAttached() {
+        Log.v(TAG,"onFragmentAttached()");
+        ActionBar toolbar = getSupportActionBar();
+        if(toolbar != null) {
+            toolbar.show();
+        }
     }
 
     @Override
@@ -226,8 +264,24 @@ public class GalleryActivity extends BaseActivity
             fragment = WallPaperFragment.newInstance();
         }
 
+        FragmentTransaction ft = fragmentMgr.beginTransaction();
+        ft.replace(R.id.fragment_container, fragment, WallPaperFragment.TAG)
+                .commit();
+    }
+
+
+    private void showFullscreenFragment(String url){
+        FragmentManager fragmentMgr = getSupportFragmentManager();
+        FullScreenImageFragment fragment = (FullScreenImageFragment)
+                fragmentMgr.findFragmentByTag(FullScreenImageFragment.TAG);
+
+        if(fragment == null){
+            fragment = FullScreenImageFragment.newInstance(url);
+        }
+
         fragmentMgr.beginTransaction()
-                .replace(R.id.fragment_container, fragment, WallPaperFragment.TAG)
+                .replace(R.id.fragment_container, fragment, FullScreenImageFragment.TAG)
+                .addToBackStack("FullScreenImage")
                 .commit();
     }
 

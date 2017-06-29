@@ -17,4 +17,6 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle saveState){
         super.onCreate(saveState);
     }
+
+
 }

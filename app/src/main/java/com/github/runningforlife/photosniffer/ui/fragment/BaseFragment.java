@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
 
-import com.github.runningforlife.photosniffer.utils.DisplayUtil;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -21,11 +19,17 @@ public class BaseFragment extends Fragment implements Refresh{
     public static final String LinearManager = "linearManager";
     public static final String GridManager = "GridManager";
 
+    public interface ItemClickListener{
+        void onItemClick(int pos, String url);
+        void onFragmentAttached();
+    }
+
+
     @Override
     public void onCreate(Bundle savedState){
         super.onCreate(savedState);
 
-        setRetainInstance(true);
+        //setRetainInstance(true);
     }
 
     @Override

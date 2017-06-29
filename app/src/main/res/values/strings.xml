@@ -62,4 +62,5 @@
     <string name="check_copyright_notes">Check Copyright Notes</string>
     <string name="copyright_declaration">Copytright Declaration</string>
     <string name="pref_pola_retrieved" translatable="false">pref_pola_retrieved</string>
+    <string name="back_home">back home</string>
 </resources>

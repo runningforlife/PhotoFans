@@ -23,9 +23,11 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
     private ImageLoadCallback callback;
     private int mReqWidth;
     private int mReqHeight;
+    private ImageView.ScaleType mScaleType;
 
     public GlideLoaderListener(ImageView view){
         this.imageView = view;
+        mScaleType = ImageView.ScaleType.CENTER_CROP;
     }
 
     public void addCallback(ImageLoadCallback callback){
@@ -38,6 +40,10 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
 
     public void setReqHeight(int height){
         mReqHeight = height ;
+    }
+
+    public void setScaleType(ImageView.ScaleType scaleType){
+        mScaleType = scaleType;
     }
 
     public interface ImageLoadCallback{
@@ -58,7 +64,7 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
     public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
         if(imageView != null) {
             // scale bitmap
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imageView.setScaleType(mScaleType);
             if(mReqHeight >0 && mReqWidth > 0) {
                 Bitmap bm = BitmapUtil.scaleToFill(resource,mReqWidth,mReqHeight);
                 imageView.setImageBitmap(bm);
