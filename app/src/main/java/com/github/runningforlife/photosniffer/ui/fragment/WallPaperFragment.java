@@ -112,16 +112,6 @@ public class WallPaperFragment extends BaseFragment
     }
 
     @Override
-    public void onImageLoadStart(int pos) {
-
-    }
-
-    @Override
-    public void onImageLoadDone(int pos, boolean isSuccess) {
-
-    }
-
-    @Override
     public void removeItemAtPos(int pos) {
         mPresenter.removeItemAtPos(pos);
     }

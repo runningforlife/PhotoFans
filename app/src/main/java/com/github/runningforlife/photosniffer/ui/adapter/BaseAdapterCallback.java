@@ -24,17 +24,6 @@ public interface BaseAdapterCallback {
     void onItemClicked(int pos, String adapter);
 
     /*
-     * image start loading
-     */
-    void onImageLoadStart(int pos);
-
-    /*
-     * image loading complete
-     */
-    void onImageLoadDone(int pos, boolean isSuccess);
-
-
-    /*
      * remove item at pos
      */
     void removeItemAtPos(int pos);

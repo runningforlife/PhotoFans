@@ -219,16 +219,6 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     }
 
     @Override
-    public void onImageLoadStart(int pos) {
-
-    }
-
-    @Override
-    public void onImageLoadDone(int pos, boolean isSuccess) {
-
-    }
-
-    @Override
     public int getCount() {
         return mPresenter.getItemCount();
     }
