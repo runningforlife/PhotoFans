@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -21,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
@@ -29,7 +28,7 @@ import com.github.runningforlife.photosniffer.presenter.GalleryPresenterImpl;
 import com.github.runningforlife.photosniffer.ui.GalleryView;
 import com.github.runningforlife.photosniffer.ui.activity.ImageDetailActivity;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
-import com.github.runningforlife.photosniffer.ui.adapter.ImageAdapterCallback;
+import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
 import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
@@ -41,7 +40,7 @@ import butterknife.ButterKnife;
  */
 
 public class AllPicturesFragment extends BaseFragment implements GalleryView,
-        ImageAdapterCallback {
+        GalleryAdapterCallback {
     public static final String TAG = "AllPicturesFragment";
 
     @BindView(R.id.rcv_gallery) RecyclerView mRvImgList;
@@ -49,7 +48,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     @BindView(R.id.wv_page) WebView mWvPage;
     private GalleryPresenter mPresenter;
     private GalleryAdapter mAdapter;
-    private RefreshCallback mCallback;
+    private FragmentCallback mCallback;
 
     public interface RefreshCallback {
         void onRefreshDone(boolean success);
@@ -77,11 +76,13 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         super.onAttach(context);
         Log.v(TAG,"onAttach()");
         //initView(context);
-        if(!(context instanceof RefreshCallback)){
+        if(!(context instanceof FragmentCallback)){
             throw new IllegalStateException("refresh callback must be implemented");
         }
 
-        mCallback = (RefreshCallback)context;
+        mCallback = (FragmentCallback)context;
+        // show tool bar
+        mCallback.onFragmentAttached();
     }
 
     @Override
@@ -135,7 +136,11 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
             mRefresher.setRefreshing(false);
         }
 
-        mCallback.onRefreshDone(isSuccess);
+        if(isSuccess){
+            mCallback.showToast(getString(R.string.refresh_success));
+        }else{
+            mCallback.showToast(getString(R.string.refresh_error));
+        }
     }
 
     @Override
@@ -144,7 +149,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         if(mRefresher.isRefreshing()){
             mRefresher.setRefreshing(false);
         }
-        ToastUtil.showToast(getContext(),getString(R.string.network_not_connected));
+        ToastUtil.showToast(getActivity(),getString(R.string.network_not_connected));
     }
 
     @Override
@@ -172,6 +177,35 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
                 }).show();
     }
 
+
+    @Override
+    public void onContextMenuCreated(int pos, String adapter) {
+        Log.v(TAG,"onContextMenuCreated()");
+
+        mCurrentPos = pos;
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item){
+        Log.v(TAG,"onContextItemSelected()");
+
+        switch (item.getItemId()){
+            case R.id.menu_save:
+                mPresenter.saveImageAtPos(mCurrentPos);
+                break;
+            case R.id.menu_delete:
+                mPresenter.removeItemAtPos(mCurrentPos);
+                break;
+            case R.id.menu_wallpaper:
+                mPresenter.setWallpaperAtPos(mCurrentPos);
+                break;
+            default:
+                return super.onContextItemSelected(item);
+        }
+
+        return true;
+    }
+
     @Override
     public void onItemClicked(int pos,String adapter) {
         Log.v(TAG,"onItemClick(): pos = " + pos);
@@ -182,11 +216,6 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         Intent intent = new Intent(getContext(),ImageDetailActivity.class);
         intent.putExtra("image",pos);
         startActivity(intent);
-    }
-
-    @Override
-    public void onItemLongClicked(int pos, String adapter) {
-
     }
 
     @Override
@@ -214,18 +243,22 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         mPresenter.removeItemAtPos(pos);
     }
 
-    private void saveImage(int pos, Bitmap bitmap) {
-        Log.d(TAG,"saveImage(): pos = " + pos);
-        mPresenter.saveImageAtPos(pos);
-    }
-
     @Override
     public void onImageSaveDone(String path) {
         Log.v(TAG,"onImageSaveDone(): isOk = " + !TextUtils.isEmpty(path));
         if(!TextUtils.isEmpty(path)) {
-            ToastUtil.showToast(getContext(), getString(R.string.save_image_Success) + path);
+            mCallback.showToast(getString(R.string.save_image_Success) + path);
         }else{
-            ToastUtil.showToast(getContext(),getString(R.string.save_image_fail));
+            mCallback.showToast(getString(R.string.save_image_fail));
+        }
+    }
+
+    @Override
+    public void onWallpaperSetDone(boolean isOk) {
+        if(isOk){
+            mCallback.showToast(getString(R.string.set_wallpaper_success));
+        }else{
+            mCallback.showToast(getString(R.string.set_wallpaper_fail));
         }
     }
 
@@ -271,8 +304,9 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         mRvImgList.setHasFixedSize(true);
         mRvImgList.setLayoutManager(gridLayoutMgr);
         mRvImgList.setItemAnimator(new ScaleInOutItemAnimator());
+        mRvImgList.setBackgroundResource(R.color.colorLightGrey);
 
-        mAdapter = new GalleryAdapter(getContext(),this);
+        mAdapter = new GalleryAdapter(getActivity(),this);
         mRvImgList.setAdapter(mAdapter);
         mRefresher.setColorSchemeResources(android.R.color.holo_blue_light,
                 android.R.color.holo_orange_light,

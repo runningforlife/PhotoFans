@@ -28,10 +28,10 @@ public class ImagePagerAdapter extends PagerAdapter{
     public static final String TAG = "ImagePageAdapter";
 
     private Context mContext;
-    private ImageAdapterCallback mCallback;
+    private PageAdapterCallback mCallback;
 
-    public ImagePagerAdapter(Context context, ImageAdapterCallback callback){
-        mCallback = callback;
+    public ImagePagerAdapter(Context context, BaseAdapterCallback callback){
+        mCallback = (PageAdapterCallback) callback;
         mContext = context;
     }
 

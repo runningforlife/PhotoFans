@@ -1,15 +1,19 @@
 package com.github.runningforlife.photosniffer.presenter;
 
+import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
+import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.model.RealmManager;
 import com.github.runningforlife.photosniffer.ui.FavorView;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -60,6 +64,8 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
 
     @Override
     public void saveImageAtPos(final int pos) {
+        if(pos < 0 || pos >= mFavorList.size()) return;
+
         GlideLoaderListener listener = new GlideLoaderListener(null);
         listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
             @Override
@@ -96,6 +102,14 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
     }
 
     @Override
+    public void setWallpaperAtPos(int pos) {
+        Log.v(TAG,"setWallpaperAtPos()");
+        if(pos >= 0 && pos < mFavorList.size()) {
+            setWallpaper(mFavorList.get(pos).getUrl());
+        }
+    }
+
+    @Override
     public void init() {
         // start loading data
         mRealmMgr.onStart();
@@ -123,6 +137,7 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
 
     @Override
     public void onImageSaveDone(String path) {
+        Log.v(TAG,"onImageSaveDone()");
         mView.onImageSaveDone(path);
     }
 
@@ -136,5 +151,32 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
     public void onDestroy() {
         mRealmMgr.onDestroy();
         mRealmMgr.removeListener(this);
+    }
+
+    private void setWallpaper(String url){
+        if(TextUtils.isEmpty(url)) return;
+
+        GlideLoaderListener listener = new GlideLoaderListener(null);
+        listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+            @Override
+            public void onImageLoadDone(Object o) {
+                Log.d(TAG,"onImageLoadDone()");
+                if(o instanceof Bitmap) {
+                    WallpaperManager wpm = (WallpaperManager)mContext.getSystemService(Context.WALLPAPER_SERVICE);
+                    try {
+                        // TODO: use flag to distinguish system and lock screen wallpaper
+                        wpm.setBitmap((Bitmap)o);
+                        mView.onWallpaperSetDone(true);
+                    } catch (IOException e) {
+                        mView.onWallpaperSetDone(false);
+                        e.printStackTrace();
+                    }
+                }else{
+                    mView.onWallpaperSetDone(false);
+                }
+            }
+        });
+        GlideLoader.downloadOnly(mContext, url, listener,
+                Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
     }
 }

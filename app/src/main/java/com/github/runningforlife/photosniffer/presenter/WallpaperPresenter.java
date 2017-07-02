@@ -22,8 +22,6 @@ public abstract class WallpaperPresenter implements Presenter{
 
     public abstract void refresh();
 
-    public abstract void setWallpaper();
-
     public abstract void setWallpaperAtPos(int pos);
 
     public abstract void setView(WallpaperView view);

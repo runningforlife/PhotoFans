@@ -4,10 +4,9 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.UiThread;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -15,10 +14,10 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +29,7 @@ import com.github.runningforlife.photosniffer.ui.fragment.BaseFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FavoriteImageFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FullScreenImageFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.WallPaperFragment;
+import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
 import java.io.File;
 
@@ -37,9 +37,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class GalleryActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-        AllPicturesFragment.RefreshCallback,ActivityCompat.OnRequestPermissionsResultCallback,
-        BaseFragment.ItemClickListener{
+        implements NavigationView.OnNavigationItemSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback,
+        BaseFragment.FragmentCallback {
 
     private static final String TAG = "GalleryActivity";
     final static int MY_STORAGE_PERMISSION_REQUEST = 100;
@@ -140,7 +139,6 @@ public class GalleryActivity extends BaseActivity
         return true;
     }
 
-
     @Override
     public void onItemClick(int pos, String url) {
         Log.v(TAG,"onItemClick(): pos = " + pos);
@@ -165,17 +163,14 @@ public class GalleryActivity extends BaseActivity
         }
     }
 
+    @UiThread
     @Override
-    public void onRefreshDone(boolean isSuccess) {
-        Log.v(TAG,"onRefreshDone()");
-
-        if(isSuccess) {
-            Toast.makeText(getApplicationContext(), R.string.refresh_success, Toast.LENGTH_SHORT)
-                    .show();
-        }else{
-            Toast.makeText(getApplicationContext(),R.string.refresh_error,Toast.LENGTH_SHORT)
-                    .show();
-        }
+    public void showToast(String msg) {
+        Log.v(TAG,"showToast()");
+        Toast t = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
+        t.setGravity(Gravity.CENTER, 0, 0);
+        t.show();
+        //ToastUtil.showToast(this, toast);
     }
 
     @Override
@@ -197,16 +192,8 @@ public class GalleryActivity extends BaseActivity
     }
 
     private void initView(){
-
-        FragmentManager fragmentMgr = getSupportFragmentManager();
-        Fragment fragment = fragmentMgr.findFragmentByTag(AllPicturesFragment.TAG);
-        if(fragment == null){
-            fragment = AllPicturesFragment.newInstance();
-        }
-
-        fragmentMgr.beginTransaction()
-                .replace(R.id.fragment_container,fragment,AllPicturesFragment.TAG)
-                .commit();
+        Log.v(TAG,"initView()");
+        startGalleryFragment();
     }
 
     private void startSetting(){
@@ -217,16 +204,10 @@ public class GalleryActivity extends BaseActivity
     }
 
     private void setRefreshing(boolean refreshing){
-        AllPicturesFragment fragment = (AllPicturesFragment)getSupportFragmentManager().
-                findFragmentByTag(AllPicturesFragment.TAG);
-        if(fragment != null && fragment.isRefreshing() && fragment.isVisible()){
+        FragmentManager fragmentMgr = getSupportFragmentManager();
+        BaseFragment fragment = (BaseFragment) fragmentMgr.findFragmentById(R.id.fragment_container);
+        if(fragment != null){
             fragment.setRefreshing(refreshing);
-        }
-
-        FavoriteImageFragment fragment1 = (FavoriteImageFragment)getSupportFragmentManager()
-                .findFragmentByTag(FavoriteImageFragment.TAG);
-        if(fragment1 != null && fragment1.isVisible()){
-            fragment1.setRefreshing(refreshing);
         }
     }
 
@@ -242,7 +223,6 @@ public class GalleryActivity extends BaseActivity
         fragmentMgr.beginTransaction()
                 .replace(R.id.fragment_container,fragment, FavoriteImageFragment.TAG)
                 .commit();
-
     }
 
     private void startGalleryFragment(){

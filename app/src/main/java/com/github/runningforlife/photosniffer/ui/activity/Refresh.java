@@ -1,4 +1,4 @@
-package com.github.runningforlife.photosniffer.ui.fragment;
+package com.github.runningforlife.photosniffer.ui.activity;
 
 /**
  * an interface to control refresher in fragment by parent view

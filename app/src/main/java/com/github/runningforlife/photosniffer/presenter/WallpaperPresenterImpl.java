@@ -3,8 +3,10 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
@@ -14,6 +16,9 @@ import com.github.runningforlife.photosniffer.ui.WallpaperView;
 
 import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import io.realm.RealmResults;
 
@@ -27,10 +32,13 @@ public class WallpaperPresenterImpl extends WallpaperPresenter{
     private WallpaperView mView;
     private RealmManager mRealmMgr;
     private RealmResults<ImageRealm> mWallpaper;
+    private ExecutorService mExecutor;
+
 
     public WallpaperPresenterImpl(Context context){
         mContext = context;
         mRealmMgr = RealmManager.getInstance();
+        mExecutor = Executors.newSingleThreadExecutor();
     }
 
     @Override
@@ -59,12 +67,36 @@ public class WallpaperPresenterImpl extends WallpaperPresenter{
     @Override
     public void removeItemAtPos(int pos) {
         checkNotNull(mWallpaper);
-        mRealmMgr.delete(mWallpaper.get(pos));
+        if(pos >= 0 && pos <= mWallpaper.size()) {
+            mRealmMgr.delete(mWallpaper.get(pos));
+        }
     }
 
     @Override
-    public void saveImageAtPos(int pos) {
+    public void saveImageAtPos(final int pos) {
+        if (pos >= 0 && pos < mWallpaper.size()) {
+            GlideLoaderListener listener = new GlideLoaderListener(null);
+            listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+                @Override
+                public void onImageLoadDone(Object o) {
+                    Log.d(TAG, "onImageLoadDone()");
+                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mWallpaper.get(pos).getName());
+                    r.addCallback(WallpaperPresenterImpl.this);
+                    mExecutor.submit(r);
+                }
+            });
 
+            String imgUrl = mWallpaper.get(pos).getUrl();
+            if (imgUrl.endsWith(ImageSource.POLA_IMAGE_END)) {
+                final String newUrl = imgUrl.substring(0, imgUrl.lastIndexOf("/") + 1) +
+                        ImageSource.POLA_FULL_IMAGE_END;
+                GlideLoader.downloadOnly(mContext, newUrl, listener,
+                        Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+            } else {
+                GlideLoader.downloadOnly(mContext, imgUrl, listener,
+                        Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+            }
+        }
     }
 
     @Override
@@ -82,7 +114,8 @@ public class WallpaperPresenterImpl extends WallpaperPresenter{
 
     @Override
     public void onImageSaveDone(String path) {
-
+        Log.v(TAG,"onImageSaveDone()");
+        mView.onImageSaveDone(path);
     }
 
     @Override
@@ -102,13 +135,16 @@ public class WallpaperPresenterImpl extends WallpaperPresenter{
     }
 
     @Override
-    public void setWallpaper() {
-        Log.v(TAG,"setWallpaper()");
-        // random to choose a picture from wallpaper data
-        if(mWallpaper == null || mWallpaper.size() <= 0) return;
+    public void setWallpaperAtPos(int pos) {
+        if(pos < 0) return;
 
-        Random rnd = new Random();
-        final int pos = rnd.nextInt(mWallpaper.size());
+        String url = mWallpaper.get(pos).getUrl();
+
+        setWallpaper(url);
+    }
+
+    private void setWallpaper(String url){
+        if(TextUtils.isEmpty(url)) return;
 
         GlideLoaderListener listener = new GlideLoaderListener(null);
         listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
@@ -118,26 +154,19 @@ public class WallpaperPresenterImpl extends WallpaperPresenter{
                 if(o instanceof Bitmap) {
                     WallpaperManager wpm = (WallpaperManager)mContext.getSystemService(Context.WALLPAPER_SERVICE);
                     try {
+                        // TODO: use flag to distinguish system and lock screen wallpaper
                         wpm.setBitmap((Bitmap)o);
-                        //mView.onWallpaperSetDone(true);
-                        // mark it as wall paper
-                        //mRealmMgr.setWallpaper(mWallpaper.get(pos).getUrl());
+                        mView.onWallpaperSetDone(true);
                     } catch (IOException e) {
-                        //mView.onWallpaperSetDone(false);
+                        mView.onWallpaperSetDone(false);
                         e.printStackTrace();
                     }
                 }else{
-                    //mView.onWallpaperSetDone(false);
+                    mView.onWallpaperSetDone(false);
                 }
             }
         });
-        GlideLoader.downloadOnly(mContext, mWallpaper.get(pos).getUrl(), listener,
+        GlideLoader.downloadOnly(mContext, url, listener,
                 Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
     }
-
-    @Override
-    public void setWallpaperAtPos(int pos) {
-
-    }
-
 }

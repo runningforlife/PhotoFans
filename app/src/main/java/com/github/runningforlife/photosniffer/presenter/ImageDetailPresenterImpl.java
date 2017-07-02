@@ -56,7 +56,9 @@ public class ImageDetailPresenterImpl extends ImageDetailPresenter {
     @Override
     public void removeItemAtPos(int pos) {
         Log.d(TAG,"removeItemAtPos()");
-        mRealmMgr.delete(mImgList.get(pos));
+        if(pos >= 0 && pos < mImgList.size()) {
+            mRealmMgr.delete(mImgList.get(pos));
+        }
     }
 
     @Override

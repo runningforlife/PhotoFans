@@ -34,9 +34,9 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
     private static final int DEFAULT_IMAGE_HEIGHT = (int)(200*DisplayUtil.getScreenRatio());
 
     private Context mContext;
-    private ImageAdapterCallback mCallback;
+    private BaseAdapterCallback mCallback;
 
-    public PreviewAdapter(Context context, ImageAdapterCallback callback){
+    public PreviewAdapter(Context context, BaseAdapterCallback callback){
         mContext = context;
         mCallback = callback;
     }

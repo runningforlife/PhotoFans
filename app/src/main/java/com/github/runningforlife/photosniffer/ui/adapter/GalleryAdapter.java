@@ -1,11 +1,13 @@
 package com.github.runningforlife.photosniffer.ui.adapter;
 
 import android.content.Context;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -33,15 +35,15 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     private static final String TAG = "GalleryAdapter";
     @SuppressWarnings("unchecked")
     private LayoutInflater mInflater;
-    private ImageAdapterCallback mCallback;
+    private GalleryAdapterCallback mCallback;
     private Context mContext;
     private int mWidth;
     private int mHeight;
     private String mLoader;
     private String mLayoutMgr;
 
-    public GalleryAdapter(Context context,ImageAdapterCallback callback){
-        mCallback = callback;
+    public GalleryAdapter(Context context,BaseAdapterCallback callback){
+        mCallback = (GalleryAdapterCallback) callback;
         mInflater = LayoutInflater.from(context);
         // different device panel size may need different width and height
         mContext = context;
@@ -49,14 +51,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         mLoader = Loader.GLIDE;
 
         mLayoutMgr = GridManager;
-    }
-
-    public void setImageWidth(int w){
-        mWidth = w;
-    }
-
-    public void setImageHeight(int h){
-        mHeight = h;
     }
 
     public void setLayoutManager(@RecycleLayout String layoutManager){
@@ -118,7 +112,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         return mCallback.getCount();
     }
 
-    public class PhotoViewHolder extends RecyclerView.ViewHolder{
+    public class PhotoViewHolder extends RecyclerView.ViewHolder
+            implements View.OnCreateContextMenuListener {
         @BindView(R.id.iv_photo) ImageView img;
 
         public PhotoViewHolder(View root) {
@@ -135,15 +130,17 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                 }
             });
 
-/*            root.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if(mCallback != null){
-                        mCallback.onItemLongClicked(getAdapterPosition(), TAG);
-                    }
-                    return false;
-                }
-            });*/
+            root.setOnCreateContextMenuListener(this);
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            Log.v(TAG,"onCreateContextMenu()");
+            MenuInflater inflater = ((AppCompatActivity)mContext).getMenuInflater();
+
+            inflater.inflate(R.menu.menu_context_choice, menu);
+
+            mCallback.onContextMenuCreated(getAdapterPosition(), TAG);
         }
     }
 }

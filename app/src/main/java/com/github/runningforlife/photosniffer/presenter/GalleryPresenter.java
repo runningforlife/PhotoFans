@@ -21,6 +21,8 @@ public abstract class GalleryPresenter implements Presenter {
 
     public abstract void setWebView(WebView webView);
 
+    public abstract void setWallpaperAtPos(int pos);
+
     @Override
     public void onFavorDataChange(RealmResults<ImageRealm> data){
         // keep empty

@@ -29,12 +29,13 @@ import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenter;
 import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
-import com.github.runningforlife.photosniffer.ui.adapter.ImageAdapterCallback;
+import com.github.runningforlife.photosniffer.ui.adapter.BaseAdapterCallback;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import com.github.runningforlife.photosniffer.ui.adapter.ImagePagerAdapter;
+import com.github.runningforlife.photosniffer.ui.adapter.PageAdapterCallback;
 import com.github.runningforlife.photosniffer.ui.adapter.PreviewAdapter;
 import com.github.runningforlife.photosniffer.ui.fragment.ActionListDialogFragment;
 import com.github.runningforlife.photosniffer.model.UserAction;
@@ -50,7 +51,7 @@ import static com.github.runningforlife.photosniffer.model.UserAction.*;
  */
 
 public class ImageDetailActivity extends AppCompatActivity implements ImageDetailView,
-        ImageAdapterCallback,ActionListDialogFragment.ActionCallback {
+        PageAdapterCallback,ActionListDialogFragment.ActionCallback {
     private static final String TAG = "ImageDetailActivity";
 
     @BindView(R.id.rv_images) RecyclerView mLvImgPreview;
@@ -167,10 +168,10 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     @Override
     public void onWallpaperSetDone(boolean isOk) {
         if(isOk){
-            ToastUtil.showToast(getApplicationContext(),
+            ToastUtil.showToast(this,
                     getString(R.string.set_wallpaper_success));
         }else{
-            ToastUtil.showToast(getApplicationContext(),
+            ToastUtil.showToast(this,
                     getString(R.string.set_wallpaper_fail));
         }
     }

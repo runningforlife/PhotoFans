@@ -17,6 +17,8 @@ public abstract class FavorImagePresenter implements Presenter{
      */
     public abstract void cancelFavorAtPos(int pos);
 
+    public abstract void setWallpaperAtPos(int pos);
+
     @Override
     public void onUsedDataChange(RealmResults<ImageRealm> data){
         // keep empty

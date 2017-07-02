@@ -1,35 +1,26 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
-import static com.github.runningforlife.photosniffer.model.UserAction.*;
 
-import com.github.runningforlife.photosniffer.model.UserAction;
 import com.github.runningforlife.photosniffer.presenter.WallpaperPresenter;
 import com.github.runningforlife.photosniffer.presenter.WallpaperPresenterImpl;
 import com.github.runningforlife.photosniffer.ui.WallpaperView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
-import com.github.runningforlife.photosniffer.ui.adapter.ImageAdapterCallback;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,9 +30,8 @@ import butterknife.ButterKnife;
  */
 
 public class WallPaperFragment extends BaseFragment
-        implements ImageAdapterCallback, WallpaperView{
+        implements GalleryAdapterCallback, WallpaperView{
     public static final String TAG = "WallpaperFragment";
-    public static final String ALARM_AUTO_WALLPAPER = "com.github.runningforlife.AUTO_WALLPAPER";
 
     @BindView(R.id.refresh)
     SwipeRefreshLayout mSrlRefresh;
@@ -50,7 +40,7 @@ public class WallPaperFragment extends BaseFragment
 
     private GalleryAdapter mAdapter;
     private WallpaperPresenter mPresenter;
-    private ItemClickListener mListener;
+    private FragmentCallback mCallback;
 
     public static WallPaperFragment newInstance(){
         return new WallPaperFragment();
@@ -67,8 +57,6 @@ public class WallPaperFragment extends BaseFragment
 
         initPresenter();
 
-        //registerActionMenu();
-
         return root;
     }
 
@@ -78,11 +66,10 @@ public class WallPaperFragment extends BaseFragment
 
         Log.v(TAG,"onAttach()");
         try {
-            mListener = (ItemClickListener)context;
-            //mListener.onFragmentAttached();
+            mCallback = (FragmentCallback)context;
         }catch (ClassCastException e){
-            Log.e(TAG,"parent activity must implement ItemClickListener");
-            mListener = null;
+            Log.e(TAG,"parent activity must implement FragmentCallback");
+            throw new IllegalStateException("refresh callback must be implemented");
         }
     }
 
@@ -90,43 +77,13 @@ public class WallPaperFragment extends BaseFragment
     public void onResume(){
         super.onResume();
 
-        if(mListener != null){
-            mListener.onFragmentAttached();
+        if(mCallback != null){
+            mCallback.onFragmentAttached();
         }
 
         mPresenter.onStart();
 
         setTitle();
-
-        registerActionMenu(mRcvWallpaper);
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo info){
-        super.onCreateContextMenu(menu, v, info);
-        Log.v(TAG,"onCreateContextMenu()");
-        MenuInflater inflater = getActivity().getMenuInflater();
-
-        inflater.inflate(R.menu.menu_context_choice, menu);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item){
-        Log.v(TAG,"onContextItemSelected()");
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-
-        switch (item.getItemId()){
-            case R.id.menu_save:
-                break;
-            case R.id.menu_wallpaper:
-                break;
-            case R.id.menu_delete:
-                break;
-            default:
-                break;
-        }
-
-        return super.onContextItemSelected(item);
     }
 
     @Override
@@ -149,18 +106,8 @@ public class WallPaperFragment extends BaseFragment
     @Override
     public void onItemClicked(int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
-        if(mListener != null){
-            mListener.onItemClick(pos, mPresenter.getItemAtPos(pos).getUrl());
-        }
-    }
-
-    @Override
-    public void onItemLongClicked(int pos, String adapter) {
-        Log.v(TAG,"onItemLongClicked(): pos " + pos);
-
-        View view = mRcvWallpaper.getChildAt(pos);
-        if(view != null){
-            //registerActionMenu(view);
+        if(mCallback != null){
+            mCallback.onItemClick(pos, mPresenter.getItemAtPos(pos).getUrl());
         }
     }
 
@@ -194,7 +141,48 @@ public class WallPaperFragment extends BaseFragment
 
     @Override
     public void onImageSaveDone(String path) {
+        if(TextUtils.isEmpty(path)){
+            mCallback.showToast(getString(R.string.save_image_Success));
+        }else{
+            mCallback.showToast(getString(R.string.save_image_fail));
+        }
+    }
 
+    @Override
+    public void onWallpaperSetDone(boolean isOk) {
+        if(isOk){
+            mCallback.showToast(getString(R.string.set_wallpaper_success));
+        }else{
+            mCallback.showToast(getString(R.string.set_wallpaper_fail));
+        }
+    }
+
+    @Override
+    public void onContextMenuCreated(int pos, String adapter) {
+        Log.v(TAG,"onContextMenuCreated()");
+
+        mCurrentPos = pos;
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item){
+        Log.v(TAG,"onContextItemSelected()");
+
+        switch (item.getItemId()){
+            case R.id.menu_save:
+                mPresenter.saveImageAtPos(mCurrentPos);
+                break;
+            case R.id.menu_delete:
+                mPresenter.removeItemAtPos(mCurrentPos);
+                break;
+            case R.id.menu_wallpaper:
+                mPresenter.setWallpaperAtPos(mCurrentPos);
+                break;
+            default:
+                return super.onContextItemSelected(item);
+        }
+
+        return true;
     }
 
     private void initView(){
@@ -202,8 +190,9 @@ public class WallPaperFragment extends BaseFragment
                 2, StaggeredGridLayoutManager.VERTICAL);
         mRcvWallpaper.setLayoutManager(sgm);
 
-        mAdapter = new GalleryAdapter(getContext(), this);
+        mAdapter = new GalleryAdapter(getActivity(), this);
         mRcvWallpaper.setAdapter(mAdapter);
+        mRcvWallpaper.setBackgroundResource(R.color.colorLightGrey);
 
         mSrlRefresh.setColorSchemeResources(android.R.color.holo_blue_light,
                 android.R.color.holo_orange_light,
@@ -229,10 +218,5 @@ public class WallPaperFragment extends BaseFragment
         if(activity != null) {
             activity.setTitle(title);
         }
-    }
-
-    private void registerActionMenu(View view){
-        Log.v(TAG,"registerActionMenu()");
-        registerForContextMenu(view);
     }
 }

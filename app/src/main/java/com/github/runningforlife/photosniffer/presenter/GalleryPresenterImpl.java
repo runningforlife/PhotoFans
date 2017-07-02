@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.presenter;
 
+import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -23,6 +24,7 @@ import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.model.RealmManager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -147,6 +149,15 @@ public class GalleryPresenterImpl extends GalleryPresenter
     }
 
     @Override
+    public void setWallpaperAtPos(int pos) {
+        Log.v(TAG,"setWallpaperAtPos()");
+
+        if(pos >= 0 && pos < mImageList.size()){
+            setWallpaper(mImageList.get(pos).getUrl());
+        }
+    }
+
+    @Override
     public int getItemCount() {
         if(mImageList == null) return 0;
 
@@ -163,7 +174,7 @@ public class GalleryPresenterImpl extends GalleryPresenter
     @Override
     public void removeItemAtPos(int pos) {
         Log.v(TAG,"removeItemAtPos(): position = " + pos);
-        if(mImageList == null) return;
+        if(mImageList == null || pos < 0) return;
 
         mRealmMgr.delete(mImageList.get(pos));
     }
@@ -398,7 +409,35 @@ public class GalleryPresenterImpl extends GalleryPresenter
 
     @Override
     public void onImageSaveDone(String path) {
+        Log.v(TAG,"onImageSaveDone()");
         mView.onImageSaveDone(path);
+    }
+
+    private void setWallpaper(String url){
+        if(TextUtils.isEmpty(url)) return;
+
+        GlideLoaderListener listener = new GlideLoaderListener(null);
+        listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+            @Override
+            public void onImageLoadDone(Object o) {
+                Log.d(TAG,"onImageLoadDone()");
+                if(o instanceof Bitmap) {
+                    WallpaperManager wpm = (WallpaperManager)mContext.getSystemService(Context.WALLPAPER_SERVICE);
+                    try {
+                        // TODO: use flag to distinguish system and lock screen wallpaper
+                        wpm.setBitmap((Bitmap)o);
+                        mView.onWallpaperSetDone(true);
+                    } catch (IOException e) {
+                        mView.onWallpaperSetDone(false);
+                        e.printStackTrace();
+                    }
+                }else{
+                    mView.onWallpaperSetDone(false);
+                }
+            }
+        });
+        GlideLoader.downloadOnly(mContext, url, listener,
+                Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
     }
 
     private final class  H extends Handler{

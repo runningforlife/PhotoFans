@@ -3,7 +3,6 @@ package com.github.runningforlife.photosniffer.ui.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,32 +18,25 @@ import android.view.ViewGroup;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
-import com.github.runningforlife.photosniffer.model.UserAction;
 import com.github.runningforlife.photosniffer.presenter.FavorImagePresenter;
 import com.github.runningforlife.photosniffer.presenter.FavorImagePresenterImpl;
 import com.github.runningforlife.photosniffer.ui.FavorView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
-import com.github.runningforlife.photosniffer.ui.adapter.ImageAdapterCallback;
+import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
 import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.github.runningforlife.photosniffer.model.UserAction.DELETE;
-import static com.github.runningforlife.photosniffer.model.UserAction.FAVOR;
-import static com.github.runningforlife.photosniffer.model.UserAction.SAVE;
-import static com.github.runningforlife.photosniffer.model.UserAction.WALLPAPER;
 
 /**
  * a fragment containing all favorite images
  */
 
 public class FavoriteImageFragment extends BaseFragment
-        implements ImageAdapterCallback, FavorView{
+        implements GalleryAdapterCallback, FavorView{
     public static final String TAG = "FavorImageFragment";
     @BindView(R.id.rcv_img_list) RecyclerView mRcvFavorList;
     @BindView(R.id.refresh) SwipeRefreshLayout mSrlRefresh;
@@ -55,7 +47,7 @@ public class FavoriteImageFragment extends BaseFragment
     private int mCurrentPos;
 
 
-    private ItemClickListener mListener;
+    private FragmentCallback mCallback;
 
     public static FavoriteImageFragment newInstance(){
         return new FavoriteImageFragment();
@@ -81,10 +73,10 @@ public class FavoriteImageFragment extends BaseFragment
 
         Log.v(TAG,"onAttach()");
         try {
-            mListener = (ItemClickListener)context;
+            mCallback = (FragmentCallback)context;
         } catch (ClassCastException e){
-            Log.e(TAG,"parent activity must implement ItemClickListener");
-            mListener = null;
+            Log.e(TAG,"parent activity must implement FragmentCallback");
+            throw new IllegalStateException("parent activity must implement FragmentCallback");
         }
     }
 
@@ -93,8 +85,8 @@ public class FavoriteImageFragment extends BaseFragment
     public void onResume(){
         super.onResume();
 
-        if(mListener != null) {
-            mListener.onFragmentAttached();
+        if(mCallback != null) {
+            mCallback.onFragmentAttached();
         }
 
         mPresenter.onStart();
@@ -118,7 +110,7 @@ public class FavoriteImageFragment extends BaseFragment
         // restore back ground
         mRcvFavorList.setBackgroundResource(R.color.colorLightGrey);
 
-        mAdapter = new GalleryAdapter(getContext(),this);
+        mAdapter = new GalleryAdapter(getActivity(),this);
         mAdapter.setImageLoader(Loader.GLIDE);
         mRcvFavorList.setAdapter(mAdapter);
 
@@ -151,15 +143,9 @@ public class FavoriteImageFragment extends BaseFragment
     public void onItemClicked(int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
 
-        if(mListener != null){
-            mListener.onItemClick(pos, mPresenter.getItemAtPos(pos).getUrl());
+        if(mCallback != null){
+            mCallback.onItemClick(pos, mPresenter.getItemAtPos(pos).getUrl());
         }
-    }
-
-    @Override
-    public void onItemLongClicked(int pos, String adapter) {
-        Log.v(TAG,"onItemLongClicked()");
-        mCurrentPos = pos;
     }
 
     @Override
@@ -239,10 +225,47 @@ public class FavoriteImageFragment extends BaseFragment
     @Override
     public void onImageSaveDone(String path) {
         if(TextUtils.isEmpty(path)){
-            ToastUtil.showToast(getContext(),getString(R.string.save_image_fail));
+            mCallback.showToast(getString(R.string.save_image_Success));
         }else{
-            ToastUtil.showToast(getContext(),getString(R.string.save_image_Success) + path);
+            mCallback.showToast(getString(R.string.save_image_fail));
         }
+    }
+
+    @Override
+    public void onWallpaperSetDone(boolean isOk) {
+        if(isOk){
+            mCallback.showToast(getString(R.string.set_wallpaper_success));
+        }else{
+            mCallback.showToast(getString(R.string.set_wallpaper_fail));
+        }
+    }
+
+    @Override
+    public void onContextMenuCreated(int pos, String adapter) {
+        Log.v(TAG,"onContextMenuCreated()");
+
+        mCurrentPos = pos;
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item){
+        Log.v(TAG,"onContextItemSelected()");
+
+        switch (item.getItemId()){
+            case R.id.menu_save:
+                mPresenter.saveImageAtPos(mCurrentPos);
+                break;
+            case R.id.menu_delete:
+                mPresenter.removeItemAtPos(mCurrentPos);
+                break;
+            case R.id.menu_wallpaper:
+                mPresenter.setWallpaperAtPos(mCurrentPos);
+                break;
+            default:
+                return super.onContextItemSelected(item);
+        }
+
+        return true;
     }
 
     private void setTitle(){
@@ -257,4 +280,5 @@ public class FavoriteImageFragment extends BaseFragment
         mPresenter = new FavorImagePresenterImpl(getContext(),this);
         mPresenter.init();
     }
+
 }

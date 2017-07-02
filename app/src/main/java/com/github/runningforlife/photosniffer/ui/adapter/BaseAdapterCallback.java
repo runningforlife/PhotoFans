@@ -6,7 +6,7 @@ import com.github.runningforlife.photosniffer.model.ImageRealm;
  * image detail adapter callback
  */
 
-public interface ImageAdapterCallback {
+public interface BaseAdapterCallback {
 
     /*
      * get the number of images
@@ -22,13 +22,6 @@ public interface ImageAdapterCallback {
      * item at pos is clicked
      */
     void onItemClicked(int pos, String adapter);
-
-
-    /*
-     * item at pos is long clicked
-     */
-    void onItemLongClicked(int pos, String adapter);
-
 
     /*
      * image start loading
