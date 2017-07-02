@@ -24,7 +24,6 @@ import com.github.runningforlife.photosniffer.ui.FavorView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
 import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
-import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
 import java.util.List;
 
@@ -57,7 +56,7 @@ public class FavoriteImageFragment extends BaseFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedState){
         Log.v(TAG,"onCreateView()");
 
-        View root = inflater.inflate(R.layout.fragment_favor_image,parent,false);
+        View root = inflater.inflate(R.layout.fragment_user_image,parent,false);
         ButterKnife.bind(this,root);
 
         initView();
@@ -140,17 +139,17 @@ public class FavoriteImageFragment extends BaseFragment
     }
 
     @Override
-    public void onItemClicked(int pos, String adapter) {
+    public void onItemClicked(View view, int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
 
         if(mCallback != null){
-            mCallback.onItemClick(pos, mPresenter.getItemAtPos(pos).getUrl());
+            mCallback.onItemClick(view,pos, mPresenter.getItemAtPos(pos).getUrl());
         }
     }
 
     @Override
     public void removeItemAtPos(int pos) {
-
+        mPresenter.removeItemAtPos(pos);
     }
 
     @Override

@@ -25,6 +25,7 @@ import android.view.View;
 
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenter;
 import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl;
@@ -112,6 +113,13 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     @Override
+    public void onPause(){
+        super.onPause();
+
+        GlideLoader.pauseRequest(this);
+    }
+
+    @Override
     public void onDestroy(){
         super.onDestroy();
         Log.v(TAG,"onDestroy()");
@@ -186,9 +194,8 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         return mPresenter.getItemAtPos(pos);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
-    public void onItemClicked(int pos, String adapter) {
+    public void onItemClicked(View view, int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos " + pos);
         mCurrentImgIdx = pos;
         // loading image
@@ -306,7 +313,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         });
 
         getPreviewScrollParams();
-
     }
 
     private void initPresenter(){

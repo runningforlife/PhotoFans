@@ -17,6 +17,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
@@ -198,10 +199,10 @@ public class GalleryPresenterImpl extends GalleryPresenter
             if(imgUrl.endsWith(ImageSource.POLA_IMAGE_END)){
                 final String newUrl = imgUrl.substring(0, imgUrl.lastIndexOf("/")+1) +
                         ImageSource.POLA_FULL_IMAGE_END;
-                GlideLoader.downloadOnly(mContext, newUrl, listener,
+                GlideLoader.downloadOnly(mContext, newUrl, listener, Priority.HIGH,
                         Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
             }else {
-                GlideLoader.downloadOnly(mContext, imgUrl, listener,
+                GlideLoader.downloadOnly(mContext, imgUrl, listener, Priority.HIGH,
                         Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
             }
         }
@@ -334,7 +335,7 @@ public class GalleryPresenterImpl extends GalleryPresenter
                 @Override
                 public void onLoadResource(WebView view, String url) {
                     Log.v(TAG,"onLoadResource(): url = " + url);
-
+                    view.pageDown(true);
                     String key = mContext.getString(R.string.pref_pola_latest_collections_number);
                     int current = SharedPrefUtil.getInt(key,50);
 
@@ -344,7 +345,7 @@ public class GalleryPresenterImpl extends GalleryPresenter
                         if(collections > current){
                             SharedPrefUtil.putInt(key, collections);
                             current = collections;
-                            saveAllPolaUrls(url, collections +1, current);
+                            saveAllPolaUrls(url, collections + 1, current);
                         }
                     }
                 }
@@ -353,8 +354,6 @@ public class GalleryPresenterImpl extends GalleryPresenter
                 public void onPageFinished(WebView view, String url) {
                     Log.v(TAG,"onPageFinished()");
                     view.pageDown(true);
-/*                    view.loadUrl("javascript:window.HtmlViewer.retrieveHtml" +
-                            "('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");*/
                 }
             });
             mWvPage.loadUrl(polaUrl);
@@ -436,7 +435,7 @@ public class GalleryPresenterImpl extends GalleryPresenter
                 }
             }
         });
-        GlideLoader.downloadOnly(mContext, url, listener,
+        GlideLoader.downloadOnly(mContext, url, listener, Priority.HIGH,
                 Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
     }
 

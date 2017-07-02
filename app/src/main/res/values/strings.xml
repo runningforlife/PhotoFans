@@ -63,4 +63,6 @@
     <string name="copyright_declaration">Copytright Declaration</string>
     <string name="pref_pola_retrieved" translatable="false">pref_pola_retrieved</string>
     <string name="back_home">back home</string>
+    <string name="fragment_image_transition">Fragment Image Transition</string>
+    <string name="activity_image_transition">Activity Image Transition</string>
 </resources>

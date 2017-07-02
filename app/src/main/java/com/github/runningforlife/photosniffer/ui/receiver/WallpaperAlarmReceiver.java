@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.app.AppGlobals;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
@@ -79,10 +80,10 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
             if(imgUrl.endsWith(ImageSource.POLA_IMAGE_END)){
                 final String newUrl = imgUrl.substring(0, imgUrl.lastIndexOf("/")+1) +
                         ImageSource.POLA_FULL_IMAGE_END;
-                GlideLoader.downloadOnly(context, newUrl, listener,
+                GlideLoader.downloadOnly(context, newUrl, listener, Priority.IMMEDIATE,
                         Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_WIDTH);
             }else {
-                GlideLoader.downloadOnly(context, imgUrl, listener,
+                GlideLoader.downloadOnly(context, imgUrl, listener, Priority.IMMEDIATE,
                         Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_WIDTH);
             }
         }finally {

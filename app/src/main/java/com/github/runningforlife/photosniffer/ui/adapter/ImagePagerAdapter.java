@@ -2,6 +2,7 @@ package com.github.runningforlife.photosniffer.ui.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,8 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.github.runningforlife.photosniffer.R;
@@ -49,21 +52,26 @@ public class ImagePagerAdapter extends PagerAdapter{
     public Object instantiateItem(ViewGroup parent, final int position){
         Log.v(TAG,"instantiateItem(): position = " + position);
 
-        ImageView view = (ImageView) LayoutInflater.from(mContext)
+        final ImageView view = (ImageView) LayoutInflater.from(mContext)
                 .inflate(R.layout.item_image_detail,parent,false);
+        // transition name
+        if(Build.VERSION.SDK_INT >= 21) {
+            String transitionName = mContext.getString(R.string.activity_image_transition)
+                    + String.valueOf(position);
+            view.setTransitionName(transitionName);
+        }
         // start loading
         mCallback.onImageLoadStart(position);
         // preload image
-        MiscUtil.preloadImage(view);
+        //MiscUtil.preloadImage(view);
         view.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_scale_out));
         GlideLoader.load(mContext,new ImageLoaderListener(view,position),mCallback.getItemAtPos(position).getUrl(),
-                DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
-
+                Priority.IMMEDIATE,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(mCallback != null) {
-                    mCallback.onItemClicked(position, TAG);
+                    mCallback.onItemClicked(view,position, TAG);
                 }
             }
         });

@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
@@ -77,7 +78,7 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
             }
         });
         GlideLoader.downloadOnly(mContext, mFavorList.get(pos).getUrl(), listener,
-                DEFAULT_WIDTH, DEFAULT_HEIGHT);
+                Priority.HIGH,DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
     @Override
@@ -176,7 +177,7 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
                 }
             }
         });
-        GlideLoader.downloadOnly(mContext, url, listener,
+        GlideLoader.downloadOnly(mContext, url, listener, Priority.HIGH,
                 Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
     }
 }

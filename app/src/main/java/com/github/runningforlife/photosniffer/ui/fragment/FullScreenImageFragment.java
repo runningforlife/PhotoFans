@@ -2,6 +2,7 @@ package com.github.runningforlife.photosniffer.ui.fragment;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +17,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
@@ -39,6 +41,7 @@ import static com.github.runningforlife.photosniffer.model.UserAction.WALLPAPER;
 
 public class FullScreenImageFragment extends BaseFragment implements ActionListDialogFragment.ActionCallback{
     public static final String TAG = "FullScreenImageFragment";
+    public static final String POSITION = "position";
     private static final String IMAGE_URL = "image_url";
 
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -118,6 +121,13 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
 
     private void initView(){
         Log.v(TAG,"initView()");
+        if(Build.VERSION.SDK_INT >= 21) {
+            // transition name
+            String pos = getArguments().getString(POSITION);
+            String transitionName = getString(R.string.fragment_image_transition)
+                    + pos;
+            imageView.setTransitionName(transitionName);
+        }
         toolbar.setNavigationIcon(R.drawable.ic_back_white_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,7 +141,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
         if(!TextUtils.isEmpty(url)) {
             GlideLoaderListener listener = new GlideLoaderListener(imageView);
             listener.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            GlideLoader.downloadOnly(getContext(), url, listener,
+            GlideLoader.downloadOnly(getContext(), url, listener, Priority.IMMEDIATE,
                     Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
         }
 

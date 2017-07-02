@@ -3,7 +3,9 @@ package com.github.runningforlife.photosniffer.ui.fragment;
 import android.os.Bundle;
 import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
+import android.view.View;
 
+import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.ui.activity.Refresh;
 
 import java.lang.annotation.Retention;
@@ -23,7 +25,7 @@ public class BaseFragment extends Fragment implements Refresh {
     protected int mCurrentPos = -1;
 
     public interface FragmentCallback {
-        void onItemClick(int pos, String url);
+        void onItemClick(View view, int pos, String url);
         void onFragmentAttached();
         void showToast(String toast);
     }
@@ -34,6 +36,13 @@ public class BaseFragment extends Fragment implements Refresh {
         super.onCreate(savedState);
 
         //setRetainInstance(true);
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+
+        //GlideLoader.pauseRequest(getContext());
     }
 
     @Override

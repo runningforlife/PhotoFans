@@ -3,6 +3,7 @@ package com.github.runningforlife.photosniffer.ui.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,12 +20,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.ui.fragment.AllPicturesFragment;
@@ -144,15 +145,15 @@ public class GalleryActivity extends BaseActivity
     }
 
     @Override
-    public void onItemClick(int pos, String url) {
+    public void onItemClick(View sharedView, int pos, String url) {
         Log.v(TAG,"onItemClick(): pos = " + pos);
         if(!TextUtils.isEmpty(url)) {
             ActionBar toolbar = getSupportActionBar();
             if(toolbar != null) {
+                toolbar.setShowHideAnimationEnabled(true);
                 toolbar.hide();
             }
-
-            showFullscreenFragment(url);
+            showFullscreenFragment(sharedView, pos, url);
         }else{
             Log.e(TAG,"onItemClick(): url is empty");
         }
@@ -226,10 +227,12 @@ public class GalleryActivity extends BaseActivity
         if(fragment == null){
             fragment = FavoriteImageFragment.newInstance();
         }
-
-        fragmentMgr.beginTransaction()
-                .replace(R.id.fragment_container,fragment, FavoriteImageFragment.TAG)
-                .commit();
+        FragmentTransaction ft = fragmentMgr.beginTransaction()
+                .replace(R.id.fragment_container,fragment, FavoriteImageFragment.TAG);
+        if(Build.VERSION.SDK_INT >= 19) {
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        }
+        ft.commit();
     }
 
     private void startGalleryFragment(){
@@ -238,7 +241,6 @@ public class GalleryActivity extends BaseActivity
         if(fragment == null) {
             fragment = (AllPicturesFragment) AllPicturesFragment.newInstance();
         }
-
         fragmentMgr.beginTransaction()
                 .replace(R.id.fragment_container,fragment, AllPicturesFragment.TAG)
                 .commit();
@@ -250,14 +252,15 @@ public class GalleryActivity extends BaseActivity
         if(fragment == null){
             fragment = WallPaperFragment.newInstance();
         }
-
         FragmentTransaction ft = fragmentMgr.beginTransaction();
+        if(Build.VERSION.SDK_INT >= 19) {
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        }
         ft.replace(R.id.fragment_container, fragment, WallPaperFragment.TAG)
                 .commit();
     }
 
-
-    private void showFullscreenFragment(String url){
+    private void showFullscreenFragment(View sharedView, int pos,String url){
         FragmentManager fragmentMgr = getSupportFragmentManager();
         FullScreenImageFragment fragment = (FullScreenImageFragment)
                 fragmentMgr.findFragmentByTag(FullScreenImageFragment.TAG);
@@ -265,11 +268,19 @@ public class GalleryActivity extends BaseActivity
         if(fragment == null){
             fragment = FullScreenImageFragment.newInstance(url);
         }
+        Bundle args = fragment.getArguments();
+        if(args != null) {
+            args.putString(FullScreenImageFragment.POSITION, String.valueOf(pos));
+        }
 
-        fragmentMgr.beginTransaction()
+        FragmentTransaction ft = fragmentMgr.beginTransaction()
                 .replace(R.id.fragment_container, fragment, FullScreenImageFragment.TAG)
                 .addToBackStack("FullScreenImage")
-                .commit();
+                .addSharedElement(sharedView, getString(R.string.fragment_image_transition));
+        if(Build.VERSION.SDK_INT >= 19) {
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        }
+        ft.commit();
     }
 
     private void makeAppDir(){

@@ -1,6 +1,9 @@
 package com.github.runningforlife.photosniffer.ui.adapter;
 
 import android.content.Context;
+import android.os.Build;
+import android.renderscript.RenderScript;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -12,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 
@@ -92,8 +96,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                     listener.setReqWidth(mWidth);
                     listener.setReqHeight(mHeight);
                 }
-                GlideLoader.load(mContext,url,listener,DEFAULT_IMAGE_MEDIUM_WIDTH,
-                        DEFAULT_IMAGE_MEDIUM_HEIGHT);
+                GlideLoader.load(mContext,url,listener, Priority.HIGH,
+                        DEFAULT_IMAGE_MEDIUM_WIDTH, DEFAULT_IMAGE_MEDIUM_HEIGHT);
             }
 
         }else if(getItemCount() > 0){
@@ -120,12 +124,17 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
             super(root);
 
             ButterKnife.bind(this,root);
-
+            // transition name
+            if(Build.VERSION.SDK_INT >= 21) {
+                String transitionName = mContext.getString(R.string.activity_image_transition)
+                        + String.valueOf(getAdapterPosition());
+                img.setTransitionName(transitionName);
+            }
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(mCallback != null){
-                        mCallback.onItemClicked(getAdapterPosition(),TAG);
+                        mCallback.onItemClicked(img,getAdapterPosition(),TAG);
                     }
                 }
             });

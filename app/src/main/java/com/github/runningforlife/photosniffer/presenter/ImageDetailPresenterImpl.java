@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
@@ -80,7 +81,7 @@ public class ImageDetailPresenterImpl extends ImageDetailPresenter {
             }
         });
         GlideLoader.downloadOnly(mContext, mImgList.get(pos).getUrl(), listener,
-                Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+                Priority.HIGH,Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
     }
 
     @Override
@@ -120,7 +121,7 @@ public class ImageDetailPresenterImpl extends ImageDetailPresenter {
             }
         });
         GlideLoader.downloadOnly(mContext, mImgList.get(pos).getUrl(), listener,
-                Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+                Priority.HIGH,Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
     }
 
     @Override

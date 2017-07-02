@@ -49,7 +49,7 @@ public class WallPaperFragment extends BaseFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedState){
 
-        View root = inflater.inflate(R.layout.fragment_favor_image, parent, false);
+        View root = inflater.inflate(R.layout.fragment_user_image, parent, false);
 
         ButterKnife.bind(this, root);
 
@@ -104,10 +104,10 @@ public class WallPaperFragment extends BaseFragment
     }
 
     @Override
-    public void onItemClicked(int pos, String adapter) {
+    public void onItemClicked(View view, int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
         if(mCallback != null){
-            mCallback.onItemClick(pos, mPresenter.getItemAtPos(pos).getUrl());
+            mCallback.onItemClick(view,pos, mPresenter.getItemAtPos(pos).getUrl());
         }
     }
 

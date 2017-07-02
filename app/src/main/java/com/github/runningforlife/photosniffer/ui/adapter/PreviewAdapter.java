@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
@@ -59,7 +60,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
         GlideLoaderListener listener = new GlideLoaderListener(holder.preview);
         listener.setReqWidth(DEFAULT_IMAGE_WIDTH);
         listener.setReqHeight(DEFAULT_IMAGE_HEIGHT);
-        GlideLoader.load(mContext,url, listener,
+        GlideLoader.load(mContext,url, listener, Priority.HIGH,
                 DEFAULT_IMAGE_MEDIUM_WIDTH,DEFAULT_IMAGE_MEDIUM_WIDTH);
     }
 
@@ -82,7 +83,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
                 // FIXME: there is exception when item is clicked
                 public void onClick(View v) {
                     if(mCallback != null) {
-                        mCallback.onItemClicked(getAdapterPosition(), TAG);
+                        mCallback.onItemClicked(preview,getAdapterPosition(), TAG);
                     }
                 }
             });

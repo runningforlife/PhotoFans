@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
@@ -90,10 +91,10 @@ public class WallpaperPresenterImpl extends WallpaperPresenter{
             if (imgUrl.endsWith(ImageSource.POLA_IMAGE_END)) {
                 final String newUrl = imgUrl.substring(0, imgUrl.lastIndexOf("/") + 1) +
                         ImageSource.POLA_FULL_IMAGE_END;
-                GlideLoader.downloadOnly(mContext, newUrl, listener,
+                GlideLoader.downloadOnly(mContext, newUrl, listener, Priority.HIGH,
                         Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
             } else {
-                GlideLoader.downloadOnly(mContext, imgUrl, listener,
+                GlideLoader.downloadOnly(mContext, imgUrl, listener,Priority.HIGH,
                         Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
             }
         }
@@ -166,7 +167,7 @@ public class WallpaperPresenterImpl extends WallpaperPresenter{
                 }
             }
         });
-        GlideLoader.downloadOnly(mContext, url, listener,
+        GlideLoader.downloadOnly(mContext, url, listener, Priority.HIGH,
                 Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
     }
 }

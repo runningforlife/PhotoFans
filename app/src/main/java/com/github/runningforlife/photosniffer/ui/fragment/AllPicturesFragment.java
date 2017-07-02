@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -50,10 +51,6 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     private GalleryAdapter mAdapter;
     private FragmentCallback mCallback;
 
-    public interface RefreshCallback {
-        void onRefreshDone(boolean success);
-    }
-
     public static Fragment newInstance(){
         return new AllPicturesFragment();
     }
@@ -90,8 +87,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         super.onResume();
 
         setTitle();
-        mRvImgList.removeAllViews();
-        mPresenter.onStart();
+        //mRvImgList.removeAllViews();
     }
 
     @Override
@@ -207,7 +203,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     }
 
     @Override
-    public void onItemClicked(int pos,String adapter) {
+    public void onItemClicked(View view, int pos,String adapter) {
         Log.v(TAG,"onItemClick(): pos = " + pos);
 
         if(mRefresher.isRefreshing()){
@@ -215,7 +211,10 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         }
         Intent intent = new Intent(getContext(),ImageDetailActivity.class);
         intent.putExtra("image",pos);
-        startActivity(intent);
+        ActivityOptionsCompat options = ActivityOptionsCompat.
+                makeSceneTransitionAnimation(getActivity(), view,
+                        getString(R.string.activity_image_transition) + String.valueOf(pos));
+        startActivity(intent, options.toBundle());
     }
 
     @Override
@@ -317,6 +316,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         mPresenter = new GalleryPresenterImpl(getContext(),this);
         mPresenter.init();
         mPresenter.setWebView(mWvPage);
+        mPresenter.onStart();
     }
 
     private void setTitle(){

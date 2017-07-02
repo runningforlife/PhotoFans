@@ -4,13 +4,22 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/tran_fragment_image</item>
+        <item name="android:windowSharedElementExitTransition">@transition/tran_fragment_image</item>
+        <item name="android:windowExitTransition">@android:transition/fade</item>
+        <item name="android:windowEnterTransition">@android:transition/fade</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="AppTheme.NoActionBar.DarkStatusBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/tran_fragment_image</item>
+        <item name="android:windowSharedElementExitTransition">@transition/tran_fragment_image</item>
+        <item name="android:windowExitTransition">@android:transition/fade</item>
+        <item name="android:windowEnterTransition">@android:transition/fade</item>        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@color/colorDarkBlack</item>
     </style>
 
