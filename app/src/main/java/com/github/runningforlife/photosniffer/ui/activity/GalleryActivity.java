@@ -4,6 +4,9 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.UiThread;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -44,6 +47,7 @@ public class GalleryActivity extends BaseActivity
     final static int MY_STORAGE_PERMISSION_REQUEST = 100;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
+    private Handler mHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,11 +169,14 @@ public class GalleryActivity extends BaseActivity
 
     @UiThread
     @Override
-    public void showToast(String msg) {
+    public void showToast(final String msg) {
         Log.v(TAG,"showToast()");
-        Toast t = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
-        t.setGravity(Gravity.CENTER, 0, 0);
-        t.show();
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                ToastUtil.showToast(GalleryActivity.this, msg);
+            }
+        });
         //ToastUtil.showToast(this, toast);
     }
 

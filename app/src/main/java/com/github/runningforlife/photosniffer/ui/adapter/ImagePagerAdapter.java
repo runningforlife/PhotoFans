@@ -99,6 +99,7 @@ public class ImagePagerAdapter extends PagerAdapter{
         @Override
         public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
             Log.v(TAG,"onException(): " + e);
+            image.setImageResource(R.drawable.ic_photo_grey_24dp);
             mCallback.onImageLoadDone(pos,false);
             return false;
         }

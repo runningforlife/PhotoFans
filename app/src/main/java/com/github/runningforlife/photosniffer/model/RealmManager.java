@@ -247,6 +247,8 @@ public class RealmManager implements LifeCycle{
             public void execute(Realm realm) {
                 RealmResults<ImageRealm> used = realm.where(ImageRealm.class)
                         .equalTo("mIsUsed", true)
+                        .equalTo("mIsFavor", false)
+                        .equalTo("mIsWallpaper", false)
                         .findAllSorted("mTimeStamp",Sort.ASCENDING);
                 int total = used.size();
                 for(int i = 0; i <  total - maxImgs; ++i){

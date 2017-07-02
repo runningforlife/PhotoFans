@@ -131,7 +131,7 @@ public class WallPaperFragment extends BaseFragment
 
     @Override
     public void onImageSaveDone(String path) {
-        if(TextUtils.isEmpty(path)){
+        if(!TextUtils.isEmpty(path)){
             mCallback.showToast(getString(R.string.save_image_Success));
         }else{
             mCallback.showToast(getString(R.string.save_image_fail));
