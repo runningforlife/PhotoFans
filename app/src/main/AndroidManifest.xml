@@ -42,12 +42,17 @@
         <activity android:name="com.github.runningforlife.photosniffer.ui.activity.SettingsActivity"
             android:theme="@style/AppTheme"
             android:label="@string/action_settings">
-
         </activity>
 
         <activity android:name="com.github.runningforlife.photosniffer.ui.activity.ImageSourceSelectionActivity"
             android:theme="@style/AppTheme"
             android:label="@string/select_your_favorite_websites">
+        </activity>
+
+        <activity android:name=".ui.activity.FullScreenImageActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".ui.activity.GalleryActivity"
+            android:label="">
         </activity>
 
         <service android:name="com.github.runningforlife.photosniffer.service.ImageRetrieveService">

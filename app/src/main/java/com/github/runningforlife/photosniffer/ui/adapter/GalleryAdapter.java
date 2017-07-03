@@ -126,8 +126,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
             ButterKnife.bind(this,root);
             // transition name
             if(Build.VERSION.SDK_INT >= 21) {
-                String transitionName = mContext.getString(R.string.activity_image_transition)
-                        + String.valueOf(getAdapterPosition());
+                String transitionName = mContext.getString(R.string.activity_image_transition);
                 img.setTransitionName(transitionName);
             }
             root.setOnClickListener(new View.OnClickListener() {

@@ -11,6 +11,7 @@ import android.os.Message;
 import android.support.annotation.UiThread;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -148,12 +149,13 @@ public class GalleryActivity extends BaseActivity
     public void onItemClick(View sharedView, int pos, String url) {
         Log.v(TAG,"onItemClick(): pos = " + pos);
         if(!TextUtils.isEmpty(url)) {
-            ActionBar toolbar = getSupportActionBar();
+/*            ActionBar toolbar = getSupportActionBar();
             if(toolbar != null) {
                 toolbar.setShowHideAnimationEnabled(true);
                 toolbar.hide();
-            }
-            showFullscreenFragment(sharedView, pos, url);
+            }*/
+            //showFullscreenFragment(sharedView, pos, url);
+            showFullScreenImage(sharedView, pos, url);
         }else{
             Log.e(TAG,"onItemClick(): url is empty");
         }
@@ -192,8 +194,6 @@ public class GalleryActivity extends BaseActivity
                     makeAppDir();
                 } else {
                     Log.v(TAG,"fail to request storage permission");
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                 }
             }
         }
@@ -260,27 +260,18 @@ public class GalleryActivity extends BaseActivity
                 .commit();
     }
 
-    private void showFullscreenFragment(View sharedView, int pos,String url){
-        FragmentManager fragmentMgr = getSupportFragmentManager();
-        FullScreenImageFragment fragment = (FullScreenImageFragment)
-                fragmentMgr.findFragmentByTag(FullScreenImageFragment.TAG);
-
-        if(fragment == null){
-            fragment = FullScreenImageFragment.newInstance(url);
+    private void showFullScreenImage(View sharedView, int pos, String url){
+        Intent intent = new Intent(this, FullScreenImageActivity.class);
+        intent.putExtra(FullScreenImageFragment.POSITION, pos);
+        intent.putExtra(FullScreenImageFragment.IMAGE_URL, url);
+        if(Build.VERSION.SDK_INT >= 16) {
+            ActivityOptionsCompat options = ActivityOptionsCompat.
+                    makeSceneTransitionAnimation(this, sharedView,
+                            getString(R.string.activity_image_transition) + String.valueOf(pos));
+            startActivity(intent, options.toBundle());
+        }else{
+            startActivity(intent);
         }
-        Bundle args = fragment.getArguments();
-        if(args != null) {
-            args.putString(FullScreenImageFragment.POSITION, String.valueOf(pos));
-        }
-
-        FragmentTransaction ft = fragmentMgr.beginTransaction()
-                .replace(R.id.fragment_container, fragment, FullScreenImageFragment.TAG)
-                .addToBackStack("FullScreenImage")
-                .addSharedElement(sharedView, getString(R.string.fragment_image_transition));
-        if(Build.VERSION.SDK_INT >= 19) {
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        }
-        ft.commit();
     }
 
     private void makeAppDir(){

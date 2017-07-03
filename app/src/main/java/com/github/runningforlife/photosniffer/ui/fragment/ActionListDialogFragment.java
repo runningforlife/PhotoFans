@@ -3,9 +3,12 @@ package com.github.runningforlife.photosniffer.ui.fragment;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -77,6 +80,7 @@ public class ActionListDialogFragment extends DialogFragment{
         Dialog dialog = new Dialog(getContext(),R.style.FullScreeWidthDialog);
 
         dialog.setContentView(R.layout.fragment_dialog_action_list);
+
         return dialog;
     }
 
@@ -91,6 +95,11 @@ public class ActionListDialogFragment extends DialogFragment{
             lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
             window.setAttributes(lp);
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            if(Build.VERSION.SDK_INT >= 21) {
+                Transition transition = TransitionInflater.from(getContext())
+                        .inflateTransition(android.R.transition.fade);
+                window.setExitTransition(transition);
+            }
         }
     }
 
