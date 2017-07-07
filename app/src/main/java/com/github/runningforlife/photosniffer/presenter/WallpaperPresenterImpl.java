@@ -50,7 +50,7 @@ public class WallpaperPresenterImpl extends WallpaperPresenter{
     @Override
     public void init() {
         Log.v(TAG,"init()");
-        mRealmMgr.onStart();
+        mRealmMgr.addWallpaperDataChangeListener(this);
     }
 
     @Override
@@ -122,12 +122,14 @@ public class WallpaperPresenterImpl extends WallpaperPresenter{
     @Override
     public void onStart() {
         Log.v(TAG,"onStart()");
-        mRealmMgr.addListener(this);
+        mRealmMgr.onStart();
     }
 
     @Override
     public void onDestroy() {
         mRealmMgr.onDestroy();
+
+        mRealmMgr.removeWallpaperDataChangeListener(this);
     }
 
     @Override

@@ -86,7 +86,7 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
         Log.v(TAG,"refresh()");
         mIsRefreshing = true;
         mRealmMgr.queryAllAsync();
-        mRealmMgr.addListener(this);
+        mRealmMgr.addFavorDataChangeListener(this);
 
     }
 
@@ -112,8 +112,8 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
 
     @Override
     public void init() {
-        // start loading data
-        mRealmMgr.onStart();
+        Log.v(TAG,"init()");
+        mRealmMgr.addFavorDataChangeListener(this);
     }
 
     @Override
@@ -132,11 +132,6 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
     }
 
     @Override
-    public void onWallpaperDataChange(RealmResults<ImageRealm> data) {
-
-    }
-
-    @Override
     public void onImageSaveDone(String path) {
         Log.v(TAG,"onImageSaveDone()");
         mView.onImageSaveDone(path);
@@ -145,13 +140,14 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
     @Override
     public void onStart() {
         Log.v(TAG,"onStart()");
-        mRealmMgr.addListener(this);
+        // start loading data
+        mRealmMgr.onStart();
     }
 
     @Override
     public void onDestroy() {
         mRealmMgr.onDestroy();
-        mRealmMgr.removeListener(this);
+        mRealmMgr.removeFavorDataChangeListener(this);
     }
 
     private void setWallpaper(String url){

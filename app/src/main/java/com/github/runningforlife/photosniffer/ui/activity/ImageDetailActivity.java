@@ -149,8 +149,13 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         int id = item.getItemId();
         if(id == android.R.id.home){
-            Intent intent = new Intent(this, GalleryActivity.class);
-            NavUtils.navigateUpTo(this,intent);
+            if(Build.VERSION.SDK_INT >= 21){
+                finishAfterTransition();
+            }else {
+                finish();
+            }
+/*            Intent intent = new Intent(this, GalleryActivity.class);
+            NavUtils.navigateUpTo(this,intent);*/
             return true;
         }else if(id == R.id.action_more){
             showActionDialog();

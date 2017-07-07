@@ -11,8 +11,7 @@ import com.github.runningforlife.photosniffer.utils.DisplayUtil;
  * @since 1.0
  */
 
-public interface Presenter extends RealmManager.RealmDataChangeListener,
-        ImageSaveRunnable.ImageSaveCallback, LifeCycle {
+public interface Presenter extends ImageSaveRunnable.ImageSaveCallback, LifeCycle {
     int DEFAULT_WIDTH = 1024;
     int DEFAULT_HEIGHT = (int)(DEFAULT_WIDTH* DisplayUtil.getScreenRatio());
 

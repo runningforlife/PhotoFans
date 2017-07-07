@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import io.realm.RealmResults;
 import io.realm.Sort;
@@ -53,6 +54,8 @@ public class GalleryPresenterImpl extends GalleryPresenter
     private static final int DEFAULT_RETRIEVE_TIME_OUT = 20000;
     private static final int DEFAULT_STOP_TIME_OUT = 40000;
     private static final int DEFAULT_RETRIEVED_IMAGES = 10;
+    // update Pola collections every 15days
+    private static final long POLA_UPDATED_DURATION = TimeUnit.DAYS.toMillis(15);
 
     private Context mContext;
     private GalleryView mView;
@@ -96,7 +99,7 @@ public class GalleryPresenterImpl extends GalleryPresenter
     public void refreshAnyway(){
         Log.v(TAG,"refreshAnyway()");
         // in case of no callback
-        mRealmMgr.addListener(this);
+        mRealmMgr.addUsedDataChangeListener(this);
 
         stopRetrieveIfNeeded();
 
@@ -211,17 +214,19 @@ public class GalleryPresenterImpl extends GalleryPresenter
     @Override
     public void init() {
         mIsRefreshing = false;
-        mRealmMgr.onStart();
         //mRealmMgr.addListener(this);
         mReceiver = new SimpleResultReceiver(new Handler(Looper.myLooper()));
         mReceiver.setReceiver(this);
+
+        mRealmMgr.addUsedDataChangeListener(this);
+        mRealmMgr.addUnusedDataChangeListener(this);
     }
 
     @Override
     public void onStart() {
         Log.v(TAG,"onStart()");
         // start earlier
-        mRealmMgr.addListener(this);
+        mRealmMgr.onStart();
     }
 
     @Override
@@ -229,7 +234,8 @@ public class GalleryPresenterImpl extends GalleryPresenter
         Log.v(TAG,"onDestroy()");
         //releaseWakeLock();
 
-        mRealmMgr.removeListener(this);
+        mRealmMgr.removeUsedDataChangeListener(this);
+        mRealmMgr.removeUnusedDataChangeListener(this);
         //mView = null;
         mRealmMgr.onDestroy();
         // stop service
@@ -312,9 +318,11 @@ public class GalleryPresenterImpl extends GalleryPresenter
         if(webSrc != null && webSrc.contains(polaUrl)){
             String polaRetrieved = mContext.getString(R.string.pref_pola_retrieved);
             boolean isPolaRetrieved = SharedPrefUtil.getBoolean(polaRetrieved, false);
+            String lastUpdatedTime = mContext.getString(R.string.pref_pola_last_updated_time);
             if(!isPolaRetrieved){
-                saveAllPolaUrls(polaUrl, 1, 50);
+                saveAllPolaUrls(polaUrl, 1, 52);
                 SharedPrefUtil.putBoolean(polaRetrieved, true);
+                SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
             }
             //mWvPage.addJavascriptInterface(new WebViewJsInterface(), "HtmlViewer");
             mWvPage.setWebViewClient(new WebViewClient(){
@@ -337,15 +345,24 @@ public class GalleryPresenterImpl extends GalleryPresenter
                     Log.v(TAG,"onLoadResource(): url = " + url);
                     view.pageDown(true);
                     String key = mContext.getString(R.string.pref_pola_latest_collections_number);
-                    int current = SharedPrefUtil.getInt(key,50);
+                    String lastUpdatedTime = mContext.getString(R.string.pref_pola_last_updated_time);
+                    int current = SharedPrefUtil.getInt(key,52);
 
                     if(url != null && url.endsWith("thumb.jpg")){
-
                         int collections = getLatestCollectionsNumber(url);
                         if(collections > current){
                             SharedPrefUtil.putInt(key, collections);
                             current = collections;
-                            saveAllPolaUrls(url, collections + 1, current);
+                            saveAllPolaUrls(url, current+1, collections);
+                            SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
+                        }
+                    }else{
+                        long lastTime = SharedPrefUtil.getLong(lastUpdatedTime, System.currentTimeMillis());
+                        if(System.currentTimeMillis() - lastTime >= POLA_UPDATED_DURATION){
+                            SharedPrefUtil.putInt(key, current + 1);
+                            // save next collections
+                            saveAllPolaUrls(url, current+1, current+1);
+                            SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
                         }
                     }
                 }
@@ -361,7 +378,7 @@ public class GalleryPresenterImpl extends GalleryPresenter
     }
 
     private int getLatestCollectionsNumber(String url){
-        if(TextUtils.isEmpty(url)) return 50;
+        if(TextUtils.isEmpty(url)) return 52;
 
         String sub = url.substring(ImageSource.POLA_IMAGE_START.length()+1);
         String[] splits = sub.split("/");
@@ -444,7 +461,7 @@ public class GalleryPresenterImpl extends GalleryPresenter
         static final int EVENT_RETRIEVE_TIME_OUT = 1;
         static final int EVENT_STOP_SERVICE = 2;
 
-        public H(Looper looper){
+         H(Looper looper){
             super(looper);
         }
 

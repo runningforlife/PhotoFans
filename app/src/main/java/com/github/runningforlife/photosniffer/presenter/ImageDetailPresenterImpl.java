@@ -126,19 +126,19 @@ public class ImageDetailPresenterImpl extends ImageDetailPresenter {
 
     @Override
     public void init() {
-        //mImgList = new ArrayList<>();
-        mRealmMgr.onStart();
+        Log.v(TAG,"init()");
+        mRealmMgr.addUsedDataChangeListener(this);
     }
 
     @Override
     public void onStart() {
         Log.v(TAG,"onStart()");
-        mRealmMgr.addListener(this);
+        mRealmMgr.onStart();
     }
 
     @Override
     public void onDestroy() {
-        mRealmMgr.removeListener(this);
+        mRealmMgr.removeUsedDataChangeListener(this);
         mRealmMgr.onDestroy();
     }
 

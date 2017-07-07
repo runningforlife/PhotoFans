@@ -3,6 +3,7 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.webkit.WebView;
 
 import com.github.runningforlife.photosniffer.model.ImageRealm;
+import com.github.runningforlife.photosniffer.model.RealmManager;
 
 import io.realm.RealmResults;
 
@@ -10,7 +11,8 @@ import io.realm.RealmResults;
  * a gallery presenter used to load photo list
  */
 
-public abstract class GalleryPresenter implements Presenter {
+public abstract class GalleryPresenter implements Presenter,
+        RealmManager.UsedDataChangeListener, RealmManager.UnusedDataChangeListener {
 
     /*
      * refresh data(download from network asynchrously)
@@ -23,14 +25,4 @@ public abstract class GalleryPresenter implements Presenter {
 
     public abstract void setWallpaperAtPos(int pos);
 
-    @Override
-    public void onFavorDataChange(RealmResults<ImageRealm> data){
-        // keep empty
-    }
-
-
-    @Override
-    public void onWallpaperDataChange(RealmResults<ImageRealm> data) {
-        // not care
-    }
 }

@@ -88,6 +88,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
 
         setTitle();
         //mRvImgList.removeAllViews();
+        mPresenter.onStart();
     }
 
     @Override
@@ -316,7 +317,6 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         mPresenter = new GalleryPresenterImpl(getContext(),this);
         mPresenter.init();
         mPresenter.setWebView(mWvPage);
-        mPresenter.onStart();
     }
 
     private void setTitle(){
