@@ -25,7 +25,7 @@ import io.realm.RealmResults;
  * presenter to get favor image list
  */
 
-public class FavorImagePresenterImpl extends FavorImagePresenter{
+public class FavorImagePresenterImpl implements FavorImagePresenter{
     private static final String TAG = "FavorImagePresenter";
     private FavorView mView;
     private Context mContext;
@@ -91,18 +91,6 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
     }
 
     @Override
-    public void cancelFavorAtPos(int pos) {
-        Log.v(TAG,"cancelFavorAtPos()");
-        Realm r =  Realm.getDefaultInstance();
-        r.beginTransaction();
-
-        ImageRealm img = mFavorList.get(pos);
-        img.setIsFavor(false);
-
-        r.commitTransaction();
-    }
-
-    @Override
     public void setWallpaperAtPos(int pos) {
         Log.v(TAG,"setWallpaperAtPos()");
         if(pos >= 0 && pos < mFavorList.size()) {
@@ -113,7 +101,9 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
     @Override
     public void init() {
         Log.v(TAG,"init()");
-        mRealmMgr.addFavorDataChangeListener(this);
+        // start loading data
+        mRealmMgr.onStart();
+        //mRealmMgr.addFavorDataChangeListener(this);
     }
 
     @Override
@@ -140,8 +130,7 @@ public class FavorImagePresenterImpl extends FavorImagePresenter{
     @Override
     public void onStart() {
         Log.v(TAG,"onStart()");
-        // start loading data
-        mRealmMgr.onStart();
+        mRealmMgr.addFavorDataChangeListener(this);
     }
 
     @Override

@@ -9,16 +9,16 @@ import io.realm.RealmResults;
  * a presenter to show the detail of the image
  */
 
-public abstract class ImageDetailPresenter implements Presenter,
+public interface ImageDetailPresenter extends Presenter,
         RealmManager.UsedDataChangeListener{
     /*
      * favor image at pos
      */
-    public abstract void favorImageAtPos(int pos);
+    void favorImageAtPos(int pos);
 
     /*
      * set wallpaper
      */
-    public abstract void setWallpaper(int pos);
+    void setWallpaper(int pos);
 
 }

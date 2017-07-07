@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -47,8 +48,7 @@ import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 /**
  * a presenter to bridge UI and data repository
  */
-public class GalleryPresenterImpl extends GalleryPresenter
-        implements SimpleResultReceiver.Receiver{
+public class GalleryPresenterImpl implements GalleryPresenter,SimpleResultReceiver.Receiver{
     private static final String TAG = "GalleryPresenter";
 
     private static final int DEFAULT_RETRIEVE_TIME_OUT = 20000;
@@ -162,6 +162,19 @@ public class GalleryPresenterImpl extends GalleryPresenter
     }
 
     @Override
+    public void favorImageAtPos(int pos) {
+        Log.v(TAG,"favorImageAtPos()");
+
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+
+        ImageRealm item = mImageList.get(pos);
+        item.setIsFavor(true);
+
+        realm.commitTransaction();
+    }
+
+    @Override
     public int getItemCount() {
         if(mImageList == null) return 0;
 
@@ -214,19 +227,18 @@ public class GalleryPresenterImpl extends GalleryPresenter
     @Override
     public void init() {
         mIsRefreshing = false;
+        // start earlier
+        mRealmMgr.onStart();
         //mRealmMgr.addListener(this);
         mReceiver = new SimpleResultReceiver(new Handler(Looper.myLooper()));
         mReceiver.setReceiver(this);
-
-        mRealmMgr.addUsedDataChangeListener(this);
-        mRealmMgr.addUnusedDataChangeListener(this);
     }
 
     @Override
     public void onStart() {
         Log.v(TAG,"onStart()");
-        // start earlier
-        mRealmMgr.onStart();
+        mRealmMgr.addUsedDataChangeListener(this);
+        mRealmMgr.addUnusedDataChangeListener(this);
     }
 
     @Override
@@ -255,7 +267,7 @@ public class GalleryPresenterImpl extends GalleryPresenter
         mImageList = data;
         // unsorted: keep list descending sorted
         sort();
-        mView.notifyDataChanged();
+        mView.onDataSetChanged();
 
         String key = mContext.getString(R.string.pref_max_reserved_images);
         int maxReservedImage = Integer.parseInt(SharedPrefUtil.getString(key, "100"));

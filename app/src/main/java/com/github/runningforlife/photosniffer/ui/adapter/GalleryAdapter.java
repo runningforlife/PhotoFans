@@ -2,8 +2,7 @@ package com.github.runningforlife.photosniffer.ui.adapter;
 
 import android.content.Context;
 import android.os.Build;
-import android.renderscript.RenderScript;
-import android.support.annotation.RequiresApi;
+import android.support.annotation.MenuRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -45,6 +44,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     private int mHeight;
     private String mLoader;
     private String mLayoutMgr;
+    private @MenuRes int mContextMenId;
 
     public GalleryAdapter(Context context,BaseAdapterCallback callback){
         mCallback = (GalleryAdapterCallback) callback;
@@ -55,6 +55,13 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         mLoader = Loader.GLIDE;
 
         mLayoutMgr = GridManager;
+
+        mContextMenId = R.menu.menu_context_default;
+    }
+
+
+    public void setContextMenuRes(@MenuRes int id){
+        mContextMenId = id;
     }
 
     public void setLayoutManager(@RecycleLayout String layoutManager){
@@ -146,7 +153,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
             Log.v(TAG,"onCreateContextMenu()");
             MenuInflater inflater = ((AppCompatActivity)mContext).getMenuInflater();
 
-            inflater.inflate(R.menu.menu_context_choice, menu);
+            inflater.inflate(R.menu.menu_context_default, menu);
 
             mCallback.onContextMenuCreated(getAdapterPosition(), TAG);
         }

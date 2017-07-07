@@ -13,19 +13,13 @@ import io.realm.RealmResults;
  * Created by jason on 6/16/17.
  */
 
-public abstract class WallpaperPresenter implements Presenter,
+public interface WallpaperPresenter extends Presenter,
         RealmManager.WallpaperDataChangeListener{
 
-    public void checkNotNull(Object object){
-        if(object == null){
-            throw new IllegalArgumentException("view should not be null");
-        }
-    }
+    void refresh();
 
-    public abstract void refresh();
+    void setWallpaperAtPos(int pos);
 
-    public abstract void setWallpaperAtPos(int pos);
-
-    public abstract void setView(WallpaperView view);
+    void setView(WallpaperView view);
 
 }

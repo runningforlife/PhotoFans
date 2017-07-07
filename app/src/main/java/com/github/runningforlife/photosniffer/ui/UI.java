@@ -8,6 +8,11 @@ package com.github.runningforlife.photosniffer.ui;
 
 public interface UI {
     /*
+     * data set is changed
+     */
+    void onDataSetChanged();
+
+    /*
      * image save is done
      */
     void onImageSaveDone(String path);

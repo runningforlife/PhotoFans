@@ -11,18 +11,19 @@ import io.realm.RealmResults;
  * a gallery presenter used to load photo list
  */
 
-public abstract class GalleryPresenter implements Presenter,
+public interface GalleryPresenter extends Presenter,
         RealmManager.UsedDataChangeListener, RealmManager.UnusedDataChangeListener {
 
     /*
      * refresh data(download from network asynchrously)
      */
-    public abstract void refresh();
+    void refresh();
 
-    public abstract void refreshAnyway();
+    void refreshAnyway();
 
-    public abstract void setWebView(WebView webView);
+    void setWebView(WebView webView);
 
-    public abstract void setWallpaperAtPos(int pos);
+    void setWallpaperAtPos(int pos);
 
+    void favorImageAtPos(int pos);
 }

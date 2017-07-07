@@ -27,7 +27,7 @@ import io.realm.RealmResults;
  * wallpaper presenter to get UI data
  */
 
-public class WallpaperPresenterImpl extends WallpaperPresenter{
+public class WallpaperPresenterImpl implements WallpaperPresenter{
     private static final String TAG = "WallpaperPresenter";
     private Context mContext;
     private WallpaperView mView;
@@ -50,24 +50,21 @@ public class WallpaperPresenterImpl extends WallpaperPresenter{
     @Override
     public void init() {
         Log.v(TAG,"init()");
-        mRealmMgr.addWallpaperDataChangeListener(this);
+        mRealmMgr.onStart();
     }
 
     @Override
     public int getItemCount() {
-        checkNotNull(mWallpaper);
         return mWallpaper.size();
     }
 
     @Override
     public ImageRealm getItemAtPos(int pos) {
-        checkNotNull(mWallpaper);
         return mWallpaper.get(pos);
     }
 
     @Override
     public void removeItemAtPos(int pos) {
-        checkNotNull(mWallpaper);
         if(pos >= 0 && pos <= mWallpaper.size()) {
             mRealmMgr.delete(mWallpaper.get(pos));
         }
@@ -122,7 +119,7 @@ public class WallpaperPresenterImpl extends WallpaperPresenter{
     @Override
     public void onStart() {
         Log.v(TAG,"onStart()");
-        mRealmMgr.onStart();
+        mRealmMgr.addWallpaperDataChangeListener(this);
     }
 
     @Override

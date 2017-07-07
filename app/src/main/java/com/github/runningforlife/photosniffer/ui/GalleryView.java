@@ -5,8 +5,7 @@ package com.github.runningforlife.photosniffer.ui;
  */
 
 public interface GalleryView extends UI {
-    void notifyDataChanged();
-
+    
     void onRefreshDone(boolean isSuccess);
 
     void onNetworkDisconnect();

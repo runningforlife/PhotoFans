@@ -5,9 +5,5 @@ package com.github.runningforlife.photosniffer.ui;
  */
 
 public interface ImageDetailView extends UI{
-
-    /*
-     * on data set changed,notify UI to change
-     */
-    void onDataSetChanged();
+    //
 }

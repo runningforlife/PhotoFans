@@ -6,11 +6,6 @@ package com.github.runningforlife.photosniffer.ui;
 
 public interface FavorView extends UI{
     /*
-     * data set is changed
-     */
-    void onDataSetChanged();
-
-    /*
      * refresh data set
      */
     void onRefreshDone(boolean isSuccess);

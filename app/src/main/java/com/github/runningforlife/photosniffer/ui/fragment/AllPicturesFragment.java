@@ -116,8 +116,8 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     }
 
     @Override
-    public void notifyDataChanged() {
-        Log.v(TAG,"notifyDataChanged()");
+    public void onDataSetChanged() {
+        Log.v(TAG,"onDataSetChanged()");
         if(mRvImgList.getAdapter() == null){
             mRvImgList.setAdapter(mAdapter);
         }
@@ -189,6 +189,9 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         switch (item.getItemId()){
             case R.id.menu_save:
                 mPresenter.saveImageAtPos(mCurrentPos);
+                break;
+            case R.id.menu_favor:
+                mPresenter.favorImageAtPos(mCurrentPos);
                 break;
             case R.id.menu_delete:
                 mPresenter.removeItemAtPos(mCurrentPos);
@@ -297,6 +300,8 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
         mRvImgList.setBackgroundResource(R.color.colorLightGrey);
 
         mAdapter = new GalleryAdapter(getActivity(),this);
+        mAdapter.setContextMenuRes(R.menu.menu_context_gallery);
+
         mRvImgList.setAdapter(mAdapter);
         mRefresher.setColorSchemeResources(android.R.color.holo_blue_light,
                 android.R.color.holo_orange_light,

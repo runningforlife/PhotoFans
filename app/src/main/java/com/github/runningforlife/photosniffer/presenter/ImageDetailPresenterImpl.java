@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
  * Created by jason on 4/6/17.
  */
 
-public class ImageDetailPresenterImpl extends ImageDetailPresenter {
+public class ImageDetailPresenterImpl implements ImageDetailPresenter {
     private static final String TAG = "ImageDetailPresenter";
 
     private Context mContext;
@@ -127,13 +127,13 @@ public class ImageDetailPresenterImpl extends ImageDetailPresenter {
     @Override
     public void init() {
         Log.v(TAG,"init()");
-        mRealmMgr.addUsedDataChangeListener(this);
+        mRealmMgr.onStart();
     }
 
     @Override
     public void onStart() {
         Log.v(TAG,"onStart()");
-        mRealmMgr.onStart();
+        mRealmMgr.addUsedDataChangeListener(this);
     }
 
     @Override

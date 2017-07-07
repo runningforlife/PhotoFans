@@ -9,11 +9,9 @@ import io.realm.RealmResults;
  * presenter to get favor image list
  */
 
-public abstract class FavorImagePresenter implements Presenter, RealmManager.FavorDataChangeListener{
+public interface FavorImagePresenter extends Presenter, RealmManager.FavorDataChangeListener{
 
-    public abstract void refresh();
+    void refresh();
 
-    public abstract void cancelFavorAtPos(int pos);
-
-    public abstract void setWallpaperAtPos(int pos);
+    void setWallpaperAtPos(int pos);
 }
