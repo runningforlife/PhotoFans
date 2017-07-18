@@ -13,9 +13,9 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.model.ImageWebSite;
 import com.github.runningforlife.photosniffer.model.RealmManager;
-import com.github.runningforlife.photosniffer.model.VisitedPageInfo;
 import com.github.runningforlife.photosniffer.ui.adapter.MultiSelectionListAdapter;
 
 import java.util.HashSet;
@@ -122,24 +122,24 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
         RealmManager helper = RealmManager.getInstance();
 
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<VisitedPageInfo> pages = helper.getAllUnvisitedPages(realm);
+        RealmResults<ImagePageInfo> pages = helper.getAllUnvisitedImagePages(realm);
 
         if(pages.size() > 0) {
             Set<String> allUrls = new HashSet<>();
-            for (VisitedPageInfo p : pages) {
+            for (ImagePageInfo p : pages) {
                 allUrls.add(p.getUrl());
             }
             // whether we should update database
             for (String url : src) {
                 if(!allUrls.contains(url)){
-                    VisitedPageInfo pageInfo = new VisitedPageInfo(url);
+                    ImagePageInfo pageInfo = new ImagePageInfo(url);
                     helper.savePageAsync(pageInfo);
                 }
             }
         }else{
             // save it to data base
             for(String url : src){
-                VisitedPageInfo pageInfo = new VisitedPageInfo(url);
+                ImagePageInfo pageInfo = new ImagePageInfo(url);
                 helper.savePageAsync(pageInfo);
             }
         }

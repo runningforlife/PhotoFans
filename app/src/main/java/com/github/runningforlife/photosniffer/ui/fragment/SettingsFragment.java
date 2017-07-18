@@ -4,17 +4,15 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.model.RealmManager;
-import com.github.runningforlife.photosniffer.model.VisitedPageInfo;
 import com.github.runningforlife.photosniffer.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.ui.receiver.WallpaperAlarmReceiver;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
@@ -75,13 +73,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 RealmManager helper = RealmManager.getInstance();
 
                 Realm realm = Realm.getDefaultInstance();
-                RealmResults<VisitedPageInfo> visited = helper.getAllVisitedPages(realm);
+                RealmResults<ImagePageInfo> visited = helper.getAllVisitedPages(realm);
 
                 Iterator it = src.iterator();
                 while(it.hasNext()){
                     String url = (String) it.next();
                     if(!visited.contains(url)){
-                        helper.savePageAsync(new VisitedPageInfo(url));
+                        helper.savePageAsync(new ImagePageInfo(url));
                     }
                 }
 

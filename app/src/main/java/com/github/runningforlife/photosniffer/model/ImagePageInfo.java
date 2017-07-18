@@ -7,16 +7,16 @@ import io.realm.annotations.PrimaryKey;
  * a class to record visited pages
  */
 
-public class VisitedPageInfo extends RealmObject {
+public class ImagePageInfo extends RealmObject {
     @PrimaryKey
     private String mUrl;
     private long mVisitTime;
     private boolean mIsVisited;
 
-    public VisitedPageInfo(){
+    public ImagePageInfo(){
     }
 
-    public VisitedPageInfo(String url){
+    public ImagePageInfo(String url){
         mIsVisited = false;
     }
 
@@ -46,10 +46,10 @@ public class VisitedPageInfo extends RealmObject {
 
     @Override
     public boolean equals(Object o){
-        if(!(o instanceof  VisitedPageInfo)){
+        if(!(o instanceof ImagePageInfo)){
             return false;
         }
 
-        return this == o || (this.mUrl.equals(((VisitedPageInfo)o).mUrl));
+        return this == o || (this.mUrl.equals(((ImagePageInfo)o).mUrl));
     }
 }

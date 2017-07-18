@@ -3,9 +3,9 @@ package com.github.runningforlife.photosniffer.crawler.processor;
 import android.util.Log;
 import android.webkit.URLUtil;
 
+import com.github.runningforlife.photosniffer.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.model.RealmManager;
-import com.github.runningforlife.photosniffer.model.VisitedPageInfo;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import us.codecraft.webmagic.processor.PageProcessor;
 
 public class ImageRetrievePageProcessor implements PageProcessor {
 
-    private static final String TAG = "PageProcessor";
+    private static final String TAG = "ImagePageProcessor";
 
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000).setTimeOut(10000);
 
@@ -41,7 +41,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private static List<String> sLastUrl;
     private int mCurrentImages;
     @SuppressWarnings("unchecked")
-    private SourcePageFilter mPageFilter;
+    private ImagePageFilter mPageFilter;
     private static final int DEFAULT_RETRIEVED_IMAGES = 20;
     // executor server to save data
     private ExecutorService mExecutor;
@@ -50,7 +50,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         mExpectedImages = expected;
         mListeners = new ArrayList<>();
         sLastUrl = new ArrayList<>();
-        mPageFilter = new SourcePageFilter();
+        mPageFilter = new ImagePageFilter();
         mIsExpectedDone = false;
         mCurrentImages = 0;
         mExecutor = Executors.newFixedThreadPool(2,new MyThreadFactory());
@@ -108,7 +108,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
         if(!isVisited(page) && isValidPage(page)) {
             List<ImageRealm> result = ImageRetrieverFactory.getInstance().
-                    retrieveImages(page);
+                    retrieve(page);
             if(result != null && result.size() > 0) {
                 for(ImageRealm img : result){
                     if(mCurrentImages <= mExpectedImages && !img.getUsed()){
@@ -133,7 +133,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
             // save to disk
             mExecutor.submit(new SaveRunnable(getPageList(page),
-                    VisitedPageInfo.class.getSimpleName()));
+                    ImagePageInfo.class.getSimpleName()));
         }
     }
 
@@ -153,8 +153,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private void loadPages(){
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<VisitedPageInfo> pages = RealmManager.getInstance()
-                .getAllUnvisitedPages(realm);
+        RealmResults<ImagePageInfo> pages = RealmManager.getInstance()
+                .getAllUnvisitedImagePages(realm);
         Log.d(TAG,"loadPages(): unvisisted page size = " + pages.size());
 
         if(pages.size() > 0){
@@ -175,7 +175,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                 }
             }
 
-            for (VisitedPageInfo info : pages) {
+            for (ImagePageInfo info : pages) {
                 if (!sAllPages.containsKey(info.getUrl())) {
                     sAllPages.put(info.getUrl(),info.getIsVisited());
                 }
@@ -219,23 +219,23 @@ public class ImageRetrievePageProcessor implements PageProcessor {
             if(ImageRealm.class.getSimpleName().equals(type)){
                 rm.saveImageRealmAsync((List<ImageRealm>) data);
             }
-            else if(VisitedPageInfo.class.getSimpleName().equals(type)){
-                rm.savePageAsync((List<VisitedPageInfo>) data);
+            else if(ImagePageInfo.class.getSimpleName().equals(type)){
+                rm.savePageAsync((List<ImagePageInfo>) data);
             }
         }
     }
 
-    private List<VisitedPageInfo> getPageList(Page page){
+    private List<ImagePageInfo> getPageList(Page page){
 
         List<String> urlList = page.getHtml().links().all();
-        List<VisitedPageInfo> pageList = new ArrayList<>(urlList.size() + 1);
+        List<ImagePageInfo> pageList = new ArrayList<>(urlList.size() + 1);
 
         page.addTargetRequests(urlList);
 
         urlList.add(page.getUrl().get());
         for(String url : urlList){
             if(!sAllPages.containsKey(url) && isValidPageUrl(url)) {
-                VisitedPageInfo info = new VisitedPageInfo();
+                ImagePageInfo info = new ImagePageInfo();
                 info.setUrl(url);
                 if(urlList.indexOf(url) != 0) {
                     info.setIsVisited(false);

@@ -8,9 +8,7 @@ import android.util.Log;
 import com.github.runningforlife.photosniffer.presenter.LifeCycle;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
@@ -180,14 +178,34 @@ public class RealmManager implements LifeCycle{
         }
     }
 
+    public void saveQuotePage(final List<QuotePageInfo> pageList){
+        Realm r = Realm.getDefaultInstance();
+
+        try{
+            r.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.copyToRealmOrUpdate(pageList);
+                }
+            }, new Realm.Transaction.OnSuccess() {
+                @Override
+                public void onSuccess() {
+                    Log.v(TAG,"saveQuotePage(): success");
+                }
+            });
+        }finally {
+            r.close();
+        }
+    }
+
     //Note: Realm objects can only be accessed on the thread they were created
-    public void savePageAsync(final VisitedPageInfo info) {
+    public void savePageAsync(final ImagePageInfo info) {
         Realm r = Realm.getDefaultInstance();
         try {
             r.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    RealmResults<VisitedPageInfo> all = realm.where(VisitedPageInfo.class)
+                    RealmResults<ImagePageInfo> all = realm.where(ImagePageInfo.class)
                             .findAll();
                     if(!all.contains(info)) {
                         realm.copyToRealmOrUpdate(info);
@@ -240,7 +258,7 @@ public class RealmManager implements LifeCycle{
         }
     }
 
-    public void savePageAsync(final List<VisitedPageInfo> data) {
+    public void savePageAsync(final List<ImagePageInfo> data) {
         if(data == null || data.size() <= 0) return;
         Realm r = Realm.getDefaultInstance();
         try {
@@ -248,9 +266,9 @@ public class RealmManager implements LifeCycle{
                 @Override
                 public void execute(Realm realm) {
                     Log.v(TAG, "execute(): saved data size = " + data.size());
-                    RealmResults<VisitedPageInfo> all = realm.where(VisitedPageInfo.class)
+                    RealmResults<ImagePageInfo> all = realm.where(ImagePageInfo.class)
                             .findAll();
-                    for(VisitedPageInfo page : data) {
+                    for(ImagePageInfo page : data) {
                         if(!all.contains(page)) {
                             realm.copyToRealmOrUpdate(data);
                         }
@@ -271,8 +289,8 @@ public class RealmManager implements LifeCycle{
         query();
     }
 
-    public RealmResults<VisitedPageInfo> getAllVisitedPages(Realm r){
-        RealmResults<VisitedPageInfo> visited = r.where(VisitedPageInfo.class)
+    public RealmResults<ImagePageInfo> getAllVisitedPages(Realm r){
+        RealmResults<ImagePageInfo> visited = r.where(ImagePageInfo.class)
                 .equalTo("mIsVisited", true)
                 .isNotNull("mUrl")
                 .findAll();
@@ -280,8 +298,8 @@ public class RealmManager implements LifeCycle{
         return visited;
     }
 
-    public RealmResults<VisitedPageInfo> getAllUnvisitedPages(Realm r){
-        RealmResults<VisitedPageInfo> unVisited = r.where(VisitedPageInfo.class)
+    public RealmResults<ImagePageInfo> getAllUnvisitedImagePages(Realm r){
+        RealmResults<ImagePageInfo> unVisited = r.where(ImagePageInfo.class)
                 .equalTo("mIsVisited",false)
                 .isNotNull("mUrl")
                 .findAll();

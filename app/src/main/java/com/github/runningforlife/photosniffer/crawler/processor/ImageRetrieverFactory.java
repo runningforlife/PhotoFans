@@ -1,15 +1,9 @@
 package com.github.runningforlife.photosniffer.crawler.processor;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
-import com.github.runningforlife.photosniffer.app.AppGlobals;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 
 import org.jsoup.nodes.Document;
@@ -32,7 +26,7 @@ import us.codecraft.webmagic.selector.Html;
  * Created by jason on 4/1/17.
  */
 
-public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
+public class ImageRetrieverFactory implements PageRetriever<ImageRealm>,ImageSource{
     private static final String TAG = "RetrieverFactory";
 
     private static Map<String,String> sImgSource = new HashMap<>();
@@ -72,7 +66,7 @@ public class ImageRetrieverFactory implements ImageRetriever,ImageSource{
     }
 
     @Override
-    public List<ImageRealm> retrieveImages(Page page){
+    public List<ImageRealm> retrieve(Page page){
         if(page == null){
             throw new IllegalArgumentException("page should not be null");
         }

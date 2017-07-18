@@ -8,10 +8,10 @@ import java.util.List;
  * filter the page
  */
 
-public class SourcePageFilter implements PageFilter {
+public class ImagePageFilter implements PageFilter {
     private  List<String> defSourceSite;
 
-    public SourcePageFilter(){
+    public ImagePageFilter(){
         defSourceSite = SharedPrefUtil.getImageSource();
     }
 
