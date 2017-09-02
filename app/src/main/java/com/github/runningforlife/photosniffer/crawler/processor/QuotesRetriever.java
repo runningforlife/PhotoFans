@@ -25,7 +25,7 @@ import us.codecraft.webmagic.Page;
 public class QuotesRetriever implements PageRetriever<QuoteRealm>{
     private static final String TAG = "QuotesRetriever";
 
-    private static final String CLASS_CONTENT = "grid_content";
+    private static final String CLASS_CONTENT = "grid__content";
     private static final String CLASS_AUTHOR = "quote-single__author-name-link";
     private static final String CLASS_CONTENT_LINK = "grid__content-link";
     private static final String ATTR_LINK = "href";
@@ -53,8 +53,9 @@ public class QuotesRetriever implements PageRetriever<QuoteRealm>{
 
     @Override
     public List<QuoteRealm> retrieve(Page page) {
-        Log.v(TAG,"retrieve()");
         if(page == null) return null;
+
+        Log.v(TAG,"retrieve()");
 
         Document doc = page.getHtml().getDocument();
 
@@ -75,14 +76,17 @@ public class QuotesRetriever implements PageRetriever<QuoteRealm>{
 
             Elements eContent = element.getElementsByClass(CLASS_CONTENT_LINK);
             String url = eContent.get(0).attr(ATTR_LINK);
-            String text = eContent.get(0).ownText();
-
-            QuoteRealm quote = new QuoteRealm(url, author, text);
-            quotes.add(quote);
+            String text = eContent.text();
+            if(!TextUtils.isEmpty(text)) {
+                QuoteRealm quote = new QuoteRealm(url, author, text);
+                quotes.add(quote);
+            }
         }
 
         pageList.addAll(quotePageList);
         quoteList.addAll(quotes);
+        // save quotes
+        saveQuoteList(quotes);
         // save page list
         savePageList(quotePageList);
 
@@ -101,13 +105,30 @@ public class QuotesRetriever implements PageRetriever<QuoteRealm>{
         return quoteList;
     }
 
-    private void savePageList(final List<QuotePageInfo> pageList){
+    private void savePageList(final List<QuotePageInfo> pages){
+        if(pages.size() <= 0) return;
+
+        Log.v(TAG,"savePageList(): page size = " + pages.size());
         MyThreadFactory.getInstance().newThread(new Runnable() {
             @Override
             public void run() {
                 Log.v(TAG,"savePageList()");
                 RealmManager realmManager = RealmManager.getInstance();
-                realmManager.saveQuotePage(pageList);
+                realmManager.saveQuotePage(pages);
+            }
+        }).start();
+    }
+
+    private void saveQuoteList(final List<QuoteRealm> quotes){
+        if(quotes.size() <= 0) return;
+
+        Log.v(TAG,"savePageList(): quotes size = " + quotes.size());
+        MyThreadFactory.getInstance().newThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.v(TAG,"saveQuoteList()");
+                RealmManager realmManager = RealmManager.getInstance();
+                realmManager.saveQuoteRealm(quotes);
             }
         }).start();
     }

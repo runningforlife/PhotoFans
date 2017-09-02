@@ -20,13 +20,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.Toast;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
-import com.github.runningforlife.photosniffer.presenter.GalleryPresenter;
-import com.github.runningforlife.photosniffer.presenter.GalleryPresenterImpl;
-import com.github.runningforlife.photosniffer.ui.GalleryView;
+import com.github.runningforlife.photosniffer.presenter.AllPicturesPresenter;
+import com.github.runningforlife.photosniffer.presenter.AllPicturesPresenterImpl;
+import com.github.runningforlife.photosniffer.ui.AllPictureView;
 import com.github.runningforlife.photosniffer.ui.activity.ImageDetailActivity;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
@@ -40,14 +39,14 @@ import butterknife.ButterKnife;
  * a fragment to display all pictures
  */
 
-public class AllPicturesFragment extends BaseFragment implements GalleryView,
+public class AllPicturesFragment extends BaseFragment implements AllPictureView,
         GalleryAdapterCallback {
     public static final String TAG = "AllPicturesFragment";
 
     @BindView(R.id.rcv_gallery) RecyclerView mRvImgList;
     @BindView(R.id.srl_refresh) SwipeRefreshLayout mRefresher;
     @BindView(R.id.wv_page) WebView mWvPage;
-    private GalleryPresenter mPresenter;
+    private AllPicturesPresenter mPresenter;
     private GalleryAdapter mAdapter;
     private FragmentCallback mCallback;
 
@@ -319,7 +318,7 @@ public class AllPicturesFragment extends BaseFragment implements GalleryView,
     }
 
     private void initPresenter(){
-        mPresenter = new GalleryPresenterImpl(getContext(),this);
+        mPresenter = new AllPicturesPresenterImpl(getContext(),this);
         mPresenter.init();
         mPresenter.setWebView(mWvPage);
     }

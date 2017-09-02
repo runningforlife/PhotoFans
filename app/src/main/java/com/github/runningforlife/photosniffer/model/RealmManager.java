@@ -33,11 +33,15 @@ public class RealmManager implements LifeCycle{
     private RealmResults<ImageRealm> mAllUnUsed;
     private RealmResults<ImageRealm> mAllFavor;
     private RealmResults<ImageRealm> mAllWallpaper;
+
+    private RealmResults<QuotePageInfo> mAllQuotePage;
+    private RealmResults<QuoteRealm> mAllQuotes;
     // callback to listen realm changes: update or query complete
     private List<UsedDataChangeListener> mUsedChangeListener;
     private List<UnusedDataChangeListener> mUnusedChangeListener;
     private List<FavorDataChangeListener> mFavorChangeListener;
     private List<WallpaperDataChangeListener> mWallpaperChangeListener;
+    private List<QuoteDataChangeListener> mQuoteDataChangeListener;
 
     private UsedRealmDataChangeListener mUsedDataChangeListener;
     private UnusedRealmDataChangeListener mUnusedDataChangeListener;
@@ -58,6 +62,10 @@ public class RealmManager implements LifeCycle{
 
     public interface WallpaperDataChangeListener{
         void onWallpaperDataChange(RealmResults<ImageRealm> data);
+    }
+
+    public interface QuoteDataChangeListener{
+        void onQuoteDataChange(RealmResults<QuoteRealm> data);
     }
 
     public void addUsedDataChangeListener(UsedDataChangeListener listener){
@@ -118,6 +126,15 @@ public class RealmManager implements LifeCycle{
         }
     }
 
+    public void addQuoteDataChangeListener(QuoteDataChangeListener listener){
+        if(listener != null){
+            mQuoteDataChangeListener.add(listener);
+        }
+    }
+
+    public void removeQuoteDataChangeListener(QuoteDataChangeListener listener){
+        mQuoteDataChangeListener.remove(listener);
+    }
 
     public static RealmManager getInstance() {
         return sInstance;
@@ -132,6 +149,7 @@ public class RealmManager implements LifeCycle{
         mUnusedChangeListener = new ArrayList<>();
         mFavorChangeListener = new ArrayList<>();
         mWallpaperChangeListener = new ArrayList<>();
+        mQuoteDataChangeListener = new ArrayList<>();
 
         queryAllAsync();
     }
@@ -167,6 +185,10 @@ public class RealmManager implements LifeCycle{
                 mAllWallpaper.removeAllChangeListeners();
                 mAllWallpaper = null;
             }
+            if(mAllQuotes != null){
+                mAllQuotes.removeAllChangeListeners();
+                mAllQuotes = null;
+            }
             if (realm != null) {
                 realm.close();
                 realm = null;
@@ -194,6 +216,26 @@ public class RealmManager implements LifeCycle{
                 }
             });
         }finally {
+            r.close();
+        }
+    }
+
+    public void saveQuoteRealm(final List<QuoteRealm> data){
+        Realm r = Realm.getDefaultInstance();
+
+        try{
+            r.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.copyToRealmOrUpdate(data);
+                }
+            }, new Realm.Transaction.OnSuccess() {
+                @Override
+                public void onSuccess() {
+                    Log.v(TAG,"saveQuoteRealm(): success");
+                }
+            });
+        } finally {
             r.close();
         }
     }
@@ -443,6 +485,16 @@ public class RealmManager implements LifeCycle{
                 listener.onWallpaperDataChange(mAllWallpaper);
             }
         }
+
+        if(mAllQuotes == null || !mAllQuotes.isValid()){
+            mAllQuotes = realm.where(QuoteRealm.class)
+                    .findAllAsync();
+            mAllQuotes.addChangeListener(new QuoteRealmDataChangeListener());
+        }else if(mAllQuotes.isValid()){
+            for(QuoteDataChangeListener listener : mQuoteDataChangeListener){
+                listener.onQuoteDataChange(mAllQuotes);
+            }
+        }
     }
 
     private class UsedRealmDataChangeListener implements RealmChangeListener<RealmResults<ImageRealm>>{
@@ -484,6 +536,16 @@ public class RealmManager implements LifeCycle{
         public void onChange(RealmResults<ImageRealm> element) {
             for(WallpaperDataChangeListener listener : mWallpaperChangeListener){
                 listener.onWallpaperDataChange(element);
+            }
+        }
+    }
+
+    private class QuoteRealmDataChangeListener implements RealmChangeListener<RealmResults<QuoteRealm>>{
+
+        @Override
+        public void onChange(RealmResults<QuoteRealm> element) {
+            for(QuoteDataChangeListener listener : mQuoteDataChangeListener){
+                listener.onQuoteDataChange(element);
             }
         }
     }

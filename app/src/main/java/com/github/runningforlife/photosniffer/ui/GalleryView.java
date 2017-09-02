@@ -1,14 +1,10 @@
 package com.github.runningforlife.photosniffer.ui;
 
 /**
- * a gallery interface to be used in presenter
+ * Created by jason on 7/18/17.
  */
 
-public interface GalleryView extends UI {
-    
-    void onRefreshDone(boolean isSuccess);
+public interface GalleryView {
 
-    void onNetworkDisconnect();
-
-    void onMobileConnected();
+    void onRefreshDone(boolean success);
 }

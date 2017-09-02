@@ -19,6 +19,7 @@ public class QuoteRealm extends RealmObject {
     private String author;
     private String text;
     private String savedTime;
+    private long showTime; // when this item is showed
 
     public QuoteRealm(){
 
@@ -62,6 +63,14 @@ public class QuoteRealm extends RealmObject {
 
     public String getSavedTime(){
         return savedTime;
+    }
+
+    public void setShowTime(long showTime){
+        this.showTime = showTime;
+    }
+
+    public long getShowTime(){
+        return showTime;
     }
 
     @Override

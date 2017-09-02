@@ -113,7 +113,7 @@ public class ImageRetrieveService extends Service implements
     }
 
     private void handleIntent(Intent intent) {
-        int max = intent.getIntExtra(EXTRA_EXPECTED_IMAGES,0);
+        int max = intent.getIntExtra(EXTRA_EXPECTED_IMAGES, 10);
         mReceiver = intent.getParcelableExtra("receiver");
         if(mReceiver != null) {
             mReceiver.send(ServiceStatus.RUNNING, null);
@@ -170,8 +170,6 @@ public class ImageRetrieveService extends Service implements
     }
 
     private final class H extends  Handler{
-        private int mStartId;
-
         static final int EVENT_RETRIEVE_START = 1;
         static final int EVENT_RETRIEVE_DONE = 2;
 
@@ -186,7 +184,6 @@ public class ImageRetrieveService extends Service implements
             switch (what){
                 case EVENT_RETRIEVE_START:
                     handleIntent((Intent)msg.obj);
-                    mStartId = msg.arg1;
                     break;
                 case EVENT_RETRIEVE_DONE:
                     int size = (int)msg.obj;

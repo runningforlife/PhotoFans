@@ -5,6 +5,7 @@ import android.util.Log;
 import com.github.runningforlife.photosniffer.model.QuotePageInfo;
 import com.github.runningforlife.photosniffer.model.QuoteRealm;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import us.codecraft.webmagic.Page;
@@ -23,14 +24,22 @@ public class QuotePageProcessor implements PageProcessor, QuotesRetriever.Retrie
             .setSleepTime(1000).setTimeOut(3000);
     private QuotePageFilter filter;
     private QuotesRetriever retriever;
-    private RetrieveCompleteCallback callback;
+    private List<RetrieveCompleteCallback> callback;
 
     public interface RetrieveCompleteCallback{
-        void onRetrieveComplete(boolean success);
+        void onRetrieveComplete(int cnt);
     }
 
-    public void setCallback(RetrieveCompleteCallback callback){
-        this.callback = callback;
+    public void addCallback(RetrieveCompleteCallback cb){
+        if(!callback.contains(cb)) {
+            callback.add(cb);
+        }
+    }
+
+    public void removeCallback(RetrieveCompleteCallback cb){
+        if(callback != null){
+            callback.remove(cb);
+        }
     }
 
     public QuotePageProcessor(int expected){
@@ -38,6 +47,8 @@ public class QuotePageProcessor implements PageProcessor, QuotesRetriever.Retrie
         filter = new QuotePageFilter();
         retriever = new QuotesRetriever(expect);
         retriever.setCompleteListener(this);
+
+        callback = new ArrayList<>();
     }
 
     @Override
@@ -67,9 +78,13 @@ public class QuotePageProcessor implements PageProcessor, QuotesRetriever.Retrie
     public void onRetrieveComplete(int cnt) {
         Log.v(TAG,"onRetrieveComplete()");
         if(cnt > 0){
-            callback.onRetrieveComplete(true);
+            for(RetrieveCompleteCallback cb : callback){
+                cb.onRetrieveComplete(cnt);
+            }
         }else{
-            callback.onRetrieveComplete(false);
+            for(RetrieveCompleteCallback cb : callback){
+                cb.onRetrieveComplete(-1);
+            }
         }
     }
 

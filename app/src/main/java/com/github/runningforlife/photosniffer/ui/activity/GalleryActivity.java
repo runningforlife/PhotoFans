@@ -3,12 +3,13 @@ package com.github.runningforlife.photosniffer.ui.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.support.annotation.UiThread;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -21,14 +22,20 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.model.QuoteRealm;
+import com.github.runningforlife.photosniffer.presenter.GalleryPresenter;
+import com.github.runningforlife.photosniffer.presenter.GalleryPresenterImpl;
+import com.github.runningforlife.photosniffer.ui.GalleryView;
 import com.github.runningforlife.photosniffer.ui.fragment.AllPicturesFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.BaseFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FavoriteImageFragment;
@@ -43,13 +50,21 @@ import butterknife.ButterKnife;
 
 public class GalleryActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback,
-        BaseFragment.FragmentCallback {
+        BaseFragment.FragmentCallback, GalleryView {
 
     private static final String TAG = "GalleryActivity";
     final static int MY_STORAGE_PERMISSION_REQUEST = 100;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
+
+    private View headerView;
+    private TextView tvQuote;
+    private TextView tvQuoteAuthor;
+    private ImageView ivQuoteSync;
+
     private Handler mHandler = new Handler(Looper.getMainLooper());
+
+    private GalleryPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +81,13 @@ public class GalleryActivity extends BaseActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
+        navView.setNavigationItemSelectedListener(this);
+        headerView = navView.getHeaderView(0);
+
+        initView();
+
+        initPresenter();
 
         drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -78,6 +98,9 @@ public class GalleryActivity extends BaseActivity
             public void onDrawerOpened(View drawerView) {
                 Log.v(TAG,"onDrawerOpened()");
                 setRefreshing(false);
+                if(presenter != null) {
+                    presenter.refresh();
+                }
             }
 
             @Override
@@ -91,8 +114,6 @@ public class GalleryActivity extends BaseActivity
 
             }
         });
-
-        initView();
     }
 
     @Override
@@ -100,6 +121,8 @@ public class GalleryActivity extends BaseActivity
         super.onResume();
 
         checkStoragePermission();
+
+        presenter.onStart();
     }
 
     @Override
@@ -149,12 +172,6 @@ public class GalleryActivity extends BaseActivity
     public void onItemClick(View sharedView, int pos, String url) {
         Log.v(TAG,"onItemClick(): pos = " + pos);
         if(!TextUtils.isEmpty(url)) {
-/*            ActionBar toolbar = getSupportActionBar();
-            if(toolbar != null) {
-                toolbar.setShowHideAnimationEnabled(true);
-                toolbar.hide();
-            }*/
-            //showFullscreenFragment(sharedView, pos, url);
             showFullScreenImage(sharedView, pos, url);
         }else{
             Log.e(TAG,"onItemClick(): url is empty");
@@ -184,6 +201,23 @@ public class GalleryActivity extends BaseActivity
     }
 
     @Override
+    public void onRefreshDone(boolean success) {
+        Log.v(TAG,"onRefreshDone()");
+        AnimationDrawable animDrawable = (AnimationDrawable)ivQuoteSync.getBackground();
+        if(animDrawable != null && animDrawable.isRunning()){
+            animDrawable.stop();
+        }
+        //ivQuoteSync.setBackgroundResource(0);
+        ivQuoteSync.setImageResource(R.drawable.ic_sync_white_24dp_0);
+        if(success){
+            setNavView(presenter.getNextQuote());
+        }else{
+            tvQuote.setText(R.string.no_quotes_available);
+            tvQuoteAuthor.setText("");
+        }
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -201,7 +235,35 @@ public class GalleryActivity extends BaseActivity
 
     private void initView(){
         Log.v(TAG,"initView()");
+        tvQuote = (TextView)headerView.findViewById(R.id.tv_quote);
+        tvQuoteAuthor = (TextView)headerView.findViewById(R.id.tv_quote_author);
+        ivQuoteSync = (ImageView)headerView.findViewById(R.id.iv_sync);
+
+        ivQuoteSync.setBackgroundResource(R.drawable.refresh_anim_list);
+        ivQuoteSync.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // refresh current quotes data
+                presenter.refresh();
+
+                AnimationDrawable animDrawable = (AnimationDrawable) ivQuoteSync.getBackground();
+                animDrawable.start();
+            }
+        });
         startGalleryFragment();
+    }
+
+    private void setNavView(QuoteRealm quote){
+        //TextView quotes = (TextView) navView.findViewById(R.id.tv_quote);
+        tvQuote.setText(quote.getText());
+        tvQuoteAuthor.setText(quote.getAuthor());
+    }
+
+    private void initPresenter(){
+        Log.v(TAG,"initPresenter()");
+        presenter = new GalleryPresenterImpl(getApplicationContext(), this);
+        presenter.init();
+        presenter.onStart();
     }
 
     private void startSetting(){

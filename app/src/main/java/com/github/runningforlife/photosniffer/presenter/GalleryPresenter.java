@@ -1,29 +1,21 @@
 package com.github.runningforlife.photosniffer.presenter;
 
-import android.webkit.WebView;
+import android.support.v4.os.ResultReceiver;
 
-import com.github.runningforlife.photosniffer.model.ImageRealm;
+import com.github.runningforlife.photosniffer.model.QuoteRealm;
 import com.github.runningforlife.photosniffer.model.RealmManager;
-
-import io.realm.RealmResults;
+import com.github.runningforlife.photosniffer.service.QuotesRetrieveService;
+import com.github.runningforlife.photosniffer.service.SimpleResultReceiver;
 
 /**
- * a gallery presenter used to load photo list
+ *  a presenter to get data for gallery activity
  */
 
-public interface GalleryPresenter extends Presenter,
-        RealmManager.UsedDataChangeListener, RealmManager.UnusedDataChangeListener {
+public interface GalleryPresenter extends RealmManager.QuoteDataChangeListener,
+        LifeCycle, SimpleResultReceiver.Receiver{
+    void init();
 
-    /*
-     * refresh data(download from network asynchrously)
-     */
     void refresh();
 
-    void refreshAnyway();
-
-    void setWebView(WebView webView);
-
-    void setWallpaperAtPos(int pos);
-
-    void favorImageAtPos(int pos);
+    QuoteRealm getNextQuote();
 }
