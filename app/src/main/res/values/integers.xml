@@ -3,4 +3,5 @@
     <integer name="max_reserved_image_number">100</integer>
     <integer name="auto_wallpaper_interval">3600000</integer>
     <integer name="auot_quote_refresh_interval">3600000</integer>
+    <integer name="dialog_dismiss_count_down">10000</integer>
 </resources>

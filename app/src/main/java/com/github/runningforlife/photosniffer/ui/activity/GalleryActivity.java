@@ -9,10 +9,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.UiThread;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -26,9 +26,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.runningforlife.photosniffer.R;
@@ -40,7 +38,9 @@ import com.github.runningforlife.photosniffer.ui.fragment.AllPicturesFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.BaseFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FavoriteImageFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FullScreenImageFragment;
+import com.github.runningforlife.photosniffer.ui.fragment.RetrieveHintFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.WallPaperFragment;
+import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
 import java.io.File;
@@ -123,6 +123,14 @@ public class GalleryActivity extends BaseActivity
         checkStoragePermission();
 
         presenter.onStart();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // tell user how to start retrieve images
+                showImageRetrieveHint();
+            }
+        },1000);
     }
 
     @Override
@@ -310,12 +318,12 @@ public class GalleryActivity extends BaseActivity
 
     private void startWallpaperFragment(){
         FragmentManager fragmentMgr = getSupportFragmentManager();
-        WallPaperFragment fragment = (WallPaperFragment)fragmentMgr.findFragmentByTag(WallPaperFragment.TAG);
-        if(fragment == null){
+        WallPaperFragment fragment = (WallPaperFragment) fragmentMgr.findFragmentByTag(WallPaperFragment.TAG);
+        if (fragment == null) {
             fragment = WallPaperFragment.newInstance();
         }
         FragmentTransaction ft = fragmentMgr.beginTransaction();
-        if(Build.VERSION.SDK_INT >= 19) {
+        if (Build.VERSION.SDK_INT >= 19) {
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         }
         ft.replace(R.id.fragment_container, fragment, WallPaperFragment.TAG)
@@ -333,6 +341,47 @@ public class GalleryActivity extends BaseActivity
             startActivity(intent, options.toBundle());
         }else{
             startActivity(intent);
+        }
+    }
+
+    private void showImageRetrieveHint(){
+        String key = getString(R.string.pref_new_user);
+        boolean isNewUser = SharedPrefUtil.getBoolean(key, true);
+        Log.v(TAG,"showImageRetrieveHint(): isNewUser = " + isNewUser);
+        if(isNewUser) {
+            FragmentManager fm = getSupportFragmentManager();
+
+            RetrieveHintFragment fragment = (RetrieveHintFragment)
+                    fm.findFragmentByTag(RetrieveHintFragment.TAG);
+            if (fragment == null) {
+                fragment = (RetrieveHintFragment) RetrieveHintFragment.newInstance();
+            }
+
+            FragmentTransaction ft = fm.beginTransaction();
+
+            ft.setCustomAnimations(R.anim.anim_enter_from_top, R.anim.anim_exit_to_top);
+            ft.add(R.id.fragment_container, fragment, RetrieveHintFragment.TAG)
+                    .commit();
+
+            SharedPrefUtil.putBoolean(key, false);
+
+            int dismissCount = getResources().getInteger(R.integer.dialog_dismiss_count_down);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    dismissRetrieveHintFragment();
+                }
+            }, dismissCount);
+        }
+    }
+
+    private void dismissRetrieveHintFragment(){
+        Log.v(TAG,"dismissRetrieveHintFragment()");
+
+        FragmentManager fm = getSupportFragmentManager();
+        RetrieveHintFragment rhf = (RetrieveHintFragment) fm.findFragmentByTag(RetrieveHintFragment.TAG);
+        if(rhf != null) {
+            rhf.dismiss();
         }
     }
 

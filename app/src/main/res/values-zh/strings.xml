@@ -1,11 +1,5 @@
 <resources xmlns:android="http://schemas.android.com/tools">
-    <string name="app_name">PhotoSniffer</string>
-
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
     <string name="action_settings">设置</string>
-    <string name="photo">Photo</string>
     <string name="gallery">图库</string>
     <string name="favorite">收藏</string>
     <string name="tools">设置</string>
@@ -13,11 +7,8 @@
     <string name="action_delete">删除</string>
     <string name="action_share">分享</string>
     <string name="action_favorite">收藏</string>
-    <string name="pref_wifi_download">pref_wifi_only_download</string>
-    <string name="pref_choose_image_source">key_choose_image_source</string>
     <string name="action_more">查看更多</string>
     <string name="save_image_Success">图片保存至</string>
-    <string name="pref_max_reserved_images">Max Reserved Images</string>
     <string name="action_wallpaper">设置为壁纸</string>
     <string name="set_wallpaper_success">设置壁纸成功</string>
     <string name="set_wallpaper_fail">设置壁纸出错</string>
@@ -30,15 +21,9 @@
     <string name="Wallpaper">壁纸</string>
     <string name="want_to_clear_cache">是否清除所有缓存</string>
     <string name="clear_image_caches">清除缓存</string>
-    <string name="pref_give_your_advice">key_give_your_advice</string>
     <string name="give_your_advice">请给出您的建议</string>
-    <string name="pref_automatic_wallpaper">Enable Automatic Wallpaper</string>
     <string name="set_wallpaper">壁纸设置</string>
-    <string name="key_auto_wallpaper_setting_interval">pref_auto_wallpaper_interval</string>
     <string name="set_auto_wallpaper_interval">设置自动壁纸时间间隔</string>
-    <string name="pref_pola_latest_collections_number">pola_latest_collections_number</string>
-    <string name="pref_auto_wallpaper_interval">pref_auto_wallpaper_time_interval</string>
-    <string name="pref_new_user">pref_new_user</string>
     <string name="share">分享</string>
     <string name="my_copyright_declaration">所有图片均来自网络免费图片，请勿用于任何商业目的。\n如有任何问题，请联系wlh2119@gmail.com</string>
     <string name="check_copyright_notes">查看版权说明</string>
@@ -60,4 +45,6 @@
     <string name="wifi_only_download">仅在WIFI链接时下载图片</string>
     <string name="max_reserved_images">图片保存的最大数目</string>
     <string name="copyright_declaration">版权声明</string>
+    <string name="refresh_hint">下拉获取图片</string>
+    <string name="no_quotes_available">无法获取格言</string>
 </resources>

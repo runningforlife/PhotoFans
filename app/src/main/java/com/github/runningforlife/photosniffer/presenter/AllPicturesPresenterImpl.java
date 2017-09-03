@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.service.wallpaper.WallpaperService;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
@@ -44,6 +45,8 @@ import com.github.runningforlife.photosniffer.service.SimpleResultReceiver;
 import com.github.runningforlife.photosniffer.ui.AllPictureView;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
+
+import org.apache.log4j.WriterAppender;
 
 /**
  * a presenter to bridge UI and data repository
@@ -450,7 +453,7 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
             public void onImageLoadDone(Object o) {
                 Log.d(TAG,"onImageLoadDone()");
                 if(o instanceof Bitmap) {
-                    WallpaperManager wpm = (WallpaperManager)mContext.getSystemService(Context.WALLPAPER_SERVICE);
+                    WallpaperManager wpm = WallpaperManager.getInstance(mContext);
                     try {
                         // TODO: use flag to distinguish system and lock screen wallpaper
                         wpm.setBitmap((Bitmap)o);

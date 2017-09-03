@@ -218,7 +218,7 @@ public class AppGlobals extends Application{
         if(isNewUser && ni.isConnected()){
             LeanCloudManager cloud = LeanCloudManager.getInstance();
             cloud.newUser(Build.FINGERPRINT);
-            SharedPrefUtil.putBoolean(key, false);
+            //SharedPrefUtil.putBoolean(key, false);
         }
     }
 

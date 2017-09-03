@@ -18,5 +18,10 @@ public class ImageRealmMigration implements RealmMigration{
                     .addField("mIsWallpaper",Boolean.class);
             ++oldVersion;
         }
+
+        if(oldVersion == 1){
+            schema.create("QuoteRealm");
+            ++oldVersion;
+        }
     }
 }

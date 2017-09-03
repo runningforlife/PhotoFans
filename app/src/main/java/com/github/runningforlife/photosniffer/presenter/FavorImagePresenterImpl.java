@@ -148,7 +148,7 @@ public class FavorImagePresenterImpl implements FavorImagePresenter{
             public void onImageLoadDone(Object o) {
                 Log.d(TAG,"onImageLoadDone()");
                 if(o instanceof Bitmap) {
-                    WallpaperManager wpm = (WallpaperManager)mContext.getSystemService(Context.WALLPAPER_SERVICE);
+                    WallpaperManager wpm = WallpaperManager.getInstance(mContext);
                     try {
                         // TODO: use flag to distinguish system and lock screen wallpaper
                         wpm.setBitmap((Bitmap)o);

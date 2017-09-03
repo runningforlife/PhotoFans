@@ -227,7 +227,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
                 public void onImageLoadDone(Object o) {
                     Log.d(TAG,"onImageLoadDone()");
                     if(o instanceof Bitmap) {
-                        WallpaperManager wpm = (WallpaperManager)getContext().getSystemService(Context.WALLPAPER_SERVICE);
+                        WallpaperManager wpm = WallpaperManager.getInstance(getContext());
                         try {
                             wpm.setBitmap((Bitmap)o);
                             // mark it as wall paper

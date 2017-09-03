@@ -66,7 +66,7 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
                 public void onImageLoadDone(Object o) {
                     Log.d(TAG, "onImageLoadDone()");
                     if (o instanceof Bitmap) {
-                        WallpaperManager wpm = (WallpaperManager) context.getSystemService(Context.WALLPAPER_SERVICE);
+                        WallpaperManager wpm = WallpaperManager.getInstance(context);
                         try {
                             wpm.setBitmap((Bitmap) o);
                         } catch (IOException e) {

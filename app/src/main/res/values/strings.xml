@@ -1,5 +1,5 @@
 <resources xmlns:android="http://schemas.android.com/tools">
-    <string name="app_name">PhotoSniffer</string>
+    <string name="app_name" translatable="false">PhotoSniffer</string>
 
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
@@ -62,13 +62,14 @@
     <string name="check_copyright_notes">Check Copyright Notes</string>
     <string name="copyright_declaration">Copytright Declaration</string>
     <string name="pref_pola_retrieved" translatable="false">pref_pola_retrieved</string>
-    <string name="back_home">back home</string>
-    <string name="fragment_image_transition">Fragment Image Transition</string>
-    <string name="activity_image_transition">Activity Image Transition</string>
-    <string name="pref_pola_last_updated_time">pola_last_updated_time</string>
+    <string name="back_home" translatable="false">back home</string>
+    <string name="fragment_image_transition" translatable="false">Fragment Image Transition</string>
+    <string name="activity_image_transition" translatable="false">Activity Image Transition</string>
+    <string name="pref_pola_last_updated_time" translatable="false">pola_last_updated_time</string>
     <string name="no_quotes_available">Quotes Not Available</string>
-    <string name="quotes_refresh">Refresh Quotes</string>
-    <string name="last_refreshing_time">key_last_quotes_refreshing_time</string>
-    <string name="quotes_favor">favor quotes</string>
-    <string name="quotes_share">share quotes</string>
+    <string name="quotes_refresh" translatable="false">Refresh Quotes</string>
+    <string name="last_refreshing_time" translatable="false">key_last_quotes_refreshing_time</string>
+    <string name="quotes_favor" translatable="false">favor quotes</string>
+    <string name="quotes_share" translatable="false">share quotes</string>
+    <string name="refresh_hint">Retrivee Images by pulling down</string>
 </resources>
