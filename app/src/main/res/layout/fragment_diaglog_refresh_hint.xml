@@ -2,23 +2,27 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorLightGrey">
+    android:layout_margin="@dimen/margin_small"
+    android:background="@drawable/round_corner_shape">
 
     <TextView android:id="@+id/tv_refresh_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:text="@string/refresh_hint"
-        android:textColor="@android:color/white"/>
+        android:textColor="@android:color/white"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginBottom="@dimen/margin_small" />
 
     <ImageButton android:id="@+id/ib_close"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerInParent="true"
-        android:layout_toRightOf="@id/tv_refresh_hint"
+        android:backgroundTint="@color/ColorDarkGrey"
         android:contentDescription="close the dialog"
+        android:layout_marginRight="@dimen/margin_small"
         android:src="@drawable/ic_clear_white_24dp"/>
 
 </RelativeLayout>

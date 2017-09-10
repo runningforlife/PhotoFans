@@ -15,7 +15,7 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
-
+-ignorewarnings
 -keep class com.bumptech.glide.integration.okhttp3.OkHttpGlideModule
 #-keep public class * implements com.bumptech.glide.module.GlideModule
 -keepnames class com.github.runningforlife.photofans.glide.DiskStorageModule

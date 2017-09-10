@@ -66,6 +66,7 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="com.github.runningforlife.AUTO_WALLPAPER"/>
+                <action android:name="android.intent.action.SCREEN_ON"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>

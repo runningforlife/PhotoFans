@@ -59,6 +59,8 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
     private static final int DEFAULT_RETRIEVED_IMAGES = 10;
     // update Pola collections every 15days
     private static final long POLA_UPDATED_DURATION = TimeUnit.DAYS.toMillis(15);
+    // current latest pola
+    private static final int LATEST_POLA_COUNT = 56;
 
     private Context mContext;
     private AllPictureView mView;
@@ -106,8 +108,6 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
 
         stopRetrieveIfNeeded();
 
-        loadPolaPageIfNeeded();
-
         if(mUnUsedImages == null || mUnUsedImages.size() < DEFAULT_RETRIEVED_IMAGES) {
             mIsRefreshing = true;
             Intent intent = new Intent(mContext, ImageRetrieveService.class);
@@ -127,6 +127,8 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
             Message msg1 = mMainHandler.obtainMessage(H.EVENT_STOP_SERVICE);
             mMainHandler.sendMessageDelayed(msg1, DEFAULT_STOP_TIME_OUT);
         }
+
+        loadPolaPageIfNeeded();
 
         if(mUnUsedImages != null && mUnUsedImages.size() > 0) {
             // notify
@@ -335,7 +337,7 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
             boolean isPolaRetrieved = SharedPrefUtil.getBoolean(polaRetrieved, false);
             String lastUpdatedTime = mContext.getString(R.string.pref_pola_last_updated_time);
             if(!isPolaRetrieved){
-                saveAllPolaUrls(polaUrl, 1, 52);
+                saveAllPolaUrls(polaUrl, 1, LATEST_POLA_COUNT);
                 SharedPrefUtil.putBoolean(polaRetrieved, true);
                 SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
             }
@@ -361,7 +363,7 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
                     view.pageDown(true);
                     String key = mContext.getString(R.string.pref_pola_latest_collections_number);
                     String lastUpdatedTime = mContext.getString(R.string.pref_pola_last_updated_time);
-                    int current = SharedPrefUtil.getInt(key,52);
+                    int current = SharedPrefUtil.getInt(key,LATEST_POLA_COUNT);
 
                     if(url != null && url.endsWith("thumb.jpg")){
                         int collections = getLatestCollectionsNumber(url);
@@ -408,6 +410,7 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
             public void run() {
                 List<ImageRealm> pola = new ArrayList<>();
 
+                int count = 0;
                 for(int c = start; c <= end; ++c) {
                     for(int n = 1; n <= ImageSource.POLA_IMAGE_NUMBER_PER_COLLECTION; ++n) {
                         ImageRealm ir = new ImageRealm();
@@ -415,7 +418,11 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
                         ir.setIsFavor(false);
                         ir.setIsWallpaper(false);
                         ir.setTimeStamp(System.currentTimeMillis());
-                        ir.setUsed(false);
+                        if(count++ < 10) {
+                            ir.setUsed(true);
+                        }else{
+                            ir.setUsed(false);
+                        }
                         ir.setName("unknown");
                         pola.add(ir);
                     }

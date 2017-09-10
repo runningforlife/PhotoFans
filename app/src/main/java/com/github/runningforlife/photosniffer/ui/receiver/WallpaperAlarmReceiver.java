@@ -1,10 +1,12 @@
 package com.github.runningforlife.photosniffer.ui.receiver;
 
+import android.annotation.TargetApi;
 import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
@@ -34,18 +36,33 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.v(TAG,"onReceive()");
-        if(ALARM_AUTO_WALLPAPER.equals(intent.getAction())){
+        String action = intent.getAction();
+        if(ALARM_AUTO_WALLPAPER.equals(action)){
             MyThreadFactory.getInstance().
                     newThread(new Runnable() {
                 @Override
                 public void run() {
-                    setWallpaper();
+                    if(Build.VERSION.SDK_INT >= 24) {
+                        setWallpaper(WallpaperManager.FLAG_SYSTEM);
+                    }else{
+                        setWallpaper(-1);
+                    }
                 }
             }).start();
+        }else if(Intent.ACTION_SCREEN_ON.equals(action)){
+            MyThreadFactory.getInstance()
+                    .newThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(Build.VERSION.SDK_INT >= 24) {
+                                setWallpaper(WallpaperManager.FLAG_LOCK);
+                            }
+                        }
+                    });
         }
     }
 
-    private void setWallpaper(){
+    private void setWallpaper(final int flag){
         Log.v(TAG,"setWallpaper()");
         Realm rm = Realm.getDefaultInstance();
         try {
@@ -68,7 +85,11 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
                     if (o instanceof Bitmap) {
                         WallpaperManager wpm = WallpaperManager.getInstance(context);
                         try {
-                            wpm.setBitmap((Bitmap) o);
+                            if(Build.VERSION.SDK_INT >= 24 && flag != -1) {
+                                wpm.setBitmap((Bitmap) o, null, true, flag);
+                            }else{
+                                wpm.setBitmap((Bitmap)o);
+                            }
                         } catch (IOException e) {
                             //mView.onWallpaperSetDone(false);
                             e.printStackTrace();

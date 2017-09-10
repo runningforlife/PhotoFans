@@ -1,9 +1,11 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
+import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
@@ -47,6 +49,16 @@ public class RetrieveHintFragment extends DialogFragment{
     }
 
     @Override
+    @NonNull
+    public Dialog onCreateDialog(Bundle savedSate){
+        Log.v(TAG,"onCreateDialog()");
+        Dialog dialog = new Dialog(getContext(), R.style.FullScreeWidthDialog);
+        dialog.setContentView(R.layout.fragment_diaglog_refresh_hint);
+
+        return dialog;
+    }
+
+    @Override
     public void onResume(){
         super.onResume();
         Log.v(TAG, "onResume()");
@@ -70,20 +82,16 @@ public class RetrieveHintFragment extends DialogFragment{
     }
 
     private void initDialog(){
-        Window window = getDialog().getWindow();
-
-        if(window != null) {
-            WindowManager.LayoutParams lp = window.getAttributes();
-            lp.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
-            lp.gravity = Gravity.TOP;
-            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-            window.setAttributes(lp);
-            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            if(Build.VERSION.SDK_INT >= 21) {
-                Transition transition = TransitionInflater.from(getContext())
-                        .inflateTransition(android.R.transition.fade);
-                window.setExitTransition(transition);
+        if(getDialog() != null) {
+            Window window = getDialog().getWindow();
+            if (window != null) {
+                WindowManager.LayoutParams lp = window.getAttributes();
+                lp.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+                lp.gravity = Gravity.TOP;
+                lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+                lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                window.setAttributes(lp);
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             }
         }
     }

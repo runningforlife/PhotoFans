@@ -23,6 +23,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -124,18 +125,26 @@ public class GalleryActivity extends BaseActivity
 
         presenter.onStart();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // tell user how to start retrieve images
-                showImageRetrieveHint();
-            }
-        },1000);
+        String key = getString(R.string.pref_new_user);
+        boolean isNewUser = SharedPrefUtil.getBoolean(key, true);
+
+        if(isNewUser) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // tell user how to start retrieve images
+                    showImageRetrieveHint();
+                }
+            }, 2000);
+
+            SharedPrefUtil.putBoolean(key, false);
+        }
     }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
+        Log.v(TAG,"onDestroy()");
     }
 
     @Override
@@ -212,15 +221,16 @@ public class GalleryActivity extends BaseActivity
     public void onRefreshDone(boolean success) {
         Log.v(TAG,"onRefreshDone()");
         AnimationDrawable animDrawable = (AnimationDrawable)ivQuoteSync.getBackground();
-        if(animDrawable != null && animDrawable.isRunning()){
+        if(animDrawable != null){
             animDrawable.stop();
         }
-        //ivQuoteSync.setBackgroundResource(0);
+        ivQuoteSync.clearAnimation();
         ivQuoteSync.setImageResource(R.drawable.ic_sync_white_24dp_0);
         if(success){
             setNavView(presenter.getNextQuote());
         }else{
             tvQuote.setText(R.string.no_quotes_available);
+            tvQuote.setGravity(Gravity.CENTER);
             tvQuoteAuthor.setText("");
         }
     }
@@ -345,34 +355,28 @@ public class GalleryActivity extends BaseActivity
     }
 
     private void showImageRetrieveHint(){
-        String key = getString(R.string.pref_new_user);
-        boolean isNewUser = SharedPrefUtil.getBoolean(key, true);
-        Log.v(TAG,"showImageRetrieveHint(): isNewUser = " + isNewUser);
-        if(isNewUser) {
-            FragmentManager fm = getSupportFragmentManager();
+        Log.v(TAG,"showImageRetrieveHint(): isNewUser = ");
+        FragmentManager fm = getSupportFragmentManager();
 
-            RetrieveHintFragment fragment = (RetrieveHintFragment)
-                    fm.findFragmentByTag(RetrieveHintFragment.TAG);
-            if (fragment == null) {
-                fragment = (RetrieveHintFragment) RetrieveHintFragment.newInstance();
-            }
-
-            FragmentTransaction ft = fm.beginTransaction();
-
-            ft.setCustomAnimations(R.anim.anim_enter_from_top, R.anim.anim_exit_to_top);
-            ft.add(R.id.fragment_container, fragment, RetrieveHintFragment.TAG)
-                    .commit();
-
-            SharedPrefUtil.putBoolean(key, false);
-
-            int dismissCount = getResources().getInteger(R.integer.dialog_dismiss_count_down);
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    dismissRetrieveHintFragment();
-                }
-            }, dismissCount);
+        RetrieveHintFragment fragment = (RetrieveHintFragment)
+                fm.findFragmentByTag(RetrieveHintFragment.TAG);
+        if (fragment == null) {
+            fragment = (RetrieveHintFragment) RetrieveHintFragment.newInstance();
         }
+
+        FragmentTransaction ft = fm.beginTransaction();
+
+        ft.setCustomAnimations(R.anim.anim_enter_from_top, android.R.anim.fade_out);
+        ft.add(R.id.fragment_container, fragment, RetrieveHintFragment.TAG)
+                .commit();
+
+        int dismissCount = getResources().getInteger(R.integer.dialog_dismiss_count_down);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                dismissRetrieveHintFragment();
+            }
+        }, dismissCount);
     }
 
     private void dismissRetrieveHintFragment(){
@@ -382,6 +386,9 @@ public class GalleryActivity extends BaseActivity
         RetrieveHintFragment rhf = (RetrieveHintFragment) fm.findFragmentByTag(RetrieveHintFragment.TAG);
         if(rhf != null) {
             rhf.dismiss();
+            fm.beginTransaction()
+                .remove(rhf)
+                .commit();
         }
     }
 
