@@ -34,6 +34,7 @@ import com.github.runningforlife.photosniffer.ui.adapter.BaseAdapterCallback;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.RealmObject;
 
 import com.github.runningforlife.photosniffer.ui.adapter.ImagePagerAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.PageAdapterCallback;
@@ -195,7 +196,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     @Override
-    public ImageRealm getItemAtPos(int pos) {
+    public RealmObject getItemAtPos(int pos) {
         return mPresenter.getItemAtPos(pos);
     }
 

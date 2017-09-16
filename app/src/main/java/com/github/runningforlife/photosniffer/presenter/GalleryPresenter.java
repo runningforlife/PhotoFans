@@ -18,4 +18,8 @@ public interface GalleryPresenter extends RealmManager.QuoteDataChangeListener,
     void refresh();
 
     QuoteRealm getNextQuote();
+
+    void favorQuote();
+
+    boolean isCurrentFavored();
 }

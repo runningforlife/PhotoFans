@@ -20,15 +20,19 @@ public class QuoteRealm extends RealmObject {
     private String text;
     private String savedTime;
     private long showTime; // when this item is showed
+    private boolean isFavor;
+    private String header;
 
     public QuoteRealm(){
-
+        isFavor = false;
+        savedTime = DateFormat.getDateTimeInstance().format(new Date());
     }
 
     public QuoteRealm(@NonNull String url, String author, String text){
         this.url = url;
         this.author = author;
         this.text = text;
+        this.isFavor = false;
         this.savedTime = DateFormat.getDateTimeInstance().format(new Date());
     }
 
@@ -73,12 +77,30 @@ public class QuoteRealm extends RealmObject {
         return showTime;
     }
 
+    public void setIsFavor(boolean isFavor){
+        this.isFavor = isFavor;
+    }
+
+    public boolean getIsFavor(){
+        return isFavor;
+    }
+
+    public void setHeader(String url){
+        this.header = url;
+    }
+
+    public String getHeader(){
+        return header;
+    }
+
     @Override
     public String toString(){
         return "Quote Detail:" +
                 ",url=" + url +
                 ",author=" + author +
-                ",text=" + text;
+                ",text=" + text +
+                ",isFavor=" + isFavor+
+                ",header=" + header;
     }
 
     @Override
@@ -87,6 +109,7 @@ public class QuoteRealm extends RealmObject {
 
         return (this == o || (url.equals(((QuoteRealm)o).url) &&
                 (author.equals(((QuoteRealm)o).author) &&
-                (text.equals(((QuoteRealm)o).text)))));
+                (text.equals(((QuoteRealm)o).text))))) &&
+                (header.equals(((QuoteRealm)o).header));
     }
 }

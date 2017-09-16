@@ -18,6 +18,7 @@ import com.bumptech.glide.request.target.Target;
 import com.github.runningforlife.photosniffer.R;
 
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
+import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import static com.github.runningforlife.photosniffer.loader.Loader.*;
@@ -65,7 +66,8 @@ public class ImagePagerAdapter extends PagerAdapter{
         // preload image
         //MiscUtil.preloadImage(view);
         view.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_scale_out));
-        GlideLoader.load(mContext,new ImageLoaderListener(view,position),mCallback.getItemAtPos(position).getUrl(),
+        GlideLoader.load(mContext,new ImageLoaderListener(view,position),
+                ((ImageRealm)mCallback.getItemAtPos(position)).getUrl(),
                 Priority.IMMEDIATE,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
         view.setOnClickListener(new View.OnClickListener() {
             @Override

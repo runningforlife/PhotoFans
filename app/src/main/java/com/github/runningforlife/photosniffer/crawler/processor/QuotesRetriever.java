@@ -3,7 +3,6 @@ package com.github.runningforlife.photosniffer.crawler.processor;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.model.QuotePageInfo;
 import com.github.runningforlife.photosniffer.model.QuoteRealm;
 import com.github.runningforlife.photosniffer.model.RealmManager;
@@ -25,10 +24,13 @@ import us.codecraft.webmagic.Page;
 public class QuotesRetriever implements PageRetriever<QuoteRealm>{
     private static final String TAG = "QuotesRetriever";
 
+    private static final String CLASS_GRID = "grid";
+    private static final String CLASS_HEADER = "grid__header";
     private static final String CLASS_CONTENT = "grid__content";
     private static final String CLASS_AUTHOR = "quote-single__author-name-link";
     private static final String CLASS_CONTENT_LINK = "grid__content-link";
     private static final String ATTR_LINK = "href";
+    private static final String ATTR_IMG = "img";
 
     private int expect;
     private RetrieveCompleteListener listener;
@@ -59,12 +61,16 @@ public class QuotesRetriever implements PageRetriever<QuoteRealm>{
 
         Document doc = page.getHtml().getDocument();
 
-        Elements elements = doc.getElementsByClass(CLASS_CONTENT);
+        Elements elements = doc.getElementsByClass(CLASS_GRID);
 
         List<QuoteRealm> quotes = new ArrayList<>();
         // page list
         List<QuotePageInfo> quotePageList = new ArrayList<>();
         for(Element element : elements){
+            // header url
+            Elements header = element.getElementsByClass(CLASS_HEADER);
+            String headerUrl = header.select(ATTR_IMG).get(0).attr("src");
+
             Elements eAuthor = element.getElementsByClass(CLASS_AUTHOR);
             String author = eAuthor.get(0).ownText();
             // author pag list
@@ -79,6 +85,7 @@ public class QuotesRetriever implements PageRetriever<QuoteRealm>{
             String text = eContent.text();
             if(!TextUtils.isEmpty(text)) {
                 QuoteRealm quote = new QuoteRealm(url, author, text);
+                quote.setHeader(headerUrl);
                 quotes.add(quote);
             }
         }

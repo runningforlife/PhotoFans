@@ -21,6 +21,7 @@ import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
 import io.realm.RealmResults;
 
 /**
@@ -52,7 +53,6 @@ public class GalleryPresenterImpl implements GalleryPresenter{
 
         isRefreshing = false;
         this.context = context;
-        receiver = new SimpleResultReceiver(new Handler(Looper.myLooper()));
 
         String key = context.getString(R.string.last_refreshing_time);
         lastRefreshing = SharedPrefUtil.getLong(key, System.currentTimeMillis());
@@ -60,6 +60,7 @@ public class GalleryPresenterImpl implements GalleryPresenter{
         AUTO_REFRESH_INTERVAL = context.getResources().
                 getInteger(R.integer.auot_quote_refresh_interval);
         handler = new H(Looper.myLooper());
+        receiver = new SimpleResultReceiver(handler);
     }
 
     @Override
@@ -73,7 +74,8 @@ public class GalleryPresenterImpl implements GalleryPresenter{
         Log.v(TAG,"refresh()");
 
         long current = System.currentTimeMillis();
-        if(quotes.size() <= 0 || current >= lastRefreshing + AUTO_REFRESH_INTERVAL){
+        if((quotes.size() >= 0 && current >= lastRefreshing + AUTO_REFRESH_INTERVAL)
+                || quotes.size() <= 0){
             isRefreshing = true;
             startRetrieveQuote();
             lastRefreshing = System.currentTimeMillis();
@@ -92,27 +94,46 @@ public class GalleryPresenterImpl implements GalleryPresenter{
         ++current;
         current %= quotes.size();
 
+        Log.d(TAG,"getNextQuote(): quote = " + quotes.get(current));
         return quotes.get(current);
+    }
+
+    @Override
+    public void favorQuote() {
+        Log.v(TAG,"favorQuote()");
+
+        boolean isFavored = quotes.get(current).getIsFavor();
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+
+        QuoteRealm qr = quotes.get(current);
+        qr.setIsFavor(!isFavored);
+
+        realm.commitTransaction();
+    }
+
+    @Override
+    public boolean isCurrentFavored() {
+        return current != -1 && quotes.get(current).getIsFavor();
     }
 
     @Override
     public void onQuoteDataChange(RealmResults<QuoteRealm> data) {
         Log.v(TAG,"onQuoteDataChange(): data size = " + data.size());
-        if(data != null) {
-            for(QuoteRealm item : data){
-                if(!quotes.contains(item)){
-                    quotes.add(item);
-                }
+        for(QuoteRealm item : data){
+            if(!quotes.contains(item)){
+                quotes.add(item);
             }
+        }
+
+        if (quotes.size() <= 0) {
+            view.onRefreshDone(false);
+        } else if(isRefreshing){
+            view.onRefreshDone(true);
         }
 
         if(isRefreshing) {
             isRefreshing = false;
-            if (quotes.size() <= 0) {
-                view.onRefreshDone(false);
-            } else {
-                view.onRefreshDone(true);
-            }
         }
     }
 
@@ -150,8 +171,13 @@ public class GalleryPresenterImpl implements GalleryPresenter{
                 break;
             case ServiceStatus.SUCCESS:
                 Log.v(TAG,"quotes retrieving success");
-                if(isRefreshing) {
+                int count = data.getInt("result");
+                if(count <= 0){
+                    view.onRefreshDone(false);
+                }else{
                     view.onRefreshDone(true);
+                }
+                if(isRefreshing) {
                     isRefreshing = false;
                 }
                 break;
@@ -159,12 +185,12 @@ public class GalleryPresenterImpl implements GalleryPresenter{
                 Log.v(TAG,"quotes retrieving fail");
                 if(isRefreshing) {
                     isRefreshing = false;
-                    if (quotes.size() <= 0) {
-                        view.onRefreshDone(false);
-                    } else {
-                        // we have data to offer
-                        view.onRefreshDone(true);
-                    }
+                }
+                if (quotes.size() <= 0) {
+                    view.onRefreshDone(false);
+                } else {
+                    // we have data to offer
+                    view.onRefreshDone(true);
                 }
                 break;
             default:
@@ -187,7 +213,11 @@ public class GalleryPresenterImpl implements GalleryPresenter{
                 case EVENT_PULL_QUOTE_TIMEOUT:
                     if(isRefreshing){
                         isRefreshing = false;
+                    }
+                    if(quotes.size() <= 0){
                         view.onRefreshDone(false);
+                    }else{
+                        view.onRefreshDone(true);
                     }
                     break;
                 default:

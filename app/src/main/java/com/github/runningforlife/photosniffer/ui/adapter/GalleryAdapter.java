@@ -81,7 +81,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
     @Override
     public void onBindViewHolder(final PhotoViewHolder vh, final int position) {
-        final ImageRealm img = mCallback.getItemAtPos(position);
+        final ImageRealm img = (ImageRealm)mCallback.getItemAtPos(position);
         final String url = img.getUrl();
         Log.d(TAG,"onBindViewHolder(): pos = " + position);
 
@@ -123,7 +123,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         return mCallback.getCount();
     }
 
-    public class PhotoViewHolder extends RecyclerView.ViewHolder
+    final class PhotoViewHolder extends RecyclerView.ViewHolder
             implements View.OnCreateContextMenuListener {
         @BindView(R.id.iv_photo) ImageView img;
 
@@ -155,7 +155,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
 
             inflater.inflate(R.menu.menu_context_default, menu);
 
-            mCallback.onContextMenuCreated(getAdapterPosition(), TAG);
+            if(mCallback != null) {
+                mCallback.onContextMenuCreated(getAdapterPosition(), TAG);
+            }
         }
     }
 }

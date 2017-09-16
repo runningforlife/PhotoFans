@@ -14,6 +14,4 @@ interface ImageLoadCallback {
      * image loading complete
      */
     void onImageLoadDone(int pos, boolean isSuccess);
-
-
 }

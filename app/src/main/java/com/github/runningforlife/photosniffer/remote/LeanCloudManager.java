@@ -44,7 +44,6 @@ public class LeanCloudManager implements CloudApi{
 
     @Override
     public void saveFile(final File file) {
-        Log.v(TAG,"saveFile()");
         String name = "log_" + System.currentTimeMillis() + ".txt";
         try {
             AVFile cf = AVFile.withAbsoluteLocalPath(name, file.getAbsolutePath());
@@ -54,6 +53,8 @@ public class LeanCloudManager implements CloudApi{
                     if(e != null){
                         Log.d(TAG,"saveFile(): fail");
                         e.printStackTrace();
+                    }else{
+                        Log.v(TAG,"saveFile(): success");
                     }
                 }
             });

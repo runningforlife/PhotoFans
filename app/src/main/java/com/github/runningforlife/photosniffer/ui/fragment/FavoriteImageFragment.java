@@ -20,7 +20,7 @@ import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.presenter.FavorImagePresenter;
 import com.github.runningforlife.photosniffer.presenter.FavorImagePresenterImpl;
-import com.github.runningforlife.photosniffer.ui.FavorView;
+import com.github.runningforlife.photosniffer.ui.FavorPictureView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
 import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
@@ -29,13 +29,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.RealmObject;
 
 /**
  * a fragment containing all favorite images
  */
 
 public class FavoriteImageFragment extends BaseFragment
-        implements GalleryAdapterCallback, FavorView{
+        implements GalleryAdapterCallback, FavorPictureView {
     public static final String TAG = "FavorImageFragment";
     @BindView(R.id.rcv_img_list) RecyclerView mRcvFavorList;
     @BindView(R.id.refresh) SwipeRefreshLayout mSrlRefresh;
@@ -134,7 +135,7 @@ public class FavoriteImageFragment extends BaseFragment
     }
 
     @Override
-    public ImageRealm getItemAtPos(int pos) {
+    public RealmObject getItemAtPos(int pos) {
         return mPresenter.getItemAtPos(pos);
     }
 
@@ -143,7 +144,7 @@ public class FavoriteImageFragment extends BaseFragment
         Log.v(TAG,"onItemClicked(): pos = " + pos);
 
         if(mCallback != null){
-            mCallback.onItemClick(view,pos, mPresenter.getItemAtPos(pos).getUrl());
+            mCallback.onItemClick(view,pos, ((ImageRealm)mPresenter.getItemAtPos(pos)).getUrl());
         }
     }
 

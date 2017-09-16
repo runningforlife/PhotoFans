@@ -18,6 +18,11 @@
             android:id="@+id/nav_wallpaper"
             android:icon="@drawable/ic_wallpaper_black_24dp"
             android:title="@string/Wallpaper" />
+
+        <item
+            android:id="@+id/nav_quote"
+            android:icon="@drawable/ic_loyalty_black_24dp"
+            android:title="@string/quotes"/>
     </group>
 
     <group android:id="@+id/group_manage">

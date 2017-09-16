@@ -1,18 +1,23 @@
 package com.github.runningforlife.photosniffer.ui.activity;
 
 import android.Manifest;
+import android.animation.AnimatorInflater;
+import android.animation.StateListAnimator;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.UiThread;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -27,6 +32,8 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -39,6 +46,7 @@ import com.github.runningforlife.photosniffer.ui.fragment.AllPicturesFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.BaseFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FavoriteImageFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FullScreenImageFragment;
+import com.github.runningforlife.photosniffer.ui.fragment.QuotesFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.RetrieveHintFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.WallPaperFragment;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
@@ -62,6 +70,8 @@ public class GalleryActivity extends BaseActivity
     private TextView tvQuote;
     private TextView tvQuoteAuthor;
     private ImageView ivQuoteSync;
+    private ImageView ivFavor;
+    private ImageView ivShare;
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
 
@@ -129,15 +139,15 @@ public class GalleryActivity extends BaseActivity
         boolean isNewUser = SharedPrefUtil.getBoolean(key, true);
 
         if(isNewUser) {
-            new Handler().postDelayed(new Runnable() {
+            mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     // tell user how to start retrieve images
                     showImageRetrieveHint();
                 }
             }, 2000);
-
-            SharedPrefUtil.putBoolean(key, false);
+            // set to false when first refresh done
+            //SharedPrefUtil.putBoolean(key, false);
         }
     }
 
@@ -169,15 +179,24 @@ public class GalleryActivity extends BaseActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
-        if (id == R.id.nav_favorite) {
-            startFavorFragment();
-        } else if (id == R.id.nav_gallery) {
-            startGalleryFragment();
-        } else if (id == R.id.nav_wallpaper) {
-            startWallpaperFragment();
-        } else if (id == R.id.nav_settings) {
-            startSetting();
+        switch (id){
+            case R.id.nav_favorite:
+                startFavorFragment();
+                break;
+            case R.id.nav_gallery:
+                startGalleryFragment();
+                break;
+            case R.id.nav_wallpaper:
+                startWallpaperFragment();
+                break;
+            case R.id.nav_settings:
+                startSetting();
+                break;
+            case R.id.nav_quote:
+                showQuotesFragment();
+                break;
+            default:
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -220,13 +239,13 @@ public class GalleryActivity extends BaseActivity
     @Override
     public void onRefreshDone(boolean success) {
         Log.v(TAG,"onRefreshDone()");
-        AnimationDrawable animDrawable = (AnimationDrawable)ivQuoteSync.getBackground();
-        if(animDrawable != null){
-            animDrawable.stop();
-        }
         ivQuoteSync.clearAnimation();
-        ivQuoteSync.setImageResource(R.drawable.ic_sync_white_24dp_0);
         if(success){
+            if(presenter.isCurrentFavored()){
+                ivFavor.setImageResource(R.drawable.ic_favorite_white_24dp);
+            }else{
+                ivFavor.setImageResource(R.drawable.ic_favorite_border_white_24dp);
+            }
             setNavView(presenter.getNextQuote());
         }else{
             tvQuote.setText(R.string.no_quotes_available);
@@ -257,24 +276,66 @@ public class GalleryActivity extends BaseActivity
         tvQuoteAuthor = (TextView)headerView.findViewById(R.id.tv_quote_author);
         ivQuoteSync = (ImageView)headerView.findViewById(R.id.iv_sync);
 
-        ivQuoteSync.setBackgroundResource(R.drawable.refresh_anim_list);
+        ivFavor = (ImageView)headerView.findViewById(R.id.iv_favor);
+        ivShare = (ImageView)headerView.findViewById(R.id.iv_share);
+        //ivQuoteSync.setBackgroundResource(R.drawable.refresh_anim_list);
         ivQuoteSync.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // refresh current quotes data
                 presenter.refresh();
 
-                AnimationDrawable animDrawable = (AnimationDrawable) ivQuoteSync.getBackground();
-                animDrawable.start();
+                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_rotate);
+                ivQuoteSync.startAnimation(animation);
             }
         });
+
+        ivFavor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.favorQuote();
+                if(!presenter.isCurrentFavored()){
+                    Animation fadeOut = AnimationUtils.loadAnimation(getApplicationContext(),
+                            android.R.anim.fade_out);
+                    ivFavor.startAnimation(fadeOut);
+
+                    ivFavor.setImageResource(R.drawable.ic_favorite_white_24dp);
+                    Animation fadeIn = AnimationUtils.loadAnimation(getApplicationContext(),
+                            android.R.anim.fade_in);
+                    ivFavor.startAnimation(fadeIn);
+                }else{
+                    Animation fadeOut = AnimationUtils.loadAnimation(getApplicationContext(),
+                            android.R.anim.fade_out);
+                    ivFavor.startAnimation(fadeOut);
+
+                    ivFavor.setImageResource(R.drawable.ic_favorite_border_white_24dp);
+                    Animation fadeIn = AnimationUtils.loadAnimation(getApplicationContext(),
+                            android.R.anim.fade_in);
+                    ivFavor.startAnimation(fadeIn);
+                }
+            }
+        });
+
         startGalleryFragment();
     }
 
     private void setNavView(QuoteRealm quote){
         //TextView quotes = (TextView) navView.findViewById(R.id.tv_quote);
-        tvQuote.setText(quote.getText());
-        tvQuoteAuthor.setText(quote.getAuthor());
+        int maxLen = getResources().getInteger(R.integer.max_quote_length);
+        String content = quote.getText();
+        if(!TextUtils.isEmpty(content)) {
+            if(content.length() <= maxLen){
+                tvQuote.setText(quote.getText());
+            }else{
+                String txt = content + getString(R.string.ellipsis);
+                tvQuote.setText(txt);
+            }
+            tvQuoteAuthor.setText(quote.getAuthor());
+        }else{
+            tvQuote.setText(R.string.no_quotes_available);
+            tvQuote.setGravity(Gravity.CENTER);
+            tvQuoteAuthor.setText("");
+        }
     }
 
     private void initPresenter(){
@@ -293,9 +354,9 @@ public class GalleryActivity extends BaseActivity
 
     private void setRefreshing(boolean refreshing){
         FragmentManager fragmentMgr = getSupportFragmentManager();
-        BaseFragment fragment = (BaseFragment) fragmentMgr.findFragmentById(R.id.fragment_container);
-        if(fragment != null){
-            fragment.setRefreshing(refreshing);
+        Fragment fragment =  fragmentMgr.findFragmentById(R.id.fragment_container);
+        if(fragment != null && fragment instanceof BaseFragment){
+            ((BaseFragment)fragment).setRefreshing(refreshing);
         }
     }
 
@@ -354,6 +415,23 @@ public class GalleryActivity extends BaseActivity
         }
     }
 
+    private void showQuotesFragment(){
+        Log.v(TAG,"showQuotesFragment()");
+
+        FragmentManager fragmentMgr = getSupportFragmentManager();
+        QuotesFragment fragment = (QuotesFragment) fragmentMgr.findFragmentByTag(QuotesFragment.TAG);
+        if(fragment == null){
+            fragment = QuotesFragment.newInstance();
+        }
+        FragmentTransaction ft = fragmentMgr.beginTransaction();
+        if (Build.VERSION.SDK_INT >= 19) {
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        }
+        ft.replace(R.id.fragment_container, fragment, QuotesFragment.TAG)
+                .commit();
+
+    }
+
     private void showImageRetrieveHint(){
         Log.v(TAG,"showImageRetrieveHint(): isNewUser = ");
         FragmentManager fm = getSupportFragmentManager();
@@ -371,7 +449,7 @@ public class GalleryActivity extends BaseActivity
                 .commit();
 
         int dismissCount = getResources().getInteger(R.integer.dialog_dismiss_count_down);
-        new Handler().postDelayed(new Runnable() {
+        mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 dismissRetrieveHintFragment();

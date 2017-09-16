@@ -12,13 +12,12 @@ import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.model.RealmManager;
-import com.github.runningforlife.photosniffer.ui.FavorView;
+import com.github.runningforlife.photosniffer.ui.FavorPictureView;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import io.realm.Realm;
 import io.realm.RealmResults;
 
 /**
@@ -27,14 +26,14 @@ import io.realm.RealmResults;
 
 public class FavorImagePresenterImpl implements FavorImagePresenter{
     private static final String TAG = "FavorImagePresenter";
-    private FavorView mView;
+    private FavorPictureView mView;
     private Context mContext;
     private RealmManager mRealmMgr;
     private RealmResults<ImageRealm> mFavorList;
     private ExecutorService mExecutor;
     private boolean mIsRefreshing;
 
-    public FavorImagePresenterImpl(Context context, FavorView view){
+    public FavorImagePresenterImpl(Context context, FavorPictureView view){
         mContext = context;
         mView = view;
         mRealmMgr = RealmManager.getInstance();

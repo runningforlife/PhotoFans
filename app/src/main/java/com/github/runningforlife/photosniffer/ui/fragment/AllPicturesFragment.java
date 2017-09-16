@@ -34,6 +34,7 @@ import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.RealmObject;
 
 /**
  * a fragment to display all pictures
@@ -226,7 +227,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
     }
 
     @Override
-    public ImageRealm getItemAtPos(int pos) {
+    public RealmObject getItemAtPos(int pos) {
         return mPresenter.getItemAtPos(pos);
     }
 

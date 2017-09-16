@@ -2,6 +2,7 @@ package com.github.runningforlife.photosniffer.ui.adapter;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,6 +16,7 @@ import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
+import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
@@ -37,7 +39,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
     private Context mContext;
     private BaseAdapterCallback mCallback;
 
-    public PreviewAdapter(Context context, BaseAdapterCallback callback){
+    public PreviewAdapter(Context context, @NonNull BaseAdapterCallback callback){
         mContext = context;
         mCallback = callback;
     }
@@ -53,7 +55,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
     public void onBindViewHolder(ImageViewHolder holder, int position) {
         Log.v(TAG,"onBindViewHolder(): position = " + position);
 
-        String url = mCallback.getItemAtPos(position).getUrl();
+        String url = ((ImageRealm)mCallback.getItemAtPos(position)).getUrl();
         // preload
         MiscUtil.preloadImage(holder.preview);
         holder.preview.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_view_alpha));
@@ -72,7 +74,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
     final class ImageViewHolder extends RecyclerView.ViewHolder{
         @BindView(R.id.iv_preview) ImageView preview;
 
-        public ImageViewHolder(View root) {
+        ImageViewHolder(View root) {
             super(root);
 
             ButterKnife.bind(this,root);

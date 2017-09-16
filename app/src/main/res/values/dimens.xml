@@ -31,4 +31,7 @@
     <dimen name="margin_medium">15dp</dimen>
     <dimen name="author_text_size">16sp</dimen>
     <dimen name="dialog_corner_size">8dp</dimen>
+    <dimen name="cardview_height">160dp</dimen>
+    <dimen name="quote_content_size">16sp</dimen>
+    <dimen name="cardview_content_margin">10dp</dimen>
 </resources>

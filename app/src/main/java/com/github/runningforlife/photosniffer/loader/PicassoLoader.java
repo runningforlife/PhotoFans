@@ -21,7 +21,6 @@ public class PicassoLoader{
         Picasso.with(context)
                 .load(url)
                 .resize(w,h)
-                .fit()
                 .into(iv);
     }
 

@@ -72,4 +72,6 @@
     <string name="quotes_favor" translatable="false">favor quotes</string>
     <string name="quotes_share" translatable="false">share quotes</string>
     <string name="refresh_hint">Retrivee Images by pulling down</string>
+    <string name="quotes">Quotes</string>
+    <string name="ellipsis">....</string>
 </resources>

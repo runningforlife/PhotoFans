@@ -4,6 +4,8 @@ import android.view.View;
 
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 
+import io.realm.RealmObject;
+
 /**
  * image detail adapter callback
  */
@@ -18,7 +20,7 @@ public interface BaseAdapterCallback {
     /*
      * get item at given position
      */
-    ImageRealm getItemAtPos(int pos);
+    RealmObject getItemAtPos(int pos);
 
     /*
      * item at pos is clicked

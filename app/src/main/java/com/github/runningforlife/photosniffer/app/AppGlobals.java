@@ -1,6 +1,5 @@
 package com.github.runningforlife.photosniffer.app;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Application;
 import android.content.BroadcastReceiver;
@@ -17,7 +16,7 @@ import android.util.Log;
 
 import com.avos.avoscloud.AVOSCloud;
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.model.ImageRealmMigration;
+import com.github.runningforlife.photosniffer.model.MyRealmMigration;
 import com.github.runningforlife.photosniffer.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.service.MyThreadFactory;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
@@ -65,7 +64,7 @@ public class AppGlobals extends Application{
         Realm.init(this);
         RealmConfiguration realmConfig = new RealmConfiguration.Builder()
                 .name(appName)
-                .migration(new ImageRealmMigration())
+                .migration(new MyRealmMigration())
                 .build();
         Realm.setDefaultConfiguration(realmConfig);
         // it seems that we should init here

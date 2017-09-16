@@ -24,6 +24,7 @@ import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.RealmObject;
 
 /**
  * fragment to manager wallpaper
@@ -99,7 +100,7 @@ public class WallPaperFragment extends BaseFragment
     }
 
     @Override
-    public ImageRealm getItemAtPos(int pos) {
+    public RealmObject getItemAtPos(int pos) {
         return mPresenter.getItemAtPos(pos);
     }
 
@@ -107,7 +108,7 @@ public class WallPaperFragment extends BaseFragment
     public void onItemClicked(View view, int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
         if(mCallback != null){
-            mCallback.onItemClick(view,pos, mPresenter.getItemAtPos(pos).getUrl());
+            mCallback.onItemClick(view,pos, ((ImageRealm)mPresenter.getItemAtPos(pos)).getUrl());
         }
     }
 

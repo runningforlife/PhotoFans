@@ -4,6 +4,8 @@ import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.model.RealmManager;
 import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 
+import io.realm.RealmObject;
+
 /**
  * a presenter to do interactions with UI and update database
  *
@@ -29,7 +31,7 @@ public interface Presenter extends ImageSaveRunnable.ImageSaveCallback, LifeCycl
     /*
      * get item at given position
      */
-    ImageRealm getItemAtPos(int pos);
+    RealmObject getItemAtPos(int pos);
 
     /*
      * remove item at given position

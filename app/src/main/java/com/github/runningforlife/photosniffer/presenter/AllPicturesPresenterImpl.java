@@ -332,10 +332,21 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
         final List<String> webSrc = SharedPrefUtil.getImageSource();
         String polaUrl = ImageSource.URL_POLA;
 
-        if(webSrc != null && webSrc.contains(polaUrl)){
+        final String key = mContext.getString(R.string.pref_pola_latest_collections_number);
+        final String lastUpdatedTime = mContext.getString(R.string.pref_pola_last_updated_time);
+        final long lastTime = SharedPrefUtil.getLong(lastUpdatedTime, System.currentTimeMillis());
+        long now = System.currentTimeMillis();
+
+        String keyNewUser = mContext.getString(R.string.pref_new_user);
+        boolean isFirstTimeUse = SharedPrefUtil.getBoolean(keyNewUser, true);
+
+        if(webSrc != null && webSrc.contains(polaUrl)
+                && (isFirstTimeUse || now >= lastTime + POLA_UPDATED_DURATION)){
+            
+            SharedPrefUtil.putBoolean(keyNewUser, false);
+
             String polaRetrieved = mContext.getString(R.string.pref_pola_retrieved);
             boolean isPolaRetrieved = SharedPrefUtil.getBoolean(polaRetrieved, false);
-            String lastUpdatedTime = mContext.getString(R.string.pref_pola_last_updated_time);
             if(!isPolaRetrieved){
                 saveAllPolaUrls(polaUrl, 1, LATEST_POLA_COUNT);
                 SharedPrefUtil.putBoolean(polaRetrieved, true);
@@ -361,8 +372,6 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
                 public void onLoadResource(WebView view, String url) {
                     Log.v(TAG,"onLoadResource(): url = " + url);
                     view.pageDown(true);
-                    String key = mContext.getString(R.string.pref_pola_latest_collections_number);
-                    String lastUpdatedTime = mContext.getString(R.string.pref_pola_last_updated_time);
                     int current = SharedPrefUtil.getInt(key,LATEST_POLA_COUNT);
 
                     if(url != null && url.endsWith("thumb.jpg")){
@@ -374,7 +383,6 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
                             SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
                         }
                     }else{
-                        long lastTime = SharedPrefUtil.getLong(lastUpdatedTime, System.currentTimeMillis());
                         if(System.currentTimeMillis() - lastTime >= POLA_UPDATED_DURATION){
                             SharedPrefUtil.putInt(key, current + 1);
                             // save next collections
