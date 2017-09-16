@@ -28,7 +28,7 @@ public class QuotesRetrieveService extends Service
 
     public static final String EXTRA_RETRIEVE_QUOTES = "expect_quotes";
     private static final int DEFAULT_QUOTES_NUMBER = 10;
-    private static final int DEFAULT_RETRIEVE_TIMEOUT = 10000; // 10s
+    private static final int DEFAULT_RETRIEVE_TIMEOUT = 10*1000; // 10s
 
     private int expect;
     private QuotePageProcessor processor;
@@ -106,10 +106,9 @@ public class QuotesRetrieveService extends Service
     }
 
     private void handleResult(){
+        sendResult();
         // stop spider
         spider.stop();
-
-        sendResult();
         // stop service itself
         looper.quit();
         stopSelf();

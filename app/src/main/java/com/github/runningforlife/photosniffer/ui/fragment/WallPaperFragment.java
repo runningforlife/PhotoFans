@@ -41,7 +41,6 @@ public class WallPaperFragment extends BaseFragment
 
     private GalleryAdapter mAdapter;
     private WallpaperPresenter mPresenter;
-    private FragmentCallback mCallback;
 
     public static WallPaperFragment newInstance(){
         return new WallPaperFragment();

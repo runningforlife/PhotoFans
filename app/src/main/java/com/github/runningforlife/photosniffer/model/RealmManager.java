@@ -488,7 +488,8 @@ public class RealmManager implements LifeCycle{
 
         if(mAllQuotes == null || !mAllQuotes.isValid()){
             mAllQuotes = realm.where(QuoteRealm.class)
-                    .findAllAsync();
+                    .findAllAsync()
+                    .sort("savedTime", Sort.DESCENDING);
             mAllQuotes.addChangeListener(new QuoteRealmDataChangeListener());
         }else if(mAllQuotes.isValid()){
             for(QuoteDataChangeListener listener : mQuoteDataChangeListener){

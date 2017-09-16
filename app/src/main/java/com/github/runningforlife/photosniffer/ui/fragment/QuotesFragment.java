@@ -1,6 +1,8 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -29,6 +31,7 @@ public class QuotesFragment extends BaseFragment
     public static final String TAG = "QuotesFragment";
 
     @BindView(R.id.rcv_quotes) RecyclerView rcvQuote;
+    @BindView(R.id.srl_refresh) SwipeRefreshLayout srlRefresh;
     private QuotesAdapter adapter;
     private QuotePresenter presenter;
     // current selected position to show context menu
@@ -57,6 +60,17 @@ public class QuotesFragment extends BaseFragment
         super.onResume();
         Log.v(TAG,"onResume()");
         presenter.onStart();
+    }
+
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+
+        if(!(context instanceof FragmentCallback)){
+            throw new IllegalStateException("FragmentCallback is not implemented");
+        }
+
+        mCallback = (FragmentCallback)context;
     }
 
     @Override
@@ -113,6 +127,18 @@ public class QuotesFragment extends BaseFragment
 
     private void initView(){
         Log.v(TAG,"initView()");
+
+        srlRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.v(TAG,"onRefresh()");
+                presenter.refresh();
+            }
+        });
+        srlRefresh.setColorSchemeResources(android.R.color.holo_blue_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_orange_dark);
+
         adapter = new QuotesAdapter(getContext(), this);
 
         LinearLayoutManager llm = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
@@ -142,7 +168,35 @@ public class QuotesFragment extends BaseFragment
     @Override
     public void onRefreshDone(boolean isSuccess) {
         Log.v(TAG,"onRefreshDone()");
+        srlRefresh.setRefreshing(false);
+        if(adapter != null){
+            adapter.notifyDataSetChanged();
+        }
 
+        if(mCallback != null) {
+            if (isSuccess) {
+                mCallback.showToast(getString(R.string.refresh_success));
+            } else {
+                mCallback.showToast(getString(R.string.refresh_error));
+            }
+        }
+    }
 
+    @Override
+    public boolean isRefreshing(){
+        return srlRefresh.isRefreshing();
+    }
+
+    @Override
+    public void setRefreshing(boolean enable){
+        srlRefresh.setRefreshing(enable);
+    }
+
+    @Override
+    public void onNetworkDisconnect() {
+        Log.v(TAG,"onNetworkDisconnect()");
+        if(mCallback != null) {
+            mCallback.showToast(getString(R.string.network_not_connected));
+        }
     }
 }

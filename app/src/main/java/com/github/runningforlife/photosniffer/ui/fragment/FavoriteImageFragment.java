@@ -47,8 +47,6 @@ public class FavoriteImageFragment extends BaseFragment
     private int mCurrentPos;
 
 
-    private FragmentCallback mCallback;
-
     public static FavoriteImageFragment newInstance(){
         return new FavoriteImageFragment();
     }

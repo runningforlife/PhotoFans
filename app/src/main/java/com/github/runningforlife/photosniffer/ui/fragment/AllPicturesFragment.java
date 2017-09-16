@@ -49,7 +49,6 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
     @BindView(R.id.wv_page) WebView mWvPage;
     private AllPicturesPresenter mPresenter;
     private GalleryAdapter mAdapter;
-    private FragmentCallback mCallback;
 
     public static Fragment newInstance(){
         return new AllPicturesFragment();

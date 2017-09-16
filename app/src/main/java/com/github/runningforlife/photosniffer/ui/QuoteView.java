@@ -5,4 +5,8 @@ package com.github.runningforlife.photosniffer.ui;
  */
 
 public interface QuoteView extends UI, RefreshView {
+    /**
+     * network is disconnected
+     */
+    void onNetworkDisconnect();
 }

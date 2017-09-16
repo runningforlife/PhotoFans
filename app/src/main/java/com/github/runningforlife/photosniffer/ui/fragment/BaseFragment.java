@@ -23,6 +23,7 @@ public class BaseFragment extends Fragment implements Refresh {
     public static final String GridManager = "GridManager";
     // current context menu item view position
     protected int mCurrentPos = -1;
+    protected FragmentCallback mCallback;
 
     public interface FragmentCallback {
         void onItemClick(View view, int pos, String url);

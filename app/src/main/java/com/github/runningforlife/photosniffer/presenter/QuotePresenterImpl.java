@@ -15,10 +15,12 @@ import com.github.runningforlife.photosniffer.service.QuotesRetrieveService;
 import com.github.runningforlife.photosniffer.service.ServiceStatus;
 import com.github.runningforlife.photosniffer.service.SimpleResultReceiver;
 import com.github.runningforlife.photosniffer.ui.QuoteView;
+import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
+import io.realm.Sort;
 
 /**
  * Created by jason on 9/16/17.
@@ -35,7 +37,6 @@ public class QuotePresenterImpl implements QuotePresenter {
     private RealmResults<QuoteRealm> quotes;
     private SimpleResultReceiver receiver;
     private boolean isRefreshing;
-    private boolean isDataChanged;
     private Handler handler;
 
     public QuotePresenterImpl(Context context, @Nullable QuoteView view){
@@ -52,9 +53,9 @@ public class QuotePresenterImpl implements QuotePresenter {
 
         handler = new H();
         receiver = new SimpleResultReceiver(handler);
+        receiver.setReceiver(this);
 
         isRefreshing = false;
-        isDataChanged = false;
     }
 
     @Override
@@ -106,9 +107,7 @@ public class QuotePresenterImpl implements QuotePresenter {
     public void onQuoteDataChange(RealmResults<QuoteRealm> data) {
         Log.v(TAG,"onQuoteDataChange()");
         quotes = data;
-        if(quotes == null || quotes.size() != data.size()){
-            isDataChanged = true;
-        }
+        quotes.sort("savedTime", Sort.DESCENDING);
         if(view != null){
             view.onDataSetChanged();
         }
@@ -130,6 +129,11 @@ public class QuotePresenterImpl implements QuotePresenter {
     @Override
     public void refresh() {
         Log.v(TAG,"refresh()");
+
+        if(!MiscUtil.isConnected(context)){
+            view.onNetworkDisconnect();
+            return;
+        }
 
         if(!isRefreshing) {
             retrieveQuotes();
