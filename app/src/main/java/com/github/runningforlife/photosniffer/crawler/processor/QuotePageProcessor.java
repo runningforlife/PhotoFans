@@ -88,6 +88,10 @@ public class QuotePageProcessor implements PageProcessor, QuotesRetriever.Retrie
         }
     }
 
+    public int getRetrieveQuoteSize(){
+        return  retriever.getQuoteList().size();
+    }
+
     // for test
     public List<QuotePageInfo> getPageList(){
         return retriever.getPageList();

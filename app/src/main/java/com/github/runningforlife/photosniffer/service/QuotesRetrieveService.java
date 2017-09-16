@@ -28,10 +28,7 @@ public class QuotesRetrieveService extends Service
 
     public static final String EXTRA_RETRIEVE_QUOTES = "expect_quotes";
     private static final int DEFAULT_QUOTES_NUMBER = 10;
-
-    static final int EVENT_RETRIEVE_START = 1;
-    static final int EVENT_RETRIEVE_SUCCESS = 2;
-    static final int EVENT_RETRIEVE_FAIL = 3;
+    private static final int DEFAULT_RETRIEVE_TIMEOUT = 10000; // 10s
 
     private int expect;
     private QuotePageProcessor processor;
@@ -76,6 +73,13 @@ public class QuotesRetrieveService extends Service
         return START_NOT_STICKY;
     }
 
+    @Override
+    public void onDestroy(){
+        Log.v(TAG,"onDestroy()");
+
+        processor.removeCallback(this);
+    }
+
     private void retrieveQuotes(){
         if(processor == null){
             processor = new QuotePageProcessor(expect);
@@ -88,29 +92,47 @@ public class QuotesRetrieveService extends Service
                 .start();
 
         // tell client that we are starting
-        handler.sendEmptyMessage(EVENT_RETRIEVE_START);
+        handler.sendEmptyMessage(H.EVENT_RETRIEVE_START);
+        // timeout message
+        handler.sendEmptyMessageAtTime(H.EVENT_RETRIEVE_TIMEOUT,
+                System.currentTimeMillis() + DEFAULT_RETRIEVE_TIMEOUT);
     }
 
     @Override
     public void onRetrieveComplete(int cnt) {
         Log.v(TAG,"onRetrieveComplete()");
-        if(cnt > 0){
-            Message msg = handler.obtainMessage(EVENT_RETRIEVE_SUCCESS, cnt);
-            msg.sendToTarget();
-        }else{
-            handler.sendEmptyMessage(EVENT_RETRIEVE_FAIL);
-        }
+        Message msg = handler.obtainMessage(H.EVENT_RETRIEVE_DONE, cnt);
+        msg.sendToTarget();
     }
 
-    private void cleanUp(){
+    private void handleResult(){
         // stop spider
         spider.stop();
+
+        sendResult();
         // stop service itself
         looper.quit();
         stopSelf();
     }
 
+    private void sendResult(){
+        Log.v(TAG,"sendResult()");
+
+        int quotes = processor.getRetrieveQuoteSize();
+        if(quotes > 0){
+            Bundle bundle = new Bundle();
+            bundle.putInt("result", quotes);
+            resultReceiver.send(ServiceStatus.SUCCESS, bundle);
+        }else{
+            resultReceiver.send(ServiceStatus.ERROR, null);
+        }
+    }
+
     private final class H extends Handler{
+
+        static final int EVENT_RETRIEVE_START = 1;
+        static final int EVENT_RETRIEVE_DONE = 2;
+        static final int EVENT_RETRIEVE_TIMEOUT = 3;
 
         H(Looper looper){
             super(looper);
@@ -124,16 +146,9 @@ public class QuotesRetrieveService extends Service
                 case EVENT_RETRIEVE_START:
                     resultReceiver.send(ServiceStatus.RUNNING, null);
                     break;
-                case EVENT_RETRIEVE_SUCCESS:
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("result",(int)message.obj);
-                    resultReceiver.send(ServiceStatus.SUCCESS, bundle);
-                    cleanUp();
-                    break;
-                case EVENT_RETRIEVE_FAIL:
-                    resultReceiver.send(ServiceStatus.ERROR,null);
-                    cleanUp();
-                    break;
+                case EVENT_RETRIEVE_DONE:
+                case EVENT_RETRIEVE_TIMEOUT:
+                    handleResult();
                 default:
                     break;
             }

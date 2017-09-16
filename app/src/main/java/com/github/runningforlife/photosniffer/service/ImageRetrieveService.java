@@ -37,6 +37,7 @@ public class ImageRetrieveService extends Service implements
     //private boolean mRedelivery;
     // max number of images to be retrieved a time
     public static final String EXTRA_EXPECTED_IMAGES = "maxImages";
+    private static final int DEFAULT_RETRIEVE_TIME_OUT = 20*1000;
 
     private ResultReceiver mReceiver;
     private ImageRetrievePageProcessor mProcessor;
@@ -110,6 +111,10 @@ public class ImageRetrieveService extends Service implements
         message.obj = intent;
         message.arg1 = startId;
         message.sendToTarget();
+
+        //timeout message
+        Message msg = mServiceHandler.obtainMessage(H.EVENT_RETRIEVE_TIMEOUT);
+        mServiceHandler.sendMessageDelayed(msg, DEFAULT_RETRIEVE_TIME_OUT);
     }
 
     private void handleIntent(Intent intent) {
@@ -143,10 +148,9 @@ public class ImageRetrieveService extends Service implements
         mSpider.run();
     }
 
-
-    private void handleExpectedComplete(int size){
-        Log.v(TAG,"handleExpectedComplete()");
-        sendResult(size);
+    private void handleResult(){
+        Log.v(TAG,"handleTimeout()");
+        sendResult(mProcessor.getRetrievedImageCount());
     }
 
     private void clearUp(){
@@ -160,9 +164,10 @@ public class ImageRetrieveService extends Service implements
 
     private void sendResult(int size){
         Log.v(TAG,"sendResult(): size = " + size);
-        Bundle bundle = new Bundle();
-        bundle.putLong("result", size);
+
         if(size != 0) {
+            Bundle bundle = new Bundle();
+            bundle.putLong("result", size);
             mReceiver.send(ServiceStatus.SUCCESS, bundle);
         }else{
             mReceiver.send(ServiceStatus.ERROR,null);
@@ -172,6 +177,7 @@ public class ImageRetrieveService extends Service implements
     private final class H extends  Handler{
         static final int EVENT_RETRIEVE_START = 1;
         static final int EVENT_RETRIEVE_DONE = 2;
+        static final int EVENT_RETRIEVE_TIMEOUT = 3;
 
         H(Looper looper){
             super(looper);
@@ -186,8 +192,10 @@ public class ImageRetrieveService extends Service implements
                     handleIntent((Intent)msg.obj);
                     break;
                 case EVENT_RETRIEVE_DONE:
-                    int size = (int)msg.obj;
-                    handleExpectedComplete(size);
+                case EVENT_RETRIEVE_TIMEOUT:
+                    handleResult();
+                    break;
+                default:
                     break;
             }
         }
