@@ -29,7 +29,8 @@ import io.realm.Sort;
 public class QuotePresenterImpl implements QuotePresenter {
     private static final String TAG = "QuotesPresenter";
 
-    private static final int DEFAULT_RETRIEVE_QUOTES = 15;
+    private static final int DEFAULT_RETRIEVE_QUOTES = 10;
+    private static final int DEFAULT_RETRIEVE_TIMEOUT = 22*1000;
 
     private Context context;
     private QuoteView view;
@@ -147,6 +148,9 @@ public class QuotePresenterImpl implements QuotePresenter {
         intent.putExtra(QuotesRetrieveService.EXTRA_RETRIEVE_QUOTES, DEFAULT_RETRIEVE_QUOTES);
 
         context.startService(intent);
+        // timeout message
+        Message msg = handler.obtainMessage(H.EVENT_RETRIEVE_QUOTE_TIMEOUT);
+        handler.sendMessageDelayed(msg, DEFAULT_RETRIEVE_TIMEOUT);
     }
 
     @Override
@@ -160,19 +164,19 @@ public class QuotePresenterImpl implements QuotePresenter {
             case ServiceStatus.SUCCESS:
                 if(isRefreshing){
                     isRefreshing = false;
-                }
-                int count = data.getInt("result");
-                if(count > 0){
-                    view.onRefreshDone(true);
-                }else{
-                    view.onRefreshDone(false);
+                    int count = data.getInt("result");
+                    if(count > 0){
+                        view.onRefreshDone(true);
+                    }else{
+                        view.onRefreshDone(false);
+                    }
                 }
                 break;
             case ServiceStatus.ERROR:
                 if(isRefreshing){
                     isRefreshing = false;
+                    view.onRefreshDone(false);
                 }
-                view.onRefreshDone(false);
                 break;
             default:
                 break;
@@ -192,8 +196,8 @@ public class QuotePresenterImpl implements QuotePresenter {
                 case EVENT_RETRIEVE_QUOTE_TIMEOUT:
                     if(isRefreshing){
                         isRefreshing = false;
+                        view.onRefreshDone(false);
                     }
-                    view.onRefreshDone(false);
                     break;
             }
         }

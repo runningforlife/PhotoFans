@@ -15,7 +15,13 @@ import android.util.Log;
 import com.github.runningforlife.photosniffer.crawler.OkHttpDownloader;
 import com.github.runningforlife.photosniffer.crawler.processor.QuotePageFilter;
 import com.github.runningforlife.photosniffer.crawler.processor.QuotePageProcessor;
+import com.github.runningforlife.photosniffer.model.QuotePageInfo;
+import com.github.runningforlife.photosniffer.model.RealmManager;
 
+import java.util.Random;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 import us.codecraft.webmagic.Spider;
 
 /**
@@ -28,7 +34,7 @@ public class QuotesRetrieveService extends Service
 
     public static final String EXTRA_RETRIEVE_QUOTES = "expect_quotes";
     private static final int DEFAULT_QUOTES_NUMBER = 10;
-    private static final int DEFAULT_RETRIEVE_TIMEOUT = 10*1000; // 10s
+    private static final int DEFAULT_RETRIEVE_TIMEOUT = 20*1000; // 20s
 
     private int expect;
     private QuotePageProcessor processor;
@@ -37,6 +43,7 @@ public class QuotesRetrieveService extends Service
     private volatile H handler;
     private Looper looper;
     private ResultReceiver resultReceiver;
+    private RealmResults<QuotePageInfo> quotePages;
 
     public QuotesRetrieveService() {
         super();
@@ -81,21 +88,28 @@ public class QuotesRetrieveService extends Service
     }
 
     private void retrieveQuotes(){
+        loadQuotePages();
         if(processor == null){
-            processor = new QuotePageProcessor(expect);
+            processor = new QuotePageProcessor(quotePages, expect);
             processor.addCallback(this);
         }
 
-        spider = Spider.create(processor);
-        spider.setDownloader(new OkHttpDownloader())
-                .addUrl(QuotePageFilter.QUOTE_SOURCE_0)
-                .start();
+        spider = Spider.create(processor)
+                       .setDownloader(new OkHttpDownloader());
 
+        if(quotePages == null || quotePages.size() <= 0) {
+            spider.addUrl(QuotePageFilter.QUOTE_SOURCE_0);
+        }else{
+            Random rnd = new Random(quotePages.size());
+            int idx = rnd.nextInt(quotePages.size());
+            spider.addUrl(quotePages.get(idx).getUrl());
+        }
+        spider.start();
         // tell client that we are starting
         handler.sendEmptyMessage(H.EVENT_RETRIEVE_START);
         // timeout message
-        handler.sendEmptyMessageAtTime(H.EVENT_RETRIEVE_TIMEOUT,
-                System.currentTimeMillis() + DEFAULT_RETRIEVE_TIMEOUT);
+        Message msg = handler.obtainMessage(H.EVENT_RETRIEVE_TIMEOUT);
+        handler.sendMessageDelayed(msg, DEFAULT_RETRIEVE_TIMEOUT);
     }
 
     @Override
@@ -103,6 +117,11 @@ public class QuotesRetrieveService extends Service
         Log.v(TAG,"onRetrieveComplete()");
         Message msg = handler.obtainMessage(H.EVENT_RETRIEVE_DONE, cnt);
         msg.sendToTarget();
+    }
+
+    private void loadQuotePages(){
+        Realm realm = Realm.getDefaultInstance();
+        quotePages = RealmManager.getAllUnvisitedQuotePages(realm);
     }
 
     private void handleResult(){

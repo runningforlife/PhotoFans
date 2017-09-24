@@ -73,7 +73,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 RealmManager helper = RealmManager.getInstance();
 
                 Realm realm = Realm.getDefaultInstance();
-                RealmResults<ImagePageInfo> visited = helper.getAllVisitedPages(realm);
+                RealmResults<ImagePageInfo> visited = RealmManager.getAllVisitedPages(realm);
 
                 Iterator it = src.iterator();
                 while(it.hasNext()){

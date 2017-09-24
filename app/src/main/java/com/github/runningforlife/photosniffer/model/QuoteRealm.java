@@ -22,6 +22,7 @@ public class QuoteRealm extends RealmObject {
     private long showTime; // when this item is showed
     private boolean isFavor;
     private String header;
+    private boolean isUsed;
 
     public QuoteRealm(){
         isFavor = false;
@@ -34,6 +35,7 @@ public class QuoteRealm extends RealmObject {
         this.text = text;
         this.isFavor = false;
         this.savedTime = DateFormat.getDateTimeInstance().format(new Date());
+        this.isUsed = false;
     }
 
     public void setUrl(String url){
@@ -91,6 +93,14 @@ public class QuoteRealm extends RealmObject {
 
     public String getHeader(){
         return header;
+    }
+
+    public void setIsUsed(boolean isUsed){
+        this.isUsed = isUsed;
+    }
+
+    public boolean getIsUsed(){
+        return this.isUsed;
     }
 
     @Override

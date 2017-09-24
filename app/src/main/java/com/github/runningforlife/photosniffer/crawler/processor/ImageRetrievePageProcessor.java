@@ -153,8 +153,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private void loadPages(){
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<ImagePageInfo> pages = RealmManager.getInstance()
-                .getAllUnvisitedImagePages(realm);
+        RealmResults<ImagePageInfo> pages = RealmManager.getAllUnvisitedImagePages(realm);
         Log.d(TAG,"loadPages(): unvisisted page size = " + pages.size());
 
         if(pages.size() > 0){

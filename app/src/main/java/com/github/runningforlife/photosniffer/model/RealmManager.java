@@ -35,7 +35,8 @@ public class RealmManager implements LifeCycle{
     private RealmResults<ImageRealm> mAllWallpaper;
 
     private RealmResults<QuotePageInfo> mAllQuotePage;
-    private RealmResults<QuoteRealm> mAllQuotes;
+    private RealmResults<QuoteRealm> mAllUsedQuotes;
+    private RealmResults<QuoteRealm> mAllUnUsedQuotes;
     // callback to listen realm changes: update or query complete
     private List<UsedDataChangeListener> mUsedChangeListener;
     private List<UnusedDataChangeListener> mUnusedChangeListener;
@@ -185,9 +186,9 @@ public class RealmManager implements LifeCycle{
                 mAllWallpaper.removeAllChangeListeners();
                 mAllWallpaper = null;
             }
-            if(mAllQuotes != null){
-                mAllQuotes.removeAllChangeListeners();
-                mAllQuotes = null;
+            if(mAllUsedQuotes != null){
+                mAllUsedQuotes.removeAllChangeListeners();
+                mAllUsedQuotes = null;
             }
             if (realm != null) {
                 realm.close();
@@ -331,7 +332,7 @@ public class RealmManager implements LifeCycle{
         query();
     }
 
-    public RealmResults<ImagePageInfo> getAllVisitedPages(Realm r){
+    public static RealmResults<ImagePageInfo> getAllVisitedPages(Realm r){
         RealmResults<ImagePageInfo> visited = r.where(ImagePageInfo.class)
                 .equalTo("mIsVisited", true)
                 .isNotNull("mUrl")
@@ -340,13 +341,20 @@ public class RealmManager implements LifeCycle{
         return visited;
     }
 
-    public RealmResults<ImagePageInfo> getAllUnvisitedImagePages(Realm r){
+    public static RealmResults<ImagePageInfo> getAllUnvisitedImagePages(Realm r){
         RealmResults<ImagePageInfo> unVisited = r.where(ImagePageInfo.class)
                 .equalTo("mIsVisited",false)
                 .isNotNull("mUrl")
                 .findAll();
 
         return unVisited;
+    }
+
+    public static RealmResults<QuotePageInfo> getAllUnvisitedQuotePages(Realm r){
+        return r.where(QuotePageInfo.class)
+                .equalTo("isVisited", false)
+                .isNotNull("url")
+                .findAll();
     }
 
     public void delete(final RealmObject object){
@@ -486,14 +494,15 @@ public class RealmManager implements LifeCycle{
             }
         }
 
-        if(mAllQuotes == null || !mAllQuotes.isValid()){
-            mAllQuotes = realm.where(QuoteRealm.class)
+        if(mAllUsedQuotes == null || !mAllUsedQuotes.isValid()){
+            mAllUsedQuotes = realm.where(QuoteRealm.class)
+                    .equalTo("isUsed", true)
                     .findAllAsync()
                     .sort("savedTime", Sort.DESCENDING);
-            mAllQuotes.addChangeListener(new QuoteRealmDataChangeListener());
-        }else if(mAllQuotes.isValid()){
+            mAllUsedQuotes.addChangeListener(new QuoteRealmDataChangeListener());
+        }else if(mAllUsedQuotes.isValid()){
             for(QuoteDataChangeListener listener : mQuoteDataChangeListener){
-                listener.onQuoteDataChange(mAllQuotes);
+                listener.onQuoteDataChange(mAllUsedQuotes);
             }
         }
     }

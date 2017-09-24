@@ -8,6 +8,7 @@ import com.github.runningforlife.photosniffer.model.QuoteRealm;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.RealmResults;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -42,10 +43,10 @@ public class QuotePageProcessor implements PageProcessor, QuotesRetriever.Retrie
         }
     }
 
-    public QuotePageProcessor(int expected){
+    public QuotePageProcessor(RealmResults<QuotePageInfo> pages, int expected){
         int expect = expected <= 0 ? DEFAULT_RETRIEVED_QUOTES : expected;
         filter = new QuotePageFilter();
-        retriever = new QuotesRetriever(expect);
+        retriever = new QuotesRetriever(pages, expect);
         retriever.setCompleteListener(this);
 
         callback = new ArrayList<>();

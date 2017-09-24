@@ -240,6 +240,7 @@ public class GalleryActivity extends BaseActivity
     public void onRefreshDone(boolean success) {
         Log.v(TAG,"onRefreshDone()");
         ivQuoteSync.clearAnimation();
+
         if(success){
             if(presenter.isCurrentFavored()){
                 ivFavor.setImageResource(R.drawable.ic_favorite_white_24dp);
@@ -273,6 +274,10 @@ public class GalleryActivity extends BaseActivity
     private void initView(){
         Log.v(TAG,"initView()");
         tvQuote = (TextView)headerView.findViewById(R.id.tv_quote);
+        Animation animation = AnimationUtils.makeInAnimation(
+                getApplicationContext(), true);
+        tvQuote.setAnimation(animation);
+
         tvQuoteAuthor = (TextView)headerView.findViewById(R.id.tv_quote_author);
         ivQuoteSync = (ImageView)headerView.findViewById(R.id.iv_sync);
 
@@ -424,6 +429,7 @@ public class GalleryActivity extends BaseActivity
             fragment = QuotesFragment.newInstance();
         }
         FragmentTransaction ft = fragmentMgr.beginTransaction();
+
         if (Build.VERSION.SDK_INT >= 19) {
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         }
