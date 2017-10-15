@@ -5,6 +5,7 @@ package com.github.runningforlife.photosniffer.ui;
  */
 
 public interface AllPictureView extends ImageUI, RefreshView {
+
     void onNetworkDisconnect();
 
     void onMobileConnected();

@@ -94,14 +94,14 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
     public void onDestroyView(){
         super.onDestroyView();
         Log.v(TAG,"onDestroyView()");
-        mPresenter.onDestroy();
+        //mPresenter.onDestroy();
     }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
         Log.v(TAG,"onDestroy()");
-        //mPresenter.onDestroy();
+        mPresenter.onDestroy();
     }
 
     @Override
@@ -112,16 +112,6 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
     @Override
     public void setRefreshing(boolean enable){
         mRefresher.setRefreshing(enable);
-    }
-
-    @Override
-    public void onDataSetChanged() {
-        Log.v(TAG,"onDataSetChanged()");
-        if(mRvImgList.getAdapter() == null){
-            mRvImgList.setAdapter(mAdapter);
-        }
-        //mRvImgList.invalidate();
-        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -173,6 +163,23 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
                 }).show();
     }
 
+    @Override
+    public void onDataSetRangeChange(int start, int count) {
+        Log.v(TAG,"onDataSetRangeChange(): start=" + start + ", count=" + count);
+        if(mRvImgList.getAdapter() == null){
+            mRvImgList.setAdapter(mAdapter);
+        }
+        if(start == 0 && count > 0){
+            mAdapter.notifyItemRangeInserted(0, count);
+            mRvImgList.smoothScrollToPosition(0);
+        // one item is removed
+        }else if(start >= 0 && count < 0){
+            mAdapter.notifyItemRangeRemoved(start, (-1)*count);
+        }else {
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
 
     @Override
     public void onContextMenuCreated(int pos, String adapter) {
@@ -184,7 +191,6 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
     @Override
     public boolean onContextItemSelected(MenuItem item){
         Log.v(TAG,"onContextItemSelected()");
-
         switch (item.getItemId()){
             case R.id.menu_save:
                 mPresenter.saveImageAtPos(mCurrentPos);
@@ -208,10 +214,10 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
     @Override
     public void onItemClicked(View view, int pos,String adapter) {
         Log.v(TAG,"onItemClick(): pos = " + pos);
-
         if(mRefresher.isRefreshing()){
             mRefresher.setRefreshing(false);
         }
+
         Intent intent = new Intent(getContext(),ImageDetailActivity.class);
         intent.putExtra("image",pos);
         ActivityOptionsCompat options = ActivityOptionsCompat.
@@ -294,6 +300,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
         GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(),2, GridLayoutManager.VERTICAL,false);
         gridLayoutMgr.setSmoothScrollbarEnabled(true);
         mRvImgList.setHasFixedSize(true);
+
         mRvImgList.setLayoutManager(gridLayoutMgr);
         mRvImgList.setItemAnimator(new ScaleInOutItemAnimator());
         mRvImgList.setBackgroundResource(R.color.colorLightGrey);
@@ -302,6 +309,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
         mAdapter.setContextMenuRes(R.menu.menu_context_gallery);
 
         mRvImgList.setAdapter(mAdapter);
+        //mAdapter.setHasStableIds(true);
         mRefresher.setColorSchemeResources(android.R.color.holo_blue_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_orange_dark);

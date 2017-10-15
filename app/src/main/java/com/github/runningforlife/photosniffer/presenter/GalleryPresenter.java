@@ -13,6 +13,7 @@ import com.github.runningforlife.photosniffer.service.SimpleResultReceiver;
 
 public interface GalleryPresenter extends RealmManager.QuoteDataChangeListener,
         LifeCycle, SimpleResultReceiver.Receiver{
+
     void init();
 
     void refresh();

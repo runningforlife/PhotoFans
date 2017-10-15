@@ -39,6 +39,7 @@ public class QuotePresenterImpl implements QuotePresenter {
     private SimpleResultReceiver receiver;
     private boolean isRefreshing;
     private Handler handler;
+    private int mLastRemovedPos = -1;
 
     public QuotePresenterImpl(Context context, @Nullable QuoteView view){
         this.context = context;
@@ -72,6 +73,8 @@ public class QuotePresenterImpl implements QuotePresenter {
     @Override
     public void removeItemAtPos(int pos) {
         Log.v(TAG,"removeItemAtPos()");
+
+        mLastRemovedPos = pos;
 
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
@@ -107,10 +110,20 @@ public class QuotePresenterImpl implements QuotePresenter {
     @Override
     public void onQuoteDataChange(RealmResults<QuoteRealm> data) {
         Log.v(TAG,"onQuoteDataChange()");
-        quotes = data;
+        int currentSize = 0;
+        if(quotes != null){
+            currentSize = quotes.size();
+        }else {
+            quotes = data;
+        }
         quotes.sort("savedTime", Sort.DESCENDING);
-        if(view != null){
-            view.onDataSetChanged();
+
+        if(data.size() > currentSize){
+            view.onDataSetRangeChange(0, quotes.size());
+        }else if(mLastRemovedPos != -1){
+            view.onDataSetRangeChange(mLastRemovedPos, -1);
+        }else{
+            view.onDataSetRangeChange(0, quotes.size());
         }
     }
 

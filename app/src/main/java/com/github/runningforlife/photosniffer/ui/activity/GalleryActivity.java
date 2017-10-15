@@ -3,6 +3,7 @@ package com.github.runningforlife.photosniffer.ui.activity;
 import android.Manifest;
 import android.animation.AnimatorInflater;
 import android.animation.StateListAnimator;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
@@ -410,13 +411,16 @@ public class GalleryActivity extends BaseActivity
         Intent intent = new Intent(this, FullScreenImageActivity.class);
         intent.putExtra(FullScreenImageFragment.POSITION, pos);
         intent.putExtra(FullScreenImageFragment.IMAGE_URL, url);
-        if(Build.VERSION.SDK_INT >= 16) {
+        if(Build.VERSION.SDK_INT >= 21) {
+            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
+                    sharedView, getString(R.string.activity_image_transition));
+            startActivity(intent, options.toBundle());
+
+        }else if(Build.VERSION.SDK_INT >= 16){
             ActivityOptionsCompat options = ActivityOptionsCompat.
                     makeSceneTransitionAnimation(this, sharedView,
                             getString(R.string.activity_image_transition) + String.valueOf(pos));
             startActivity(intent, options.toBundle());
-        }else{
-            startActivity(intent);
         }
     }
 

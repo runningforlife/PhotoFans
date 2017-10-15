@@ -34,7 +34,7 @@ public class WallpaperPresenterImpl implements WallpaperPresenter{
     private RealmManager mRealmMgr;
     private RealmResults<ImageRealm> mWallpaper;
     private ExecutorService mExecutor;
-
+    private int mLastRemovedPos = -1;
 
     public WallpaperPresenterImpl(Context context){
         mContext = context;
@@ -67,6 +67,7 @@ public class WallpaperPresenterImpl implements WallpaperPresenter{
     public void removeItemAtPos(int pos) {
         if(pos >= 0 && pos <= mWallpaper.size()) {
             mRealmMgr.delete(mWallpaper.get(pos));
+            mLastRemovedPos = pos;
         }
     }
 
@@ -99,13 +100,22 @@ public class WallpaperPresenterImpl implements WallpaperPresenter{
 
     @Override
     public void onWallpaperDataChange(RealmResults<ImageRealm> data) {
-        if(data == null){
-            throw new NullPointerException("data set is null");
+        Log.v(TAG,"onWallpaperDataChange()");
+
+        int currentSize = 0;
+        if(mWallpaper != null){
+            currentSize = mWallpaper.size();
+        }else {
+            mWallpaper = data;
         }
 
-        mWallpaper = data;
-
-        mView.onDataSetChanged();
+        if(data.size() > currentSize){
+            mView.onDataSetRangeChange(0, mWallpaper.size());
+        }else if(mLastRemovedPos != -1){
+            mView.onDataSetRangeChange(mLastRemovedPos, -1);
+        }else {
+            mView.onDataSetRangeChange(0, mWallpaper.size());
+        }
 
         mView.onRefreshDone(true);
     }

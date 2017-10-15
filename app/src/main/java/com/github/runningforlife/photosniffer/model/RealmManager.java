@@ -9,6 +9,7 @@ import com.github.runningforlife.photosniffer.presenter.LifeCycle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
@@ -48,6 +49,9 @@ public class RealmManager implements LifeCycle{
     private UnusedRealmDataChangeListener mUnusedDataChangeListener;
     // async task
     private RealmAsyncTask mAsyncTask;
+    // remove item lock
+    private final Object mRemoveLock = new Object();
+    private BlockingDeque<RemoveItemTransaction> mRemovedQue;
 
     public interface UsedDataChangeListener{
         void onUsedDataChange(RealmResults<ImageRealm> data);
@@ -70,7 +74,7 @@ public class RealmManager implements LifeCycle{
     }
 
     public void addUsedDataChangeListener(UsedDataChangeListener listener){
-        if(listener != null) {
+        if (!mUsedChangeListener.contains(listener)) {
             mUsedChangeListener.add(listener);
             if(mAllUnUsed != null && mAllUsed.isLoaded()){
                 listener.onUsedDataChange(mAllUsed);
@@ -83,7 +87,7 @@ public class RealmManager implements LifeCycle{
     }
 
     public void addUnusedDataChangeListener(UnusedDataChangeListener listener){
-        if(listener != null){
+        if(!mUnusedChangeListener.contains(listener)){
             mUnusedChangeListener.add(listener);
             if(mAllUnUsed != null && mAllUnUsed.isLoaded()){
                 listener.onUnusedDataChange(mAllUnUsed);
@@ -357,16 +361,30 @@ public class RealmManager implements LifeCycle{
                 .findAll();
     }
 
-    public void delete(final RealmObject object){
-        if(object == null) return;
+    public void deleteAsync(final RealmObject object){
         Realm r = Realm.getDefaultInstance();
 
-        r.executeTransaction(new Realm.Transaction() {
+        r.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 object.deleteFromRealm();
             }
         });
+    }
+
+    public void delete(final RealmObject object){
+        if(object == null) return;
+
+            Realm r = Realm.getDefaultInstance();
+
+            r.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    synchronized (mRemoveLock) {
+                        object.deleteFromRealm();
+                    }
+                }
+            });
     }
 
     // keep latest images
@@ -389,8 +407,8 @@ public class RealmManager implements LifeCycle{
                         .equalTo("mIsFavor", false)
                         .equalTo("mIsWallpaper", false)
                         .findAllSorted("mTimeStamp",Sort.ASCENDING);
-                int total = used.size();
-                for(int i = 0; i <  total - maxImgs; ++i){
+                int diff = used.size() - maxImgs;
+                for(int i = 0; i <  diff; ++i){
                     // realm object cannot be accessed by multiple threads
                     ImageRealm item = used.get(i);
                     item.deleteFromRealm();

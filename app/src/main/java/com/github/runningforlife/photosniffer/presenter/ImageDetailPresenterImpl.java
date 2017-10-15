@@ -3,6 +3,7 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.v7.util.SortedList;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
@@ -34,12 +35,19 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
     private ImageDetailView mView;
     private RealmManager mRealmMgr;
     private ExecutorService mExecutor;
+    private UpdateOp mOp;
+    private int mLastRemovePos;
+
 
     public ImageDetailPresenterImpl(Context context, ImageDetailView view){
         mContext = context;
         mView = view;
         mRealmMgr = RealmManager.getInstance();
         mExecutor = Executors.newSingleThreadExecutor();
+
+        mOp = UpdateOp.OP_NONE;
+        mLastRemovePos = -1;
+        //mImgList = new SortedList<ImageRealm>(ImageRealm.class, new SortedListCallback());
     }
 
     @Override
@@ -60,6 +68,8 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
         if(pos >= 0 && pos < mImgList.size()) {
             mRealmMgr.delete(mImgList.get(pos));
         }
+        mOp = UpdateOp.OP_DELETE;
+        mLastRemovePos = pos;
     }
 
     @Override
@@ -145,17 +155,15 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
     @Override
     public void onUsedDataChange(RealmResults<ImageRealm> data) {
         Log.v(TAG,"onUsedDataChange(): data size = " + data.size());
-        mImgList = data;
-        // keep sorted
-        sort();
 
-        if(mView != null) {
-            mView.onDataSetChanged();
+        data.sort("mTimeStamp", Sort.DESCENDING);
+
+        if(mImgList == null){
+            mImgList = data;
+            mView.onDataSetRangeChange(0, mImgList.size());
+        }else if(mOp == UpdateOp.OP_DELETE){
+            mView.onDataSetRangeChange(mLastRemovePos, -1);
         }
-    }
-
-    private void sort(){
-        mImgList.sort("mTimeStamp", Sort.DESCENDING);
     }
 
     @Override

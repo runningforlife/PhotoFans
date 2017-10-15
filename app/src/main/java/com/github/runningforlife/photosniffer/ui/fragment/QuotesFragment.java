@@ -158,9 +158,14 @@ public class QuotesFragment extends BaseFragment
     }
 
     @Override
-    public void onDataSetChanged() {
-        Log.v(TAG,"onDataSetChanged()");
-        if(adapter != null){
+    public void onDataSetRangeChange(int start, int count) {
+        Log.v(TAG,"onDataSetRangeChange()");
+        if(start == 0 && count > 0){
+            adapter.notifyItemRangeInserted(0, count);
+        // item removed
+        }else if(start >= 0 && count < 0){
+            adapter.notifyItemRangeRemoved(start, (-1)*count);
+        }else{
             adapter.notifyDataSetChanged();
         }
     }

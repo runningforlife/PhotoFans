@@ -166,14 +166,23 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     @Override
-    public void onDataSetChanged() {
-        Log.v(TAG,"onDataSetChanged()");
+    public void onDataSetRangeChange(int start, int count) {
+        Log.v(TAG,"onDataSetRangeChange()");
         if(mImgPager.getAdapter() == null) {
             mImgPager.setAdapter(mPagerAdapter);
             mLvImgPreview.setAdapter(mAdapter);
         }
-        mPagerAdapter.notifyDataSetChanged();
-        mAdapter.notifyDataSetChanged();
+        if(start == 0 && count > 0){
+            mPagerAdapter.notifyDataSetChanged();
+            mAdapter.notifyItemRangeInserted(0, count);
+        // item deleted
+        }else if(start >= 0 && count < 0){
+            mPagerAdapter.notifyDataSetChanged();
+            mAdapter.notifyItemRangeRemoved(start, (-1)*count);
+        }else{
+            mPagerAdapter.notifyDataSetChanged();
+            mAdapter.notifyDataSetChanged();
+        }
         // current index is changed
         mImgPager.setCurrentItem(mCurrentImgIdx);
         mLvImgPreview.smoothScrollToPosition(mCurrentImgIdx);
@@ -248,6 +257,10 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     @Override
     public void removeItemAtPos(int pos) {
         mPresenter.removeItemAtPos(pos);
+
+        View obj = mImgPager.getChildAt(pos);
+        mPagerAdapter.destroyItem(mImgPager, pos,obj);
+        mImgPager.removeView(obj);
     }
 
     @Override
@@ -325,6 +338,9 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mPresenter = new ImageDetailPresenterImpl(getApplicationContext(),ImageDetailActivity.this);
         // may have null pointer exception
         mPresenter.init();
+        // set adapter to bind data
+        mImgPager.setAdapter(mPagerAdapter);
+        mLvImgPreview.setAdapter(mAdapter);
     }
 
     private void initActionList(){

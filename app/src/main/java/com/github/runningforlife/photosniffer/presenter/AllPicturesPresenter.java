@@ -13,7 +13,6 @@ import io.realm.RealmResults;
 
 public interface AllPicturesPresenter extends Presenter,
         RealmManager.UsedDataChangeListener, RealmManager.UnusedDataChangeListener {
-
     /*
      * refresh data(download from network asynchrously)
      */

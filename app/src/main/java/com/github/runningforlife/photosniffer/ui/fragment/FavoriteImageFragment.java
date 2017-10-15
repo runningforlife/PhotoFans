@@ -152,11 +152,15 @@ public class FavoriteImageFragment extends BaseFragment
     }
 
     @Override
-    public void onDataSetChanged() {
-        Log.v(TAG,"onDataSetChanged()");
-        //FIXME: D/skia: --- decoder->decode returned false
-        mRcvFavorList.invalidate();
-        mAdapter.notifyDataSetChanged();
+    public void onDataSetRangeChange(int start, int count) {
+        Log.v(TAG,"onDataSetRangeChange()");
+        if(start == 0 && count > 0){
+            mAdapter.notifyItemRangeInserted(start, count);
+        }else if(start >= 0 && count < 0){
+            mAdapter.notifyItemRangeRemoved(start, (-1)*count);
+        }else{
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     //FIXME: image view is loaded too slow, we have to

@@ -7,8 +7,8 @@ package com.github.runningforlife.photosniffer.ui;
  */
 
 public interface UI {
-    /*
-     * data set is changed
+    /**
+     * the range of data set is changed
      */
-    void onDataSetChanged();
+    void onDataSetRangeChange(int start, int count);
 }

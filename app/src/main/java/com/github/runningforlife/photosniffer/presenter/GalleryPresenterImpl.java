@@ -30,6 +30,7 @@ import io.realm.RealmResults;
 
 public class GalleryPresenterImpl implements GalleryPresenter{
     private static final String TAG = "GalleryPresenter";
+
     private static final int DEFAULT_RETRIEVE_QUOTES = 10;
     private static final int DEFAULT_PULL_TIMEOUT = 15*1000; //15s
     private static long AUTO_REFRESH_INTERVAL = 0;
