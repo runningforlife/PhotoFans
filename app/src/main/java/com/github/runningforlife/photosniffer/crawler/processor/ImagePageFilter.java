@@ -17,6 +17,7 @@ public class ImagePageFilter implements PageFilter {
 
     @Override
     public boolean accept(String url) {
-        return defSourceSite.contains(url);
+        return defSourceSite.contains(url) && (!url.startsWith(ImageSource.POLA_IMAGE_URL_START)
+                || !url.startsWith(ImageSource.POLA_IMAGE_URL_START_1));
     }
 }

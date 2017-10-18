@@ -1,5 +1,8 @@
 package com.github.runningforlife.photosniffer.ui.activity;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,6 +53,9 @@ import static com.github.runningforlife.photosniffer.model.UserAction.*;
 
 /**
  * activity to show the detail of the images
+ *
+ * FIXME:
+ * java.lang.IndexOutOfBoundsException: Inconsistency detected. Invalid item position 0(offset:98).state:98
  */
 
 public class ImageDetailActivity extends AppCompatActivity implements ImageDetailView,
@@ -255,12 +261,24 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     @Override
-    public void removeItemAtPos(int pos) {
+    public void removeItemAtPos(final int pos) {
         mPresenter.removeItemAtPos(pos);
 
-        View obj = mImgPager.getChildAt(pos);
+        mCurrentImgIdx = pos;
+
+        final View obj = mImgPager.getChildAt(pos);
+        ObjectAnimator alpha = ObjectAnimator.ofFloat(obj, "alpha", 1f, 0f);
+        alpha.setDuration(500);
+        alpha.start();
+
+        mImgPager.removeViewAt(pos);
         mPagerAdapter.destroyItem(mImgPager, pos,obj);
-        mImgPager.removeView(obj);
+        mPagerAdapter.notifyDataSetChanged();
+
+        mImgPager.setCurrentItem(pos + 1);
+        mLvImgPreview.smoothScrollToPosition(pos + 1);
+
+        //mImgPager.removeView(obj);
     }
 
     @Override
@@ -274,9 +292,9 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
             saveImage(mCurrentImgIdx);
         }else if(action.equals(ACTION_DELETE.action())){
             // remove image
-            mPresenter.removeItemAtPos(mCurrentImgIdx);
+           removeItemAtPos(mCurrentImgIdx);
             // refresh data at once
-            mPresenter.onStart();
+            //mPresenter.onStart();
         }else if(action.equals(ACTION_FAVOR.action())){
             // favor this image
             mPresenter.favorImageAtPos(mCurrentImgIdx);
@@ -301,7 +319,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         mImgPager.addOnPageChangeListener(new ImagePageStateListener());
         LinearLayoutManager llMgr = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        mLvImgPreview.setVisibility(View.VISIBLE);
+        mLvImgPreview.setVisibility(View.INVISIBLE);
         mLvImgPreview.setLayoutManager(llMgr);
         mLvImgPreview.setItemAnimator(new DefaultItemAnimator());
 
@@ -309,9 +327,8 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mCurrentImgIdx = data.getIntExtra("image",0);
         Log.v(TAG,"initView(): current image index = " + mCurrentImgIdx);
         mImgPager.setCurrentItem(mCurrentImgIdx);
-        //TODO: try to scroll to center
+
         mLvImgPreview.scrollToPosition(mCurrentImgIdx);
-        mLvImgPreview.setVisibility(View.VISIBLE);
         mLvImgPreview.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -395,7 +412,9 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
             Log.v(TAG,"onPageSelected()");
             mCurrentImgIdx = position;
             setTitle();
-            mLvImgPreview.scrollToPosition(position);
+            if(mLvImgPreview.isShown()) {
+                mLvImgPreview.scrollToPosition(position);
+            }
         }
 
         @Override

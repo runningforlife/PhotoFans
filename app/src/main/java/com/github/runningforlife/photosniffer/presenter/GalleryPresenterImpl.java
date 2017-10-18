@@ -17,6 +17,7 @@ import com.github.runningforlife.photosniffer.service.ServiceStatus;
 import com.github.runningforlife.photosniffer.service.SimpleResultReceiver;
 import com.github.runningforlife.photosniffer.ui.GalleryView;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
+import com.google.common.base.Preconditions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,7 +103,7 @@ public class GalleryPresenterImpl implements GalleryPresenter{
     @Override
     public void favorQuote() {
         Log.v(TAG,"favorQuote()");
-
+        Preconditions.checkNotNull(quotes,"quote array list should not be null");
         boolean isFavored = quotes.get(current).getIsFavor();
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
