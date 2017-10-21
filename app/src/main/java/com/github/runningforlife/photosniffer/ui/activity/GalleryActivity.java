@@ -1,23 +1,17 @@
 package com.github.runningforlife.photosniffer.ui.activity;
 
 import android.Manifest;
-import android.animation.AnimatorInflater;
-import android.animation.StateListAnimator;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.RequiresApi;
 import android.support.annotation.UiThread;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -326,21 +320,27 @@ public class GalleryActivity extends BaseActivity
     }
 
     private void setNavView(QuoteRealm quote){
-        //TextView quotes = (TextView) navView.findViewById(R.id.tv_quote);
-        int maxLen = getResources().getInteger(R.integer.max_quote_length);
-        String content = quote.getText();
-        if(!TextUtils.isEmpty(content)) {
-            if(content.length() <= maxLen){
-                tvQuote.setText(quote.getText());
-            }else{
-                String txt = content + getString(R.string.ellipsis);
-                tvQuote.setText(txt);
+        if(quote != null) {
+            ivFavor.setVisibility(View.VISIBLE);
+            ivShare.setVisibility(View.VISIBLE);
+            int maxLen = getResources().getInteger(R.integer.max_quote_length);
+            String content = quote.getText();
+            if (!TextUtils.isEmpty(content)) {
+                if (content.length() <= maxLen) {
+                    tvQuote.setText(quote.getText());
+                } else {
+                    String txt = content + getString(R.string.ellipsis);
+                    tvQuote.setText(txt);
+                }
+                tvQuoteAuthor.setText(quote.getAuthor());
+            } else {
+                tvQuote.setText(R.string.no_quotes_available);
+                tvQuote.setGravity(Gravity.CENTER);
+                tvQuoteAuthor.setText("");
             }
-            tvQuoteAuthor.setText(quote.getAuthor());
         }else{
-            tvQuote.setText(R.string.no_quotes_available);
-            tvQuote.setGravity(Gravity.CENTER);
-            tvQuoteAuthor.setText("");
+            ivFavor.setVisibility(View.INVISIBLE);
+            ivShare.setVisibility(View.INVISIBLE);
         }
     }
 

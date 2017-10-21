@@ -1,9 +1,14 @@
 package com.github.runningforlife.photosniffer.ui.adapter;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.RippleDrawable;
 import android.os.Build;
 import android.support.v4.view.PagerAdapter;
+import android.support.v7.graphics.Palette;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +25,9 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 import static com.github.runningforlife.photosniffer.loader.Loader.*;
 
@@ -53,7 +61,7 @@ public class ImagePagerAdapter extends PagerAdapter{
     public Object instantiateItem(ViewGroup parent, final int position){
         Log.v(TAG,"instantiateItem(): position = " + position);
 
-        final ImageView view = (ImageView) LayoutInflater.from(mContext)
+        final View view = LayoutInflater.from(mContext)
                 .inflate(R.layout.item_image_detail,parent,false);
         // transition name
         if(Build.VERSION.SDK_INT >= 21) {
@@ -93,16 +101,16 @@ public class ImagePagerAdapter extends PagerAdapter{
 
     @Override
     public void destroyItem(ViewGroup parent,int position, Object object){
-        parent.removeView((ImageView)object);
+        parent.removeView((View)object);
     }
 
     public final class ImageLoaderListener implements RequestListener<String,Bitmap> {
         private static final String TAG = "GlideLoader";
-        private ImageView image;
+        @BindView(R.id.iv_image_detail) ImageView image;
         private int pos;
 
-        ImageLoaderListener(ImageView view, int pos){
-            this.image = view;
+        ImageLoaderListener(View view, int pos){
+            ButterKnife.bind(this, view);
             this.pos = pos;
         }
 
@@ -121,6 +129,16 @@ public class ImagePagerAdapter extends PagerAdapter{
             //image.startAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_scale_out));
             image.setImageBitmap(resource);
             mCallback.onImageLoadDone(pos,true);
+            if(Build.VERSION.SDK_INT >= 23){
+                RippleDrawable rd = (RippleDrawable)image.getForeground();
+                if(rd != null) {
+                    Palette palette = Palette.from(resource).generate();
+                    int dc = palette.getDominantColor(Color.DKGRAY);
+                    ColorStateList csl = ColorStateList.valueOf(dc);
+                    rd.setColor(csl);
+                    //rd.setColorFilter(dc, PorterDuff.Mode.DST_IN);
+                }
+            }
             return false;
         }
     }

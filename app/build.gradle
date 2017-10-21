@@ -65,5 +65,5 @@ dependencies {
     compile 'com.github.rahatarmanahmed:circularprogressview:2.5.0'
     // LeanCloud 基础包
     compile 'cn.leancloud.android:avoscloud-sdk:v4.1.0'
-    compile 'com.google.guava:guava:18.0'
+    compile 'com.android.support:palette-v7:24.2.1'
 }

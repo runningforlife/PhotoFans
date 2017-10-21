@@ -119,6 +119,9 @@ public class WallPaperFragment extends BaseFragment
     @Override
     public void onDataSetRangeChange(int start, int count) {
         Log.v(TAG,"onDataSetRangeChange()");
+        if(mRcvWallpaper.getAdapter() == null){
+            mRcvWallpaper.setAdapter(mAdapter);
+        }
         if(start == 0 && count > 0){
             mAdapter.notifyItemRangeInserted(start, count);
         }else if(start >= 0 && count < 0){

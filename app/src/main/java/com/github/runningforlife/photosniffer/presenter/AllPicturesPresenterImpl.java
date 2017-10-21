@@ -120,12 +120,7 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
         stopRetrieveIfNeeded();
 
         if(mUnUsedImages == null || mUnUsedImages.size() < DEFAULT_RETRIEVED_IMAGES) {
-            mIsRefreshing = true;
-            Intent intent = new Intent(mContext, ImageRetrieveService.class);
-            intent.putExtra("receiver", mReceiver);
-            intent.putExtra(ImageRetrieveService.EXTRA_EXPECTED_IMAGES, DEFAULT_RETRIEVED_IMAGES);
-            mContext.startService(intent);
-
+            startCrawlerSilent(false);
             // timeout message
             Message msg = mMainHandler.obtainMessage(H.EVENT_RETRIEVE_TIME_OUT);
             mMainHandler.sendMessageDelayed(msg, DEFAULT_RETRIEVE_TIME_OUT);
@@ -144,6 +139,8 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
             }
             // add unused to the list
             mRealmMgr.markUnusedRealm(DEFAULT_RETRIEVED_IMAGES);
+            // silent crawling pictures
+            //startCrawlerSilent(true);
         }else if(!mIsRefreshing){
             // ah, something wrong
             mView.onRefreshDone(false);
@@ -292,7 +289,7 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
             mView.onDataSetRangeChange(mLastRemovePos, -1);
         }else if(mOp == UpdateOp.OP_BATCH_DELETE){
             String key = mContext.getString(R.string.pref_max_reserved_images);
-            int maxReservedImage = Integer.parseInt(SharedPrefUtil.getString(key, "100"));
+            int maxReservedImage = Integer.parseInt(SharedPrefUtil.getString(key, "300"));
             mView.onDataSetRangeChange(maxReservedImage, maxReservedImage - mImgList.size());
         }
 
@@ -347,6 +344,14 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
         // try to stop service firstly
         Intent intent = new Intent(mContext,ImageRetrieveService.class);
         mContext.stopService(intent);
+    }
+
+    private void startCrawlerSilent(boolean isSilent){
+        mIsRefreshing = !isSilent;
+        Intent intent = new Intent(mContext, ImageRetrieveService.class);
+        intent.putExtra("receiver", mReceiver);
+        intent.putExtra(ImageRetrieveService.EXTRA_EXPECTED_IMAGES, DEFAULT_RETRIEVED_IMAGES);
+        mContext.startService(intent);
     }
 
     private void removeMessageIfNeeded(){

@@ -1,7 +1,13 @@
 package com.github.runningforlife.photosniffer.loader;
 
 import android.annotation.TargetApi;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.RippleDrawable;
+import android.os.Build;
+import android.support.v7.graphics.Palette;
 import android.util.Log;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -75,8 +81,19 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
             }else{
                 imageView.setImageBitmap(resource);
             }
-            imageView.startAnimation(
-                    AnimationUtils.loadAnimation(AppGlobals.getInstance(), R.anim.anim_view_alpha));
+            imageView.setAnimation(AnimationUtils.loadAnimation(AppGlobals.getInstance(),
+                    android.R.anim.fade_in));
+            // get the main color of the image
+            Palette palette = Palette.from(resource).generate();
+            if(Build.VERSION.SDK_INT >= 23) {
+                RippleDrawable rd = (RippleDrawable) imageView.getForeground();
+                if(rd != null) {
+                    int dc = palette.getDominantColor(Color.DKGRAY);
+                    ColorStateList csl = ColorStateList.valueOf(dc);
+                    rd.setColor(csl);
+                    rd.setColorFilter(dc, PorterDuff.Mode.DST_IN);
+                }
+            }
         }
 
         Log.d(TAG,"onResourceReady(): from memory = " + isFromMemoryCache);

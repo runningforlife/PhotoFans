@@ -33,4 +33,14 @@
         <item name="android:windowIsFloating">false</item>
     </style>
 
+    <style name="DrawerImageView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">@dimen/margin_small</item>
+        <item name="android:layout_marginRight">@dimen/margin_small</item>
+        <item name="android:padding">@dimen/drawable_image_padding</item>
+        <item name="android:scaleType">centerCrop</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+    </style>
+
 </resources>

@@ -109,6 +109,7 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
     @Override
     public void setWallpaper(final int pos) {
         Log.v(TAG,"setWallpaper(): pos = " + pos);
+        mOp = UpdateOp.OP_MODIFY;
         GlideLoaderListener listener = new GlideLoaderListener(null);
         listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
             @Override
@@ -163,6 +164,8 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
             mView.onDataSetRangeChange(0, mImgList.size());
         }else if(mOp == UpdateOp.OP_DELETE){
             mView.onDataSetRangeChange(mLastRemovePos, -1);
+        }else if(mOp == UpdateOp.OP_MODIFY){
+            mView.onDataSetRangeChange(0,0);
         }
     }
 

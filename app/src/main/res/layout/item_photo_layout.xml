@@ -8,8 +8,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="@dimen/image_min_height"
+        android:foreground="@drawable/ripple_background"
+        android:background="@drawable/ripple_background"
         android:contentDescription="@string/photo"
         android:scaleType="centerCrop"
+        android:elevation="3dp"
         android:layout_gravity="center"/>
 
 </LinearLayout>

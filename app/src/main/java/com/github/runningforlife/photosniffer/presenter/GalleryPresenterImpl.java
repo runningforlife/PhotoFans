@@ -17,7 +17,6 @@ import com.github.runningforlife.photosniffer.service.ServiceStatus;
 import com.github.runningforlife.photosniffer.service.SimpleResultReceiver;
 import com.github.runningforlife.photosniffer.ui.GalleryView;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
-import com.google.common.base.Preconditions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,10 +73,8 @@ public class GalleryPresenterImpl implements GalleryPresenter{
     @Override
     public void refresh() {
         Log.v(TAG,"refresh()");
-
         long current = System.currentTimeMillis();
-        if((quotes.size() >= 0 && current >= lastRefreshing + AUTO_REFRESH_INTERVAL)
-                || quotes.size() <= 0){
+        if(quotes == null || (quotes.size() >= 0 && current >= lastRefreshing + AUTO_REFRESH_INTERVAL)){
             isRefreshing = true;
             startRetrieveQuote();
             lastRefreshing = System.currentTimeMillis();
@@ -92,6 +89,7 @@ public class GalleryPresenterImpl implements GalleryPresenter{
     @Override
     public QuoteRealm getNextQuote() {
         Log.v(TAG,"getNextQuote()");
+        if(quotes == null || quotes.size() <= 0) return null;
 
         ++current;
         current %= quotes.size();
@@ -103,20 +101,22 @@ public class GalleryPresenterImpl implements GalleryPresenter{
     @Override
     public void favorQuote() {
         Log.v(TAG,"favorQuote()");
-        Preconditions.checkNotNull(quotes,"quote array list should not be null");
-        boolean isFavored = quotes.get(current).getIsFavor();
-        Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
+        if(quotes != null && quotes.size() > 0) {
+            boolean isFavored = quotes.get(current).getIsFavor();
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
 
-        QuoteRealm qr = quotes.get(current);
-        qr.setIsFavor(!isFavored);
+            QuoteRealm qr = quotes.get(current);
+            qr.setIsFavor(!isFavored);
 
-        realm.commitTransaction();
+            realm.commitTransaction();
+        }
     }
 
     @Override
     public boolean isCurrentFavored() {
-        return current != -1 && quotes.get(current).getIsFavor();
+        return current != -1 && quotes.size() > 0
+                && quotes.get(current).getIsFavor();
     }
 
     @Override

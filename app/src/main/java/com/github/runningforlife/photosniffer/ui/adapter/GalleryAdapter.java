@@ -144,20 +144,19 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                     }
                 }
             });
-
-            root.setOnCreateContextMenuListener(this);
+            //root.setOnCreateContextMenuListener(this);
         }
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             Log.v(TAG,"onCreateContextMenu()");
-            MenuInflater inflater = ((AppCompatActivity)mContext).getMenuInflater();
+/*            MenuInflater inflater = ((AppCompatActivity)mContext).getMenuInflater();
 
             inflater.inflate(R.menu.menu_context_default, menu);
 
             if(mCallback != null) {
                 mCallback.onContextMenuCreated(getAdapterPosition(), TAG);
-            }
+            }*/
         }
     }
 }

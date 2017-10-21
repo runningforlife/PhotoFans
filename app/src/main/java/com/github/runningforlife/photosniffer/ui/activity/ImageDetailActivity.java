@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -20,7 +21,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.transition.Slide;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -104,7 +107,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         initView();
 
-        initActionList();
+        initPresenter();
 
         mMainHandler = new EventHandler(Looper.getMainLooper());
     }
@@ -113,8 +116,9 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     public void onResume(){
         super.onResume();
         Log.v(TAG,"onResume()");
-        initPresenter();
         mPresenter.onStart();
+
+        initActionList();
 
         setTitle();
     }
@@ -268,16 +272,35 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         final View obj = mImgPager.getChildAt(pos);
         ObjectAnimator alpha = ObjectAnimator.ofFloat(obj, "alpha", 1f, 0f);
-        alpha.setDuration(500);
+        alpha.setDuration(300);
+        alpha.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                Log.v(TAG,"onAnimationEnd()");
+                //mImgPager.removeViewAt(pos);
+                mPagerAdapter.destroyItem(mImgPager, pos,obj);
+                mPagerAdapter.notifyDataSetChanged();
+
+                mImgPager.setCurrentItem(pos + 1);
+                mLvImgPreview.smoothScrollToPosition(pos + 1);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
         alpha.start();
-
-        mImgPager.removeViewAt(pos);
-        mPagerAdapter.destroyItem(mImgPager, pos,obj);
-        mPagerAdapter.notifyDataSetChanged();
-
-        mImgPager.setCurrentItem(pos + 1);
-        mLvImgPreview.smoothScrollToPosition(pos + 1);
-
         //mImgPager.removeView(obj);
     }
 
@@ -445,6 +468,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         FragmentManager fm = getSupportFragmentManager();
         fm.beginTransaction()
+          .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
           .add(fragment,"ActionList")
           .commit();
     }

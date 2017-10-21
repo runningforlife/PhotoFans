@@ -1,5 +1,7 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
+import android.animation.AnimatorInflater;
+import android.animation.TimeInterpolator;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -7,6 +9,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.view.animation.LinearOutSlowInInterpolator;
+import android.transition.Fade;
+import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.util.Log;
@@ -16,6 +21,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -96,10 +103,16 @@ public class ActionListDialogFragment extends DialogFragment{
             window.setAttributes(lp);
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             if(Build.VERSION.SDK_INT >= 21) {
-                Transition transition = TransitionInflater.from(getContext())
-                        .inflateTransition(android.R.transition.fade);
-                window.setExitTransition(transition);
+                Transition enterSlide = new Slide(Gravity.BOTTOM);
+                enterSlide.setInterpolator(new LinearOutSlowInInterpolator());
+                enterSlide.setDuration(1000);
+                window.setEnterTransition(enterSlide);
+
+                Transition fade = new Fade();
+                fade.setDuration(android.R.integer.config_mediumAnimTime);
+                window.setExitTransition(fade);
             }
+
         }
     }
 
