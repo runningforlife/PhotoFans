@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -59,7 +60,8 @@ public class QuotesFragment extends BaseFragment
     public void onResume(){
         super.onResume();
         Log.v(TAG,"onResume()");
-        presenter.onStart();
+
+        setTitle(getString(R.string.quotes));
     }
 
     @Override
@@ -155,6 +157,8 @@ public class QuotesFragment extends BaseFragment
 
         presenter = new QuotePresenterImpl(getContext(), this);
         presenter.init();
+
+        presenter.onStart();
     }
 
     @Override

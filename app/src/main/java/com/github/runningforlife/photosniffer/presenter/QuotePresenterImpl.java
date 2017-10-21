@@ -39,12 +39,15 @@ public class QuotePresenterImpl implements QuotePresenter {
     private SimpleResultReceiver receiver;
     private boolean isRefreshing;
     private Handler handler;
+    private UpdateOp mOp;
     private int mLastRemovedPos = -1;
 
     public QuotePresenterImpl(Context context, @Nullable QuoteView view){
         this.context = context;
         this.view = view;
         realmMgr = RealmManager.getInstance();
+
+        mOp = UpdateOp.OP_NONE;
     }
 
     @Override
@@ -62,6 +65,8 @@ public class QuotePresenterImpl implements QuotePresenter {
 
     @Override
     public int getItemCount() {
+        if(quotes == null) return 0;
+
         return quotes.size();
     }
 
@@ -73,6 +78,8 @@ public class QuotePresenterImpl implements QuotePresenter {
     @Override
     public void removeItemAtPos(int pos) {
         Log.v(TAG,"removeItemAtPos()");
+
+        mOp = UpdateOp.OP_DELETE;
 
         mLastRemovedPos = pos;
 
@@ -110,20 +117,15 @@ public class QuotePresenterImpl implements QuotePresenter {
     @Override
     public void onQuoteDataChange(RealmResults<QuoteRealm> data) {
         Log.v(TAG,"onQuoteDataChange()");
-        int currentSize = 0;
-        if(quotes != null){
-            currentSize = quotes.size();
-        }else {
-            quotes = data;
-        }
-        quotes.sort("savedTime", Sort.DESCENDING);
 
-        if(data.size() > currentSize){
+        if(quotes == null){
+            quotes = data;
             view.onDataSetRangeChange(0, quotes.size());
-        }else if(mLastRemovedPos != -1){
+        }else if(mOp == UpdateOp.OP_DELETE){
             view.onDataSetRangeChange(mLastRemovedPos, -1);
         }else{
-            view.onDataSetRangeChange(0, quotes.size());
+            // nothing changed
+            view.onDataSetRangeChange(0, 0);
         }
     }
 

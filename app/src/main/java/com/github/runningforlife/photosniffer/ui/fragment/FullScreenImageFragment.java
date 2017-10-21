@@ -1,8 +1,6 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
 import android.app.WallpaperManager;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -12,17 +10,17 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.NavUtils;
-import android.support.v7.widget.Toolbar;
+import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
@@ -32,10 +30,7 @@ import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.model.RealmManager;
 import com.github.runningforlife.photosniffer.model.UserAction;
-import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl;
 import com.github.runningforlife.photosniffer.presenter.ImageSaveRunnable;
-import com.github.runningforlife.photosniffer.service.MyThreadFactory;
-import com.github.runningforlife.photosniffer.ui.activity.GalleryActivity;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
 import java.io.IOException;
@@ -137,6 +132,9 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
                     Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
         }
 
+/*        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.anim_scale_in);
+        imageView.setAnimation(animation);*/
+
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -147,13 +145,21 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
     }
 
     private void showActionListFragment(){
-        FragmentManager fragmentMgr = getChildFragmentManager();
+        if(getActivity() != null) {
+            FragmentManager fragmentMgr = getActivity().getSupportFragmentManager();
 
-        ActionListDialogFragment fragment = (ActionListDialogFragment) ActionListDialogFragment.newInstance(mUserActionList);
-        fragment.setCallback(this);
+            ActionListDialogFragment fragment = (ActionListDialogFragment) fragmentMgr.findFragmentByTag(ActionListDialogFragment.TAG);
+            if (fragment == null) {
+                fragment = (ActionListDialogFragment) ActionListDialogFragment.newInstance(mUserActionList);
+            }
+            fragment.setCallback(this);
 
-        fragment.show(fragmentMgr, ActionListDialogFragment.TAG);
-
+            fragmentMgr.beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    //.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_to_bottom)
+                    .add(fragment, ActionListDialogFragment.TAG)
+                    .commit();
+        }
     }
 
     private void initActionList(){

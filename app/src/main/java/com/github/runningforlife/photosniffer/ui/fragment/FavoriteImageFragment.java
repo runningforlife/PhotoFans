@@ -87,9 +87,7 @@ public class FavoriteImageFragment extends BaseFragment
             mCallback.onFragmentAttached();
         }
 
-        mPresenter.onStart();
-
-        setTitle();
+        setTitle(getString(R.string.my_favorite_images));
     }
 
     @Override
@@ -260,17 +258,11 @@ public class FavoriteImageFragment extends BaseFragment
         return true;
     }
 
-    private void setTitle(){
-        String myFavorite = getString(R.string.my_favorite_images);
-        Activity activity = getActivity();
-        if(activity != null){
-            activity.setTitle(myFavorite);
-        }
-    }
-
     private void initPresenter(){
         mPresenter = new FavorImagePresenterImpl(getContext(),this);
         mPresenter.init();
+
+        mPresenter.onStart();
     }
 
 }

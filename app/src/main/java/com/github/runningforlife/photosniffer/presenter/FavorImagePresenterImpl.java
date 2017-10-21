@@ -32,6 +32,7 @@ public class FavorImagePresenterImpl implements FavorImagePresenter{
     private RealmResults<ImageRealm> mFavorList;
     private ExecutorService mExecutor;
     private boolean mIsRefreshing;
+    private UpdateOp mOp;
     private int mLastRemovedPos = -1;
 
     public FavorImagePresenterImpl(Context context, FavorPictureView view){
@@ -40,6 +41,8 @@ public class FavorImagePresenterImpl implements FavorImagePresenter{
         mRealmMgr = RealmManager.getInstance();
         mExecutor = Executors.newSingleThreadExecutor();
         mIsRefreshing = false;
+
+        mOp = UpdateOp.OP_NONE;
     }
 
     @Override
@@ -61,6 +64,7 @@ public class FavorImagePresenterImpl implements FavorImagePresenter{
         if(pos >= 0 && pos <= mFavorList.size()) {
             mRealmMgr.delete(mFavorList.get(pos));
             mLastRemovedPos = pos;
+            mOp = UpdateOp.OP_DELETE;
         }
     }
 
@@ -111,20 +115,15 @@ public class FavorImagePresenterImpl implements FavorImagePresenter{
     public void onFavorDataChange(RealmResults<ImageRealm> data) {
         Log.v(TAG,"onFavorDataChange(): data size = " + data.size());
 
-        int currentImgSize = 0;
-        if(mFavorList != null){
-            currentImgSize = mFavorList.size();
-        }else {
+        if(mFavorList == null){
             mFavorList = data;
-        }
-
-        if(data.size() > currentImgSize){
             mView.onDataSetRangeChange(0, mFavorList.size());
-        }else if(mLastRemovedPos != -1){
+        }else if(mOp == UpdateOp.OP_DELETE){
             mView.onDataSetRangeChange(mLastRemovedPos, -1);
             mLastRemovedPos = -1;
         } else {
-            mView.onDataSetRangeChange(0, mFavorList.size());
+            // nothing happened
+            mView.onDataSetRangeChange(0, 0);
         }
 
         if(mIsRefreshing && mView != null){

@@ -81,9 +81,7 @@ public class WallPaperFragment extends BaseFragment
             mCallback.onFragmentAttached();
         }
 
-        mPresenter.onStart();
-
-        setTitle();
+        setTitle(getString(R.string.set_wallpaper));
     }
 
     @Override
@@ -209,13 +207,6 @@ public class WallPaperFragment extends BaseFragment
         mPresenter = new WallpaperPresenterImpl(getContext());
         mPresenter.setView(this);
         mPresenter.init();
-    }
-
-    private void setTitle(){
-        String title = getString(R.string.set_wallpaper);
-        Activity activity = getActivity();
-        if(activity != null) {
-            activity.setTitle(title);
-        }
+        mPresenter.onStart();
     }
 }

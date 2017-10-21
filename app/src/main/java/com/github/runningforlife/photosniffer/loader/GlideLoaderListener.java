@@ -81,8 +81,8 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
             }else{
                 imageView.setImageBitmap(resource);
             }
-            imageView.setAnimation(AnimationUtils.loadAnimation(AppGlobals.getInstance(),
-                    android.R.anim.fade_in));
+/*            imageView.setAnimation(AnimationUtils.loadAnimation(AppGlobals.getInstance(),
+                    android.R.anim.fade_in));*/
             // get the main color of the image
             Palette palette = Palette.from(resource).generate();
             if(Build.VERSION.SDK_INT >= 23) {

@@ -34,12 +34,14 @@ public class WallpaperPresenterImpl implements WallpaperPresenter{
     private RealmManager mRealmMgr;
     private RealmResults<ImageRealm> mWallpaper;
     private ExecutorService mExecutor;
+    private UpdateOp mOp;
     private int mLastRemovedPos = -1;
 
     public WallpaperPresenterImpl(Context context){
         mContext = context;
         mRealmMgr = RealmManager.getInstance();
         mExecutor = Executors.newSingleThreadExecutor();
+        mOp = UpdateOp.OP_DELETE;
     }
 
     @Override
@@ -68,12 +70,14 @@ public class WallpaperPresenterImpl implements WallpaperPresenter{
         if(pos >= 0 && pos <= mWallpaper.size()) {
             mRealmMgr.delete(mWallpaper.get(pos));
             mLastRemovedPos = pos;
+            mOp = UpdateOp.OP_DELETE;
         }
     }
 
     @Override
     public void saveImageAtPos(final int pos) {
         if (pos >= 0 && pos < mWallpaper.size()) {
+            mOp = UpdateOp.OP_MODIFY;
             GlideLoaderListener listener = new GlideLoaderListener(null);
             listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
                 @Override
@@ -102,19 +106,14 @@ public class WallpaperPresenterImpl implements WallpaperPresenter{
     public void onWallpaperDataChange(RealmResults<ImageRealm> data) {
         Log.v(TAG,"onWallpaperDataChange()");
 
-        int currentSize = 0;
-        if(mWallpaper != null){
-            currentSize = mWallpaper.size();
-        }else {
+        if(mWallpaper == null){
             mWallpaper = data;
-        }
-
-        if(data.size() > currentSize){
             mView.onDataSetRangeChange(0, mWallpaper.size());
-        }else if(mLastRemovedPos != -1){
+        }else if(mOp == UpdateOp.OP_DELETE){
             mView.onDataSetRangeChange(mLastRemovedPos, -1);
         }else {
-            mView.onDataSetRangeChange(0, mWallpaper.size());
+            // nothing happened
+            mView.onDataSetRangeChange(0, 0);
         }
 
         mView.onRefreshDone(true);

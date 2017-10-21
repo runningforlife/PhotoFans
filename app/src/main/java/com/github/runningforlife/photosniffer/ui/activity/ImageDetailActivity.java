@@ -469,6 +469,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         FragmentManager fm = getSupportFragmentManager();
         fm.beginTransaction()
           .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+          //.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_to_bottom)
           .add(fragment,"ActionList")
           .commit();
     }

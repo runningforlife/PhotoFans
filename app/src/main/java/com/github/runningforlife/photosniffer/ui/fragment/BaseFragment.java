@@ -1,10 +1,12 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
+import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.ui.activity.Refresh;
 
@@ -54,6 +56,13 @@ public class BaseFragment extends Fragment implements Refresh {
     @Override
     public void setRefreshing(boolean enable) {
         // empty
+    }
+
+    protected void setTitle(String title){
+        Activity activity = getActivity();
+        if(activity != null){
+            activity.setTitle(title);
+        }
     }
 
 }

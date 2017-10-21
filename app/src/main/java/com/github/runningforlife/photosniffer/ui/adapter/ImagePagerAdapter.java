@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.RippleDrawable;
 import android.os.Build;
 import android.support.v4.view.PagerAdapter;
@@ -16,7 +15,6 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
@@ -24,7 +22,6 @@ import com.github.runningforlife.photosniffer.R;
 
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
-import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -73,7 +70,7 @@ public class ImagePagerAdapter extends PagerAdapter{
         mCallback.onImageLoadStart(position);
         // preload image
         //MiscUtil.preloadImage(view);
-        view.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_scale_out));
+        view.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_scale_in));
         GlideLoader.load(mContext,new ImageLoaderListener(view,position),
                 ((ImageRealm)mCallback.getItemAtPos(position)).getUrl(),
                 Priority.IMMEDIATE,DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
@@ -126,7 +123,7 @@ public class ImagePagerAdapter extends PagerAdapter{
         public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
             Log.v(TAG,"onResourceReady(): from memory = " + isFromMemoryCache);
             image.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            //image.startAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_scale_out));
+            //image.startAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_scale_in));
             image.setImageBitmap(resource);
             mCallback.onImageLoadDone(pos,true);
             if(Build.VERSION.SDK_INT >= 23){

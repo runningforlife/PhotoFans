@@ -361,17 +361,6 @@ public class RealmManager implements LifeCycle{
                 .findAll();
     }
 
-    public void deleteAsync(final RealmObject object){
-        Realm r = Realm.getDefaultInstance();
-
-        r.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                object.deleteFromRealm();
-            }
-        });
-    }
-
     public void delete(final RealmObject object){
         if(object == null) return;
 

@@ -34,5 +34,5 @@
     <dimen name="cardview_height">160dp</dimen>
     <dimen name="quote_content_size">16sp</dimen>
     <dimen name="cardview_content_margin">10dp</dimen>
-    <dimen name="drawable_image_padding">12dp</dimen>
+    <dimen name="drawable_image_padding">10dp</dimen>
 </resources>

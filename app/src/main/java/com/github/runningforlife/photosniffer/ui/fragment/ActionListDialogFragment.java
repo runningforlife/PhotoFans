@@ -112,7 +112,6 @@ public class ActionListDialogFragment extends DialogFragment{
                 fade.setDuration(android.R.integer.config_mediumAnimTime);
                 window.setExitTransition(fade);
             }
-
         }
     }
 
