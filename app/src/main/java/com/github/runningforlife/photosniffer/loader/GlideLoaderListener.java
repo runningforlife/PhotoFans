@@ -60,6 +60,7 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
     @Override
     public boolean onException(Exception e, String model, com.bumptech.glide.request.target.Target<Bitmap> target, boolean isFirstResource) {
         Log.v(TAG,"onException(): " + e);
+        // 404 IO exception
         if(imageView != null) {
             imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             imageView.setImageResource(R.drawable.ic_photo_grey_24dp);

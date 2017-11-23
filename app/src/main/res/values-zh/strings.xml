@@ -48,4 +48,6 @@
     <string name="refresh_hint">下拉获取图片</string>
     <string name="no_quotes_available">无法获取格言</string>
     <string name="quotes">铭言</string>
+    <string name="hint_network_state_hung">网络不给力, 休息会再回来吧!</string>
+    <string name="hint_network_state_slow">网络有点慢，请稍后再试</string>
 </resources>

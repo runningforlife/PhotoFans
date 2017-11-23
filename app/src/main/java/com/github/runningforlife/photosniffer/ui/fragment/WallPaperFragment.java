@@ -162,6 +162,11 @@ public class WallPaperFragment extends BaseFragment
     }
 
     @Override
+    public void onNetworkState(String state) {
+
+    }
+
+    @Override
     public boolean onContextItemSelected(MenuItem item){
         Log.v(TAG,"onContextItemSelected()");
 

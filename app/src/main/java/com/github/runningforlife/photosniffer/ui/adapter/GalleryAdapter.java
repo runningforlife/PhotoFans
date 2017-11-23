@@ -3,13 +3,11 @@ package com.github.runningforlife.photosniffer.ui.adapter;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.MenuRes;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -27,6 +25,8 @@ import com.github.runningforlife.photosniffer.loader.PicassoLoaderListener;
 import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
+import java.io.IOException;
+
 import static com.github.runningforlife.photosniffer.loader.Loader.*;
 import static com.github.runningforlife.photosniffer.ui.fragment.BaseFragment.*;
 
@@ -36,15 +36,19 @@ import static com.github.runningforlife.photosniffer.ui.fragment.BaseFragment.*;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoViewHolder>{
     private static final String TAG = "GalleryAdapter";
+
+    // if network error count is larger than 10, network is bad
+    private static final int NETWORK_HUNG_ERROR_COUNT = 15;
+    private static final int NETWORK_SLOW_ERROR_COUNT = 5;
+
     @SuppressWarnings("unchecked")
     private LayoutInflater mInflater;
     private GalleryAdapterCallback mCallback;
     private Context mContext;
-    private int mWidth;
-    private int mHeight;
     private String mLoader;
     private String mLayoutMgr;
     private @MenuRes int mContextMenId;
+    private int mNetworkErrorCount;
 
     public GalleryAdapter(Context context,BaseAdapterCallback callback){
         mCallback = (GalleryAdapterCallback) callback;
@@ -57,6 +61,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         mLayoutMgr = GridManager;
 
         mContextMenId = R.menu.menu_context_default;
+
+        mNetworkErrorCount = 0;
     }
 
 
@@ -83,7 +89,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     public void onBindViewHolder(final PhotoViewHolder vh, final int position) {
         final ImageRealm img = (ImageRealm)mCallback.getItemAtPos(position);
         final String url = img.getUrl();
-        Log.d(TAG,"onBindViewHolder(): pos = " + position);
+        Log.d(TAG,"onBindViewHolder(): pos = " + position + ",url = " + url);
 
         if(!TextUtils.isEmpty(url)) {
             if(LinearManager.equals(mLayoutMgr)){
@@ -98,11 +104,23 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
             }else{
                 //FIXME: some item is loaded very slowly
                 GlideLoaderListener listener = new GlideLoaderListener(vh.img);
-                if(mWidth > 0 && mHeight > 0 &&
-                        mWidth != DEFAULT_IMG_WIDTH && mHeight != DEFAULT_IMG_HEIGHT) {
-                    listener.setReqWidth(mWidth);
-                    listener.setReqHeight(mHeight);
-                }
+                listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+                    @Override
+                    public void onImageLoadDone(Object o) {
+                        Log.v(TAG,"onImageLoadDone(): " + o);
+                        // 404 or socket time out
+                        if(o instanceof IOException){
+                            // network is slow
+                            ++mNetworkErrorCount;
+                            if(mNetworkErrorCount >= NETWORK_SLOW_ERROR_COUNT){
+                                mCallback.onNetworkState(STATE_SLOW);
+                            }else if(mNetworkErrorCount > NETWORK_HUNG_ERROR_COUNT){
+                                mCallback.onNetworkState(STATE_HUNG);
+                            }
+
+                        }
+                    }
+                });
                 GlideLoader.load(mContext,url,listener, Priority.HIGH,
                         DEFAULT_IMAGE_MEDIUM_WIDTH, DEFAULT_IMAGE_MEDIUM_HEIGHT);
             }

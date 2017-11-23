@@ -77,9 +77,11 @@ public class FavorImagePresenterImpl implements FavorImagePresenter{
             @Override
             public void onImageLoadDone(Object o) {
                 Log.d(TAG,"onImageLoadDone()");
-                ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap)o), mFavorList.get(pos).getName());
-                r.addCallback(FavorImagePresenterImpl.this);
-                mExecutor.submit(r);
+                if(o instanceof Bitmap) {
+                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mFavorList.get(pos).getName());
+                    r.addCallback(FavorImagePresenterImpl.this);
+                    mExecutor.submit(r);
+                }
             }
         });
         GlideLoader.downloadOnly(mContext, mFavorList.get(pos).getUrl(), listener,

@@ -29,6 +29,7 @@ import com.github.runningforlife.photosniffer.ui.AllPictureView;
 import com.github.runningforlife.photosniffer.ui.activity.ImageDetailActivity;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
+import com.github.runningforlife.photosniffer.ui.adapter.NetworkStateCallback;
 import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
@@ -188,6 +189,14 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
         Log.v(TAG,"onContextMenuCreated()");
 
         mCurrentPos = pos;
+    }
+
+    @Override
+    public void onNetworkState(String state) {
+        Log.v(TAG,"onNetworkState()");
+        if(!state.equals(NetworkStateCallback.STATE_GOOD)){
+            mCallback.showToast(getString(R.string.hint_network_state_slow));
+        }
     }
 
     @Override

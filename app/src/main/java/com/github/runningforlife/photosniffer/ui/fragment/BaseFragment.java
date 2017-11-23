@@ -4,20 +4,24 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.View;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.ui.activity.Refresh;
+import com.github.runningforlife.photosniffer.ui.adapter.NetworkStateCallback;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
+import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
 /**
  * a abstract fragment class implemented by child
  */
 
-public class BaseFragment extends Fragment implements Refresh {
+public class BaseFragment extends Fragment implements Refresh, NetworkStateCallback {
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({LinearManager,GridManager})
     public @interface RecycleLayout{}
@@ -64,5 +68,20 @@ public class BaseFragment extends Fragment implements Refresh {
             activity.setTitle(title);
         }
     }
+
+    @Override
+    public void onNetworkState(@NetworkState String state) {
+        Log.v(TAG,"onNetworkState():state = " + state);
+        if(state.equals(NetworkStateCallback.STATE_HUNG)){
+            if(mCallback != null){
+                mCallback.showToast(getString(R.string.hint_network_state_hung));
+            }
+        }else if(state.equals(NetworkStateCallback.STATE_SLOW)){
+            if(mCallback != null) {
+                mCallback.showToast(getString(R.string.hint_network_state_slow));
+            }
+        }
+    }
+
 
 }

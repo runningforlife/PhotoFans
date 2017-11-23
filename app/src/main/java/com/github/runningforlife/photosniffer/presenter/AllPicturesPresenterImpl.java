@@ -212,9 +212,11 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
                 @Override
                 public void onImageLoadDone(Object o) {
                     Log.d(TAG,"onImageLoadDone()");
-                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap)o), mImgList.get(pos).getName());
-                    r.addCallback(AllPicturesPresenterImpl.this);
-                    mExecutor.submit(r);
+                    if(o instanceof Bitmap) {
+                        ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mImgList.get(pos).getName());
+                        r.addCallback(AllPicturesPresenterImpl.this);
+                        mExecutor.submit(r);
+                    }
                 }
             });
 

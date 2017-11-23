@@ -74,4 +74,6 @@
     <string name="refresh_hint">Retrivee Images by pulling down</string>
     <string name="quotes">Quotes</string>
     <string name="ellipsis">....</string>
+    <string name="hint_network_state_hung">Network is very slow, take a break and try it again</string>
+    <string name="hint_network_state_slow">Network is slow, please try it later</string>
 </resources>
