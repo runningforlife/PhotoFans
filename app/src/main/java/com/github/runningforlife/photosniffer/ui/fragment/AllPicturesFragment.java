@@ -202,7 +202,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
     @Override
     public boolean onContextItemSelected(MenuItem item){
         Log.v(TAG,"onContextItemSelected()");
-/*        switch (item.getItemId()){
+        switch (item.getItemId()){
             case R.id.menu_save:
                 mPresenter.saveImageAtPos(mCurrentPos);
                 break;
@@ -217,7 +217,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
                 break;
             default:
                 return super.onContextItemSelected(item);
-        }*/
+        }
 
         return true;
     }
