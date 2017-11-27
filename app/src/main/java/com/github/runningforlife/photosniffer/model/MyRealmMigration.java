@@ -16,18 +16,5 @@ public class MyRealmMigration implements io.realm.RealmMigration {
     public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
         RealmSchema schema = realm.getSchema();
         Log.v(TAG, "migrate realm from version " + oldVersion + " to version " + newVersion);
-        if(oldVersion == 0){
-            schema.get("ImageRealm")
-                    .addField("mIsWallpaper",Boolean.class);
-
-            schema.create("QuoteRealm");
-
-            ++oldVersion;
-        }
-
-        if(oldVersion == 1){
-            schema.create("QuoteRealm");
-            ++oldVersion;
-        }
     }
 }

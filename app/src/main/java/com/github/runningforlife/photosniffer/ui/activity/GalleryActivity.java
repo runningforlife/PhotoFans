@@ -1,7 +1,6 @@
 package com.github.runningforlife.photosniffer.ui.activity;
 
 import android.Manifest;
-import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -23,25 +22,16 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.model.QuoteRealm;
-import com.github.runningforlife.photosniffer.presenter.GalleryPresenter;
-import com.github.runningforlife.photosniffer.presenter.GalleryPresenterImpl;
 import com.github.runningforlife.photosniffer.ui.GalleryView;
 import com.github.runningforlife.photosniffer.ui.fragment.AllPicturesFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.BaseFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FavoriteImageFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FullScreenImageFragment;
-import com.github.runningforlife.photosniffer.ui.fragment.QuotesFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.RetrieveHintFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.WallPaperFragment;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
@@ -61,16 +51,7 @@ public class GalleryActivity extends BaseActivity
 
     @BindView(R.id.toolbar) Toolbar toolbar;
 
-    private View headerView;
-    private TextView tvQuote;
-    private TextView tvQuoteAuthor;
-    private ImageView ivQuoteSync;
-    private ImageView ivFavor;
-    private ImageView ivShare;
-
     private Handler mHandler = new Handler(Looper.getMainLooper());
-
-    private GalleryPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,11 +70,11 @@ public class GalleryActivity extends BaseActivity
 
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(this);
-        headerView = navView.getHeaderView(0);
+        //headerView = navView.getHeaderView(0);
 
         initView();
 
-        initPresenter();
+        //initPresenter();
 
         drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -104,9 +85,6 @@ public class GalleryActivity extends BaseActivity
             public void onDrawerOpened(View drawerView) {
                 Log.v(TAG,"onDrawerOpened()");
                 setRefreshing(false);
-                if(presenter != null) {
-                    presenter.refresh();
-                }
             }
 
             @Override
@@ -127,8 +105,6 @@ public class GalleryActivity extends BaseActivity
         super.onResume();
 
         checkStoragePermission();
-
-        presenter.onStart();
 
         String key = getString(R.string.pref_new_user);
         boolean isNewUser = SharedPrefUtil.getBoolean(key, true);
@@ -187,9 +163,6 @@ public class GalleryActivity extends BaseActivity
             case R.id.nav_settings:
                 startSetting();
                 break;
-            case R.id.nav_quote:
-                showQuotesFragment();
-                break;
             default:
                 break;
         }
@@ -234,20 +207,6 @@ public class GalleryActivity extends BaseActivity
     @Override
     public void onRefreshDone(boolean success) {
         Log.v(TAG,"onRefreshDone()");
-        ivQuoteSync.clearAnimation();
-
-        if(success){
-            if(presenter.isCurrentFavored()){
-                ivFavor.setImageResource(R.drawable.ic_favorite_white_24dp);
-            }else{
-                ivFavor.setImageResource(R.drawable.ic_favorite_border_white_24dp);
-            }
-            setNavView(presenter.getNextQuote());
-        }else{
-            tvQuote.setText(R.string.no_quotes_available);
-            tvQuote.setGravity(Gravity.CENTER);
-            tvQuoteAuthor.setText("");
-        }
     }
 
     @Override
@@ -268,87 +227,7 @@ public class GalleryActivity extends BaseActivity
 
     private void initView(){
         Log.v(TAG,"initView()");
-        tvQuote = (TextView)headerView.findViewById(R.id.tv_quote);
-        Animation animation = AnimationUtils.makeInAnimation(
-                getApplicationContext(), true);
-        tvQuote.setAnimation(animation);
-
-        tvQuoteAuthor = (TextView)headerView.findViewById(R.id.tv_quote_author);
-        ivQuoteSync = (ImageView)headerView.findViewById(R.id.iv_sync);
-
-        ivFavor = (ImageView)headerView.findViewById(R.id.iv_favor);
-        ivShare = (ImageView)headerView.findViewById(R.id.iv_share);
-        //ivQuoteSync.setBackgroundResource(R.drawable.refresh_anim_list);
-        ivQuoteSync.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // refresh current quotes data
-                presenter.refresh();
-
-                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_rotate);
-                ivQuoteSync.startAnimation(animation);
-            }
-        });
-
-        ivFavor.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.favorQuote();
-                if(!presenter.isCurrentFavored()){
-                    Animation fadeOut = AnimationUtils.loadAnimation(getApplicationContext(),
-                            android.R.anim.fade_out);
-                    ivFavor.startAnimation(fadeOut);
-
-                    ivFavor.setImageResource(R.drawable.ic_favorite_white_24dp);
-                    Animation fadeIn = AnimationUtils.loadAnimation(getApplicationContext(),
-                            android.R.anim.fade_in);
-                    ivFavor.startAnimation(fadeIn);
-                }else{
-                    Animation fadeOut = AnimationUtils.loadAnimation(getApplicationContext(),
-                            android.R.anim.fade_out);
-                    ivFavor.startAnimation(fadeOut);
-
-                    ivFavor.setImageResource(R.drawable.ic_favorite_border_white_24dp);
-                    Animation fadeIn = AnimationUtils.loadAnimation(getApplicationContext(),
-                            android.R.anim.fade_in);
-                    ivFavor.startAnimation(fadeIn);
-                }
-            }
-        });
-
         startGalleryFragment();
-    }
-
-    private void setNavView(QuoteRealm quote){
-        if(quote != null) {
-            ivFavor.setVisibility(View.VISIBLE);
-            ivShare.setVisibility(View.VISIBLE);
-            int maxLen = getResources().getInteger(R.integer.max_quote_length);
-            String content = quote.getText();
-            if (!TextUtils.isEmpty(content)) {
-                if (content.length() <= maxLen) {
-                    tvQuote.setText(quote.getText());
-                } else {
-                    String txt = content + getString(R.string.ellipsis);
-                    tvQuote.setText(txt);
-                }
-                tvQuoteAuthor.setText(quote.getAuthor());
-            } else {
-                tvQuote.setText(R.string.no_quotes_available);
-                tvQuote.setGravity(Gravity.CENTER);
-                tvQuoteAuthor.setText("");
-            }
-        }else{
-            ivFavor.setVisibility(View.INVISIBLE);
-            ivShare.setVisibility(View.INVISIBLE);
-        }
-    }
-
-    private void initPresenter(){
-        Log.v(TAG,"initPresenter()");
-        presenter = new GalleryPresenterImpl(getApplicationContext(), this);
-        presenter.init();
-        presenter.onStart();
     }
 
     private void startSetting(){
@@ -418,24 +297,6 @@ public class GalleryActivity extends BaseActivity
                             getString(R.string.activity_image_transition) + String.valueOf(pos));
             startActivity(intent, options.toBundle());
         }
-    }
-
-    private void showQuotesFragment(){
-        Log.v(TAG,"showQuotesFragment()");
-
-        FragmentManager fragmentMgr = getSupportFragmentManager();
-        QuotesFragment fragment = (QuotesFragment) fragmentMgr.findFragmentByTag(QuotesFragment.TAG);
-        if(fragment == null){
-            fragment = QuotesFragment.newInstance();
-        }
-        FragmentTransaction ft = fragmentMgr.beginTransaction();
-
-        if (Build.VERSION.SDK_INT >= 19) {
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        }
-        ft.replace(R.id.fragment_container, fragment, QuotesFragment.TAG)
-                .commit();
-
     }
 
     private void showImageRetrieveHint(){

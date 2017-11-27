@@ -58,10 +58,6 @@
         <service android:name="com.github.runningforlife.photosniffer.service.ImageRetrieveService">
         </service>
 
-        <service android:name=".service.QuotesRetrieveService"
-            android:exported="false">
-        </service>
-
         <receiver android:name=".ui.receiver.WallpaperAlarmReceiver"
             android:exported="false">
             <intent-filter>
