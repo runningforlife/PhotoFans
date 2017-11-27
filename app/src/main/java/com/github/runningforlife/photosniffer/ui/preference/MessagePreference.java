@@ -5,14 +5,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.preference.DialogPreference;
-import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.glide.DiskLruFactory;
-import com.github.runningforlife.photosniffer.remote.LeanCloudManager;
 
 import java.io.File;
 

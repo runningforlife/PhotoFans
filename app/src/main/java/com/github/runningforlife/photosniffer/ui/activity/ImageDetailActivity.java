@@ -2,7 +2,6 @@ package com.github.runningforlife.photosniffer.ui.activity;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,7 +11,6 @@ import android.os.Message;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -21,9 +19,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.transition.Slide;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,11 +28,9 @@ import android.view.View;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
-import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenter;
 import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
-import com.github.runningforlife.photosniffer.ui.adapter.BaseAdapterCallback;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,13 +40,13 @@ import com.github.runningforlife.photosniffer.ui.adapter.ImagePagerAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.PageAdapterCallback;
 import com.github.runningforlife.photosniffer.ui.adapter.PreviewAdapter;
 import com.github.runningforlife.photosniffer.ui.fragment.ActionListDialogFragment;
-import com.github.runningforlife.photosniffer.model.UserAction;
+import com.github.runningforlife.photosniffer.data.model.UserAction;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.runningforlife.photosniffer.model.UserAction.*;
+import static com.github.runningforlife.photosniffer.data.model.UserAction.*;
 
 /**
  * activity to show the detail of the images

@@ -1,9 +1,6 @@
 package com.github.runningforlife.photosniffer.presenter;
 
-import com.github.runningforlife.photosniffer.model.ImageRealm;
-import com.github.runningforlife.photosniffer.model.RealmManager;
-
-import io.realm.RealmResults;
+import com.github.runningforlife.photosniffer.data.local.RealmManager;
 
 /**
  * a presenter to show the detail of the image

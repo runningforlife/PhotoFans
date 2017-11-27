@@ -21,7 +21,7 @@ import com.bumptech.glide.request.target.Target;
 import com.github.runningforlife.photosniffer.R;
 
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
-import com.github.runningforlife.photosniffer.model.ImageRealm;
+import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

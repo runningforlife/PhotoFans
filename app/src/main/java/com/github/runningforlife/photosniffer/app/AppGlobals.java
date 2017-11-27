@@ -16,8 +16,8 @@ import android.util.Log;
 
 import com.avos.avoscloud.AVOSCloud;
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.model.MyRealmMigration;
-import com.github.runningforlife.photosniffer.remote.LeanCloudManager;
+import com.github.runningforlife.photosniffer.data.model.MyRealmMigration;
+import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.service.MyThreadFactory;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;

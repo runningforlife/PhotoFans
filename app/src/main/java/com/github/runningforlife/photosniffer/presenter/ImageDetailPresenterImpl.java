@@ -4,20 +4,19 @@ import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
-import android.support.v7.util.SortedList;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
-import com.github.runningforlife.photosniffer.model.RealmManager;
+import com.github.runningforlife.photosniffer.data.local.RealmManager;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-import com.github.runningforlife.photosniffer.model.ImageRealm;
+import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
 
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.github.runningforlife.photosniffer.remote;
+package com.github.runningforlife.photosniffer.data.remote;
 
 import android.os.Build;
 import android.util.Log;
@@ -6,13 +6,10 @@ import android.util.Log;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.BuildConfig;
 import com.avos.avoscloud.SaveCallback;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
 
 /**
  * lean cloud manager

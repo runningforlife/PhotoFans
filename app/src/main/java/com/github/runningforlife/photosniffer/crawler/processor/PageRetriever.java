@@ -2,7 +2,6 @@ package com.github.runningforlife.photosniffer.crawler.processor;
 
 import java.util.List;
 
-import com.github.runningforlife.photosniffer.model.ImageRealm;
 import us.codecraft.webmagic.Page;
 
 /**

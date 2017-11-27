@@ -11,8 +11,8 @@ import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
-import com.github.runningforlife.photosniffer.model.ImageRealm;
-import com.github.runningforlife.photosniffer.model.RealmManager;
+import com.github.runningforlife.photosniffer.data.model.ImageRealm;
+import com.github.runningforlife.photosniffer.data.local.RealmManager;
 import com.github.runningforlife.photosniffer.ui.FavorPictureView;
 
 import java.io.IOException;

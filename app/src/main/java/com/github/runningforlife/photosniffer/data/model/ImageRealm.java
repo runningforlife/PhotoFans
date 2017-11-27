@@ -1,4 +1,4 @@
-package com.github.runningforlife.photosniffer.model;
+package com.github.runningforlife.photosniffer.data.model;
 
 import android.support.annotation.NonNull;
 

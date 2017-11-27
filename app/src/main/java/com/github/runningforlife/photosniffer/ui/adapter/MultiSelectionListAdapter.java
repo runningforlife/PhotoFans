@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.model.ImageWebSite;
+import com.github.runningforlife.photosniffer.data.model.ImageWebSite;
 
 /**
  * a list adapter to bind data to list view

@@ -1,4 +1,4 @@
-package com.github.runningforlife.photosniffer.remote;
+package com.github.runningforlife.photosniffer.data.remote;
 
 import java.io.File;
 

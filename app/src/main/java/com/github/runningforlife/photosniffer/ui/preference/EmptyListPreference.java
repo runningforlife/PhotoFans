@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.github.runningforlife.photosniffer.model.ImageWebSite;
+import com.github.runningforlife.photosniffer.data.model.ImageWebSite;
 import com.github.runningforlife.photosniffer.ui.activity.ImageSourceSelectionActivity;
 
 /**

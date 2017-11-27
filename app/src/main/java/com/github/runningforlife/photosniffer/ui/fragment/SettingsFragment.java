@@ -13,10 +13,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.model.ImagePageInfo;
-import com.github.runningforlife.photosniffer.model.RealmManager;
-import com.github.runningforlife.photosniffer.remote.LeanCloudManager;
-import com.github.runningforlife.photosniffer.ui.receiver.WallpaperAlarmReceiver;
+import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
+import com.github.runningforlife.photosniffer.data.local.RealmManager;
+import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.util.Iterator;

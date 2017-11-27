@@ -2,8 +2,6 @@ package com.github.runningforlife.photosniffer.ui.adapter;
 
 import android.view.View;
 
-import com.github.runningforlife.photosniffer.model.ImageRealm;
-
 import io.realm.RealmObject;
 
 /**

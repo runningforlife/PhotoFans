@@ -13,9 +13,9 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.model.ImagePageInfo;
-import com.github.runningforlife.photosniffer.model.ImageWebSite;
-import com.github.runningforlife.photosniffer.model.RealmManager;
+import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
+import com.github.runningforlife.photosniffer.data.model.ImageWebSite;
+import com.github.runningforlife.photosniffer.data.local.RealmManager;
 import com.github.runningforlife.photosniffer.ui.adapter.MultiSelectionListAdapter;
 
 import java.util.HashSet;

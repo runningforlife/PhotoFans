@@ -3,9 +3,9 @@ package com.github.runningforlife.photosniffer.crawler.processor;
 import android.util.Log;
 import android.webkit.URLUtil;
 
-import com.github.runningforlife.photosniffer.model.ImagePageInfo;
-import com.github.runningforlife.photosniffer.model.ImageRealm;
-import com.github.runningforlife.photosniffer.model.RealmManager;
+import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
+import com.github.runningforlife.photosniffer.data.model.ImageRealm;
+import com.github.runningforlife.photosniffer.data.local.RealmManager;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;

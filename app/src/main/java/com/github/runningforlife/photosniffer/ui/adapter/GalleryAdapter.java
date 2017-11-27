@@ -24,7 +24,7 @@ import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.loader.PicassoLoader;
 import com.github.runningforlife.photosniffer.loader.PicassoLoaderListener;
-import com.github.runningforlife.photosniffer.model.ImageRealm;
+import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.io.IOException;

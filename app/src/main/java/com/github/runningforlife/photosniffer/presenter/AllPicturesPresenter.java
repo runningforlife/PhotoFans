@@ -2,10 +2,7 @@ package com.github.runningforlife.photosniffer.presenter;
 
 import android.webkit.WebView;
 
-import com.github.runningforlife.photosniffer.model.ImageRealm;
-import com.github.runningforlife.photosniffer.model.RealmManager;
-
-import io.realm.RealmResults;
+import com.github.runningforlife.photosniffer.data.local.RealmManager;
 
 /**
  * a gallery presenter used to load photo list

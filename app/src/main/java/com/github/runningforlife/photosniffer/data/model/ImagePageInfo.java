@@ -1,4 +1,4 @@
-package com.github.runningforlife.photosniffer.model;
+package com.github.runningforlife.photosniffer.data.model;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;

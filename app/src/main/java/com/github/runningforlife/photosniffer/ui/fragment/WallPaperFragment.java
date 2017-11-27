@@ -1,6 +1,5 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.model.ImageRealm;
+import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 
 import com.github.runningforlife.photosniffer.presenter.WallpaperPresenter;
 import com.github.runningforlife.photosniffer.presenter.WallpaperPresenterImpl;

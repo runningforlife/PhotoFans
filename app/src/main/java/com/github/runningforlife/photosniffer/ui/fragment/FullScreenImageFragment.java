@@ -19,8 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
@@ -28,8 +26,8 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
-import com.github.runningforlife.photosniffer.model.RealmManager;
-import com.github.runningforlife.photosniffer.model.UserAction;
+import com.github.runningforlife.photosniffer.data.local.RealmManager;
+import com.github.runningforlife.photosniffer.data.model.UserAction;
 import com.github.runningforlife.photosniffer.presenter.ImageSaveRunnable;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
@@ -40,10 +38,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.github.runningforlife.photosniffer.model.UserAction.DELETE;
-import static com.github.runningforlife.photosniffer.model.UserAction.FAVOR;
-import static com.github.runningforlife.photosniffer.model.UserAction.SAVE;
-import static com.github.runningforlife.photosniffer.model.UserAction.WALLPAPER;
+import static com.github.runningforlife.photosniffer.data.model.UserAction.DELETE;
+import static com.github.runningforlife.photosniffer.data.model.UserAction.FAVOR;
+import static com.github.runningforlife.photosniffer.data.model.UserAction.SAVE;
+import static com.github.runningforlife.photosniffer.data.model.UserAction.WALLPAPER;
 
 /**
  * a dialog to show full screen image

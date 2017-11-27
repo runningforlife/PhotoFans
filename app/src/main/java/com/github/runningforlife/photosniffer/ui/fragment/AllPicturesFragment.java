@@ -22,7 +22,6 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.model.ImageRealm;
 import com.github.runningforlife.photosniffer.presenter.AllPicturesPresenter;
 import com.github.runningforlife.photosniffer.presenter.AllPicturesPresenterImpl;
 import com.github.runningforlife.photosniffer.ui.AllPictureView;
