@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.os.ResultReceiver;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.github.runningforlife.photosniffer.crawler.OkHttpDownloader;
@@ -102,7 +103,10 @@ public class QuotesRetrieveService extends Service
         }else{
             Random rnd = new Random(quotePages.size());
             int idx = rnd.nextInt(quotePages.size());
-            spider.addUrl(quotePages.get(idx).getUrl());
+            final String url = quotePages.get(idx).getUrl();
+            if(!TextUtils.isEmpty(url)) {
+                spider.addUrl(url);
+            }
         }
         spider.start();
         // tell client that we are starting

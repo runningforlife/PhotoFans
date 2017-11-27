@@ -5,7 +5,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -31,8 +33,6 @@ import static com.github.runningforlife.photosniffer.ui.receiver.WallpaperAlarmR
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "SettingsFragment";
-    private static WallpaperAlarmReceiver sAlarmReceiver = new WallpaperAlarmReceiver();;
-    //private WallpaperPresenterImpl mPresenter;
 
     @Override
     public void onCreate(Bundle savedState){
@@ -44,6 +44,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onResume(){
         super.onResume();
+
+        if(Build.VERSION.SDK_INT < 24){
+            // cannot set auto lock screen, so remote it
+            final Preference pf = findPreference(getString(R.string.pref_enable_auto_lockscreen_wallpaper));
+            boolean isRemoved = getPreferenceScreen().removePreference(pf);
+            Log.v(TAG,"cannot support lock screen auto wallpaper=" + isRemoved);
+        }
 
         getPreferenceScreen()
                 .getSharedPreferences()

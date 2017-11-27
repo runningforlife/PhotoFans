@@ -504,8 +504,11 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
                 if(o instanceof Bitmap) {
                     WallpaperManager wpm = WallpaperManager.getInstance(mContext);
                     try {
-                        // TODO: use flag to distinguish system and lock screen wallpaper
-                        wpm.setBitmap((Bitmap)o);
+                        if(Build.VERSION.SDK_INT >= 24) {
+                            wpm.setBitmap((Bitmap) o, null, false, WallpaperManager.FLAG_LOCK | WallpaperManager.FLAG_SYSTEM);
+                        }else{
+                            wpm.setBitmap((Bitmap)o);
+                        }
                         mView.onWallpaperSetDone(true);
                     } catch (IOException e) {
                         mView.onWallpaperSetDone(false);

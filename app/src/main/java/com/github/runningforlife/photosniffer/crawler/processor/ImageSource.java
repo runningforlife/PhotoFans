@@ -54,8 +54,6 @@ public interface ImageSource {
     String FREEJPG_IMAGE_START = "http://en.freejpg.com.ar/asset/";
     String VH_IMAGE_START = "https://visualhunt.com/photos/";
 
-    String POLA_IMAGE_URL_START = "http://www.polayoutu.com";
-    String POLA_IMAGE_URL_START_1 = "https://www.polarr.co";
     String POLA_IMAGE_START = "http://ppe.oss-cn-shenzhen.aliyuncs.com/collections";
     String POLA_IMAGE_END = "thumb.jpg";
     String POLA_FULL_IMAGE_END = "full_res.jpg";

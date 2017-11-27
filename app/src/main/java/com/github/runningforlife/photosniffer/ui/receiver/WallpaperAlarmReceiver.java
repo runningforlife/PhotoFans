@@ -5,11 +5,14 @@ import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
+import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.app.AppGlobals;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
@@ -37,7 +40,13 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
     public void onReceive(Context context, Intent intent) {
         Log.v(TAG,"onReceive()");
         String action = intent.getAction();
-        if(ALARM_AUTO_WALLPAPER.equals(action)){
+
+        final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+
+        boolean isAutoWallpaper = sp.getBoolean(context.getString(R.string.pref_automatic_wallpaper), true);
+        boolean isAutoLockScreen = sp.getBoolean(context.getString(R.string.pref_enable_auto_lockscreen_wallpaper), false);
+
+        if(ALARM_AUTO_WALLPAPER.equals(action) && isAutoWallpaper){
             MyThreadFactory.getInstance().
                     newThread(new Runnable() {
                 @Override
@@ -49,9 +58,8 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
                     }
                 }
             }).start();
-        }else if(Intent.ACTION_SCREEN_ON.equals(action)){
-            MyThreadFactory.getInstance()
-                    .newThread(new Runnable() {
+        }else if(Intent.ACTION_SCREEN_ON.equals(action) && isAutoLockScreen){
+            MyThreadFactory.getInstance().newThread(new Runnable() {
                         @Override
                         public void run() {
                             if(Build.VERSION.SDK_INT >= 24) {

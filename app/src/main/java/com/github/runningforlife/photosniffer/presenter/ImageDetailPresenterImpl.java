@@ -3,6 +3,7 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.support.v7.util.SortedList;
 import android.util.Log;
 
@@ -118,7 +119,11 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
                 if(o instanceof Bitmap) {
                     WallpaperManager wpm =  WallpaperManager.getInstance(mContext);
                     try {
-                        wpm.setBitmap((Bitmap)o);
+                        if(Build.VERSION.SDK_INT >= 24) {
+                            wpm.setBitmap((Bitmap) o, null, false, WallpaperManager.FLAG_LOCK | WallpaperManager.FLAG_SYSTEM);
+                        }else{
+                            wpm.setBitmap((Bitmap)o);
+                        }
                         mView.onWallpaperSetDone(true);
                         // mark it as wall paper
                         mRealmMgr.setWallpaper(mImgList.get(pos).getUrl());

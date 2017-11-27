@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="auto_wallpaper_interval">
+        <item>每十五分钟</item>
         <item>每个小时</item>
         <item>每3个小时</item>
         <item>每半天</item>

@@ -30,8 +30,9 @@
     </string-array>
 
     <string-array name="auto_wallpaper_interval">
+        <item>every 15 minutes</item>
         <item>every hour</item>
-        <item>every 3hr</item>
+        <item>every 3 hours</item>
         <item>every half day</item>
         <item>every day</item>
     </string-array>

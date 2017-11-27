@@ -3,6 +3,7 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -163,8 +164,11 @@ public class FavorImagePresenterImpl implements FavorImagePresenter{
                 if(o instanceof Bitmap) {
                     WallpaperManager wpm = WallpaperManager.getInstance(mContext);
                     try {
-                        // TODO: use flag to distinguish system and lock screen wallpaper
-                        wpm.setBitmap((Bitmap)o);
+                        if(Build.VERSION.SDK_INT >= 24) {
+                            wpm.setBitmap((Bitmap) o, null, false, WallpaperManager.FLAG_LOCK | WallpaperManager.FLAG_SYSTEM);
+                        }else{
+                            wpm.setBitmap((Bitmap)o);
+                        }
                         mView.onWallpaperSetDone(true);
                     } catch (IOException e) {
                         mView.onWallpaperSetDone(false);

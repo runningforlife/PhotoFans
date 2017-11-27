@@ -21,8 +21,10 @@ public class QuotePageProcessor implements PageProcessor, QuotesRetriever.Retrie
     private static final String TAG = "QuotePageProcessor";
 
     private static final int DEFAULT_RETRIEVED_QUOTES = 10;
+
     private Site site = Site.me().setRetryTimes(3)
             .setSleepTime(1000).setTimeOut(3000);
+
     private QuotePageFilter filter;
     private QuotesRetriever retriever;
     private List<RetrieveCompleteCallback> callback;

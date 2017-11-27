@@ -14,6 +14,12 @@
         android:defaultValue="false">
     </SwitchPreference>
 
+    <SwitchPreference
+        android:key="@string/pref_enable_auto_lockscreen_wallpaper"
+        android:title="@string/enable_auto_lockscreen_wallpaper"
+        android:summary="@string/enable_auto_lockscreen_wallpaper"
+        android:defaultValue="true"/>
+
     <ListPreference
         android:key="@string/key_auto_wallpaper_setting_interval"
         android:title="@string/set_auto_wallpaper_interval"

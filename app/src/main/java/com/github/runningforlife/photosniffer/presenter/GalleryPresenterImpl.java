@@ -55,9 +55,6 @@ public class GalleryPresenterImpl implements GalleryPresenter{
         isRefreshing = false;
         this.context = context;
 
-        String key = context.getString(R.string.last_refreshing_time);
-        lastRefreshing = SharedPrefUtil.getLong(key, System.currentTimeMillis());
-
         AUTO_REFRESH_INTERVAL = context.getResources().
                 getInteger(R.integer.auot_quote_refresh_interval);
         handler = new H(Looper.myLooper());
@@ -73,13 +70,15 @@ public class GalleryPresenterImpl implements GalleryPresenter{
     @Override
     public void refresh() {
         Log.v(TAG,"refresh()");
-        long current = System.currentTimeMillis();
-        if(quotes == null || (quotes.size() >= 0 && current >= lastRefreshing + AUTO_REFRESH_INTERVAL)){
+        final long current = System.currentTimeMillis();
+
+        final String key = context.getString(R.string.last_refreshing_time);
+        lastRefreshing = SharedPrefUtil.getLong(key, current);
+        if(quotes == null ||  quotes.size() <= 0 ||
+                current == lastRefreshing || current >= lastRefreshing + AUTO_REFRESH_INTERVAL){
             isRefreshing = true;
             startRetrieveQuote();
-            lastRefreshing = System.currentTimeMillis();
-            String key = context.getString(R.string.last_refreshing_time);
-            SharedPrefUtil.putLong(key, lastRefreshing);
+            SharedPrefUtil.putLong(key,current);
         }else{
             isRefreshing = false;
             view.onRefreshDone(true);
@@ -88,9 +87,9 @@ public class GalleryPresenterImpl implements GalleryPresenter{
 
     @Override
     public QuoteRealm getNextQuote() {
-        Log.v(TAG,"getNextQuote()");
         if(quotes == null || quotes.size() <= 0) return null;
 
+        Log.v(TAG,"getNextQuote()");
         ++current;
         current %= quotes.size();
 
