@@ -134,7 +134,7 @@ public class ImageRetrieveService extends Service implements
         List<String> lastUrl =  mProcessor.getStartUrl();
         if(lastUrl.size() <= 0){
             List<String> defList = SharedPrefUtil.getImageSource();
-            String[] defSource = (String[]) defList.
+            String[] defSource = defList.
                     toArray(new String[defList.size()]);
             mSpider = Spider.create(mProcessor)
                     .addUrl(defSource)

@@ -122,7 +122,7 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
         RealmManager helper = RealmManager.getInstance();
 
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<ImagePageInfo> pages = helper.getAllUnvisitedImagePages(realm);
+        RealmResults<ImagePageInfo> pages = RealmManager.getAllUnvisitedImagePages(realm);
 
         if(pages.size() > 0) {
             Set<String> allUrls = new HashSet<>();

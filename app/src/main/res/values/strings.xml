@@ -22,7 +22,6 @@
     <string name="wifi_only_download">Download Images only wifi-connected</string>
     <string name="website_to_download_images">Websites to download images</string>
     <string name="select_your_favorite_websites">Choose the Websites you like</string>
-    <string name="mottos_for_every_day">Every Day Mottos</string>
     <string name="pref_choose_image_source" translatable="false">key_choose_image_source</string>
     <string name="action_more">Check More</string>
     <string name="save_image_Success">Image Saved To </string>
@@ -56,24 +55,14 @@
     <string name="pref_pola_latest_collections_number" translatable="false">pola_latest_collections_number</string>
     <string name="pref_auto_wallpaper_interval" translatable="false">pref_auto_wallpaper_time_interval</string>
     <string name="pref_new_user" translatable="false">pref_new_user</string>
-    <string name="share">Share</string>
     <string name="my_copyright_declaration">All those pictures are free. Please do not use them
     for any commercial usage. Any problems, please send email wlh2119@gmail.com</string>
     <string name="check_copyright_notes">Check Copyright Notes</string>
     <string name="copyright_declaration">Copytright Declaration</string>
     <string name="pref_pola_retrieved" translatable="false">pref_pola_retrieved</string>
-    <string name="back_home" translatable="false">back home</string>
-    <string name="fragment_image_transition" translatable="false">Fragment Image Transition</string>
     <string name="activity_image_transition" translatable="false">Activity Image Transition</string>
     <string name="pref_pola_last_updated_time" translatable="false">pola_last_updated_time</string>
-    <string name="no_quotes_available">Quotes Not Available</string>
-    <string name="quotes_refresh" translatable="false">Refresh Quotes</string>
-    <string name="last_refreshing_time" translatable="false">key_last_quotes_refreshing_time</string>
-    <string name="quotes_favor" translatable="false">favor quotes</string>
-    <string name="quotes_share" translatable="false">share quotes</string>
     <string name="refresh_hint">Retrivee Images by pulling down</string>
-    <string name="quotes">Quotes</string>
-    <string name="ellipsis">....</string>
     <string name="hint_network_state_hung">Network is very slow, take a break and try it again</string>
     <string name="hint_network_state_slow">Network is slow, please try it later</string>
     <string name="pref_enable_auto_lockscreen_wallpaper">pref_enable_auto_wallpaper_of_lockscreen</string>

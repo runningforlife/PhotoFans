@@ -13,11 +13,11 @@ public interface NetworkStateCallback {
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({STATE_GOOD, STATE_SLOW, STATE_HUNG})
-    public @interface NetworkState{}
+    @interface NetworkState{}
 
-    public static final String STATE_GOOD = "good";
-    public static final String STATE_SLOW = "slow";
-    public static final String STATE_HUNG = "hung";
+    String STATE_GOOD = "good";
+    String STATE_SLOW = "slow";
+    String STATE_HUNG = "hung";
 
     /**
      * current network state

@@ -24,14 +24,12 @@
     <string name="give_your_advice">请给出您的建议</string>
     <string name="set_wallpaper">壁纸设置</string>
     <string name="set_auto_wallpaper_interval">设置自动壁纸时间间隔</string>
-    <string name="share">分享</string>
     <string name="my_copyright_declaration">所有图片均来自网络免费图片，请勿用于任何商业目的。\n如有任何问题，请联系wlh2119@gmail.com</string>
     <string name="check_copyright_notes">查看版权说明</string>
     <string name="enable_automatic_wallpaper">开启自动壁纸设置</string>
     <string name="how_many_images_reserved">保留图片的最大数目</string>
     <string name="image_detail">图片详细</string>
     <string name="image_preview">图片预览</string>
-    <string name="mottos_for_every_day">每日一句</string>
     <string name="my_favorite_images">收藏图片</string>
     <string name="network_mobile_connected">当前为移动网络，是否继续？</string>
     <string name="refresh_error">刷新失败</string>
@@ -46,8 +44,6 @@
     <string name="max_reserved_images">图片保存的最大数目</string>
     <string name="copyright_declaration">版权声明</string>
     <string name="refresh_hint">下拉获取图片</string>
-    <string name="no_quotes_available">无法获取格言</string>
-    <string name="quotes">铭言</string>
     <string name="hint_network_state_hung">网络不给力, 休息会再回来吧!</string>
     <string name="hint_network_state_slow">网络有点慢，请稍后再试</string>
 </resources>

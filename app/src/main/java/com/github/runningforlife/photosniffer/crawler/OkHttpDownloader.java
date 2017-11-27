@@ -64,7 +64,7 @@ public class OkHttpDownloader extends AbstractDownloader {
 
             if(response.isSuccessful()){
                 onSuccess(request);
-                request.putExtra(request.STATUS_CODE, statusCode);
+                request.putExtra(us.codecraft.webmagic.Request.STATUS_CODE, statusCode);
 
                 return handleResponse(request,response);
             }else{

@@ -9,8 +9,6 @@
         <item>https://visualhunt.com</item>
         <item>https://pixabay.com</item>
         <item>http://www.vcg.com</item>
-        <item>http://www.youwu.cc</item>
-        <item>http://www.mmjpg.com</item>
     </string-array>
 
     <string-array name="image_website_name">
@@ -20,8 +18,6 @@
         <item>Visual Hunt</item>
         <item>Pixabay</item>
         <item>Visual China</item>
-        <item>You Wu</item>
-        <item>MM JPG</item>
     </string-array>
 
     <string-array name="default_source_url">

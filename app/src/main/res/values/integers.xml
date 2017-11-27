@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="max_reserved_image_number">100</integer>
+    <integer name="max_reserved_image_number">300</integer>
     <integer name="auto_wallpaper_interval">3600000</integer>
-    <integer name="auot_quote_refresh_interval">3600000</integer>
     <integer name="dialog_dismiss_count_down">3000</integer>
-    <integer name="max_quote_length">150</integer>
-    <integer name="max_quote_lines">5</integer>
 </resources>
