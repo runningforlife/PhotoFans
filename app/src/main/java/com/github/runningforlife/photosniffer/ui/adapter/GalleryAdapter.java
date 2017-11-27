@@ -3,11 +3,13 @@ package com.github.runningforlife.photosniffer.ui.adapter;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.MenuRes;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -162,19 +164,19 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                     }
                 }
             });
-            //root.setOnCreateContextMenuListener(this);
+            root.setOnCreateContextMenuListener(this);
         }
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             Log.v(TAG,"onCreateContextMenu()");
-/*            MenuInflater inflater = ((AppCompatActivity)mContext).getMenuInflater();
+            MenuInflater inflater = ((AppCompatActivity)mContext).getMenuInflater();
 
             inflater.inflate(R.menu.menu_context_default, menu);
 
             if(mCallback != null) {
                 mCallback.onContextMenuCreated(getAdapterPosition(), TAG);
-            }*/
+            }
         }
     }
 }
