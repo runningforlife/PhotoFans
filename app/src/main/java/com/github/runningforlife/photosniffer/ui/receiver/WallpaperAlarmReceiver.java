@@ -22,6 +22,7 @@ import com.github.runningforlife.photosniffer.service.MyThreadFactory;
 
 import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -35,6 +36,8 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
 
     public static final String ALARM_AUTO_WALLPAPER = "com.github.runningforlife.AUTO_WALLPAPER";
 
+    private static AtomicInteger sWallpaperCount = new AtomicInteger(0);
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.v(TAG,"onReceive()");
@@ -46,8 +49,7 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
         boolean isAutoLockScreen = sp.getBoolean(context.getString(R.string.pref_enable_auto_lockscreen_wallpaper), false);
 
         if(ALARM_AUTO_WALLPAPER.equals(action) && isAutoWallpaper){
-            MyThreadFactory.getInstance().
-                    newThread(new Runnable() {
+            MyThreadFactory.getInstance().newThread(new Runnable() {
                 @Override
                 public void run() {
                     if(Build.VERSION.SDK_INT >= 24) {
@@ -61,11 +63,9 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
             MyThreadFactory.getInstance().newThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(Build.VERSION.SDK_INT >= 24) {
-                                setWallpaper(WallpaperManager.FLAG_LOCK);
-                            }
+                            setWallpaper(WallpaperManager.FLAG_LOCK);
                         }
-                    });
+                    }).start();
         }
     }
 
@@ -75,14 +75,15 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
         try {
             RealmResults<ImageRealm> wallpaper = rm.where(ImageRealm.class)
                     .equalTo("mIsWallpaper", true)
+                    .or()
+                    .equalTo("mIsFavor", true)
                     .findAll();
 
             if (wallpaper.size() <= 0) return;
 
             final Context context = AppGlobals.getInstance();
 
-            Random rnd = new Random();
-            final int pos = rnd.nextInt(wallpaper.size());
+            final int pos = sWallpaperCount.getAndIncrement()%wallpaper.size();
 
             GlideLoaderListener listener = new GlideLoaderListener(null);
             listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
@@ -104,17 +105,18 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
                     }
                 }
             });
+
             String imgUrl = wallpaper.get(pos).getUrl();
             if(imgUrl.endsWith(ImageSource.POLA_IMAGE_END)){
                 final String newUrl = imgUrl.substring(0, imgUrl.lastIndexOf("/")+1) +
                         ImageSource.POLA_FULL_IMAGE_END;
                 GlideLoader.downloadOnly(context, newUrl, listener, Priority.IMMEDIATE,
-                        Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_WIDTH);
+                        Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
             }else {
                 GlideLoader.downloadOnly(context, imgUrl, listener, Priority.IMMEDIATE,
-                        Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_WIDTH);
+                        Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
             }
-        }finally {
+        } finally {
             rm.close();
         }
     }

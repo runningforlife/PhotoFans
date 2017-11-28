@@ -47,8 +47,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if(Build.VERSION.SDK_INT < 24){
             // cannot set auto lock screen, so remote it
             final Preference pf = findPreference(getString(R.string.pref_enable_auto_lockscreen_wallpaper));
-            boolean isRemoved = getPreferenceScreen().removePreference(pf);
-            Log.v(TAG,"cannot support lock screen auto wallpaper=" + isRemoved);
+            if(pf != null) {
+                boolean isRemoved = getPreferenceScreen().removePreference(pf);
+                Log.v(TAG, "cannot support lock screen auto wallpaper=" + isRemoved);
+            }
         }
 
         getPreferenceScreen()

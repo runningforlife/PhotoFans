@@ -201,7 +201,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
                 public void onImageLoadDone(Object o) {
                     Log.d(TAG,"onImageLoadDone()");
                     if(o instanceof Bitmap) {
-                        ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o),
+                        final ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o),
                                 String.valueOf(System.currentTimeMillis()));
                         r.addCallback(new ImageSaveRunnable.ImageSaveCallback() {
                             @Override
@@ -213,6 +213,8 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
                                 message.sendToTarget();
                             }
                         });
+                        // starting save image
+                        new Thread(r).start();
                     }
                 }
             });

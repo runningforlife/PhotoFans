@@ -22,7 +22,7 @@ public interface Loader {
 
     // large image size, used for full screen image
     int DEFAULT_IMG_WIDTH = (DisplayUtil.getScreenDimen().widthPixels);
-    int DEFAULT_IMG_HEIGHT = (int)(DEFAULT_IMG_WIDTH*DisplayUtil.getScreenRatio());
+    int DEFAULT_IMG_HEIGHT = (int)(DEFAULT_IMG_WIDTH/DisplayUtil.getScreenRatio());
     // medium image size
     int DEFAULT_IMAGE_MEDIUM_WIDTH = DEFAULT_IMG_WIDTH/2;
     int DEFAULT_IMAGE_MEDIUM_HEIGHT = (int)(DEFAULT_IMAGE_MEDIUM_WIDTH*DisplayUtil.getScreenRatio());
