@@ -100,10 +100,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(key,"");
             }
-        }
-
-        boolean isAuto = sharedPreferences.getBoolean(keyAutoWallpaper, false);
-        if(keyAutoWallpaper.equals(key)){
+        }else if(keyAutoWallpaper.equals(key)){
+            boolean isAuto = sharedPreferences.getBoolean(keyAutoWallpaper, true);
             if(isAuto) {
                 startAutoWallpaperAlarm();
             }else{
@@ -128,7 +126,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 .getSystemService(Context.ALARM_SERVICE);
 
         String key = getString(R.string.pref_auto_wallpaper_interval);
-        int interval = Integer.parseInt(SharedPrefUtil.getString(key, "1800000"));
+        int interval = Integer.parseInt(SharedPrefUtil.getString(key, "900000"));
         alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
                 System.currentTimeMillis(),interval, pi);
     }
@@ -138,7 +136,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 .getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(ALARM_AUTO_WALLPAPER);
         PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, intent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
+                PendingIntent.FLAG_NO_CREATE);
         alarmMgr.cancel(pi);
     }
 }

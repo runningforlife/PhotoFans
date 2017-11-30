@@ -130,9 +130,6 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
                     Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
         }
 
-/*        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.anim_scale_in);
-        imageView.setAnimation(animation);*/
-
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {

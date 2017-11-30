@@ -2,6 +2,5 @@
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
     android:duration="@android:integer/config_mediumAnimTime">
     <changeImageTransform/>
-    <changeBounds/>
-    <changeClipBounds/>
+    <changeTransform/>
 </transitionSet>

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
@@ -19,12 +20,15 @@ import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.service.MyThreadFactory;
+import com.github.runningforlife.photosniffer.utils.BitmapUtil;
+import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 
 import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
+import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 /**
@@ -40,13 +44,13 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.v(TAG,"onReceive()");
         String action = intent.getAction();
+        Log.v(TAG,"onReceive(): action=" + action);
 
         final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 
         boolean isAutoWallpaper = sp.getBoolean(context.getString(R.string.pref_automatic_wallpaper), true);
-        boolean isAutoLockScreen = sp.getBoolean(context.getString(R.string.pref_enable_auto_lockscreen_wallpaper), false);
+        boolean isAutoLockScreen = sp.getBoolean(context.getString(R.string.pref_enable_auto_lockscreen_wallpaper), true);
 
         if(ALARM_AUTO_WALLPAPER.equals(action) && isAutoWallpaper){
             MyThreadFactory.getInstance().newThread(new Runnable() {
@@ -63,7 +67,9 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
             MyThreadFactory.getInstance().newThread(new Runnable() {
                         @Override
                         public void run() {
-                            setWallpaper(WallpaperManager.FLAG_LOCK);
+                            if(Build.VERSION.SDK_INT >= 24) {
+                                setWallpaper(WallpaperManager.FLAG_LOCK);
+                            }
                         }
                     }).start();
         }
@@ -77,6 +83,8 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
                     .equalTo("mIsWallpaper", true)
                     .or()
                     .equalTo("mIsFavor", true)
+                    .or()
+                    .equalTo("mIsUsed", true)
                     .findAll();
 
             if (wallpaper.size() <= 0) return;
@@ -91,16 +99,21 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
                 public void onImageLoadDone(Object o) {
                     Log.d(TAG, "onImageLoadDone()");
                     if (o instanceof Bitmap) {
-                        WallpaperManager wpm = WallpaperManager.getInstance(context);
-                        try {
-                            if(Build.VERSION.SDK_INT >= 24 && flag != -1) {
-                                wpm.setBitmap((Bitmap) o, null, true, flag);
-                            }else{
-                                wpm.setBitmap((Bitmap)o);
+                        // check bitmap size
+                        Bitmap bm = (Bitmap)o;
+                        final DisplayMetrics dm = DisplayUtil.getScreenDimen();
+                        if(bm.getWidth() > dm.widthPixels && bm.getHeight() > dm.heightPixels) {
+                            WallpaperManager wpm = WallpaperManager.getInstance(context);
+                            try {
+                                if (Build.VERSION.SDK_INT >= 24 && flag != -1) {
+                                    wpm.setBitmap(bm, null, true, flag);
+                                } else {
+                                    wpm.setBitmap(bm);
+                                }
+                            } catch (IOException e) {
+                                //mView.onWallpaperSetDone(false);
+                                e.printStackTrace();
                             }
-                        } catch (IOException e) {
-                            //mView.onWallpaperSetDone(false);
-                            e.printStackTrace();
                         }
                     }
                 }

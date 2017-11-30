@@ -36,7 +36,6 @@
             android:theme="@style/AppTheme.NoActionBar.DarkStatusBar"
             android:label=""
             android:parentActivityName="com.github.runningforlife.photosniffer.ui.activity.GalleryActivity">
-
         </activity>
 
         <activity android:name="com.github.runningforlife.photosniffer.ui.activity.SettingsActivity"
@@ -50,7 +49,7 @@
         </activity>
 
         <activity android:name=".ui.activity.FullScreenImageActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/AppTheme.NoActionBar.DarkStatusBar"
             android:parentActivityName=".ui.activity.GalleryActivity"
             android:label="">
         </activity>
@@ -62,7 +61,6 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="com.github.runningforlife.AUTO_WALLPAPER"/>
-                <action android:name="android.intent.action.SCREEN_ON"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>

@@ -265,7 +265,9 @@ public class AppGlobals extends Application{
 
         @Override
         public void uncaughtException(Thread t, Throwable e) {
-            saveLog(e);
+            if(e != null) {
+                saveLog(e);
+            }
         }
     }
 }
