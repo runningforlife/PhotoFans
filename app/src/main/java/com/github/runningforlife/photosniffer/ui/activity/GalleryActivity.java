@@ -104,8 +104,6 @@ public class GalleryActivity extends BaseActivity
     public void onResume(){
         super.onResume();
 
-        checkStoragePermission();
-
         String key = getString(R.string.pref_new_user);
         boolean isNewUser = SharedPrefUtil.getBoolean(key, true);
 
@@ -116,9 +114,10 @@ public class GalleryActivity extends BaseActivity
                     // tell user how to start retrieve images
                     showImageRetrieveHint();
                 }
-            }, 2000);
+            }, 1000);
             // set to false when first refresh done
             //SharedPrefUtil.putBoolean(key, false);
+            checkStoragePermission();
         }
     }
 
@@ -307,21 +306,22 @@ public class GalleryActivity extends BaseActivity
                 fm.findFragmentByTag(RetrieveHintFragment.TAG);
         if (fragment == null) {
             fragment = (RetrieveHintFragment) RetrieveHintFragment.newInstance();
+
+            FragmentTransaction ft = fm.beginTransaction();
+
+            ft.setCustomAnimations(R.anim.anim_enter_from_top, android.R.anim.fade_out);
+            ft.add(R.id.fragment_container, fragment, RetrieveHintFragment.TAG)
+                    .commit();
+
+            int dismissCount = getResources().getInteger(R.integer.dialog_dismiss_count_down);
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    dismissRetrieveHintFragment();
+                }
+            }, dismissCount);
         }
 
-        FragmentTransaction ft = fm.beginTransaction();
-
-        ft.setCustomAnimations(R.anim.anim_enter_from_top, android.R.anim.fade_out);
-        ft.add(R.id.fragment_container, fragment, RetrieveHintFragment.TAG)
-                .commit();
-
-        int dismissCount = getResources().getInteger(R.integer.dialog_dismiss_count_down);
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                dismissRetrieveHintFragment();
-            }
-        }, dismissCount);
     }
 
     private void dismissRetrieveHintFragment(){

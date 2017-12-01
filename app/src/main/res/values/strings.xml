@@ -65,7 +65,6 @@
     <string name="refresh_hint">Retrivee Images by pulling down</string>
     <string name="hint_network_state_hung">Network is very slow, take a break and try it again</string>
     <string name="hint_network_state_slow">Network is slow, please try it later</string>
-    <string name="pref_enable_auto_lockscreen_wallpaper">pref_enable_auto_wallpaper_of_lockscreen</string>
+    <string name="pref_enable_auto_lockscreen_wallpaper" translatable="false">pref_enable_auto_wallpaper_of_lockscreen</string>
     <string name="enable_auto_lockscreen_wallpaper">Enable auto lock screen wallpaper setting</string>
-    <string name="auto_wallpaper_default_interval">900000</string>
 </resources>

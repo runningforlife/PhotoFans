@@ -4,9 +4,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.request.RequestListener;
 import com.github.runningforlife.photosniffer.ui.adapter.ImagePagerAdapter;
+
+import java.text.DecimalFormat;
 
 
 /**

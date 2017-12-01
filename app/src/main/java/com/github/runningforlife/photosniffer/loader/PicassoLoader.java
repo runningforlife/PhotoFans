@@ -20,6 +20,7 @@ public class PicassoLoader{
     public static void load(Context context, ImageView iv, String url, int w, int h) {
         Picasso.with(context)
                 .load(url)
+                .config(Bitmap.Config.RGB_565)
                 .resize(w,h)
                 .into(iv);
     }

@@ -126,8 +126,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 .getSystemService(Context.ALARM_SERVICE);
 
         String key = getString(R.string.pref_auto_wallpaper_interval);
-        int interval = Integer.parseInt(SharedPrefUtil.getString(key, "900000"));
-        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
+        int interval = Integer.parseInt(SharedPrefUtil.getString(key, "30000"));
+        alarmMgr.setRepeating(AlarmManager.RTC,
                 System.currentTimeMillis(),interval, pi);
     }
 
@@ -136,7 +136,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 .getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(ALARM_AUTO_WALLPAPER);
         PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, intent,
-                PendingIntent.FLAG_NO_CREATE);
+                PendingIntent.FLAG_ONE_SHOT);
         alarmMgr.cancel(pi);
     }
 }

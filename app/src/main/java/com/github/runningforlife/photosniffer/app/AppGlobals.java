@@ -18,6 +18,7 @@ import com.avos.avoscloud.AVOSCloud;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.model.MyRealmMigration;
 import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
+import com.github.runningforlife.photosniffer.service.LockScreenUpdateService;
 import com.github.runningforlife.photosniffer.service.MyThreadFactory;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
@@ -77,6 +78,8 @@ public class AppGlobals extends Application{
         initLeanCloud();
 
         saveUserInfo();
+
+        startLockScreenUpdater();
     }
 
     @Override
@@ -218,6 +221,16 @@ public class AppGlobals extends Application{
             LeanCloudManager cloud = LeanCloudManager.getInstance();
             cloud.newUser(Build.FINGERPRINT);
             //SharedPrefUtil.putBoolean(key, false);
+        }
+    }
+
+    // start lock screen update service
+    private void startLockScreenUpdater(){
+        Log.v(TAG,"startLockScreenUpdater()");
+        if(Build.VERSION.SDK_INT >= 24){
+            // start wallpaper service
+            Intent intent1 = new Intent(this, LockScreenUpdateService.class);
+            startService(intent1);
         }
     }
 

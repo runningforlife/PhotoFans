@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.SET_WALLPAPER"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:allowBackup="true"
@@ -54,13 +55,17 @@
             android:label="">
         </activity>
 
-        <service android:name="com.github.runningforlife.photosniffer.service.ImageRetrieveService">
-        </service>
+        <service android:name="com.github.runningforlife.photosniffer.service.ImageRetrieveService"/>
+
+        <service android:name=".service.LockScreenUpdateService"
+            android:exported="false"/>
 
         <receiver android:name=".ui.receiver.WallpaperAlarmReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.github.runningforlife.AUTO_WALLPAPER"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>

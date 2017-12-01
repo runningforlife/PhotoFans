@@ -19,6 +19,7 @@ import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
+import com.github.runningforlife.photosniffer.service.LockScreenUpdateService;
 import com.github.runningforlife.photosniffer.service.MyThreadFactory;
 import com.github.runningforlife.photosniffer.utils.BitmapUtil;
 import com.github.runningforlife.photosniffer.utils.DisplayUtil;
@@ -50,7 +51,6 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
         final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 
         boolean isAutoWallpaper = sp.getBoolean(context.getString(R.string.pref_automatic_wallpaper), true);
-        boolean isAutoLockScreen = sp.getBoolean(context.getString(R.string.pref_enable_auto_lockscreen_wallpaper), true);
 
         if(ALARM_AUTO_WALLPAPER.equals(action) && isAutoWallpaper){
             MyThreadFactory.getInstance().newThread(new Runnable() {
@@ -63,15 +63,12 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
                     }
                 }
             }).start();
-        }else if(Intent.ACTION_SCREEN_ON.equals(action) && isAutoLockScreen){
-            MyThreadFactory.getInstance().newThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(Build.VERSION.SDK_INT >= 24) {
-                                setWallpaper(WallpaperManager.FLAG_LOCK);
-                            }
-                        }
-                    }).start();
+        }else if(action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_LOCKED_BOOT_COMPLETED)){
+            if(Build.VERSION.SDK_INT >= 24){
+                // start wallpaper service
+                Intent intent1 = new Intent(context, LockScreenUpdateService.class);
+                context.startService(intent1);
+            }
         }
     }
 

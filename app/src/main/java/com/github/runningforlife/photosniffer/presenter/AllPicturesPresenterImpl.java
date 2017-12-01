@@ -488,7 +488,7 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
         mView.onImageSaveDone(path);
     }
 
-    private void setWallpaper(String url){
+    private void setWallpaper(final String url){
         if(TextUtils.isEmpty(url)) return;
 
         GlideLoaderListener listener = new GlideLoaderListener(null);
@@ -505,6 +505,8 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
                             wpm.setBitmap((Bitmap)o);
                         }
                         mView.onWallpaperSetDone(true);
+                        // mark it as wallpaper
+                        mRealmMgr.setWallpaper(url);
                     } catch (IOException e) {
                         mView.onWallpaperSetDone(false);
                         e.printStackTrace();
