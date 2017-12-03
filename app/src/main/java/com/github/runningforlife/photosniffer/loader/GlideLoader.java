@@ -40,17 +40,28 @@ public class GlideLoader {
              .listener(listener)
              .centerCrop()
              .crossFade()
+             .thumbnail((float)0.3)
              .into(w,h);
     }
 
     public static void downloadOnly(Context context, String url, RequestListener<String,Bitmap> listener,
-                                    Priority priority, int w, int h){
-        Glide.with(context)
-                .load(url)
-                .asBitmap()
-                .priority(priority)
-                .listener(listener)
-                .into(w,h);
+                                    Priority priority, int w, int h, boolean isWallpaper){
+        if (isWallpaper) {
+            Glide.with(context)
+                    .load(url)
+                    .asBitmap()
+                    .centerCrop()
+                    .priority(priority)
+                    .listener(listener)
+                    .into(w, h);
+        } else {
+            Glide.with(context)
+                    .load(url)
+                    .asBitmap()
+                    .priority(priority)
+                    .listener(listener)
+                    .into(w, h);
+        }
     }
 
     public static void pauseRequest(Context context){

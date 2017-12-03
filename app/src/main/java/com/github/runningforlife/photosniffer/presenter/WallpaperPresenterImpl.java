@@ -91,15 +91,8 @@ public class WallpaperPresenterImpl implements WallpaperPresenter{
             });
 
             String imgUrl = mWallpaper.get(pos).getUrl();
-            if (imgUrl.endsWith(ImageSource.POLA_IMAGE_END)) {
-                final String newUrl = imgUrl.substring(0, imgUrl.lastIndexOf("/") + 1) +
-                        ImageSource.POLA_FULL_IMAGE_END;
-                GlideLoader.downloadOnly(mContext, newUrl, listener, Priority.HIGH,
-                        Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
-            } else {
-                GlideLoader.downloadOnly(mContext, imgUrl, listener,Priority.HIGH,
-                        Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
-            }
+            GlideLoader.downloadOnly(mContext, imgUrl, listener,Priority.HIGH,
+                    Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
         }
     }
 
@@ -153,7 +146,7 @@ public class WallpaperPresenterImpl implements WallpaperPresenter{
         setWallpaper(url);
     }
 
-    private void setWallpaper(String url){
+    private void setWallpaper(String url) {
         if(TextUtils.isEmpty(url)) return;
 
         GlideLoaderListener listener = new GlideLoaderListener(null);
@@ -180,6 +173,6 @@ public class WallpaperPresenterImpl implements WallpaperPresenter{
             }
         });
         GlideLoader.downloadOnly(mContext, url, listener, Priority.HIGH,
-                Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+                dm.widthPixels , dm.heightPixels, true);
     }
 }

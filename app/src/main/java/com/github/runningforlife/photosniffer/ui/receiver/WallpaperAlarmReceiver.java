@@ -42,6 +42,8 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
     public static final String ALARM_AUTO_WALLPAPER = "com.github.runningforlife.AUTO_WALLPAPER";
 
     private static AtomicInteger sWallpaperCount = new AtomicInteger(0);
+    private static final DisplayMetrics dm = DisplayUtil.getScreenDimen();
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -76,13 +78,18 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
         Log.v(TAG,"setWallpaper()");
         Realm rm = Realm.getDefaultInstance();
         try {
-            RealmResults<ImageRealm> wallpaper = rm.where(ImageRealm.class)
+            RealmQuery<ImageRealm> query = rm.where(ImageRealm.class);
+            RealmResults<ImageRealm> wallpaper = query
                     .equalTo("mIsWallpaper", true)
                     .or()
                     .equalTo("mIsFavor", true)
-                    .or()
-                    .equalTo("mIsUsed", true)
                     .findAll();
+            if(wallpaper.size() <= 0){
+                wallpaper = query
+                        .or()
+                        .equalTo("mIsUsed", true)
+                        .findAll();
+            }
 
             if (wallpaper.size() <= 0) return;
 
@@ -98,34 +105,24 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
                     if (o instanceof Bitmap) {
                         // check bitmap size
                         Bitmap bm = (Bitmap)o;
-                        final DisplayMetrics dm = DisplayUtil.getScreenDimen();
-                        if(bm.getWidth() > dm.widthPixels && bm.getHeight() > dm.heightPixels) {
-                            WallpaperManager wpm = WallpaperManager.getInstance(context);
-                            try {
-                                if (Build.VERSION.SDK_INT >= 24 && flag != -1) {
-                                    wpm.setBitmap(bm, null, true, flag);
-                                } else {
-                                    wpm.setBitmap(bm);
-                                }
-                            } catch (IOException e) {
-                                //mView.onWallpaperSetDone(false);
-                                e.printStackTrace();
+                        WallpaperManager wpm = WallpaperManager.getInstance(context);
+                        try {
+                            if (Build.VERSION.SDK_INT >= 24 && flag != -1) {
+                                wpm.setBitmap(bm, null, true, flag);
+                            } else {
+                                wpm.setBitmap(bm);
                             }
+                        } catch (IOException e) {
+                            //mView.onWallpaperSetDone(false);
+                            e.printStackTrace();
                         }
                     }
                 }
             });
 
             String imgUrl = wallpaper.get(pos).getUrl();
-            if(imgUrl.endsWith(ImageSource.POLA_IMAGE_END)){
-                final String newUrl = imgUrl.substring(0, imgUrl.lastIndexOf("/")+1) +
-                        ImageSource.POLA_FULL_IMAGE_END;
-                GlideLoader.downloadOnly(context, newUrl, listener, Priority.IMMEDIATE,
-                        Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
-            }else {
-                GlideLoader.downloadOnly(context, imgUrl, listener, Priority.IMMEDIATE,
-                        Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
-            }
+            GlideLoader.downloadOnly(context, imgUrl, listener, Priority.IMMEDIATE,
+                    dm.widthPixels, dm.heightPixels, true);
         } finally {
             rm.close();
         }

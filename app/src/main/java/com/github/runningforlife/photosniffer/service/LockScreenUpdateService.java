@@ -50,8 +50,9 @@ public class LockScreenUpdateService extends Service {
     private static AtomicInteger sWallpaperCount = new AtomicInteger(0);
 
     private LockScreenWallpaperReceiver mReceiver;
-    // bitmap pool
-    private LruBitmapPool mBitmapPool;
+
+    private static final DisplayMetrics dm = DisplayUtil.getScreenDimen();
+
 
     @Override
     public void onCreate(){
@@ -66,11 +67,6 @@ public class LockScreenUpdateService extends Service {
 
         mReceiver = new LockScreenWallpaperReceiver(handler);
         registerReceiver(mReceiver, intentFilter);
-
-        int maxMemSize = (int) (getAvailableMemorySize()/16);
-        final Set<Bitmap.Config> config = new HashSet<>();
-        config.add(Bitmap.Config.RGB_565);
-        mBitmapPool = new LruBitmapPool(maxMemSize, config);
     }
 
     @Override
@@ -94,15 +90,8 @@ public class LockScreenUpdateService extends Service {
         return null;
     }
 
-    private long getAvailableMemorySize(){
-        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
-        ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        am.getMemoryInfo(memoryInfo);
-
-        return memoryInfo.availMem;
-    }
-
-    private void setWallpaper(final int flag){
+    @TargetApi(24)
+    private void setWallpaper(){
 
         Realm realm = Realm.getDefaultInstance();
         try {
@@ -116,10 +105,12 @@ public class LockScreenUpdateService extends Service {
             if (wallpaper.size() <= 0) return;
 
             Log.v(TAG, "setWallpaper()");
-
             final int pos = sWallpaperCount.getAndIncrement()%wallpaper.size();
             String imgUrl = wallpaper.get(pos).getUrl();
-            cacheNextWallpaper(imgUrl, true);
+
+            cacheNextWallpaper(imgUrl, false);
+
+
         }finally {
             realm.close();
         }
@@ -141,28 +132,24 @@ public class LockScreenUpdateService extends Service {
         }
     }
 
-    //FIXME: since it takes a little long time to download image,
     // it'd better to cache some images previously
+    // 1. network may have problems, so we need cache
+    // 2. use cache images to speed up
     private void cacheNextWallpaper(String imgUrl, final boolean isFirstTime){
         Log.v(TAG,"cacheNextWallpaper()");
-        // keep bitmap pool clean
-        //mBitmapPool.clearMemory();
-
         GlideLoaderListener listener = new GlideLoaderListener(null);
         listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
             @Override
             public void onImageLoadDone(Object o) {
                 Log.d(TAG, "onImageLoadDone()");
-                if(o instanceof Bitmap){
-                    if(isFirstTime){
-                        setScreenLockWallpaper((Bitmap)o, WallpaperManager.FLAG_LOCK);
-                    }
+                if (o instanceof Bitmap) {
+                    setScreenLockWallpaper((Bitmap)o, WallpaperManager.FLAG_LOCK);
                 }
             }
         });
 
         GlideLoader.downloadOnly(getApplicationContext(), imgUrl, listener, Priority.IMMEDIATE,
-                Loader.DEFAULT_IMG_WIDTH, (int) (Loader.DEFAULT_IMG_WIDTH*DisplayUtil.getScreenRatio()));
+                dm.widthPixels, dm.heightPixels, true);
     }
 
     private final class H extends  Handler{
@@ -174,8 +161,8 @@ public class LockScreenUpdateService extends Service {
         @TargetApi(24)
         @Override
         public void handleMessage(Message message){
-            if(message.what == EVENT_SET_LOCK_SCREEN_WALLPAPER){
-                setWallpaper(WallpaperManager.FLAG_LOCK);
+            if (message.what == EVENT_SET_LOCK_SCREEN_WALLPAPER) {
+                setWallpaper();
             }
         }
     }

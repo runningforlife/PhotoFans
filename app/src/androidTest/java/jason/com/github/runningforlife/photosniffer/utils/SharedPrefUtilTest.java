@@ -56,4 +56,16 @@ public class SharedPrefUtilTest {
         assertNotEquals("checking max reserved images number",val,101);
     }
 
+    @Test
+    public void testAutoWallpaperInterval(){
+        String key = context.getString(R.string.pref_auto_wallpaper_interval);
+        assertNotNull("checking auto wallpaper interval", key);
+
+        String value = SharedPrefUtil.getString(key, "100");
+        assertNotEquals("auto wallpaper should not equal to 100", value, 100);
+
+        int val = SharedPrefUtil.getInt(key, 1000);
+        assertEquals("auto wallpaper should be a string value", val, 1000);
+    }
+
 }

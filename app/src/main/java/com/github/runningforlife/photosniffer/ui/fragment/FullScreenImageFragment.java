@@ -127,7 +127,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
             GlideLoaderListener listener = new GlideLoaderListener(imageView);
             listener.setScaleType(ImageView.ScaleType.FIT_CENTER);
             GlideLoader.downloadOnly(getContext(), url, listener, Priority.IMMEDIATE,
-                    Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+                    Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
         }
 
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -216,7 +216,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
                 }
             });
             GlideLoader.downloadOnly(getContext(), url, listener,
-                    Priority.HIGH,Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+                    Priority.HIGH,Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
         }
     }
 
@@ -242,7 +242,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
                 }
             });
             GlideLoader.downloadOnly(getContext(), url, listener,
-                    Priority.HIGH,Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+                    Priority.HIGH,Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, true);
         }
     }
 

@@ -86,7 +86,7 @@ public class FavorImagePresenterImpl implements FavorImagePresenter{
             }
         });
         GlideLoader.downloadOnly(mContext, mFavorList.get(pos).getUrl(), listener,
-                Priority.HIGH,DEFAULT_WIDTH, DEFAULT_HEIGHT);
+                Priority.HIGH,DEFAULT_WIDTH, DEFAULT_HEIGHT, false);
     }
 
     @Override
@@ -180,6 +180,6 @@ public class FavorImagePresenterImpl implements FavorImagePresenter{
             }
         });
         GlideLoader.downloadOnly(mContext, url, listener, Priority.HIGH,
-                Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+                dm.widthPixels, dm.heightPixels, true);
     }
 }

@@ -27,7 +27,7 @@
         android:dialogTitle="@string/set_auto_wallpaper_interval"
         android:entries="@array/auto_wallpaper_interval"
         android:entryValues="@array/auto_wallpaper_interval_values"
-        android:defaultValue="@integer/auto_wallpaper_default_interval">
+        android:defaultValue="@string/auto_wallpaper_default_interval">
     </ListPreference>
 
     <com.github.runningforlife.photosniffer.ui.preference.EmptyListPreference

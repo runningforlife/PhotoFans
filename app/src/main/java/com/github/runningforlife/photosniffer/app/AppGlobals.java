@@ -130,6 +130,8 @@ public class AppGlobals extends Application{
                 return file;
             } catch (IOException e1) {
                 e1.printStackTrace();
+            } catch (SecurityException se){
+                se.printStackTrace();
             }
         }
 
@@ -137,7 +139,8 @@ public class AppGlobals extends Application{
     }
 
     private void saveLog(Throwable t){
-        new Thread(new FileSaveRunnable(getLogFile(),t))
+        File file = getLogFile();
+        new Thread(new FileSaveRunnable(file, t))
                 .start();
     }
 

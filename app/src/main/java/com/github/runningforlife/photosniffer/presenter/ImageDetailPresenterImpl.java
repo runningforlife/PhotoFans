@@ -91,7 +91,7 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
             }
         });
         GlideLoader.downloadOnly(mContext, mImgList.get(pos).getUrl(), listener,
-                Priority.HIGH,Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+                Priority.HIGH,Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
     }
 
     @Override
@@ -136,7 +136,7 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
             }
         });
         GlideLoader.downloadOnly(mContext, mImgList.get(pos).getUrl(), listener,
-                Priority.HIGH,Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+                Priority.HIGH, dm.widthPixels, dm.heightPixels, true);
     }
 
     @Override

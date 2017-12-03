@@ -216,15 +216,8 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
             });
 
             String imgUrl = mImgList.get(pos).getUrl();
-            if(imgUrl.endsWith(ImageSource.POLA_IMAGE_END)){
-                final String newUrl = imgUrl.substring(0, imgUrl.lastIndexOf("/")+1) +
-                        ImageSource.POLA_FULL_IMAGE_END;
-                GlideLoader.downloadOnly(mContext, newUrl, listener, Priority.HIGH,
-                        Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
-            }else {
-                GlideLoader.downloadOnly(mContext, imgUrl, listener, Priority.HIGH,
-                        Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
-            }
+            GlideLoader.downloadOnly(mContext, imgUrl, listener, Priority.HIGH,
+                    Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
         }
     }
 
@@ -517,7 +510,7 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
             }
         });
         GlideLoader.downloadOnly(mContext, url, listener, Priority.HIGH,
-                Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+                dm.widthPixels, dm.heightPixels, true);
     }
 
     private final class  H extends Handler{

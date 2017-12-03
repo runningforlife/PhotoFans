@@ -2,5 +2,4 @@
 <resources>
     <integer name="max_reserved_image_number">300</integer>
     <integer name="dialog_dismiss_count_down">3000</integer>
-    <integer name="auto_wallpaper_default_interval">30000</integer>
 </resources>
