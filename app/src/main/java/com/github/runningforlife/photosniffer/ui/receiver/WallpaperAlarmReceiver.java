@@ -75,7 +75,7 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
     }
 
     private void setWallpaper(final int flag){
-        Log.v(TAG,"setWallpaper()");
+        Log.v(TAG,"setWallpaperAtPos()");
         Realm rm = Realm.getDefaultInstance();
         try {
             RealmQuery<ImageRealm> query = rm.where(ImageRealm.class);

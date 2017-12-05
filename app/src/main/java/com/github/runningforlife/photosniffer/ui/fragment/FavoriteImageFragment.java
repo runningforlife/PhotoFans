@@ -19,6 +19,7 @@ import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.presenter.FavorImagePresenter;
 import com.github.runningforlife.photosniffer.presenter.FavorImagePresenterImpl;
+import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.FavorPictureView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
@@ -40,7 +41,7 @@ public class FavoriteImageFragment extends BaseFragment
     @BindView(R.id.rcv_img_list) RecyclerView mRcvFavorList;
     @BindView(R.id.refresh) SwipeRefreshLayout mSrlRefresh;
     GalleryAdapter mAdapter;
-    private FavorImagePresenter mPresenter;
+    private FavorImagePresenterImpl mPresenter;
 
     private List<String> mUserActionList;
     private int mCurrentPos;
@@ -149,13 +150,16 @@ public class FavoriteImageFragment extends BaseFragment
     }
 
     @Override
-    public void onDataSetRangeChange(int start, int count) {
-        Log.v(TAG,"onDataSetRangeChange()");
-        if(start == 0 && count > 0){
-            mAdapter.notifyItemRangeInserted(start, count);
-        }else if(start >= 0 && count < 0){
-            mAdapter.notifyItemRangeRemoved(start, (-1)*count);
-        }else{
+    public void onDataSetChange(int start, int end, RealmOp op) {
+        Log.v(TAG,"onDataSetChange()");
+        if (op == RealmOp.OP_INSERT) {
+            mAdapter.notifyItemRangeInserted(start,  end - start);
+            mRcvFavorList.smoothScrollToPosition(0);
+        } else if (op == RealmOp.OP_DELETE) {
+            mAdapter.notifyItemRangeRemoved(start, end - start);
+        } else if (op == RealmOp.OP_MODIFY) {
+            mAdapter.notifyItemRangeChanged(start, end - start);
+        } else {
             mAdapter.notifyDataSetChanged();
         }
     }

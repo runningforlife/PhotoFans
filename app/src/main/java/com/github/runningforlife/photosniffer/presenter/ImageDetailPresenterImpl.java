@@ -3,23 +3,21 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
-import com.github.runningforlife.photosniffer.data.local.RealmManager;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import io.realm.Sort;
 
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,49 +25,39 @@ import java.util.concurrent.Executors;
  * Created by jason on 4/6/17.
  */
 
-public class ImageDetailPresenterImpl implements ImageDetailPresenter {
+public class ImageDetailPresenterImpl extends PresenterBase implements ImageDetailPresenter {
     private static final String TAG = "ImageDetailPresenter";
 
     private Context mContext;
-    private RealmResults<ImageRealm> mImgList;
-    private ImageDetailView mView;
-    private RealmManager mRealmMgr;
+    //private ImageDetailView mView;
     private ExecutorService mExecutor;
-    private UpdateOp mOp;
-    private int mLastRemovePos;
 
 
     public ImageDetailPresenterImpl(Context context, ImageDetailView view){
+        super(view);
         mContext = context;
-        mView = view;
-        mRealmMgr = RealmManager.getInstance();
+        //mView = view;
         mExecutor = Executors.newSingleThreadExecutor();
-
-        mOp = UpdateOp.OP_NONE;
-        mLastRemovePos = -1;
-        //mImgList = new SortedList<ImageRealm>(ImageRealm.class, new SortedListCallback());
     }
 
     @Override
     public ImageRealm getItemAtPos(int pos) {
-        return mImgList.get(pos);
+        return mImageList.get(pos);
     }
 
     @Override
     public int getItemCount() {
-        if(mImgList == null) return 0;
+        if(mImageList == null) return 0;
 
-        return mImgList.size();
+        return mImageList.size();
     }
 
     @Override
     public void removeItemAtPos(int pos) {
         Log.d(TAG,"removeItemAtPos()");
-        if(pos >= 0 && pos < mImgList.size()) {
-            mRealmMgr.delete(mImgList.get(pos));
+        if(pos >= 0 && pos < mImageList.size()) {
+            mRealmMgr.delete(mImageList.get(pos));
         }
-        mOp = UpdateOp.OP_DELETE;
-        mLastRemovePos = pos;
     }
 
     @Override
@@ -82,15 +70,15 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
             public void onImageLoadDone(Object o) {
                 Log.d(TAG,"onImageLoadDone()");
                 if(o instanceof Bitmap) {
-                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mImgList.get(pos).getName());
+                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mImageList.get(pos).getName());
                     r.addCallback(ImageDetailPresenterImpl.this);
                     mExecutor.submit(r);
                 }else{
-                    mView.onImageSaveDone(null);
+                    ((ImageDetailView)mView).onImageSaveDone(null);
                 }
             }
         });
-        GlideLoader.downloadOnly(mContext, mImgList.get(pos).getUrl(), listener,
+        GlideLoader.downloadOnly(mContext, mImageList.get(pos).getUrl(), listener,
                 Priority.HIGH,Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
     }
 
@@ -100,16 +88,15 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
         Realm r = Realm.getDefaultInstance();
         r.beginTransaction();
 
-        ImageRealm favor = mImgList.get(pos);
+        ImageRealm favor = mImageList.get(pos);
         favor.setIsFavor(true);
 
         r.commitTransaction();
     }
 
     @Override
-    public void setWallpaper(final int pos) {
-        Log.v(TAG,"setWallpaper(): pos = " + pos);
-        mOp = UpdateOp.OP_MODIFY;
+    public void setWallpaperAtPos(final int pos) {
+        Log.v(TAG,"setWallpaperAtPos(): pos = " + pos);
         GlideLoaderListener listener = new GlideLoaderListener(null);
         listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
             @Override
@@ -118,24 +105,21 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
                 if(o instanceof Bitmap) {
                     WallpaperManager wpm =  WallpaperManager.getInstance(mContext);
                     try {
-                        if(Build.VERSION.SDK_INT >= 24) {
-                            wpm.setBitmap((Bitmap) o, null, false, WallpaperManager.FLAG_LOCK | WallpaperManager.FLAG_SYSTEM);
-                        }else{
-                            wpm.setBitmap((Bitmap)o);
-                        }
-                        mView.onWallpaperSetDone(true);
-                        // mark it as wall paper
-                        mRealmMgr.setWallpaper(mImgList.get(pos).getUrl());
+                        wpm.setBitmap((Bitmap)o);
+                        ((ImageDetailView)mView).onWallpaperSetDone(true);
+
+                        markAsWallpaper(mImageList.get(pos).getUrl());
+                        //mRealmMgr.setWallpaper(mImageList.get(pos).getUrl());
                     } catch (IOException e) {
-                        mView.onWallpaperSetDone(false);
+                        ((ImageDetailView)mView).onWallpaperSetDone(false);
                         e.printStackTrace();
                     }
                 }else{
-                    mView.onWallpaperSetDone(false);
+                    ((ImageDetailView)mView).onWallpaperSetDone(false);
                 }
             }
         });
-        GlideLoader.downloadOnly(mContext, mImgList.get(pos).getUrl(), listener,
+        GlideLoader.downloadOnly(mContext, mImageList.get(pos).getUrl(), listener,
                 Priority.HIGH, dm.widthPixels, dm.heightPixels, true);
     }
 
@@ -146,36 +130,29 @@ public class ImageDetailPresenterImpl implements ImageDetailPresenter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onStart() {
         Log.v(TAG,"onStart()");
-        mRealmMgr.addUsedDataChangeListener(this);
+
+        HashMap<String,String> params = new HashMap<>();
+        params.put("mIsUsed", Boolean.toString(true));
+        params.put("mIsFavor", Boolean.toString(false));
+        params.put("mIsWallpaper", Boolean.toString(false));
+        mImageList = (RealmResults<ImageRealm>) mRealmApi.queryAsync(ImageRealm.class, params);
+        mImageList.addChangeListener(mOrderRealmChangeListener);
+        //mRealmMgr.addUsedDataChangeListener(this);
     }
 
     @Override
     public void onDestroy() {
-        mRealmMgr.removeUsedDataChangeListener(this);
+        //mRealmMgr.removeUsedDataChangeListener(this);
         mRealmMgr.onDestroy();
     }
 
-    @Override
-    public void onUsedDataChange(RealmResults<ImageRealm> data) {
-        Log.v(TAG,"onUsedDataChange(): data size = " + data.size());
-
-        data.sort("mTimeStamp", Sort.DESCENDING);
-
-        if(mImgList == null){
-            mImgList = data;
-            mView.onDataSetRangeChange(0, mImgList.size());
-        }else if(mOp == UpdateOp.OP_DELETE){
-            mView.onDataSetRangeChange(mLastRemovePos, -1);
-        }else if(mOp == UpdateOp.OP_MODIFY){
-            mView.onDataSetRangeChange(0,0);
-        }
-    }
 
     @Override
     public void onImageSaveDone(String path) {
         Log.d(TAG,"onImageSaveDone()");
-        mView.onImageSaveDone(path);
+        ((ImageDetailView)mView).onImageSaveDone(path);
     }
 }

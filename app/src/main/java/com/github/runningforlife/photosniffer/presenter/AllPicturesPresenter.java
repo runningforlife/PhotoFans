@@ -8,8 +8,7 @@ import com.github.runningforlife.photosniffer.data.local.RealmManager;
  * a gallery presenter used to load photo list
  */
 
-public interface AllPicturesPresenter extends Presenter,
-        RealmManager.UsedDataChangeListener, RealmManager.UnusedDataChangeListener {
+public interface AllPicturesPresenter {
     /*
      * refresh data(download from network asynchrously)
      */
@@ -18,8 +17,6 @@ public interface AllPicturesPresenter extends Presenter,
     void refreshAnyway();
 
     void setWebView(WebView webView);
-
-    void setWallpaperAtPos(int pos);
 
     void favorImageAtPos(int pos);
 }

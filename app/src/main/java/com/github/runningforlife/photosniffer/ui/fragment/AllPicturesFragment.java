@@ -24,6 +24,7 @@ import android.webkit.WebView;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.presenter.AllPicturesPresenter;
 import com.github.runningforlife.photosniffer.presenter.AllPicturesPresenterImpl;
+import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.AllPictureView;
 import com.github.runningforlife.photosniffer.ui.activity.ImageDetailActivity;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
@@ -47,7 +48,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
     @BindView(R.id.rcv_gallery) RecyclerView mRvImgList;
     @BindView(R.id.srl_refresh) SwipeRefreshLayout mRefresher;
     @BindView(R.id.wv_page) WebView mWvPage;
-    private AllPicturesPresenter mPresenter;
+    private AllPicturesPresenterImpl mPresenter;
     private GalleryAdapter mAdapter;
 
     public static Fragment newInstance(){
@@ -166,18 +167,17 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
     }
 
     @Override
-    public void onDataSetRangeChange(int start, int count) {
-        Log.v(TAG,"onDataSetRangeChange(): start=" + start + ", count=" + count);
-        if(mRvImgList.getAdapter() == null){
-            mRvImgList.setAdapter(mAdapter);
-        }
-        if(start == 0 && count > 0){
-            mAdapter.notifyItemRangeInserted(0, count);
+    public void onDataSetChange(int start, int len, RealmOp op) {
+        Log.v(TAG,"onDataSetChange(): op = " + op);
+        if (op == RealmOp.OP_INSERT) {
+            mAdapter.notifyItemRangeInserted(start,  len);
+            mRvImgList.scrollToPosition(0);
             mRvImgList.smoothScrollToPosition(0);
-        // one item is removed
-        }else if(start >= 0 && count < 0){
-            mAdapter.notifyItemRangeRemoved(start, (-1)*count);
-        }else {
+        } else if (op == RealmOp.OP_DELETE) {
+            mAdapter.notifyItemRangeRemoved(start, len);
+        } else if (op == RealmOp.OP_MODIFY) {
+            mAdapter.notifyItemRangeChanged(start, len);
+        } else {
             mAdapter.notifyDataSetChanged();
         }
     }

@@ -1,5 +1,7 @@
 package com.github.runningforlife.photosniffer.ui;
 
+import com.github.runningforlife.photosniffer.presenter.RealmOp;
+
 /**
  * a UI interface to be used in presenter
  *
@@ -8,7 +10,7 @@ package com.github.runningforlife.photosniffer.ui;
 
 public interface UI {
     /**
-     * the range of data set is changed
+     * on data change
      */
-    void onDataSetRangeChange(int start, int count);
+    void onDataSetChange(int start, int end, RealmOp op);
 }

@@ -30,6 +30,7 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenter;
 import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl;
+import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
 
 import butterknife.BindView;
@@ -64,7 +65,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     @BindView(R.id.cpv_load) CircularProgressView mCpvLoad;
 
     private ImagePagerAdapter mPagerAdapter;
-    private ImageDetailPresenter mPresenter;
+    private ImageDetailPresenterImpl mPresenter;
     private PreviewAdapter mAdapter;
     private int mCurrentImgIdx;
     private ActionBar mActionBar;
@@ -170,23 +171,24 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     @Override
-    public void onDataSetRangeChange(int start, int count) {
-        Log.v(TAG,"onDataSetRangeChange()");
-        if(mImgPager.getAdapter() == null) {
+    public void onDataSetChange(int start, int len, RealmOp op) {
+        Log.v(TAG, "onDataSetChange(): op=" + op);
+        if (mImgPager.getAdapter() == null) {
             mImgPager.setAdapter(mPagerAdapter);
             mLvImgPreview.setAdapter(mAdapter);
         }
-        if(start == 0 && count > 0){
-            mPagerAdapter.notifyDataSetChanged();
-            mAdapter.notifyItemRangeInserted(0, count);
-        // item deleted
-        }else if(start >= 0 && count < 0){
-            mPagerAdapter.notifyDataSetChanged();
-            mAdapter.notifyItemRangeRemoved(start, (-1)*count);
-        }else{
-            mPagerAdapter.notifyDataSetChanged();
+
+        if (op == RealmOp.OP_INSERT) {
+            mAdapter.notifyItemRangeInserted(start, len);
+        } else if (op == RealmOp.OP_DELETE) {
+            mAdapter.notifyItemRangeRemoved(start, len);
+        } else if (op == RealmOp.OP_MODIFY) {
+            mAdapter.notifyItemRangeChanged(start, len);
+        } else {
             mAdapter.notifyDataSetChanged();
         }
+
+        mPagerAdapter.notifyDataSetChanged();
         // current index is changed
         mImgPager.setCurrentItem(mCurrentImgIdx);
         mLvImgPreview.smoothScrollToPosition(mCurrentImgIdx);
@@ -478,8 +480,8 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     private void setWallpaper(int pos){
-        Log.v(TAG,"setWallpaper()");
-        mPresenter.setWallpaper(pos);
+        Log.v(TAG,"setWallpaperAtPos()");
+        mPresenter.setWallpaperAtPos(pos);
     }
 
     private class EventHandler extends Handler{

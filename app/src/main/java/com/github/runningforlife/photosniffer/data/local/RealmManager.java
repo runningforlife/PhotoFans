@@ -1,15 +1,16 @@
-package com.github.runningforlife.photosniffer.model;
+package com.github.runningforlife.photosniffer.data.local;
 
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
+import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.presenter.LifeCycle;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
@@ -35,7 +36,7 @@ public class RealmManager implements LifeCycle{
     private RealmResults<ImageRealm> mAllFavor;
     private RealmResults<ImageRealm> mAllWallpaper;
 
-    // callback to listen realm changes: update or query complete
+    // callback to listen realm changes: updateAsync or query complete
     private List<UsedDataChangeListener> mUsedChangeListener;
     private List<UnusedDataChangeListener> mUnusedChangeListener;
     private List<FavorDataChangeListener> mFavorChangeListener;
@@ -47,7 +48,6 @@ public class RealmManager implements LifeCycle{
     private RealmAsyncTask mAsyncTask;
     // remove item lock
     private final Object mRemoveLock = new Object();
-    private BlockingDeque<RemoveItemTransaction> mRemovedQue;
 
     public interface UsedDataChangeListener{
         void onUsedDataChange(RealmResults<ImageRealm> data);
@@ -215,6 +215,32 @@ public class RealmManager implements LifeCycle{
         }
     }
 
+    public void insertSync(final List<? extends RealmObject> data) {
+        Log.v(TAG,"insertSync()");
+        if(data == null || data.size() == 0) return;
+
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.insertOrUpdate(data);
+            }
+        });
+    }
+
+    public void insertAsync(final List<? extends RealmObject> data) {
+        Log.v(TAG,"insertAsync()");
+        if (data == null || data.size() == 0) return;
+
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.insertOrUpdate(data);
+            }
+        });
+    }
+
     public void saveImageRealmAsync(final List<ImageRealm> data){
         Log.v(TAG,"saveImageRealmAsync()");
         if(data == null || data.size() <= 0) return;
@@ -283,10 +309,9 @@ public class RealmManager implements LifeCycle{
         return visited;
     }
 
-    public static RealmResults<ImagePageInfo> getAllUnvisitedImagePages(Realm r){
+    public static RealmResults<ImagePageInfo> getAllUnvisitedImagePages(Realm r) {
         RealmResults<ImagePageInfo> unVisited = r.where(ImagePageInfo.class)
                 .equalTo("mIsVisited",false)
-                .isNotNull("mUrl")
                 .findAll();
 
         return unVisited;

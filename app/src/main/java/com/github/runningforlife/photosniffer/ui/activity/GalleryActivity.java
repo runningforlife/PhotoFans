@@ -38,6 +38,7 @@ import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,6 +49,8 @@ public class GalleryActivity extends BaseActivity
 
     private static final String TAG = "GalleryActivity";
     final static int MY_STORAGE_PERMISSION_REQUEST = 100;
+
+    private AtomicBoolean mHintFragmentAdded;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
 
@@ -74,6 +77,7 @@ public class GalleryActivity extends BaseActivity
 
         initView();
 
+        mHintFragmentAdded = new AtomicBoolean(false);
         //initPresenter();
 
         drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
@@ -111,7 +115,7 @@ public class GalleryActivity extends BaseActivity
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    // tell user how to start retrieve images
+                    // tell user how to start retrieveImages images
                     showImageRetrieveHint();
                 }
             }, 1000);
@@ -298,13 +302,13 @@ public class GalleryActivity extends BaseActivity
         }
     }
 
-    private void showImageRetrieveHint(){
+    private void showImageRetrieveHint() {
         Log.v(TAG,"showImageRetrieveHint(): isNewUser = ");
         FragmentManager fm = getSupportFragmentManager();
 
         RetrieveHintFragment fragment = (RetrieveHintFragment)
                 fm.findFragmentByTag(RetrieveHintFragment.TAG);
-        if (fragment == null) {
+        if (fragment == null && mHintFragmentAdded.compareAndSet(false, true)) {
             fragment = (RetrieveHintFragment) RetrieveHintFragment.newInstance();
 
             FragmentTransaction ft = fm.beginTransaction();

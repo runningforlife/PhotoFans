@@ -10,12 +10,12 @@ import android.util.Log;
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
-import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.data.local.RealmManager;
 import com.github.runningforlife.photosniffer.ui.FavorPictureView;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,53 +25,45 @@ import io.realm.RealmResults;
  * presenter to get favor image list
  */
 
-public class FavorImagePresenterImpl implements FavorImagePresenter{
+public class FavorImagePresenterImpl extends PresenterBase implements FavorImagePresenter {
     private static final String TAG = "FavorImagePresenter";
-    private FavorPictureView mView;
     private Context mContext;
-    private RealmManager mRealmMgr;
-    private RealmResults<ImageRealm> mFavorList;
     private ExecutorService mExecutor;
     private boolean mIsRefreshing;
-    private UpdateOp mOp;
     private int mLastRemovedPos = -1;
 
     public FavorImagePresenterImpl(Context context, FavorPictureView view){
+        super(view);
         mContext = context;
-        mView = view;
-        mRealmMgr = RealmManager.getInstance();
         mExecutor = Executors.newSingleThreadExecutor();
         mIsRefreshing = false;
-
-        mOp = UpdateOp.OP_NONE;
     }
 
     @Override
     public int getItemCount() {
-        if(mFavorList == null) return 0;
+        if(mImageList == null) return 0;
 
-        return mFavorList.size();
+        return mImageList.size();
     }
 
     @Override
     public ImageRealm getItemAtPos(int pos) {
-        if(mFavorList == null) return null;
+        if(mImageList == null) return null;
 
-        return mFavorList.get(pos);
+        return mImageList.get(pos);
     }
 
     @Override
     public void removeItemAtPos(int pos) {
-        if(pos >= 0 && pos <= mFavorList.size()) {
-            mRealmMgr.delete(mFavorList.get(pos));
+        if(pos >= 0 && pos <= mImageList.size()) {
+            mRealmMgr.delete(mImageList.get(pos));
             mLastRemovedPos = pos;
-            mOp = UpdateOp.OP_DELETE;
         }
     }
 
     @Override
     public void saveImageAtPos(final int pos) {
-        if(pos < 0 || pos >= mFavorList.size()) return;
+        if(pos < 0 || pos >= mImageList.size()) return;
 
         GlideLoaderListener listener = new GlideLoaderListener(null);
         listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
@@ -79,13 +71,13 @@ public class FavorImagePresenterImpl implements FavorImagePresenter{
             public void onImageLoadDone(Object o) {
                 Log.d(TAG,"onImageLoadDone()");
                 if(o instanceof Bitmap) {
-                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mFavorList.get(pos).getName());
+                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mImageList.get(pos).getName());
                     r.addCallback(FavorImagePresenterImpl.this);
                     mExecutor.submit(r);
                 }
             }
         });
-        GlideLoader.downloadOnly(mContext, mFavorList.get(pos).getUrl(), listener,
+        GlideLoader.downloadOnly(mContext, mImageList.get(pos).getUrl(), listener,
                 Priority.HIGH,DEFAULT_WIDTH, DEFAULT_HEIGHT, false);
     }
 
@@ -93,16 +85,16 @@ public class FavorImagePresenterImpl implements FavorImagePresenter{
     public void refresh() {
         Log.v(TAG,"refresh()");
         mIsRefreshing = true;
-        mRealmMgr.queryAllAsync();
-        mRealmMgr.addFavorDataChangeListener(this);
+        //mRealmMgr.queryAllAsync();
+        //mRealmMgr.addFavorDataChangeListener(this);
 
     }
 
     @Override
     public void setWallpaperAtPos(int pos) {
         Log.v(TAG,"setWallpaperAtPos()");
-        if(pos >= 0 && pos < mFavorList.size()) {
-            setWallpaper(mFavorList.get(pos).getUrl());
+        if(pos >= 0 && pos < mImageList.size()) {
+            setWallpaper(mImageList.get(pos).getUrl());
         }
     }
 
@@ -115,42 +107,29 @@ public class FavorImagePresenterImpl implements FavorImagePresenter{
     }
 
     @Override
-    public void onFavorDataChange(RealmResults<ImageRealm> data) {
-        Log.v(TAG,"onFavorDataChange(): data size = " + data.size());
-
-        if(mFavorList == null){
-            mFavorList = data;
-            mView.onDataSetRangeChange(0, mFavorList.size());
-        }else if(mOp == UpdateOp.OP_DELETE){
-            mView.onDataSetRangeChange(mLastRemovedPos, -1);
-            mLastRemovedPos = -1;
-        } else {
-            // nothing happened
-            mView.onDataSetRangeChange(0, 0);
-        }
-
-        if(mIsRefreshing && mView != null){
-            mView.onRefreshDone(true);
-            mIsRefreshing = false;
-        }
-    }
-
-    @Override
     public void onImageSaveDone(String path) {
         Log.v(TAG,"onImageSaveDone()");
-        mView.onImageSaveDone(path);
+        ((FavorPictureView)mView).onImageSaveDone(path);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onStart() {
         Log.v(TAG,"onStart()");
-        mRealmMgr.addFavorDataChangeListener(this);
+
+        HashMap<String,String> params = new HashMap<>();
+        params.put("mIsUsed", Boolean.toString(true));
+        params.put("mIsFavor", Boolean.toString(true));
+        params.put("mIsWallpaper", Boolean.toString(false));
+        mImageList = (RealmResults<ImageRealm>) mRealmApi.queryAsync(ImageRealm.class, params);
+        mImageList.addChangeListener(mOrderRealmChangeListener);
+        //mRealmMgr.addFavorDataChangeListener(this);
     }
 
     @Override
     public void onDestroy() {
         mRealmMgr.onDestroy();
-        mRealmMgr.removeFavorDataChangeListener(this);
+        //mRealmMgr.removeFavorDataChangeListener(this);
     }
 
     private void setWallpaper(String url){
@@ -164,22 +143,20 @@ public class FavorImagePresenterImpl implements FavorImagePresenter{
                 if(o instanceof Bitmap) {
                     WallpaperManager wpm = WallpaperManager.getInstance(mContext);
                     try {
-                        if(Build.VERSION.SDK_INT >= 24) {
-                            wpm.setBitmap((Bitmap) o, null, false, WallpaperManager.FLAG_LOCK | WallpaperManager.FLAG_SYSTEM);
-                        }else{
-                            wpm.setBitmap((Bitmap)o);
-                        }
-                        mView.onWallpaperSetDone(true);
+                        wpm.setBitmap((Bitmap)o);
+                        ((FavorPictureView)mView).onWallpaperSetDone(true);
                     } catch (IOException e) {
-                        mView.onWallpaperSetDone(false);
+                        ((FavorPictureView)mView).onWallpaperSetDone(false);
                         e.printStackTrace();
                     }
                 }else{
-                    mView.onWallpaperSetDone(false);
+                    ((FavorPictureView)mView).onWallpaperSetDone(false);
                 }
             }
         });
         GlideLoader.downloadOnly(mContext, url, listener, Priority.HIGH,
                 dm.widthPixels, dm.heightPixels, true);
+
+        markAsWallpaper(url);
     }
 }

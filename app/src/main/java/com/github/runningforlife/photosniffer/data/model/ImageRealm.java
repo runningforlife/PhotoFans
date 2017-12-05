@@ -78,7 +78,7 @@ public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
 
     @Override
     public boolean equals(Object o){
-        if(! (o instanceof  ImageRealm)){
+        if (!(o instanceof  ImageRealm)) {
             return false;
         }
 

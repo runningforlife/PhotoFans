@@ -6,8 +6,7 @@ import com.github.runningforlife.photosniffer.data.local.RealmManager;
  * a presenter to show the detail of the image
  */
 
-public interface ImageDetailPresenter extends Presenter,
-        RealmManager.UsedDataChangeListener{
+public interface ImageDetailPresenter {
     /*
      * favor image at pos
      */
@@ -16,6 +15,6 @@ public interface ImageDetailPresenter extends Presenter,
     /*
      * set wallpaper
      */
-    void setWallpaper(int pos);
+    void setWallpaperAtPos(int pos);
 
 }

@@ -104,7 +104,7 @@ public class LockScreenUpdateService extends Service {
                     .findAll();
             if (wallpaper.size() <= 0) return;
 
-            Log.v(TAG, "setWallpaper()");
+            Log.v(TAG, "setWallpaperAtPos()");
             final int pos = sWallpaperCount.getAndIncrement()%wallpaper.size();
             String imgUrl = wallpaper.get(pos).getUrl();
 

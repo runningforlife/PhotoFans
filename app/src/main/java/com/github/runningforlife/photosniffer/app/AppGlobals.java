@@ -227,7 +227,7 @@ public class AppGlobals extends Application{
         }
     }
 
-    // start lock screen update service
+    // start lock screen updateAsync service
     private void startLockScreenUpdater(){
         Log.v(TAG,"startLockScreenUpdater()");
         if(Build.VERSION.SDK_INT >= 24){

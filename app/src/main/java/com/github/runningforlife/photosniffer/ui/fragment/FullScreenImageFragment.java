@@ -221,7 +221,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
     }
 
     private void setWallpaper(){
-        Log.v(TAG,"setWallpaper()");
+        Log.v(TAG,"setWallpaperAtPos()");
         final String url = getArguments().getString(IMAGE_URL);
         if(!TextUtils.isEmpty(url)){
             GlideLoaderListener listener = new GlideLoaderListener(null);

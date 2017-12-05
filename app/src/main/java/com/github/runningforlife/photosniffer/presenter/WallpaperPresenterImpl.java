@@ -8,7 +8,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
-import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
@@ -17,6 +16,7 @@ import com.github.runningforlife.photosniffer.data.local.RealmManager;
 import com.github.runningforlife.photosniffer.ui.WallpaperView;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -26,26 +26,17 @@ import io.realm.RealmResults;
  * wallpaper presenter to get UI data
  */
 
-public class WallpaperPresenterImpl implements WallpaperPresenter{
+public class WallpaperPresenterImpl extends PresenterBase implements WallpaperPresenter{
     private static final String TAG = "WallpaperPresenter";
     private Context mContext;
-    private WallpaperView mView;
-    private RealmManager mRealmMgr;
-    private RealmResults<ImageRealm> mWallpaper;
     private ExecutorService mExecutor;
-    private UpdateOp mOp;
     private int mLastRemovedPos = -1;
 
-    public WallpaperPresenterImpl(Context context){
+    public WallpaperPresenterImpl(Context context, WallpaperView view){
+        super(view);
         mContext = context;
         mRealmMgr = RealmManager.getInstance();
         mExecutor = Executors.newSingleThreadExecutor();
-        mOp = UpdateOp.OP_DELETE;
-    }
-
-    @Override
-    public void setView(WallpaperView view){
-        mView = view;
     }
 
     @Override
@@ -56,80 +47,69 @@ public class WallpaperPresenterImpl implements WallpaperPresenter{
 
     @Override
     public int getItemCount() {
-        return mWallpaper.size();
+        return mImageList.size();
     }
 
     @Override
     public ImageRealm getItemAtPos(int pos) {
-        return mWallpaper.get(pos);
+        return mImageList.get(pos);
     }
 
     @Override
     public void removeItemAtPos(int pos) {
-        if(pos >= 0 && pos <= mWallpaper.size()) {
-            mRealmMgr.delete(mWallpaper.get(pos));
+        if(pos >= 0 && pos <= mImageList.size()) {
+            mRealmMgr.delete(mImageList.get(pos));
             mLastRemovedPos = pos;
-            mOp = UpdateOp.OP_DELETE;
         }
     }
 
     @Override
     public void saveImageAtPos(final int pos) {
-        if (pos >= 0 && pos < mWallpaper.size()) {
-            mOp = UpdateOp.OP_MODIFY;
+        if (pos >= 0 && pos < mImageList.size()) {
             GlideLoaderListener listener = new GlideLoaderListener(null);
             listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
                 @Override
                 public void onImageLoadDone(Object o) {
                     Log.d(TAG, "onImageLoadDone()");
                     if(o instanceof Bitmap) {
-                        ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mWallpaper.get(pos).getName());
+                        ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mImageList.get(pos).getName());
                         r.addCallback(WallpaperPresenterImpl.this);
                         mExecutor.submit(r);
                     }
                 }
             });
 
-            String imgUrl = mWallpaper.get(pos).getUrl();
+            String imgUrl = mImageList.get(pos).getUrl();
             GlideLoader.downloadOnly(mContext, imgUrl, listener,Priority.HIGH,
                     Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
         }
     }
 
     @Override
-    public void onWallpaperDataChange(RealmResults<ImageRealm> data) {
-        Log.v(TAG,"onWallpaperDataChange()");
-
-        if(mWallpaper == null){
-            mWallpaper = data;
-            mView.onDataSetRangeChange(0, mWallpaper.size());
-        }else if(mOp == UpdateOp.OP_DELETE){
-            mView.onDataSetRangeChange(mLastRemovedPos, -1);
-        }else {
-            // nothing happened
-            mView.onDataSetRangeChange(0, 0);
-        }
-
-        mView.onRefreshDone(true);
-    }
-
-    @Override
     public void onImageSaveDone(String path) {
         Log.v(TAG,"onImageSaveDone()");
-        mView.onImageSaveDone(path);
+        ((WallpaperView)mView).onImageSaveDone(path);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onStart() {
         Log.v(TAG,"onStart()");
-        mRealmMgr.addWallpaperDataChangeListener(this);
+
+        HashMap<String,String> params = new HashMap<>();
+        params.put("mIsUsed", Boolean.toString(true));
+        params.put("mIsFavor", Boolean.toString(false));
+        params.put("mIsWallpaper", Boolean.toString(true));
+        mImageList = (RealmResults<ImageRealm>) mRealmApi.queryAsync(ImageRealm.class, params);
+        mImageList.addChangeListener(mOrderRealmChangeListener);
+        //mRealmMgr.addWallpaperDataChangeListener(this);
     }
 
     @Override
     public void onDestroy() {
         mRealmMgr.onDestroy();
 
-        mRealmMgr.removeWallpaperDataChangeListener(this);
+        //mRealmMgr.removeWallpaperDataChangeListener(this);
     }
 
     @Override
@@ -141,7 +121,7 @@ public class WallpaperPresenterImpl implements WallpaperPresenter{
     public void setWallpaperAtPos(int pos) {
         if(pos < 0) return;
 
-        String url = mWallpaper.get(pos).getUrl();
+        String url = mImageList.get(pos).getUrl();
 
         setWallpaper(url);
     }
@@ -154,21 +134,17 @@ public class WallpaperPresenterImpl implements WallpaperPresenter{
             @Override
             public void onImageLoadDone(Object o) {
                 Log.d(TAG,"onImageLoadDone()");
-                if(o instanceof Bitmap) {
+                if (o instanceof Bitmap) {
                     WallpaperManager wpm = WallpaperManager.getInstance(mContext);
                     try {
-                        if(Build.VERSION.SDK_INT >= 24) {
-                            wpm.setBitmap((Bitmap) o, null, false, WallpaperManager.FLAG_LOCK | WallpaperManager.FLAG_SYSTEM);
-                        }else{
-                            wpm.setBitmap((Bitmap)o);
-                        }
-                        mView.onWallpaperSetDone(true);
+                        wpm.setBitmap((Bitmap)o);
+                        ((WallpaperView)mView).onWallpaperSetDone(true);
                     } catch (IOException e) {
-                        mView.onWallpaperSetDone(false);
+                        ((WallpaperView)mView).onWallpaperSetDone(false);
                         e.printStackTrace();
                     }
-                }else{
-                    mView.onWallpaperSetDone(false);
+                } else {
+                    ((WallpaperView)mView).onWallpaperSetDone(false);
                 }
             }
         });

@@ -4,8 +4,8 @@
 
     <string-array name="image_website_url">
         <item>http://www.polayoutu.com</item>
-        <item>http://en.freejpg.com.ar</item>
         <item>https://www.pexels.com</item>
+        <item>http://en.freejpg.com.ar</item>
         <item>https://visualhunt.com</item>
         <item>https://pixabay.com</item>
         <item>http://www.vcg.com</item>
@@ -13,8 +13,8 @@
 
     <string-array name="image_website_name">
         <item>Pola Youtu</item>
-        <item>Free JPG</item>
         <item>Pexels</item>
+        <item>Free JPG</item>
         <item>Visual Hunt</item>
         <item>Pixabay</item>
         <item>Visual China</item>
@@ -22,7 +22,7 @@
 
     <string-array name="default_source_url">
         <item>http://www.polayoutu.com</item>
-        <item>http://en.freejpg.com.ar</item>
+        <item>https://www.pexels.com</item>
     </string-array>
 
     <string-array name="auto_wallpaper_interval">

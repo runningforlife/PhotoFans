@@ -21,7 +21,7 @@ public class FullScreenImageActivity extends BaseActivity {
     private static final String TAG = "FullScreenActivity";
 
     @Override
-    public void onCreate(Bundle savedState){
+    public void onCreate(Bundle savedState) {
         super.onCreate(savedState);
         setContentView(R.layout.activity_fullscreen_image);
 

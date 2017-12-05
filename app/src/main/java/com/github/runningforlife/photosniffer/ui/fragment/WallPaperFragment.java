@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 
+import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.presenter.WallpaperPresenter;
 import com.github.runningforlife.photosniffer.presenter.WallpaperPresenterImpl;
 import com.github.runningforlife.photosniffer.ui.WallpaperView;
@@ -39,7 +40,7 @@ public class WallPaperFragment extends BaseFragment
     RecyclerView mRcvWallpaper;
 
     private GalleryAdapter mAdapter;
-    private WallpaperPresenter mPresenter;
+    private WallpaperPresenterImpl mPresenter;
 
     public static WallPaperFragment newInstance(){
         return new WallPaperFragment();
@@ -114,16 +115,16 @@ public class WallPaperFragment extends BaseFragment
     }
 
     @Override
-    public void onDataSetRangeChange(int start, int count) {
-        Log.v(TAG,"onDataSetRangeChange()");
-        if(mRcvWallpaper.getAdapter() == null){
-            mRcvWallpaper.setAdapter(mAdapter);
-        }
-        if(start == 0 && count > 0){
-            mAdapter.notifyItemRangeInserted(start, count);
-        }else if(start >= 0 && count < 0){
-            mAdapter.notifyItemRangeRemoved(start, (-1)*count);
-        }else{
+    public void onDataSetChange(int start, int end, RealmOp op) {
+        Log.v(TAG,"onDataSetChange()");
+        if (op == RealmOp.OP_INSERT) {
+            mAdapter.notifyItemRangeInserted(start,  end - start);
+            mRcvWallpaper.smoothScrollToPosition(0);
+        } else if (op == RealmOp.OP_DELETE) {
+            mAdapter.notifyItemRangeRemoved(start, end - start);
+        } else if (op == RealmOp.OP_MODIFY) {
+            mAdapter.notifyItemRangeChanged(start, end - start);
+        } else {
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -208,8 +209,7 @@ public class WallPaperFragment extends BaseFragment
     }
 
     private void initPresenter(){
-        mPresenter = new WallpaperPresenterImpl(getContext());
-        mPresenter.setView(this);
+        mPresenter = new WallpaperPresenterImpl(getContext(), this);
         mPresenter.init();
         mPresenter.onStart();
     }

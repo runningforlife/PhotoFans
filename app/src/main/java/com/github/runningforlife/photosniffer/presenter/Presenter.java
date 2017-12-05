@@ -7,7 +7,7 @@ import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 import io.realm.RealmObject;
 
 /**
- * a presenter to do interactions with UI and update database
+ * a presenter to do interactions with UI and updateAsync database
  *
  * @author JasonWang
  * @since 1.0
@@ -44,4 +44,9 @@ interface Presenter extends ImageSaveRunnable.ImageSaveCallback, LifeCycle {
      * save bitmap at pos
      */
     void saveImageAtPos(int pos);
+
+    /**
+     * set wallpaper at pos
+     */
+    void setWallpaperAtPos(int pos);
 }

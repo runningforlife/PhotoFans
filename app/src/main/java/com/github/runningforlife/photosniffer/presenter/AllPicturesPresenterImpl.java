@@ -23,18 +23,18 @@ import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
-import com.github.runningforlife.photosniffer.data.local.RealmManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
-import io.realm.Sort;
 
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.service.ImageRetrieveService;
@@ -48,73 +48,65 @@ import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 /**
  * a presenter to bridge UI and data repository
  */
-public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResultReceiver.Receiver{
+public class AllPicturesPresenterImpl extends PresenterBase
+        implements AllPicturesPresenter,SimpleResultReceiver.Receiver{
     private static final String TAG = "AllPicturesPresenter";
 
     private static final int DEFAULT_RETRIEVE_TIME_OUT = 20*1000;
     private static final int DEFAULT_STOP_TIME_OUT = 40*1000;
     private static final int DEFAULT_RETRIEVED_IMAGES = 10;
-    // update Pola collections every 15days
-    private static final long POLA_UPDATED_DURATION = TimeUnit.DAYS.toMillis(10);
+    // updateAsync Pola collections every 7days
+    private static final long POLA_UPDATED_DURATION = TimeUnit.DAYS.toMillis(8);
     // current latest pola
-    private static final int LATEST_POLA_COUNT = 60;
+    private static final int LATEST_POLA_COUNT = 73;
 
     private Context mContext;
     private AllPictureView mView;
     private RealmResults<ImageRealm> mUnUsedImages;
-    private RealmResults<ImageRealm> mImgList;
-    //private SortedList<ImageRealm> mImgList;
     // whether user is refreshing data
     private boolean mIsRefreshing;
     // to receive result from service
     private SimpleResultReceiver mReceiver;
-    private RealmManager mRealmMgr;
     private ExecutorService mExecutor;
     private H mMainHandler;
     private WebView mWvPage;
     // last removed position
     private int mLastRemovePos;
-    private UpdateOp mOp;
+    private RealmOp mOp;
 
     @SuppressWarnings("unchecked")
-    public AllPicturesPresenterImpl(Context context, AllPictureView view){
+    public AllPicturesPresenterImpl(Context context, AllPictureView view) {
+        super(view);
         mView = view;
         mContext = context;
-        mRealmMgr = RealmManager.getInstance();
         // realm only allow one transaction a time
         mExecutor = Executors.newSingleThreadExecutor();
 
         mMainHandler = new H(Looper.myLooper());
 
-        //mImgList = new SortedList<ImageRealm>(ImageRealm.class, new SortedListCallback());
-
-        mOp = UpdateOp.OP_NONE;
+        mOp = RealmOp.OP_NONE;
     }
 
     @Override
     public void refresh() {
         Log.v(TAG,"refresh()");
-        if(!MiscUtil.isConnected(mContext)){
+        if (!MiscUtil.isConnected(mContext)) {
             mView.onNetworkDisconnect();
-        }else if(MiscUtil.isMobileConnected(mContext)
+        } else if (MiscUtil.isMobileConnected(mContext)
                 && SharedPrefUtil.isWifiOnlyDownloadMode(mContext)) {
             mView.onMobileConnected();
-        }else{
+        } else {
             refreshAnyway();
         }
     }
 
     @Override
-    public void refreshAnyway(){
+    public void refreshAnyway() {
         Log.v(TAG,"refreshAnyway()");
         // add operation
-        mOp = UpdateOp.OP_ADD;
-        // in case of no callback
-        mRealmMgr.addUsedDataChangeListener(this);
+        loadPolaPageIfNeeded();
 
-        stopRetrieveIfNeeded();
-
-        if(mUnUsedImages == null || mUnUsedImages.size() < DEFAULT_RETRIEVED_IMAGES) {
+        if(mUnUsedImages == null || mUnUsedImages.size() < 3*DEFAULT_RETRIEVED_IMAGES) {
             startCrawlerSilent(false);
             // timeout message
             Message msg = mMainHandler.obtainMessage(H.EVENT_RETRIEVE_TIME_OUT);
@@ -124,19 +116,13 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
             mMainHandler.sendMessageDelayed(msg1, DEFAULT_STOP_TIME_OUT);
         }
 
-        loadPolaPageIfNeeded();
-
-        if(mUnUsedImages != null && mUnUsedImages.size() > 0) {
-            // notify
-            if(mUnUsedImages.size() >= DEFAULT_RETRIEVED_IMAGES){
+        if (mUnUsedImages != null && mUnUsedImages.size() > 0) {
+            if(mUnUsedImages.size() >= DEFAULT_RETRIEVED_IMAGES) {
                 mIsRefreshing = false;
                 mView.onRefreshDone(true);
             }
-            // add unused to the list
-            mRealmMgr.markUnusedRealm(DEFAULT_RETRIEVED_IMAGES);
-            // silent crawling pictures
-            //startCrawlerSilent(true);
-        }else if(!mIsRefreshing){
+            markUnUsedRealm(DEFAULT_RETRIEVED_IMAGES);
+        } else if (!mIsRefreshing) {
             // ah, something wrong
             mView.onRefreshDone(false);
         }
@@ -147,7 +133,6 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
         mWvPage = webView;
         if(mWvPage != null){
             WebSettings settings = mWvPage.getSettings();
-            //settings.setJavaScriptEnabled(true);
             settings.setDomStorageEnabled(true);
             settings.setAllowContentAccess(true);
         }
@@ -156,9 +141,8 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
     @Override
     public void setWallpaperAtPos(int pos) {
         Log.v(TAG,"setWallpaperAtPos()");
-
-        if(pos >= 0 && pos < mImgList.size()){
-            setWallpaper(mImgList.get(pos).getUrl());
+        if (pos >= 0 && pos < mImageList.size()) {
+            setWallpaper(mImageList.get(pos).getUrl());
         }
     }
 
@@ -169,7 +153,7 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
 
-        ImageRealm item = mImgList.get(pos);
+        ImageRealm item = mImageList.get(pos);
         item.setIsFavor(true);
 
         realm.commitTransaction();
@@ -177,53 +161,72 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
 
     @Override
     public int getItemCount() {
-        if(mImgList == null) return 0;
+        if(mImageList == null) return 0;
 
-        return mImgList.size();
+        return mImageList.size();
     }
 
     @Override
     public ImageRealm getItemAtPos(int pos) {
-        if(mImgList == null) return null;
+        if(mImageList == null) return null;
 
-        return mImgList.get(pos);
+        return mImageList.get(pos);
     }
 
     @Override
     public void removeItemAtPos(int pos) {
         Log.v(TAG,"removeItemAtPos(): position = " + pos);
-        if(mImgList == null || pos < 0) return;
+        if(mImageList == null || pos < 0) return;
 
-        mOp = UpdateOp.OP_DELETE;
-        mRealmMgr.delete(mImgList.get(pos));
+        mOp = RealmOp.OP_DELETE;
+        mRealmMgr.delete(mImageList.get(pos));
     }
 
     @Override
     public void saveImageAtPos(final int pos) {
         Log.v(TAG,"saveImageAtPos(): pos = " + pos);
-        if(pos >= 0 && pos < mImgList.size()) {
+        if(pos >= 0 && pos < mImageList.size()) {
             GlideLoaderListener listener = new GlideLoaderListener(null);
             listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
                 @Override
                 public void onImageLoadDone(Object o) {
                     Log.d(TAG,"onImageLoadDone()");
                     if(o instanceof Bitmap) {
-                        ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mImgList.get(pos).getName());
+                        ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mImageList.get(pos).getName());
                         r.addCallback(AllPicturesPresenterImpl.this);
                         mExecutor.submit(r);
                     }
                 }
             });
 
-            String imgUrl = mImgList.get(pos).getUrl();
+            String imgUrl = mImageList.get(pos).getUrl();
             GlideLoader.downloadOnly(mContext, imgUrl, listener, Priority.HIGH,
                     Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void init() {
         Log.v(TAG,"init()");
+
+        HashMap<String,String> params = new HashMap<>();
+        params.put("mIsUsed", Boolean.toString(true));
+        params.put("mIsFavor", Boolean.toString(false));
+        params.put("mIsWallpaper", Boolean.toString(false));
+        mImageList = (RealmResults<ImageRealm>) mRealmApi.queryAsync(ImageRealm.class, params);
+        mImageList.addChangeListener(mOrderRealmChangeListener);
+
+        HashMap<String, String> unUsedParams = new HashMap<>();
+        unUsedParams.put("mIsUsed", Boolean.toString(false));
+        mUnUsedImages = (RealmResults<ImageRealm>) mRealmApi.queryAsync(ImageRealm.class, unUsedParams);
+        mUnUsedImages.addChangeListener(new RealmChangeListener<RealmResults<ImageRealm>>() {
+            @Override
+            public void onChange(RealmResults<ImageRealm> element) {
+                Log.v(TAG,"onChange():size=" + element.size());
+            }
+        });
+
         mIsRefreshing = false;
         //mRealmMgr.addListener(this);
         mReceiver = new SimpleResultReceiver(new Handler(Looper.myLooper()));
@@ -235,20 +238,16 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
     @Override
     public void onStart() {
         Log.v(TAG,"onStart()");
-        if(mImgList == null || mImgList.size() <= 0) {
-            mRealmMgr.onStart();
+        if(mImageList == null || mImageList.size() <= 0) {
+/*            mRealmMgr.onStart();
             mRealmMgr.addUsedDataChangeListener(this);
-            mRealmMgr.addUnusedDataChangeListener(this);
+            mRealmMgr.addUnusedDataChangeListener(this);*/
         }
     }
 
     @Override
     public void onDestroy() {
         Log.v(TAG,"onDestroy()");
-        //releaseWakeLock();
-
-        mRealmMgr.removeUsedDataChangeListener(this);
-        mRealmMgr.removeUnusedDataChangeListener(this);
         //mView = null;
         mRealmMgr.onDestroy();
         // stop service
@@ -262,62 +261,20 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
     }
 
     @Override
-    public void onUsedDataChange(RealmResults<ImageRealm> data) {
-        Log.v(TAG,"onUsedDataChange(): data size = " + data.size());
-
-        //sort(data);
-        if(mImgList != null){
-            sort(mImgList);
-        }
-
-        if(mImgList == null){
-            mImgList = data;
-            mView.onDataSetRangeChange(0, mImgList.size());
-        }else if(mOp == UpdateOp.OP_ADD){
-            mView.onDataSetRangeChange(0, DEFAULT_RETRIEVED_IMAGES);
-        }else if(mOp == UpdateOp.OP_DELETE){
-            mView.onDataSetRangeChange(mLastRemovePos, -1);
-        }else if(mOp == UpdateOp.OP_BATCH_DELETE){
-            String key = mContext.getString(R.string.pref_max_reserved_images);
-            int maxReservedImage = Integer.parseInt(SharedPrefUtil.getString(key, "300"));
-            mView.onDataSetRangeChange(maxReservedImage, maxReservedImage - mImgList.size());
-        }
-
-        mOp = UpdateOp.OP_NONE;
-
-        int currentImgSize = mImgList.size();
-        Log.d(TAG,"onUsedDataChange(): current size=" + currentImgSize);
-
-        String key = mContext.getString(R.string.pref_max_reserved_images);
-        int maxReservedImage = Integer.parseInt(SharedPrefUtil.getString(key, "500"));
-        int diff = data.size() - maxReservedImage;
-        if(diff > 0){
-            mOp = UpdateOp.OP_BATCH_DELETE;
-            mRealmMgr.trimData(maxReservedImage);
-        }
-    }
-
-    @Override
-    public void onUnusedDataChange(RealmResults<ImageRealm> data) {
-        Log.v(TAG, "onUnusedDataChange(): unused url size = " + data.size());
-        mUnUsedImages = data;
-    }
-
-    @Override
     public void onReceiveResult(int resultCode, Bundle data) {
-        switch (resultCode){
+        switch (resultCode) {
             case ServiceStatus.RUNNING:
-                Log.v(TAG,"image retrieve starting");
+                Log.v(TAG,"image retrieveImages starting");
                 break;
             case ServiceStatus.ERROR:
-                if(mIsRefreshing) {
+                if (mIsRefreshing) {
                     mView.onRefreshDone(false);
                     mIsRefreshing = false;
                 }
                 break;
             case ServiceStatus.SUCCESS:
-                Log.v(TAG,"image retrieve success");
-                if(mIsRefreshing) {
+                Log.v(TAG,"image retrieveImages success");
+                if (mIsRefreshing) {
                     mView.onRefreshDone(true);
                 }
                 mIsRefreshing = false;
@@ -326,8 +283,17 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
         }
     }
 
-    private void sort(RealmResults<ImageRealm> data){
-        data.sort("mTimeStamp", Sort.DESCENDING);
+    private void markUnUsedRealm(int num) {
+        Log.v(TAG,"markUnUsedRealm()");
+        List<ImageRealm> marked = new ArrayList<>(num);
+        for (int i = 0; i < num && i < mUnUsedImages.size(); ++i) {
+            ImageRealm ir = mUnUsedImages.get(i);
+            marked.add(ir);
+        }
+        // updateAsync
+        final HashMap<String, String> updated = new HashMap<>();
+        updated.put("mIsUsed", Boolean.toString(true));
+        mRealmApi.updateSync(ImageRealm.class, marked, updated);
     }
 
     private void stopRetrieveIfNeeded(){
@@ -351,7 +317,6 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
 
     // using webview to load pola youtu
     private void loadPolaPageIfNeeded(){
-        final List<String> webSrc = SharedPrefUtil.getImageSource();
         String polaUrl = ImageSource.URL_POLA;
 
         final String key = mContext.getString(R.string.pref_pola_latest_collections_number);
@@ -362,20 +327,19 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
         String keyNewUser = mContext.getString(R.string.pref_new_user);
         boolean isFirstTimeUse = SharedPrefUtil.getBoolean(keyNewUser, true);
 
-        if(webSrc != null && webSrc.contains(polaUrl)
-                && (isFirstTimeUse || now >= lastTime + POLA_UPDATED_DURATION)){
+        if ((isFirstTimeUse || now >= lastTime + POLA_UPDATED_DURATION)) {
             
             SharedPrefUtil.putBoolean(keyNewUser, false);
 
             String polaRetrieved = mContext.getString(R.string.pref_pola_retrieved);
             boolean isPolaRetrieved = SharedPrefUtil.getBoolean(polaRetrieved, false);
-            if(!isPolaRetrieved){
-                saveAllPolaUrls(polaUrl, 1, LATEST_POLA_COUNT);
+            if (!isPolaRetrieved) {
+                saveAllPolaUrls(1, LATEST_POLA_COUNT);
                 SharedPrefUtil.putBoolean(polaRetrieved, true);
                 SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
             }
-            //mWvPage.addJavascriptInterface(new WebViewJsInterface(), "HtmlViewer");
-            mWvPage.setWebViewClient(new WebViewClient(){
+
+            mWvPage.setWebViewClient(new WebViewClient() {
 
                 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 @Override
@@ -401,14 +365,14 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
                         if(collections > current){
                             SharedPrefUtil.putInt(key, collections);
                             current = collections;
-                            saveAllPolaUrls(url, current+1, collections);
+                            saveAllPolaUrls(current+1, collections);
                             SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
                         }
                     }else{
                         if(System.currentTimeMillis() - lastTime >= POLA_UPDATED_DURATION){
                             SharedPrefUtil.putInt(key, current + 1);
                             // save next collections
-                            saveAllPolaUrls(url, current+1, current+1);
+                            saveAllPolaUrls(current+1, current+1);
                             SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
                         }
                     }
@@ -424,7 +388,7 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
         }
     }
 
-    private int getLatestCollectionsNumber(String url){
+    private int getLatestCollectionsNumber(String url) {
         if(TextUtils.isEmpty(url)) return LATEST_POLA_COUNT;
 
         String sub = url.substring(ImageSource.POLA_IMAGE_START.length()+1);
@@ -433,7 +397,7 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
         return Integer.parseInt(splits[0]);
     }
 
-    private void saveAllPolaUrls(final String url, final int start, final int end){
+    private void saveAllPolaUrls(final int start, final int end){
 
         MyThreadFactory.getInstance().newThread(new Runnable() {
             @Override
@@ -458,7 +422,7 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
                     }
                 }
 
-                mRealmMgr.saveImageRealmAsync(pola);
+                mRealmApi.insertAsync(pola);
             }
         }).start();
     }
@@ -489,28 +453,24 @@ public class AllPicturesPresenterImpl implements AllPicturesPresenter,SimpleResu
             @Override
             public void onImageLoadDone(Object o) {
                 Log.d(TAG,"onImageLoadDone()");
-                if(o instanceof Bitmap) {
+                if (o instanceof Bitmap) {
                     WallpaperManager wpm = WallpaperManager.getInstance(mContext);
                     try {
-                        if(Build.VERSION.SDK_INT >= 24) {
-                            wpm.setBitmap((Bitmap) o, null, false, WallpaperManager.FLAG_LOCK | WallpaperManager.FLAG_SYSTEM);
-                        }else{
-                            wpm.setBitmap((Bitmap)o);
-                        }
+                        wpm.setBitmap((Bitmap)o);
                         mView.onWallpaperSetDone(true);
-                        // mark it as wallpaper
-                        mRealmMgr.setWallpaper(url);
                     } catch (IOException e) {
                         mView.onWallpaperSetDone(false);
                         e.printStackTrace();
                     }
-                }else{
+                } else {
                     mView.onWallpaperSetDone(false);
                 }
             }
         });
         GlideLoader.downloadOnly(mContext, url, listener, Priority.HIGH,
                 dm.widthPixels, dm.heightPixels, true);
+
+        markAsWallpaper(url);
     }
 
     private final class  H extends Handler{
