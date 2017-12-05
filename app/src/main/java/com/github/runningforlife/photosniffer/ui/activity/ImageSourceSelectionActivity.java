@@ -71,7 +71,7 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
         editor.putStringSet(key,new HashSet<>(values));
         editor.apply();
 
-        // update database
+        // updateAsync database
         saveImageSource(values);
     }
 
@@ -129,7 +129,7 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
             for (ImagePageInfo p : pages) {
                 allUrls.add(p.getUrl());
             }
-            // whether we should update database
+            // whether we should updateAsync database
             for (String url : src) {
                 if(!allUrls.contains(url)){
                     ImagePageInfo pageInfo = new ImagePageInfo(url);

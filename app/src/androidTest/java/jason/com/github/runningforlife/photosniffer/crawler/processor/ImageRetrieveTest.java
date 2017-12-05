@@ -14,7 +14,7 @@ import us.codecraft.webmagic.Spider;
 import static com.github.runningforlife.photosniffer.crawler.processor.ImageSource.URL_MM;
 
 /**
- * test image retrieve
+ * test image retrieveImages
  */
 
 @RunWith(AndroidJUnit4.class)

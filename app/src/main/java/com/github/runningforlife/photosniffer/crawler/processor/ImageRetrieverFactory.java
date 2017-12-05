@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
 
+import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 
 import org.jsoup.nodes.Document;
@@ -26,7 +27,7 @@ import us.codecraft.webmagic.selector.Html;
  * Created by jason on 4/1/17.
  */
 
-public class ImageRetrieverFactory implements PageRetriever<ImageRealm>,ImageSource{
+public class ImageRetrieverFactory implements PageRetriever,ImageSource{
     private static final String TAG = "RetrieverFactory";
 
     private static Map<String,String> sImgSource = new HashMap<>();
@@ -66,7 +67,7 @@ public class ImageRetrieverFactory implements PageRetriever<ImageRealm>,ImageSou
     }
 
     @Override
-    public List<ImageRealm> retrieve(Page page){
+    public List<ImageRealm> retrieveImages(Page page) {
         if(page == null){
             throw new IllegalArgumentException("page should not be null");
         }
@@ -76,7 +77,7 @@ public class ImageRetrieverFactory implements PageRetriever<ImageRealm>,ImageSou
         try {
             String baseUrl = UrlUtil.getRootUrl(url);
             Log.d(TAG,"retrieved page base url = " + baseUrl);
-            switch (baseUrl){
+            switch (baseUrl) {
                 case URL_FREE_JPG:
                     imgList = retrieve(page,URL_FREE_JPG);
                     break;
@@ -113,9 +114,14 @@ public class ImageRetrieverFactory implements PageRetriever<ImageRealm>,ImageSou
         return imgList;
     }
 
+    @Override
+    public List<ImagePageInfo> retrieveLinks(Page page) {
+        return null;
+    }
+
     private List<ImageRealm> retrieve(Page page,@IMAGE_SOURCE String imgSrc){
-        Log.v(TAG,"retrieve(): page url = " + page.getUrl().get());
-        // here we retrieve all those IMAGE urls
+        Log.v(TAG,"retrieveImages(): page url = " + page.getUrl().get());
+        // here we retrieveImages all those IMAGE urls
         String retrieveReg = sImgSource.get(imgSrc);
         Document doc = page.getHtml().getDocument();
         Elements images = doc.select(retrieveReg);
@@ -190,7 +196,7 @@ public class ImageRetrieverFactory implements PageRetriever<ImageRealm>,ImageSou
         Document doc = html.getDocument();
 
         Elements divs = null;
-        String reg = null; // regression to retrieve images
+        String reg = null; // regression to retrieveImages images
         if(src.equals(URL_MM)) {
             // div whose class name is content
             divs = doc.select("div.content");
@@ -201,7 +207,7 @@ public class ImageRetrieverFactory implements PageRetriever<ImageRealm>,ImageSou
             reg = REG_YOUWU;
         }
 
-        if(divs != null) {
+        if (divs != null) {
             for (Element div : divs) {
                 Elements allImgs = div.select(reg);
                 for (Element img : allImgs) {

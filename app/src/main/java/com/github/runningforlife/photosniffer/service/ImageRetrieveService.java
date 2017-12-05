@@ -22,8 +22,8 @@ import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import us.codecraft.webmagic.Spider;
 
 /**
- *  a service to handle image retrieve request from client
- *  client may want to give a limited number of images to retrieve at a time
+ *  a service to handle image retrieveImages request from client
+ *  client may want to give a limited number of images to retrieveImages at a time
  *
  *  @author JasonWang
  */
@@ -34,10 +34,11 @@ public class ImageRetrieveService extends Service implements
     private static final String TAG = "ImageRetrieveService";
     private volatile Looper mServiceLooper;
     private volatile H mServiceHandler;
+    private boolean mIsRetrieving;
     //private boolean mRedelivery;
     // max number of images to be retrieved a time
     public static final String EXTRA_EXPECTED_IMAGES = "maxImages";
-    private static final int DEFAULT_RETRIEVE_TIME_OUT = 20*1000;
+    private static final int DEFAULT_RETRIEVE_TIME_OUT = 30*1000;
 
     private ResultReceiver mReceiver;
     private ImageRetrievePageProcessor mProcessor;
@@ -48,7 +49,7 @@ public class ImageRetrieveService extends Service implements
     }
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
         Log.d(TAG,"onCreate()");
 
@@ -57,6 +58,8 @@ public class ImageRetrieveService extends Service implements
 
         mServiceLooper = thread.getLooper();
         mServiceHandler = new H(mServiceLooper);
+
+        mIsRetrieving = false;
     }
 
     @Nullable
@@ -72,7 +75,7 @@ public class ImageRetrieveService extends Service implements
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         Log.v(TAG,"onDestroy()");
 
         mProcessor.stopGracefully();
@@ -104,17 +107,20 @@ public class ImageRetrieveService extends Service implements
         clearUp();
     }
 
-    private void start(Intent intent, int startId){
+    private void start(Intent intent, int startId) {
         Log.v(TAG,"start()");
+        if (!mIsRetrieving) {
+            mIsRetrieving = false;
 
-        Message message = mServiceHandler.obtainMessage(H.EVENT_RETRIEVE_START);
-        message.obj = intent;
-        message.arg1 = startId;
-        message.sendToTarget();
+            Message message = mServiceHandler.obtainMessage(H.EVENT_RETRIEVE_START);
+            message.obj = intent;
+            message.arg1 = startId;
+            message.sendToTarget();
 
-        //timeout message
-        Message msg = mServiceHandler.obtainMessage(H.EVENT_RETRIEVE_TIMEOUT);
-        mServiceHandler.sendMessageDelayed(msg, DEFAULT_RETRIEVE_TIME_OUT);
+            //timeout message
+            Message msg = mServiceHandler.obtainMessage(H.EVENT_RETRIEVE_TIMEOUT);
+            mServiceHandler.sendMessageDelayed(msg, DEFAULT_RETRIEVE_TIME_OUT);
+        }
     }
 
     private void handleIntent(Intent intent) {
@@ -127,19 +133,18 @@ public class ImageRetrieveService extends Service implements
         startCrawler(max);
     }
 
-    private void startCrawler(int n){
+    private void startCrawler(int n) {
         Log.i(TAG,"startCrawler(): max images to be retrieved = " + n);
         mProcessor = new ImageRetrievePageProcessor(n);
         mProcessor.addListener(this);
         List<String> lastUrl =  mProcessor.getStartUrl();
-        if(lastUrl.size() <= 0){
+        if (lastUrl.size() <= 0) {
             List<String> defList = SharedPrefUtil.getImageSource();
-            String[] defSource = defList.
-                    toArray(new String[defList.size()]);
+            String[] defSource = defList.toArray(new String[defList.size()]);
             mSpider = Spider.create(mProcessor)
                     .addUrl(defSource)
                     .setDownloader(new OkHttpDownloader());
-        }else{
+        } else {
             mSpider = Spider.create(mProcessor)
                     .addUrl((String[])lastUrl.toArray(new String[lastUrl.size()]))
                     .setDownloader(new OkHttpDownloader());
@@ -148,12 +153,12 @@ public class ImageRetrieveService extends Service implements
         mSpider.run();
     }
 
-    private void handleResult(){
+    private void handleResult() {
         Log.v(TAG,"handleTimeout()");
         sendResult(mProcessor.getRetrievedImageCount());
     }
 
-    private void clearUp(){
+    private void clearUp() {
         mProcessor.removeListener(this);
         if(mSpider.getStatus() == Spider.Status.Running){
             mSpider.stop();
@@ -162,32 +167,32 @@ public class ImageRetrieveService extends Service implements
         stopSelf();
     }
 
-    private void sendResult(int size){
+    private void sendResult(int size) {
         Log.v(TAG,"sendResult(): size = " + size);
 
-        if(size != 0) {
+        if (size != 0) {
             Bundle bundle = new Bundle();
             bundle.putLong("result", size);
             mReceiver.send(ServiceStatus.SUCCESS, bundle);
-        }else{
+        } else {
             mReceiver.send(ServiceStatus.ERROR,null);
         }
     }
 
-    private final class H extends  Handler{
+    private final class H extends  Handler {
         static final int EVENT_RETRIEVE_START = 1;
         static final int EVENT_RETRIEVE_DONE = 2;
         static final int EVENT_RETRIEVE_TIMEOUT = 3;
 
-        H(Looper looper){
+        H (Looper looper) {
             super(looper);
         }
 
         @Override
-        public void handleMessage(Message msg){
+        public void handleMessage(Message msg) {
             int what = msg.what;
 
-            switch (what){
+            switch (what) {
                 case EVENT_RETRIEVE_START:
                     handleIntent((Intent)msg.obj);
                     break;

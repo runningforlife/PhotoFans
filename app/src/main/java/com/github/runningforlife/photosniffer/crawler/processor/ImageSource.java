@@ -6,7 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * source to retrieve images
+ * source to retrieveImages images
  */
 
 public interface ImageSource {
@@ -33,7 +33,7 @@ public interface ImageSource {
     @interface REG_RETRIEVER{}
 
     String REG_FREE_JPG = "img[src$=.jpg]";
-    String REG_PIXELS = "img"; // FIXME: still has problem
+    String REG_PIXELS = "img[src$=\\s[.jpeg]\\s"; // FIXME: still has problem
     String REG_ALBUM = "img";
     String REG_VISUAL_HUNG = "img[src$=.jpg]";
     String REG_PEXBABY = "img[src$=.jpg]";
