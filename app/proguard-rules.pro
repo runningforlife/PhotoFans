@@ -17,7 +17,7 @@
 #}
 -ignorewarnings
 -keep class com.bumptech.glide.integration.okhttp3.OkHttpGlideModule
-#-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public class * implements com.bumptech.glide.module.GlideModule
 -keepnames class com.github.runningforlife.photofans.glide.DiskStorageModule
 # for DexGuard only
 #-keepresourcexmlelements manifest/application/meta-data@value=GlideModule
