@@ -34,7 +34,7 @@ public class MiscUtil {
 
         NetworkInfo ni = cm.getActiveNetworkInfo();
 
-        return ni.isConnected() || ni.isConnectedOrConnecting();
+        return ni.isConnected();
     }
 
     public static boolean isWifiConnected(Context context){

@@ -58,15 +58,11 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
             MyThreadFactory.getInstance().newThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(Build.VERSION.SDK_INT >= 24) {
-                        setWallpaper(WallpaperManager.FLAG_SYSTEM);
-                    }else{
-                        setWallpaper(-1);
-                    }
+                    setWallpaper(-1);
                 }
             }).start();
         }else if(action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_LOCKED_BOOT_COMPLETED)){
-            if(Build.VERSION.SDK_INT >= 24){
+            if (Build.VERSION.SDK_INT >= 24) {
                 // start wallpaper service
                 Intent intent1 = new Intent(context, LockScreenUpdateService.class);
                 context.startService(intent1);
@@ -107,11 +103,7 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
                         Bitmap bm = (Bitmap)o;
                         WallpaperManager wpm = WallpaperManager.getInstance(context);
                         try {
-                            if (Build.VERSION.SDK_INT >= 24 && flag != -1) {
-                                wpm.setBitmap(bm, null, true, flag);
-                            } else {
-                                wpm.setBitmap(bm);
-                            }
+                            wpm.setBitmap(bm);
                         } catch (IOException e) {
                             //mView.onWallpaperSetDone(false);
                             e.printStackTrace();

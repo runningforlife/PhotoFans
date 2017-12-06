@@ -1,7 +1,7 @@
 package com.github.runningforlife.photosniffer.data.model;
 
 /**
- * all user action like : save/share/delete/Favor
+ * all user action like : save/share/deleteSync/Favor
  */
 
 public enum UserAction {

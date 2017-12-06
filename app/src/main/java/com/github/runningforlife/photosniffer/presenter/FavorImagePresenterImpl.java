@@ -25,18 +25,13 @@ import io.realm.RealmResults;
  * presenter to get favor image list
  */
 
-public class FavorImagePresenterImpl extends PresenterBase implements FavorImagePresenter {
+public class FavorImagePresenterImpl extends PresenterBase {
     private static final String TAG = "FavorImagePresenter";
-    private Context mContext;
     private ExecutorService mExecutor;
-    private boolean mIsRefreshing;
-    private int mLastRemovedPos = -1;
 
     public FavorImagePresenterImpl(Context context, FavorPictureView view){
-        super(view);
-        mContext = context;
+        super(context, view);
         mExecutor = Executors.newSingleThreadExecutor();
-        mIsRefreshing = false;
     }
 
     @Override
@@ -56,8 +51,7 @@ public class FavorImagePresenterImpl extends PresenterBase implements FavorImage
     @Override
     public void removeItemAtPos(int pos) {
         if(pos >= 0 && pos <= mImageList.size()) {
-            mRealmMgr.delete(mImageList.get(pos));
-            mLastRemovedPos = pos;
+            mRealmApi.deleteSync(mImageList.get(pos));
         }
     }
 
@@ -82,15 +76,6 @@ public class FavorImagePresenterImpl extends PresenterBase implements FavorImage
     }
 
     @Override
-    public void refresh() {
-        Log.v(TAG,"refresh()");
-        mIsRefreshing = true;
-        //mRealmMgr.queryAllAsync();
-        //mRealmMgr.addFavorDataChangeListener(this);
-
-    }
-
-    @Override
     public void setWallpaperAtPos(int pos) {
         Log.v(TAG,"setWallpaperAtPos()");
         if(pos >= 0 && pos < mImageList.size()) {
@@ -102,8 +87,6 @@ public class FavorImagePresenterImpl extends PresenterBase implements FavorImage
     public void init() {
         Log.v(TAG,"init()");
         // start loading data
-        mRealmMgr.onStart();
-        //mRealmMgr.addFavorDataChangeListener(this);
     }
 
     @Override
@@ -123,40 +106,11 @@ public class FavorImagePresenterImpl extends PresenterBase implements FavorImage
         params.put("mIsWallpaper", Boolean.toString(false));
         mImageList = (RealmResults<ImageRealm>) mRealmApi.queryAsync(ImageRealm.class, params);
         mImageList.addChangeListener(mOrderRealmChangeListener);
-        //mRealmMgr.addFavorDataChangeListener(this);
     }
 
     @Override
     public void onDestroy() {
-        mRealmMgr.onDestroy();
-        //mRealmMgr.removeFavorDataChangeListener(this);
-    }
-
-    private void setWallpaper(String url){
-        if(TextUtils.isEmpty(url)) return;
-
-        GlideLoaderListener listener = new GlideLoaderListener(null);
-        listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
-            @Override
-            public void onImageLoadDone(Object o) {
-                Log.d(TAG,"onImageLoadDone()");
-                if(o instanceof Bitmap) {
-                    WallpaperManager wpm = WallpaperManager.getInstance(mContext);
-                    try {
-                        wpm.setBitmap((Bitmap)o);
-                        ((FavorPictureView)mView).onWallpaperSetDone(true);
-                    } catch (IOException e) {
-                        ((FavorPictureView)mView).onWallpaperSetDone(false);
-                        e.printStackTrace();
-                    }
-                }else{
-                    ((FavorPictureView)mView).onWallpaperSetDone(false);
-                }
-            }
-        });
-        GlideLoader.downloadOnly(mContext, url, listener, Priority.HIGH,
-                dm.widthPixels, dm.heightPixels, true);
-
-        markAsWallpaper(url);
+        Log.v(TAG,"onDestroy()");
+        //mRealmMgr.onDestroy();
     }
 }

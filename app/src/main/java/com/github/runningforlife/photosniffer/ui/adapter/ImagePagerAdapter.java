@@ -22,6 +22,7 @@ import com.github.runningforlife.photosniffer.R;
 
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
+import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,15 +34,23 @@ import static com.github.runningforlife.photosniffer.loader.Loader.*;
  * image pager adapter
  */
 
-public class ImagePagerAdapter extends PagerAdapter{
+public class ImagePagerAdapter extends PagerAdapter {
     public static final String TAG = "ImagePageAdapter";
+
+    // if network error count is larger than 10, network is bad
+    private static final int NETWORK_HUNG_ERROR_COUNT = 8;
+    private static final int NETWORK_SLOW_ERROR_COUNT = 3;
 
     private Context mContext;
     private PageAdapterCallback mCallback;
+    // check network state
+    private int mNetworkErrorCount;
 
     public ImagePagerAdapter(Context context, BaseAdapterCallback callback){
         mCallback = (PageAdapterCallback) callback;
         mContext = context;
+
+        mNetworkErrorCount = 0;
     }
 
     @Override
@@ -116,6 +125,18 @@ public class ImagePagerAdapter extends PagerAdapter{
             Log.v(TAG,"onException(): " + e);
             image.setImageResource(R.drawable.ic_photo_grey_24dp);
             mCallback.onImageLoadDone(pos,false);
+            // check network state
+            if (MiscUtil.isConnected(mContext)) {
+                if(++mNetworkErrorCount >= NETWORK_SLOW_ERROR_COUNT && mNetworkErrorCount < NETWORK_HUNG_ERROR_COUNT) {
+                    mCallback.onNetworkState(NetworkStateCallback.STATE_SLOW);
+                } else if (mNetworkErrorCount > NETWORK_HUNG_ERROR_COUNT) {
+                    mCallback.onNetworkState(NetworkStateCallback.STATE_HUNG);
+                }
+            } else {
+                mCallback.onNetworkState(NetworkStateCallback.STATE_DISCONNECT);
+            }
+
+
             return false;
         }
 

@@ -40,7 +40,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     private static final String TAG = "GalleryAdapter";
 
     // if network error count is larger than 10, network is bad
-    private static final int NETWORK_HUNG_ERROR_COUNT = 15;
+    private static final int NETWORK_HUNG_ERROR_COUNT = 10;
     private static final int NETWORK_SLOW_ERROR_COUNT = 5;
 
     @SuppressWarnings("unchecked")
@@ -103,21 +103,25 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
             if (Loader.PICASSO.equals(mLoader)) {
                 PicassoLoader.load(mContext, new PicassoLoaderListener(vh.img), url,
                         DEFAULT_IMAGE_MEDIUM_WIDTH,DEFAULT_IMAGE_MEDIUM_HEIGHT);
-            }else{
-                //FIXME: some item is loaded very slowly
+            } else {
                 GlideLoaderListener listener = new GlideLoaderListener(vh.img);
                 listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
                     @Override
                     public void onImageLoadDone(Object o) {
                         Log.v(TAG,"onImageLoadDone(): " + o);
                         // 404 or socket time out
-                        if(o instanceof IOException){
-                            // network is slow
-                            ++mNetworkErrorCount;
-                            if(mNetworkErrorCount >= NETWORK_SLOW_ERROR_COUNT){
-                                mCallback.onNetworkState(STATE_SLOW);
-                            }else if(mNetworkErrorCount > NETWORK_HUNG_ERROR_COUNT){
-                                mCallback.onNetworkState(STATE_HUNG);
+                        if (o instanceof IOException) {
+                            //check network state
+                            if (MiscUtil.isConnected(mContext)) {
+                                // network is slow
+                                ++mNetworkErrorCount;
+                                if (mNetworkErrorCount >= NETWORK_SLOW_ERROR_COUNT && mNetworkErrorCount < NETWORK_HUNG_ERROR_COUNT) {
+                                    mCallback.onNetworkState(STATE_SLOW);
+                                } else if (mNetworkErrorCount >= NETWORK_HUNG_ERROR_COUNT) {
+                                    mCallback.onNetworkState(STATE_HUNG);
+                                }
+                            } else {
+                                mCallback.onNetworkState(STATE_DISCONNECT);
                             }
 
                         }

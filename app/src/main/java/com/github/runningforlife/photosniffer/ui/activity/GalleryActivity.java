@@ -55,6 +55,7 @@ public class GalleryActivity extends BaseActivity
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
+    private boolean mIsToastShowing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +79,8 @@ public class GalleryActivity extends BaseActivity
         initView();
 
         mHintFragmentAdded = new AtomicBoolean(false);
+
+        mIsToastShowing = false;
         //initPresenter();
 
         drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
@@ -118,7 +121,7 @@ public class GalleryActivity extends BaseActivity
                     // tell user how to start retrieveImages images
                     showImageRetrieveHint();
                 }
-            }, 1000);
+            }, 3000);
             // set to false when first refresh done
             //SharedPrefUtil.putBoolean(key, false);
             checkStoragePermission();
@@ -201,9 +204,19 @@ public class GalleryActivity extends BaseActivity
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                ToastUtil.showToast(GalleryActivity.this, msg);
+                if(!mIsToastShowing) {
+                    ToastUtil.showToast(GalleryActivity.this, msg);
+                    mIsToastShowing = true;
+                }
             }
         });
+
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mIsToastShowing = false;
+            }
+        }, 3000);
         //ToastUtil.showToast(this, toast);
     }
 

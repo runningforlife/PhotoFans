@@ -191,14 +191,6 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
     }
 
     @Override
-    public void onNetworkState(String state) {
-        Log.v(TAG,"onNetworkState()");
-        if(!state.equals(NetworkStateCallback.STATE_GOOD)){
-            mCallback.showToast(getString(R.string.hint_network_state_slow));
-        }
-    }
-
-    @Override
     public boolean onContextItemSelected(MenuItem item){
         Log.v(TAG,"onContextItemSelected()");
         switch (item.getItemId()){

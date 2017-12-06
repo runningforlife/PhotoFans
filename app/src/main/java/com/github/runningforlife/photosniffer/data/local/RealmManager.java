@@ -343,7 +343,7 @@ public class RealmManager implements LifeCycle{
                         mAllUsed.addChangeListener(mUsedDataChangeListener);
                     }
                 },10);
-        // delete item
+        // deleteSync item
         mAsyncTask = realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {

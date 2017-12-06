@@ -1,10 +1,8 @@
 package com.github.runningforlife.photosniffer.service;
 
 import android.annotation.TargetApi;
-import android.app.ActivityManager;
 import android.app.Service;
 import android.app.WallpaperManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -19,20 +17,13 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
-import com.bumptech.glide.load.engine.bitmap_recycle.LruBitmapPool;
-import com.github.runningforlife.photosniffer.app.AppGlobals;
-import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
-import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.ui.receiver.LockScreenWallpaperReceiver;
-import com.github.runningforlife.photosniffer.utils.BitmapUtil;
 import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
@@ -55,7 +46,7 @@ public class LockScreenUpdateService extends Service {
 
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
 
         HandlerThread ht = new HandlerThread("LockScreenWallpaper");
@@ -70,16 +61,16 @@ public class LockScreenUpdateService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId){
+    public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG,"onStartCommand(): startId = " + startId);
 
         return START_STICKY;
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
-        if(mReceiver != null) {
+        if (mReceiver != null) {
             unregisterReceiver(mReceiver);
         }
     }
@@ -91,7 +82,7 @@ public class LockScreenUpdateService extends Service {
     }
 
     @TargetApi(24)
-    private void setWallpaper(){
+    private void setWallpaper() {
 
         Realm realm = Realm.getDefaultInstance();
         try {
@@ -102,6 +93,7 @@ public class LockScreenUpdateService extends Service {
                     .or()
                     .equalTo("mIsUsed", true)
                     .findAll();
+
             if (wallpaper.size() <= 0) return;
 
             Log.v(TAG, "setWallpaperAtPos()");
@@ -110,14 +102,13 @@ public class LockScreenUpdateService extends Service {
 
             cacheNextWallpaper(imgUrl, false);
 
-
-        }finally {
+        } finally {
             realm.close();
         }
     }
 
-    private void setScreenLockWallpaper(Bitmap bm, int flag){
-        Log.v(TAG,"setScreenLockWallpaper()");
+    private void setLockScreenWallpaper(Bitmap bm, int flag) {
+        Log.v(TAG,"setLockScreenWallpaper()");
         // check bitmap size?
         WallpaperManager wpm = WallpaperManager.getInstance(getApplicationContext());
         try {
@@ -143,7 +134,7 @@ public class LockScreenUpdateService extends Service {
             public void onImageLoadDone(Object o) {
                 Log.d(TAG, "onImageLoadDone()");
                 if (o instanceof Bitmap) {
-                    setScreenLockWallpaper((Bitmap)o, WallpaperManager.FLAG_LOCK);
+                    setLockScreenWallpaper((Bitmap)o, WallpaperManager.FLAG_LOCK);
                 }
             }
         });

@@ -4,7 +4,7 @@ package com.github.runningforlife.photosniffer.ui.adapter;
  * image loading progress call back
  */
 
-interface ImageLoadCallback {
+interface ImageLoadCallback extends NetworkStateCallback {
     /*
      * image start loading
      */

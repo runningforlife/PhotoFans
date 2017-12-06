@@ -9,9 +9,7 @@ import com.github.runningforlife.photosniffer.data.local.RealmManager;
  */
 
 public interface AllPicturesPresenter {
-    /*
-     * refresh data(download from network asynchrously)
-     */
+
     void refresh();
 
     void refreshAnyway();

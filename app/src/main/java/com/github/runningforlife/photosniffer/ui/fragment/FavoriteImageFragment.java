@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
-import com.github.runningforlife.photosniffer.presenter.FavorImagePresenter;
 import com.github.runningforlife.photosniffer.presenter.FavorImagePresenterImpl;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.FavorPictureView;
@@ -109,18 +108,6 @@ public class FavoriteImageFragment extends BaseFragment
         mAdapter = new GalleryAdapter(getActivity(),this);
         mAdapter.setImageLoader(Loader.GLIDE);
         mRcvFavorList.setAdapter(mAdapter);
-
-        mSrlRefresh.setColorSchemeResources(android.R.color.holo_blue_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_orange_dark);
-        mSrlRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                Log.v(TAG,"onRefresh()");
-                mPresenter.refresh();
-            }
-        });
-
         //option menu
         setHasOptionsMenu(true);
     }
@@ -150,38 +137,27 @@ public class FavoriteImageFragment extends BaseFragment
     }
 
     @Override
-    public void onDataSetChange(int start, int end, RealmOp op) {
-        Log.v(TAG,"onDataSetChange()");
+    public void onDataSetChange(int start, int len, RealmOp op) {
+        Log.v(TAG,"onDataSetChange(): op=" + op);
         if (op == RealmOp.OP_INSERT) {
-            mAdapter.notifyItemRangeInserted(start,  end - start);
+            mAdapter.notifyItemRangeInserted(start, len );
             mRcvFavorList.smoothScrollToPosition(0);
         } else if (op == RealmOp.OP_DELETE) {
-            mAdapter.notifyItemRangeRemoved(start, end - start);
+            mAdapter.notifyItemRangeRemoved(start, len);
         } else if (op == RealmOp.OP_MODIFY) {
-            mAdapter.notifyItemRangeChanged(start, end - start);
+            mAdapter.notifyItemRangeChanged(start, len);
         } else {
             mAdapter.notifyDataSetChanged();
         }
     }
 
-    //FIXME: image view is loaded too slow, we have to
-    // refresh it manually
     @Override
-    public void onRefreshDone(boolean isSuccess) {
-        Log.v(TAG,"onRefreshDone()");
-
-        if(mSrlRefresh.isRefreshing()) {
-            mSrlRefresh.setRefreshing(false);
-        }
-    }
-
-    @Override
-    public boolean isRefreshing(){
+    public boolean isRefreshing() {
         return mSrlRefresh.isRefreshing();
     }
 
     @Override
-    public void setRefreshing(boolean enable){
+    public void setRefreshing(boolean enable) {
         if(mSrlRefresh.isRefreshing()) {
             mSrlRefresh.setRefreshing(enable);
         }
@@ -238,11 +214,6 @@ public class FavoriteImageFragment extends BaseFragment
         Log.v(TAG,"onContextMenuCreated()");
 
         mCurrentPos = pos;
-    }
-
-    @Override
-    public void onNetworkState(String state) {
-
     }
 
     @Override

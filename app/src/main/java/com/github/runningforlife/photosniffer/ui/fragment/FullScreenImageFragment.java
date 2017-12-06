@@ -168,7 +168,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
         //mUserActionList.add(share);
         mUserActionList.add(save);
         mUserActionList.add(wallpaper);
-        //mUserActionList.add(delete);
+        //mUserActionList.add(deleteSync);
         //mUserActionList.add(favor);
 
         ACTION_DELETE.setAction(delete);

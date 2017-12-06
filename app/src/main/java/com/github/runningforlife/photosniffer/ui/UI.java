@@ -13,4 +13,9 @@ public interface UI {
      * on data change
      */
     void onDataSetChange(int start, int end, RealmOp op);
+
+    /*
+    * notify user the result of setting wallpaper
+    */
+    void onWallpaperSetDone(boolean isOk);
 }

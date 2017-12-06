@@ -208,7 +208,7 @@ public class AppGlobals extends Application{
 
         LeanCloudManager cloudManager = LeanCloudManager.getInstance();
         cloudManager.saveFile(file);
-        // delete file
+        // deleteSync file
         if(file.exists()){
             file.delete();
         }

@@ -16,7 +16,6 @@ import io.realm.RealmResults;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,14 +26,12 @@ import java.util.concurrent.Executors;
 
 public class ImageDetailPresenterImpl extends PresenterBase implements ImageDetailPresenter {
     private static final String TAG = "ImageDetailPresenter";
-
-    private Context mContext;
     //private ImageDetailView mView;
     private ExecutorService mExecutor;
 
 
     public ImageDetailPresenterImpl(Context context, ImageDetailView view){
-        super(view);
+        super(context, view);
         mContext = context;
         //mView = view;
         mExecutor = Executors.newSingleThreadExecutor();
@@ -56,7 +53,7 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     public void removeItemAtPos(int pos) {
         Log.d(TAG,"removeItemAtPos()");
         if(pos >= 0 && pos < mImageList.size()) {
-            mRealmMgr.delete(mImageList.get(pos));
+            mRealmApi.deleteSync(mImageList.get(pos));
         }
     }
 
@@ -97,56 +94,30 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     @Override
     public void setWallpaperAtPos(final int pos) {
         Log.v(TAG,"setWallpaperAtPos(): pos = " + pos);
-        GlideLoaderListener listener = new GlideLoaderListener(null);
-        listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
-            @Override
-            public void onImageLoadDone(Object o) {
-                Log.d(TAG,"onImageLoadDone()");
-                if(o instanceof Bitmap) {
-                    WallpaperManager wpm =  WallpaperManager.getInstance(mContext);
-                    try {
-                        wpm.setBitmap((Bitmap)o);
-                        ((ImageDetailView)mView).onWallpaperSetDone(true);
-
-                        markAsWallpaper(mImageList.get(pos).getUrl());
-                        //mRealmMgr.setWallpaper(mImageList.get(pos).getUrl());
-                    } catch (IOException e) {
-                        ((ImageDetailView)mView).onWallpaperSetDone(false);
-                        e.printStackTrace();
-                    }
-                }else{
-                    ((ImageDetailView)mView).onWallpaperSetDone(false);
-                }
-            }
-        });
-        GlideLoader.downloadOnly(mContext, mImageList.get(pos).getUrl(), listener,
-                Priority.HIGH, dm.widthPixels, dm.heightPixels, true);
+        setWallpaper(mImageList.get(pos).getUrl());
     }
 
     @Override
     public void init() {
         Log.v(TAG,"init()");
-        mRealmMgr.onStart();
+        //mRealmMgr.onStart();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void onStart() {
         Log.v(TAG,"onStart()");
-
         HashMap<String,String> params = new HashMap<>();
         params.put("mIsUsed", Boolean.toString(true));
         params.put("mIsFavor", Boolean.toString(false));
         params.put("mIsWallpaper", Boolean.toString(false));
         mImageList = (RealmResults<ImageRealm>) mRealmApi.queryAsync(ImageRealm.class, params);
         mImageList.addChangeListener(mOrderRealmChangeListener);
-        //mRealmMgr.addUsedDataChangeListener(this);
     }
 
     @Override
     public void onDestroy() {
-        //mRealmMgr.removeUsedDataChangeListener(this);
-        mRealmMgr.onDestroy();
+        //mRealmMgr.onDestroy();
     }
 
 

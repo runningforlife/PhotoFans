@@ -16,7 +16,7 @@ import java.io.FileNotFoundException;
  * a runnable to save image
  */
 
-public class ImageSaveRunnable implements Runnable{
+public class ImageSaveRunnable implements Runnable {
     private static final String TAG = "ImageSave";
 
     private Bitmap bitmap;

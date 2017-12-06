@@ -16,7 +16,6 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
-import com.github.runningforlife.photosniffer.presenter.WallpaperPresenter;
 import com.github.runningforlife.photosniffer.presenter.WallpaperPresenterImpl;
 import com.github.runningforlife.photosniffer.ui.WallpaperView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
@@ -34,8 +33,7 @@ public class WallPaperFragment extends BaseFragment
         implements GalleryAdapterCallback, WallpaperView{
     public static final String TAG = "WallpaperFragment";
 
-    @BindView(R.id.refresh)
-    SwipeRefreshLayout mSrlRefresh;
+    @BindView(R.id.refresh) SwipeRefreshLayout mSrlRefresh;
     @BindView(R.id.rcv_img_list)
     RecyclerView mRcvWallpaper;
 
@@ -115,24 +113,17 @@ public class WallPaperFragment extends BaseFragment
     }
 
     @Override
-    public void onDataSetChange(int start, int end, RealmOp op) {
-        Log.v(TAG,"onDataSetChange()");
+    public void onDataSetChange(int start, int len, RealmOp op) {
+        Log.v(TAG,"onDataSetChange(): op=" + op);
         if (op == RealmOp.OP_INSERT) {
-            mAdapter.notifyItemRangeInserted(start,  end - start);
+            mAdapter.notifyItemRangeInserted(start,  len);
             mRcvWallpaper.smoothScrollToPosition(0);
         } else if (op == RealmOp.OP_DELETE) {
-            mAdapter.notifyItemRangeRemoved(start, end - start);
+            mAdapter.notifyItemRangeRemoved(start, len);
         } else if (op == RealmOp.OP_MODIFY) {
-            mAdapter.notifyItemRangeChanged(start, end - start);
+            mAdapter.notifyItemRangeChanged(start, len);
         } else {
             mAdapter.notifyDataSetChanged();
-        }
-    }
-
-    @Override
-    public void onRefreshDone(boolean isSuccess) {
-        if(mSrlRefresh.isRefreshing()){
-            mSrlRefresh.setRefreshing(false);
         }
     }
 
@@ -162,11 +153,6 @@ public class WallPaperFragment extends BaseFragment
     }
 
     @Override
-    public void onNetworkState(String state) {
-
-    }
-
-    @Override
     public boolean onContextItemSelected(MenuItem item){
         Log.v(TAG,"onContextItemSelected()");
 
@@ -187,7 +173,7 @@ public class WallPaperFragment extends BaseFragment
         return true;
     }
 
-    private void initView(){
+    private void initView() {
         StaggeredGridLayoutManager sgm = new StaggeredGridLayoutManager(
                 2, StaggeredGridLayoutManager.VERTICAL);
         mRcvWallpaper.setLayoutManager(sgm);
@@ -195,20 +181,9 @@ public class WallPaperFragment extends BaseFragment
         mAdapter = new GalleryAdapter(getActivity(), this);
         mRcvWallpaper.setAdapter(mAdapter);
         mRcvWallpaper.setBackgroundResource(R.color.colorLightGrey);
-
-        mSrlRefresh.setColorSchemeResources(android.R.color.holo_blue_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_orange_dark);
-        mSrlRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                Log.v(TAG,"onRefresh()");
-                mPresenter.refresh();
-            }
-        });
     }
 
-    private void initPresenter(){
+    private void initPresenter() {
         mPresenter = new WallpaperPresenterImpl(getContext(), this);
         mPresenter.init();
         mPresenter.onStart();

@@ -99,6 +99,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 uploadAdviceToCloud(data);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(key,"");
+                editor.apply();
             }
         }else if(keyAutoWallpaper.equals(key)){
             boolean isAuto = sharedPreferences.getBoolean(keyAutoWallpaper, true);
@@ -126,7 +127,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 .getSystemService(Context.ALARM_SERVICE);
 
         String key = getString(R.string.pref_auto_wallpaper_interval);
-        int interval = Integer.parseInt(SharedPrefUtil.getString(key, "30000"));
+        int interval = Integer.parseInt(SharedPrefUtil.getString(key, "900000"));
         alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
                 System.currentTimeMillis() + 10,interval, pi);
     }

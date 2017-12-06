@@ -72,16 +72,20 @@ public class BaseFragment extends Fragment implements Refresh, NetworkStateCallb
     @Override
     public void onNetworkState(@NetworkState String state) {
         Log.v(TAG,"onNetworkState():state = " + state);
-        if(state.equals(NetworkStateCallback.STATE_HUNG)){
-            if(mCallback != null){
-                mCallback.showToast(getString(R.string.hint_network_state_hung));
-            }
-        }else if(state.equals(NetworkStateCallback.STATE_SLOW)){
-            if(mCallback != null) {
-                mCallback.showToast(getString(R.string.hint_network_state_slow));
+        if (mCallback != null) {
+            switch (state) {
+                case NetworkStateCallback.STATE_DISCONNECT:
+                    mCallback.showToast(getString(R.string.network_not_connected));
+                    break;
+                case NetworkStateCallback.STATE_HUNG:
+                    mCallback.showToast(getString(R.string.hint_network_state_hung));
+                    break;
+                case NetworkStateCallback.STATE_SLOW:
+                    mCallback.showToast(getString(R.string.hint_network_state_slow));
+                    break;
+                default:
+                    break;
             }
         }
     }
-
-
 }

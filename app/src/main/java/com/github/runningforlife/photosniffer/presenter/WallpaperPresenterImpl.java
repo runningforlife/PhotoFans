@@ -26,23 +26,20 @@ import io.realm.RealmResults;
  * wallpaper presenter to get UI data
  */
 
-public class WallpaperPresenterImpl extends PresenterBase implements WallpaperPresenter{
+public class WallpaperPresenterImpl extends PresenterBase {
     private static final String TAG = "WallpaperPresenter";
-    private Context mContext;
     private ExecutorService mExecutor;
-    private int mLastRemovedPos = -1;
 
     public WallpaperPresenterImpl(Context context, WallpaperView view){
-        super(view);
+        super(context, view);
         mContext = context;
-        mRealmMgr = RealmManager.getInstance();
         mExecutor = Executors.newSingleThreadExecutor();
     }
 
     @Override
     public void init() {
         Log.v(TAG,"init()");
-        mRealmMgr.onStart();
+        //mRealmMgr.onStart();
     }
 
     @Override
@@ -57,9 +54,8 @@ public class WallpaperPresenterImpl extends PresenterBase implements WallpaperPr
 
     @Override
     public void removeItemAtPos(int pos) {
-        if(pos >= 0 && pos <= mImageList.size()) {
-            mRealmMgr.delete(mImageList.get(pos));
-            mLastRemovedPos = pos;
+        if (pos >= 0 && pos < mImageList.size()) {
+            mRealmApi.deleteSync(mImageList.get(pos));
         }
     }
 
@@ -102,19 +98,12 @@ public class WallpaperPresenterImpl extends PresenterBase implements WallpaperPr
         params.put("mIsWallpaper", Boolean.toString(true));
         mImageList = (RealmResults<ImageRealm>) mRealmApi.queryAsync(ImageRealm.class, params);
         mImageList.addChangeListener(mOrderRealmChangeListener);
-        //mRealmMgr.addWallpaperDataChangeListener(this);
     }
 
     @Override
     public void onDestroy() {
-        mRealmMgr.onDestroy();
-
-        //mRealmMgr.removeWallpaperDataChangeListener(this);
-    }
-
-    @Override
-    public void refresh() {
-        mRealmMgr.queryAllAsync();
+        Log.v(TAG,"onDestroy()");
+        //mRealmMgr.onDestroy();
     }
 
     @Override
@@ -124,31 +113,5 @@ public class WallpaperPresenterImpl extends PresenterBase implements WallpaperPr
         String url = mImageList.get(pos).getUrl();
 
         setWallpaper(url);
-    }
-
-    private void setWallpaper(String url) {
-        if(TextUtils.isEmpty(url)) return;
-
-        GlideLoaderListener listener = new GlideLoaderListener(null);
-        listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
-            @Override
-            public void onImageLoadDone(Object o) {
-                Log.d(TAG,"onImageLoadDone()");
-                if (o instanceof Bitmap) {
-                    WallpaperManager wpm = WallpaperManager.getInstance(mContext);
-                    try {
-                        wpm.setBitmap((Bitmap)o);
-                        ((WallpaperView)mView).onWallpaperSetDone(true);
-                    } catch (IOException e) {
-                        ((WallpaperView)mView).onWallpaperSetDone(false);
-                        e.printStackTrace();
-                    }
-                } else {
-                    ((WallpaperView)mView).onWallpaperSetDone(false);
-                }
-            }
-        });
-        GlideLoader.downloadOnly(mContext, url, listener, Priority.HIGH,
-                dm.widthPixels , dm.heightPixels, true);
     }
 }

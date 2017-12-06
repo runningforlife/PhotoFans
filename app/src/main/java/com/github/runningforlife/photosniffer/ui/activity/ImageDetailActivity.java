@@ -38,6 +38,7 @@ import butterknife.ButterKnife;
 import io.realm.RealmObject;
 
 import com.github.runningforlife.photosniffer.ui.adapter.ImagePagerAdapter;
+import com.github.runningforlife.photosniffer.ui.adapter.NetworkStateCallback;
 import com.github.runningforlife.photosniffer.ui.adapter.PageAdapterCallback;
 import com.github.runningforlife.photosniffer.ui.adapter.PreviewAdapter;
 import com.github.runningforlife.photosniffer.ui.fragment.ActionListDialogFragment;
@@ -192,6 +193,9 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         // current index is changed
         mImgPager.setCurrentItem(mCurrentImgIdx);
         mLvImgPreview.smoothScrollToPosition(mCurrentImgIdx);
+
+        // update title
+        setTitle();
     }
 
     @Override
@@ -416,6 +420,11 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
             Message msg = mMainHandler.obtainMessage(EventHandler.IMAGE_SAVE_FAIL);
             msg.sendToTarget();
         }
+    }
+
+    @Override
+    public void onNetworkState(@NetworkState String state) {
+        Log.v(TAG,"onNetworkState(): state=" + state);
     }
 
     private final class ImagePageStateListener implements ViewPager.OnPageChangeListener{

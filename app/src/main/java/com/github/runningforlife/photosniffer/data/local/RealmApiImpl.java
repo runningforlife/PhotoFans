@@ -165,57 +165,103 @@ public class RealmApiImpl implements RealmApi {
     }
 
     @Override
-    public void updateSync(final Class<? extends RealmObject> type, final List<? extends RealmObject> data, final HashMap<String, String> updatedValues) {
-        Log.v(TAG,"updateSync()");
+    public boolean deleteSync(final RealmObject data) {
         Realm realm = Realm.getDefaultInstance();
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                if (type == (ImageRealm.class)){
-                    Set<Map.Entry<String,String>> entries = updatedValues.entrySet();
-                    for (RealmObject ro : data) {
-                        ImageRealm ir = (ImageRealm)ro;
+                data.deleteFromRealm();
+            }
+        });
 
-                        for (Map.Entry<String, String> entry : entries) {
-                            String field = entry.getKey();
-                            switch (field) {
-                                case "mTimeStamp":
-                                    ir.setTimeStamp(Long.parseLong(entry.getValue()));
-                                    break;
-                                case "mIsUsed":
-                                    ir.setUsed(Boolean.parseBoolean(entry.getValue()));
-                                    break;
-                                case "mIsFavor":
-                                    ir.setIsFavor(Boolean.parseBoolean(entry.getValue()));
-                                case "mIsWallpaper":
-                                    ir.setIsWallpaper(Boolean.parseBoolean(entry.getValue()));
-                                    break;
-                                case "mName":
-                                    ir.setName(entry.getValue());
-                                default:
-                                    break;
-                            }
+        return false;
+    }
+
+    @Override
+    public void deleteAsync(Class<? extends RealmObject> type, final HashMap<String, String> params) {
+        Log.v(TAG,"deleteAsync()");
+        Realm realm = Realm.getDefaultInstance();
+        final RealmQuery<? extends RealmObject> query = realm.where(type);
+
+        if (ImageRealm.class == type) {
+            realm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Set<Map.Entry<String, String>> entries = params.entrySet();
+                    for(Map.Entry<String,String> entry : entries){
+                        String field = entry.getKey();
+                        switch (field){
+                            case "mTimeStamp":
+                                query.equalTo(field, Long.parseLong(entry.getValue()));
+                                break;
+                            case "mIsUsed":
+                            case "mIsFavor":
+                            case "mIsWallpaper":
+                                query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
+                                break;
+                            default:
+                                query.equalTo(field, entry.getValue());
                         }
                     }
+
+                    RealmResults<? extends RealmObject> rr = query.findAll();
+
+                    rr.deleteAllFromRealm();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void markUnusedRealm(final int num) {
+        Log.v(TAG,"markUnusedRealm()");
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmResults<ImageRealm> unused = realm.where(ImageRealm.class)
+                        .equalTo("mIsUsed", false)
+                        .findAll();
+
+                for (int i = 0; i < num && i < unused.size(); ++i) {
+                    ImageRealm ir = unused.get(i);
+                    ir.setUsed(true);
+                    ir.setTimeStamp(System.currentTimeMillis());
                 }
             }
         });
     }
 
     @Override
-    public boolean delete(final RealmObject data) {
-        Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                data.deleteFromRealm();
-            }
-        });
-        return false;
-    }
-
-    @Override
     public void trimData(Class<? extends RealmObject> type, HashMap<String, String> params, int max) {
+        Log.v(TAG,"trimData()");
 
+        Realm realm = Realm.getDefaultInstance();
+        RealmQuery<? extends RealmObject> query = realm.where(type);
+
+        if (ImageRealm.class == type) {
+            Set<Map.Entry<String, String>> entries = params.entrySet();
+            for(Map.Entry<String,String> entry : entries){
+                String field = entry.getKey();
+                switch (field) {
+                    case "mTimeStamp":
+                        query.equalTo(field, Long.parseLong(entry.getValue()));
+                        break;
+                    case "mIsUsed":
+                    case "mIsFavor":
+                    case "mIsWallpaper":
+                        query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
+                        break;
+                    default:
+                        query.equalTo(field, entry.getValue());
+                }
+            }
+
+            RealmResults<? extends RealmObject> rr = query.findAll().sort("mTimeStamp", Sort.DESCENDING);
+
+            for (int i = max; i < rr.size(); ++i) {
+                rr.get(i).deleteFromRealm();
+            }
+        }
     }
 }

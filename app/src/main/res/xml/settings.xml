@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
     <SwitchPreference
         android:key="@string/pref_wifi_download"
         android:title="@string/way_to_download_images"
         android:summary="@string/wifi_only_download"
-        android:defaultValue="true">
-    </SwitchPreference>
+        android:defaultValue="true"/>
 
     <SwitchPreference
         android:key="@string/pref_automatic_wallpaper"
         android:title="@string/enable_automatic_wallpaper"
         android:summary="@string/enable_automatic_wallpaper"
-        android:defaultValue="false">
-    </SwitchPreference>
+        android:defaultValue="true"/>
 
     <SwitchPreference
         android:key="@string/pref_enable_auto_lockscreen_wallpaper"
@@ -27,8 +26,7 @@
         android:dialogTitle="@string/set_auto_wallpaper_interval"
         android:entries="@array/auto_wallpaper_interval"
         android:entryValues="@array/auto_wallpaper_interval_values"
-        android:defaultValue="@string/auto_wallpaper_default_interval">
-    </ListPreference>
+        android:defaultValue="@string/auto_wallpaper_default_interval"/>
 
     <com.github.runningforlife.photosniffer.ui.preference.EmptyListPreference
         android:key="@string/pref_choose_image_source"
@@ -36,36 +34,31 @@
         android:summary="@string/website_to_download_images"
         android:entries="@array/image_website_name"
         android:entryValues="@array/image_website_url"
-        android:defaultValue="@array/default_source_url">
-    </com.github.runningforlife.photosniffer.ui.preference.EmptyListPreference>
+        android:defaultValue="@array/default_source_url"/>
 
     <EditTextPreference
         android:key="@string/pref_max_reserved_images"
         android:title="@string/max_reserved_images"
         android:summary="@string/how_many_images_reserved"
         android:defaultValue="@integer/max_reserved_image_number"
-        android:inputType="numberDecimal">
-    </EditTextPreference>
+        android:inputType="numberDecimal"/>
 
     <com.github.runningforlife.photosniffer.ui.preference.MessagePreference
         android:dialogTitle="@string/want_to_clear_cache"
         android:summary="@string/clear_image_caches"
-        android:title="@string/clear_image_caches">
-    </com.github.runningforlife.photosniffer.ui.preference.MessagePreference>
+        android:title="@string/clear_image_caches"/>
 
     <EditTextPreference
         android:key="@string/pref_give_your_advice"
         android:title="@string/give_your_advice"
         android:dialogTitle="@string/thanks_for_your_advice"
         android:summary="@string/write_down_your_advice"
-        android:maxLines="2">
-    </EditTextPreference>
+        android:maxLines="2"/>
 
     <com.github.runningforlife.photosniffer.ui.preference.MessagePreference
         android:dialogTitle="@string/copyright_declaration"
         android:dialogMessage="@string/my_copyright_declaration"
         android:title="@string/check_copyright_notes"
-        android:summary="@string/check_copyright_notes">
-    </com.github.runningforlife.photosniffer.ui.preference.MessagePreference>
+        android:summary="@string/check_copyright_notes"/>
 
 </PreferenceScreen>

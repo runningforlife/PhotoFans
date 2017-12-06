@@ -1,7 +1,5 @@
 package com.github.runningforlife.photosniffer.presenter;
 
-import com.github.runningforlife.photosniffer.data.local.RealmManager;
-
 /**
  * a presenter to show the detail of the image
  */
