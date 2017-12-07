@@ -251,7 +251,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     @Override
     public void onImageLoadStart(int pos) {
         Log.v(TAG,"onImageLoadStart()");
-
         mCpvLoad.setVisibility(View.VISIBLE);
         mCpvLoad.startAnimation();
     }
@@ -319,7 +318,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
             // refresh data at once
             //mPresenter.onStart();
         }else if(action.equals(ACTION_FAVOR.action())){
-            // favor this image
+            // favor this image FIXME: delay action to activity exit
             mPresenter.favorImageAtPos(mCurrentImgIdx);
         }else if(action.equals(ACTION_SHARE.action())){
 
@@ -337,8 +336,8 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
     private void initView(){
         Log.v(TAG,"initView()");
-        mAdapter = new PreviewAdapter(getApplicationContext(),ImageDetailActivity.this);
-        mPagerAdapter = new ImagePagerAdapter(getApplicationContext(),this);
+        mAdapter = new PreviewAdapter(this,ImageDetailActivity.this);
+        mPagerAdapter = new ImagePagerAdapter(this ,this);
 
         mImgPager.addOnPageChangeListener(new ImagePageStateListener());
         LinearLayoutManager llMgr = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
@@ -425,6 +424,24 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     @Override
     public void onNetworkState(@NetworkState String state) {
         Log.v(TAG,"onNetworkState(): state=" + state);
+        switch (state) {
+            case NetworkStateCallback.STATE_DISCONNECT:
+                showToast(getString(R.string.network_not_connected));
+                break;
+            case NetworkStateCallback.STATE_HUNG:
+                showToast(getString(R.string.hint_network_state_hung));
+                break;
+            case NetworkStateCallback.STATE_SLOW:
+                showToast(getString(R.string.hint_network_state_slow));
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void showToast(String msg) {
+        Log.v(TAG,"showToast()");
+        ToastUtil.showToast(this, msg);
     }
 
     private final class ImagePageStateListener implements ViewPager.OnPageChangeListener{

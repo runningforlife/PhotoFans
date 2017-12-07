@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.ui.adapter;
 
+import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.MenuRes;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.app.AppGlobals;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 
 import butterknife.BindView;
@@ -25,6 +27,7 @@ import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.loader.PicassoLoader;
 import com.github.runningforlife.photosniffer.loader.PicassoLoaderListener;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
+import com.github.runningforlife.photosniffer.ui.fragment.BaseFragment;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.io.IOException;
@@ -127,7 +130,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                         }
                     }
                 });
-                GlideLoader.load(mContext,url,listener, Priority.HIGH,
+                // keep GlideRequest life cycle consistent with fragment
+                GlideLoader.load(mContext.getApplicationContext(),url,listener, Priority.HIGH,
                         DEFAULT_IMAGE_MEDIUM_WIDTH, DEFAULT_IMAGE_MEDIUM_HEIGHT);
             }
 

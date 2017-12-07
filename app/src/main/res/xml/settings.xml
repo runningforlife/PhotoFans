@@ -11,7 +11,7 @@
         android:key="@string/pref_automatic_wallpaper"
         android:title="@string/enable_automatic_wallpaper"
         android:summary="@string/enable_automatic_wallpaper"
-        android:defaultValue="true"/>
+        android:defaultValue="false"/>
 
     <SwitchPreference
         android:key="@string/pref_enable_auto_lockscreen_wallpaper"

@@ -39,7 +39,7 @@ import io.realm.RealmConfiguration;
  * the entry point for the application
  */
 
-public class AppGlobals extends Application{
+public class AppGlobals extends Application {
     private static final String TAG = "AppGlobal";
 
     private static final String ROOT_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();

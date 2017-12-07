@@ -76,7 +76,9 @@ public class ImagePagerAdapter extends PagerAdapter {
             view.setTransitionName(transitionName);
         }
         // start loading
-        mCallback.onImageLoadStart(position);
+        if (mCallback != null) {
+            mCallback.onImageLoadStart(position);
+        }
         // preload image
         //MiscUtil.preloadImage(view);
         view.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_scale_in));

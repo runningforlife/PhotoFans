@@ -20,6 +20,7 @@ import com.github.runningforlife.photosniffer.presenter.WallpaperPresenterImpl;
 import com.github.runningforlife.photosniffer.ui.WallpaperView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
+import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,9 +34,7 @@ public class WallPaperFragment extends BaseFragment
         implements GalleryAdapterCallback, WallpaperView{
     public static final String TAG = "WallpaperFragment";
 
-    @BindView(R.id.refresh) SwipeRefreshLayout mSrlRefresh;
-    @BindView(R.id.rcv_img_list)
-    RecyclerView mRcvWallpaper;
+    @BindView(R.id.rcv_gallery) RecyclerView mRcvWallpaper;
 
     private GalleryAdapter mAdapter;
     private WallpaperPresenterImpl mPresenter;
@@ -72,7 +71,7 @@ public class WallPaperFragment extends BaseFragment
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
 
         if(mCallback != null){
@@ -83,7 +82,7 @@ public class WallPaperFragment extends BaseFragment
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
 
         mPresenter.onDestroy();
@@ -103,7 +102,7 @@ public class WallPaperFragment extends BaseFragment
     public void onItemClicked(View view, int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
         if(mCallback != null){
-            mCallback.onItemClick(view,pos, ((ImageRealm)mPresenter.getItemAtPos(pos)).getUrl());
+            mCallback.onItemClick(view,pos, mPresenter.getItemAtPos(pos).getUrl());
         }
     }
 
@@ -180,6 +179,7 @@ public class WallPaperFragment extends BaseFragment
 
         mAdapter = new GalleryAdapter(getActivity(), this);
         mRcvWallpaper.setAdapter(mAdapter);
+        mRcvWallpaper.setItemAnimator(new ScaleInOutItemAnimator());
         mRcvWallpaper.setBackgroundResource(R.color.colorLightGrey);
     }
 

@@ -172,7 +172,6 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
         if (op == RealmOp.OP_INSERT) {
             mAdapter.notifyItemRangeInserted(start,  len);
             mRvImgList.scrollToPosition(0);
-            mRvImgList.smoothScrollToPosition(0);
         } else if (op == RealmOp.OP_DELETE) {
             mAdapter.notifyItemRangeRemoved(start, len);
         } else if (op == RealmOp.OP_MODIFY) {
@@ -215,7 +214,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
 
     @Override
     public void onItemClicked(View view, int pos,String adapter) {
-        Log.v(TAG,"onItemClick(): pos = " + pos);
+        Log.v(TAG,"onItemClicked(): pos = " + pos);
         if(mRefresher.isRefreshing()){
             mRefresher.setRefreshing(false);
         }

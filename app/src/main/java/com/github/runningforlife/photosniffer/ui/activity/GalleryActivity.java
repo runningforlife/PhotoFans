@@ -211,12 +211,16 @@ public class GalleryActivity extends BaseActivity
             }
         });
 
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mIsToastShowing = false;
-            }
-        }, 3000);
+        String key = getString(R.string.pref_new_user);
+        boolean isNewUser = SharedPrefUtil.getBoolean(key, true);
+        if (isNewUser) {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mIsToastShowing = false;
+                }
+            }, 3000);
+        }
         //ToastUtil.showToast(this, toast);
     }
 

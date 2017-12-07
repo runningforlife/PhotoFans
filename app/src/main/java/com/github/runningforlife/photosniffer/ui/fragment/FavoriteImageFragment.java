@@ -37,8 +37,7 @@ import io.realm.RealmObject;
 public class FavoriteImageFragment extends BaseFragment
         implements GalleryAdapterCallback, FavorPictureView {
     public static final String TAG = "FavorImageFragment";
-    @BindView(R.id.rcv_img_list) RecyclerView mRcvFavorList;
-    @BindView(R.id.refresh) SwipeRefreshLayout mSrlRefresh;
+    @BindView(R.id.rcv_gallery) RecyclerView mRcvFavorList;
     GalleryAdapter mAdapter;
     private FavorImagePresenterImpl mPresenter;
 
@@ -153,14 +152,12 @@ public class FavoriteImageFragment extends BaseFragment
 
     @Override
     public boolean isRefreshing() {
-        return mSrlRefresh.isRefreshing();
+        return false;
     }
 
     @Override
     public void setRefreshing(boolean enable) {
-        if(mSrlRefresh.isRefreshing()) {
-            mSrlRefresh.setRefreshing(enable);
-        }
+        //empty
     }
 
     @Override

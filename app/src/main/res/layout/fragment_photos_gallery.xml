@@ -14,7 +14,9 @@
         android:layout_margin="@dimen/grid_margin"
         android:layoutAnimation="@anim/anim_rcv_layout"
         android:background="@color/colorLightGrey"
-        android:scrollIndicators="end"/>
+        android:scrollbars="vertical"
+        android:scrollbarStyle="insideInset"
+        android:scrollbarSize="@dimen/scroll_bar_size"/>
 
     <WebView android:id="@+id/wv_page"
         android:layout_width="match_parent"

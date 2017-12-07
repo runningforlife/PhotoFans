@@ -2,6 +2,7 @@ package com.github.runningforlife.photosniffer.loader;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.v4.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
@@ -34,6 +35,19 @@ public class GlideLoader {
     public static void load(Context context, String url, GlideLoaderListener listener,
                             Priority priority, int w, int h){
         Glide.with(context)
+                .load(url)
+                .asBitmap()
+                .priority(priority)
+                .listener(listener)
+                .centerCrop()
+                .crossFade()
+                .thumbnail((float)0.3)
+                .into(w,h);
+    }
+
+    public static void load(Fragment fragment, String url, GlideLoaderListener listener,
+                            Priority priority, int w, int h){
+        Glide.with(fragment)
              .load(url)
              .asBitmap()
              .priority(priority)
