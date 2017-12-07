@@ -215,15 +215,11 @@ public class AppGlobals extends Application{
     }
 
     private void saveUserInfo(){
-        ConnectivityManager cm = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo ni = cm.getActiveNetworkInfo();
-
         String key = getString(R.string.pref_new_user);
         boolean isNewUser = SharedPrefUtil.getBoolean(key, true);
-        if(isNewUser && ni.isConnected()){
+        if(isNewUser && MiscUtil.isConnected(getApplicationContext())){
             LeanCloudManager cloud = LeanCloudManager.getInstance();
             cloud.newUser(Build.FINGERPRINT);
-            //SharedPrefUtil.putBoolean(key, false);
         }
     }
 
@@ -261,10 +257,7 @@ public class AppGlobals extends Application{
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            ConnectivityManager cm = (ConnectivityManager)context.getSystemService(CONNECTIVITY_SERVICE);
-            NetworkInfo network = cm.getActiveNetworkInfo();
-            if(network.isConnected() &&
-                    network.getType() == ConnectivityManager.TYPE_WIFI){
+            if(MiscUtil.isWifiConnected(context)){
                 MyThreadFactory.getInstance().
                         newThread(new Runnable() {
                     @Override

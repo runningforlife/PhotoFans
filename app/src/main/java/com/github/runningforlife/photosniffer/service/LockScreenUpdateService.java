@@ -1,6 +1,7 @@
 package com.github.runningforlife.photosniffer.service;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
 import android.app.Service;
 import android.app.WallpaperManager;
 import android.content.Intent;
@@ -53,9 +54,8 @@ public class LockScreenUpdateService extends Service {
         ht.start();
 
         H handler = new H(ht.getLooper());
-
+        //Screen on broadcast cannot be declared at manifest file
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-
         mReceiver = new LockScreenWallpaperReceiver(handler);
         registerReceiver(mReceiver, intentFilter);
     }
@@ -63,6 +63,8 @@ public class LockScreenUpdateService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG,"onStartCommand(): startId = " + startId);
+        // keep the service at the foreground
+        startForeground(startId, new Notification());
 
         return START_STICKY;
     }
@@ -100,8 +102,19 @@ public class LockScreenUpdateService extends Service {
             final int pos = sWallpaperCount.getAndIncrement()%wallpaper.size();
             String imgUrl = wallpaper.get(pos).getUrl();
 
-            cacheNextWallpaper(imgUrl, false);
+            GlideLoaderListener listener = new GlideLoaderListener(null);
+            listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+                @Override
+                public void onImageLoadDone(Object o) {
+                    Log.d(TAG, "onImageLoadDone()");
+                    if (o instanceof Bitmap) {
+                        setLockScreenWallpaper((Bitmap)o, WallpaperManager.FLAG_LOCK);
+                    }
+                }
+            });
 
+            GlideLoader.downloadOnly(getApplicationContext(), imgUrl, listener, Priority.IMMEDIATE,
+                    dm.widthPixels, dm.heightPixels, true);
         } finally {
             realm.close();
         }
@@ -121,26 +134,6 @@ public class LockScreenUpdateService extends Service {
             //mView.onWallpaperSetDone(false);
             e.printStackTrace();
         }
-    }
-
-    // it'd better to cache some images previously
-    // 1. network may have problems, so we need cache
-    // 2. use cache images to speed up
-    private void cacheNextWallpaper(String imgUrl, final boolean isFirstTime){
-        Log.v(TAG,"cacheNextWallpaper()");
-        GlideLoaderListener listener = new GlideLoaderListener(null);
-        listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
-            @Override
-            public void onImageLoadDone(Object o) {
-                Log.d(TAG, "onImageLoadDone()");
-                if (o instanceof Bitmap) {
-                    setLockScreenWallpaper((Bitmap)o, WallpaperManager.FLAG_LOCK);
-                }
-            }
-        });
-
-        GlideLoader.downloadOnly(getApplicationContext(), imgUrl, listener, Priority.IMMEDIATE,
-                dm.widthPixels, dm.heightPixels, true);
     }
 
     private final class H extends  Handler{

@@ -4,24 +4,17 @@ import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
-import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.app.AppGlobals;
-import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
-import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.service.LockScreenUpdateService;
 import com.github.runningforlife.photosniffer.service.MyThreadFactory;
-import com.github.runningforlife.photosniffer.utils.BitmapUtil;
 import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 
 import java.io.IOException;
@@ -46,19 +39,15 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
 
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, Intent intent) {
         String action = intent.getAction();
         Log.v(TAG,"onReceive(): action=" + action);
 
-        final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-
-        boolean isAutoWallpaper = sp.getBoolean(context.getString(R.string.pref_automatic_wallpaper), true);
-
-        if(ALARM_AUTO_WALLPAPER.equals(action) && isAutoWallpaper){
+        if(ALARM_AUTO_WALLPAPER.equals(action)) {
             MyThreadFactory.getInstance().newThread(new Runnable() {
                 @Override
                 public void run() {
-                    setWallpaper(-1);
+                    setWallpaper(context);
                 }
             }).start();
         }else if(action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_LOCKED_BOOT_COMPLETED)){
@@ -70,7 +59,7 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
         }
     }
 
-    private void setWallpaper(final int flag){
+    private void setWallpaper(final Context context){
         Log.v(TAG,"setWallpaperAtPos()");
         Realm rm = Realm.getDefaultInstance();
         try {
@@ -80,7 +69,8 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
                     .or()
                     .equalTo("mIsFavor", true)
                     .findAll();
-            if(wallpaper.size() <= 0){
+
+            if (wallpaper.size() <= 0) {
                 wallpaper = query
                         .or()
                         .equalTo("mIsUsed", true)
@@ -88,8 +78,6 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver{
             }
 
             if (wallpaper.size() <= 0) return;
-
-            final Context context = AppGlobals.getInstance();
 
             final int pos = sWallpaperCount.getAndIncrement()%wallpaper.size();
 

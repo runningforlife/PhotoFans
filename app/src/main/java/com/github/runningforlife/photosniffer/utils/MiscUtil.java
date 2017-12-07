@@ -34,7 +34,7 @@ public class MiscUtil {
 
         NetworkInfo ni = cm.getActiveNetworkInfo();
 
-        return ni.isConnected();
+        return ni != null && ni.isConnected();
     }
 
     public static boolean isWifiConnected(Context context){
@@ -42,7 +42,7 @@ public class MiscUtil {
 
         NetworkInfo ni = cm.getActiveNetworkInfo();
 
-        return ni.isConnected() && ni.getType() == ConnectivityManager.TYPE_WIFI;
+        return ni != null && ni.isConnected() && ni.getType() == ConnectivityManager.TYPE_WIFI;
     }
 
     public static boolean isMobileConnected(Context context){
@@ -50,6 +50,6 @@ public class MiscUtil {
 
         NetworkInfo ni = cm.getActiveNetworkInfo();
 
-        return ni.isConnected() && ni.getType() == ConnectivityManager.TYPE_MOBILE;
+        return ni != null && ni.isConnected() && ni.getType() == ConnectivityManager.TYPE_MOBILE;
     }
 }
