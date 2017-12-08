@@ -94,7 +94,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     public void onBindViewHolder(final PhotoViewHolder vh, final int position) {
         final ImageRealm img = (ImageRealm)mCallback.getItemAtPos(position);
         final String url = img.getUrl();
-        Log.d(TAG,"onBindViewHolder(): pos = " + position + ",url = " + url);
+        Log.d(TAG,"onBindViewHolder(): pos = " + position);
 
         if(!TextUtils.isEmpty(url)) {
             if(LinearManager.equals(mLayoutMgr)){

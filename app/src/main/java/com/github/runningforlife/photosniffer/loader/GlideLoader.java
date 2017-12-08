@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.loader;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.app.Fragment;
@@ -9,8 +10,10 @@ import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.github.runningforlife.photosniffer.ui.adapter.ImagePagerAdapter;
 
+import java.io.File;
 import java.text.DecimalFormat;
 
 
@@ -76,6 +79,12 @@ public class GlideLoader {
                     .listener(listener)
                     .into(w, h);
         }
+    }
+
+    public static void downloadOriginalImage(Context context, String url, Target<File> target) {
+        Glide.with(context)
+             .load(url)
+             .downloadOnly(target);
     }
 
     public static void pauseRequest(Context context){

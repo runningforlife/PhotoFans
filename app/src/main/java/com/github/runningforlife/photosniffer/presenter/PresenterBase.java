@@ -84,10 +84,21 @@ abstract class PresenterBase implements Presenter {
         GlideLoader.downloadOnly(mContext, url, listener, Priority.HIGH,
                 dm.widthPixels , dm.heightPixels, true);
 
-        markAsWallpaper(url);
+        //markAsWallpaper(url);
     }
 
-    private void markAsWallpaper(String url) {
+    void markAsFavor(String url) {
+        Log.v(TAG,"markAsFavor()");
+        // mark it as wall paper
+        HashMap<String,String> params = new HashMap<>();
+        HashMap<String, String> updated = new HashMap<>();
+
+        params.put("mUrl", url);
+        updated.put("mIsFavor", Boolean.toString(true));
+        mRealmApi.updateAsync(ImageRealm.class, params, updated);
+    }
+
+    void markAsWallpaper(String url) {
         Log.v(TAG,"markAsWallpaper()");
         // mark it as wall paper
         HashMap<String,String> params = new HashMap<>();

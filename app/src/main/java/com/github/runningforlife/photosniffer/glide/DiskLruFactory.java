@@ -45,7 +45,7 @@ public class DiskLruFactory extends DiskLruCacheFactory{
         },diskCacheSize);
     }
 
-    private static int getExternalCacheSize(){
+    private static int getExternalCacheSize() {
         File file = Environment.getExternalStorageDirectory();
 
         long freeSpace = (file.getFreeSpace()/1024/1024); //MB

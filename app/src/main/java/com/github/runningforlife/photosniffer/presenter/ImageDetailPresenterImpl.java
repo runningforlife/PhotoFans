@@ -16,7 +16,9 @@ import io.realm.RealmResults;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,7 +30,6 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     private static final String TAG = "ImageDetailPresenter";
     //private ImageDetailView mView;
     private ExecutorService mExecutor;
-
 
     public ImageDetailPresenterImpl(Context context, ImageDetailView view){
         super(context, view);
@@ -82,18 +83,14 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     @Override
     public void favorImageAtPos(int pos) {
         Log.d(TAG,"favorImageAtPos(): pos = " + pos);
-        Realm r = Realm.getDefaultInstance();
-        r.beginTransaction();
 
-        ImageRealm favor = mImageList.get(pos);
-        favor.setIsFavor(true);
-
-        r.commitTransaction();
+        markAsFavor(mImageList.get(pos).getUrl());
     }
 
     @Override
     public void setWallpaperAtPos(final int pos) {
         Log.v(TAG,"setWallpaperAtPos(): pos = " + pos);
+
         setWallpaper(mImageList.get(pos).getUrl());
     }
 
@@ -117,6 +114,7 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
 
     @Override
     public void onDestroy() {
+        Log.v(TAG,"onDestroy()");
         //mRealmMgr.onDestroy();
     }
 
@@ -126,4 +124,5 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
         Log.d(TAG,"onImageSaveDone()");
         ((ImageDetailView)mView).onImageSaveDone(path);
     }
+
 }

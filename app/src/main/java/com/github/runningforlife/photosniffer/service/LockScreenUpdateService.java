@@ -1,9 +1,12 @@
 package com.github.runningforlife.photosniffer.service;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.app.WallpaperManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -39,6 +42,9 @@ public class LockScreenUpdateService extends Service {
 
     public static final int EVENT_SET_LOCK_SCREEN_WALLPAPER = 1;
 
+    public static final String ACTION_RESTART_LOCK_SCREEN_SERVICE =
+            "com.github.runningforlife.LOCK_SCREEN_WALLPAPER";
+
     private static AtomicInteger sWallpaperCount = new AtomicInteger(0);
 
     private LockScreenWallpaperReceiver mReceiver;
@@ -72,9 +78,12 @@ public class LockScreenUpdateService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.v(TAG,"onDestroy()");
         if (mReceiver != null) {
             unregisterReceiver(mReceiver);
         }
+
+        startUpdaterServiceAlarm();
     }
 
     @Nullable
@@ -82,6 +91,18 @@ public class LockScreenUpdateService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
+    private void startUpdaterServiceAlarm() {
+        Log.v(TAG,"startUpdaterServiceAlarm");
+        final Context context = getApplicationContext();
+        Intent intent = new Intent(ACTION_RESTART_LOCK_SCREEN_SERVICE);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+        AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        am.set(AlarmManager.ELAPSED_REALTIME, System.currentTimeMillis() + 30, pi);
+    }
+
 
     @TargetApi(24)
     private void setWallpaper() {

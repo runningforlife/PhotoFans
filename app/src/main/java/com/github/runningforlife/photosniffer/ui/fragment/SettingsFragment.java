@@ -33,11 +33,15 @@ import static com.github.runningforlife.photosniffer.ui.receiver.WallpaperAlarmR
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "SettingsFragment";
 
+    private AlarmManager mAlarmMgr;
+
     @Override
     public void onCreate(Bundle savedState){
         super.onCreate(savedState);
 
         addPreferencesFromResource(R.xml.settings);
+
+        mAlarmMgr = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
     }
 
     @Override
@@ -117,27 +121,24 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         cloud.saveAdvice(advice);
     }
 
-    private void startAutoWallpaperAlarm(){
+    private void startAutoWallpaperAlarm() {
         Log.v(TAG,"startAutoWallpaperAlarm()");
-        // start a alarm to enable automatic wallpaper setting
-        Intent intent = new Intent(ALARM_AUTO_WALLPAPER);
-        PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, intent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager alarmMgr = (AlarmManager) getActivity()
-                .getSystemService(Context.ALARM_SERVICE);
 
+        Intent intent = new Intent(ALARM_AUTO_WALLPAPER);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(getActivity(), 0, intent, 0);
+
+        // start a alarm to enable automatic wallpaper setting
         String key = getString(R.string.pref_auto_wallpaper_interval);
         int interval = Integer.parseInt(SharedPrefUtil.getString(key, "900000"));
-        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis() + 10,interval, pi);
+        mAlarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME,
+                System.currentTimeMillis() + 10 ,interval, alarmIntent);
     }
 
-    private void cancelAutoWallpaperAlarm(){
-        AlarmManager alarmMgr = (AlarmManager) getActivity()
-                .getSystemService(Context.ALARM_SERVICE);
+    private void cancelAutoWallpaperAlarm() {
+        Log.v(TAG,"cancelAutoWallpaperAlarm()");
         Intent intent = new Intent(ALARM_AUTO_WALLPAPER);
-        PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, intent,
-                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_CANCEL_CURRENT);
-        alarmMgr.cancel(pi);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(getActivity(), 0, intent, 0);
+
+        mAlarmMgr.cancel(alarmIntent);
     }
 }
