@@ -1,21 +1,14 @@
 package com.github.runningforlife.photosniffer.presenter;
 
-import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.RequiresApi;
-import android.text.TextUtils;
 import android.util.Log;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
@@ -67,7 +60,6 @@ public class AllPicturesPresenterImpl extends PresenterBase
     private SimpleResultReceiver mReceiver;
     private ExecutorService mExecutor;
     private H mMainHandler;
-    private WebView mWvPage;
     // last removed position
 
     @SuppressWarnings("unchecked")
@@ -116,16 +108,6 @@ public class AllPicturesPresenterImpl extends PresenterBase
         } else if (!mIsRefreshing) {
             // ah, something wrong
             ((AllPictureView)mView).onRefreshDone(false);
-        }
-    }
-
-    @Override
-    public void setWebView(WebView webView) {
-        mWvPage = webView;
-        if(mWvPage != null){
-            WebSettings settings = mWvPage.getSettings();
-            settings.setDomStorageEnabled(true);
-            settings.setAllowContentAccess(true);
         }
     }
 
@@ -238,9 +220,6 @@ public class AllPicturesPresenterImpl extends PresenterBase
         // shut down thread pool
         mExecutor.shutdown();
         mReceiver.setReceiver(null);
-
-        mWvPage.loadUrl(null);
-        mWvPage = null;
     }
 
     @Override
@@ -292,9 +271,6 @@ public class AllPicturesPresenterImpl extends PresenterBase
 
     // using webview to load pola youtu
     private void loadPolaPageIfNeeded() {
-        String polaUrl = ImageSource.URL_POLA;
-
-        final String key = mContext.getString(R.string.pref_pola_latest_collections_number);
         final String lastUpdatedTime = mContext.getString(R.string.pref_pola_last_updated_time);
         final long lastTime = SharedPrefUtil.getLong(lastUpdatedTime, System.currentTimeMillis());
         long now = System.currentTimeMillis();
@@ -313,63 +289,7 @@ public class AllPicturesPresenterImpl extends PresenterBase
                 SharedPrefUtil.putBoolean(polaRetrieved, true);
                 SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
             }
-
-            mWvPage.setWebViewClient(new WebViewClient() {
-
-                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-                @Override
-                public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest request) {
-                    webView.loadUrl(request.getUrl().toString());
-                    return true;
-                }
-
-                @Override
-                public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                    Log.v(TAG,"onPageStarted()");
-                    view.pageDown(true);
-                }
-
-                @Override
-                public void onLoadResource(WebView view, String url) {
-                    Log.v(TAG,"onLoadResource(): url = " + url);
-                    view.pageDown(true);
-                    int current = SharedPrefUtil.getInt(key,LATEST_POLA_COUNT);
-
-                    if (url != null && url.endsWith("thumb.jpg")) {
-                        int collections = getLatestCollectionsNumber(url);
-                        if(collections > current){
-                            SharedPrefUtil.putInt(key, collections);
-                            current = collections;
-                            saveAllPolaUrls(current+1, collections);
-                            SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
-                        }
-                    } else {
-                        if(System.currentTimeMillis() - lastTime >= POLA_UPDATED_DURATION){
-                            SharedPrefUtil.putInt(key, current + 1);
-                            // save next collections
-                            saveAllPolaUrls(current+1, current+1);
-                            SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
-                        }
-                    }
-                }
-
-                @Override
-                public void onPageFinished(WebView view, String url) {
-                    Log.v(TAG,"onPageFinished()");
-                    view.pageDown(true);
-                }
-            });
-            mWvPage.loadUrl(polaUrl);
         }
-    }
-
-    private int getLatestCollectionsNumber(String url) {
-        if(TextUtils.isEmpty(url)) return LATEST_POLA_COUNT;
-
-        String sub = url.substring(ImageSource.POLA_IMAGE_START.length()+1);
-        String[] splits = sub.split("/");
-
-        return Integer.parseInt(splits[0]);
     }
 
     private void saveAllPolaUrls(final int start, final int end){
@@ -378,22 +298,26 @@ public class AllPicturesPresenterImpl extends PresenterBase
             @Override
             public void run() {
                 List<ImageRealm> pola = new ArrayList<>();
-
+                List<String> builtInWallpapers = SharedPrefUtil.getArrayList(mContext.getString(R.string.build_in_wallpaper_list));
                 int count = 0;
                 for(int c = start; c <= end; ++c) {
                     for(int n = 1; n <= ImageSource.POLA_IMAGE_NUMBER_PER_COLLECTION; ++n) {
                         ImageRealm ir = new ImageRealm();
-                        ir.setUrl(buildPolaImageUrl(c,n,ImageSource.POLA_IMAGE_END));
-                        ir.setIsFavor(false);
-                        ir.setIsWallpaper(false);
-                        ir.setTimeStamp(System.currentTimeMillis());
-                        if(count++ < 10) {
-                            ir.setUsed(true);
-                        }else{
-                            ir.setUsed(false);
+                        String url = buildPolaImageUrl(c,n,ImageSource.POLA_IMAGE_END);
+                        if (builtInWallpapers == null || !builtInWallpapers.contains(url)) {
+                            ir.setUrl(url);
+                            ir.setIsFavor(false);
+                            ir.setIsWallpaper(false);
+                            ir.setIsCached(false);
+                            ir.setTimeStamp(System.currentTimeMillis());
+                            if (count++ < 10) {
+                                ir.setUsed(true);
+                            } else {
+                                ir.setUsed(false);
+                            }
+                            ir.setName("unknown");
+                            pola.add(ir);
                         }
-                        ir.setName("unknown");
-                        pola.add(ir);
                     }
                 }
 

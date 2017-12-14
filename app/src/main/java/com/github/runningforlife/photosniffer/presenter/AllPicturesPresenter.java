@@ -14,7 +14,5 @@ public interface AllPicturesPresenter {
 
     void refreshAnyway();
 
-    void setWebView(WebView webView);
-
     void favorImageAtPos(int pos);
 }

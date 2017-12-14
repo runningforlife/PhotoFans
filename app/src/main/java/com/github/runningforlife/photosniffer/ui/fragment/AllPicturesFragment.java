@@ -47,7 +47,6 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
 
     @BindView(R.id.rcv_gallery) RecyclerView mRvImgList;
     @BindView(R.id.srl_refresh) SwipeRefreshLayout mRefresher;
-    @BindView(R.id.wv_page) WebView mWvPage;
     private AllPicturesPresenterImpl mPresenter;
     private GalleryAdapter mAdapter;
 
@@ -329,7 +328,6 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
     private void initPresenter(){
         mPresenter = new AllPicturesPresenterImpl(getContext(),this);
         mPresenter.init();
-        mPresenter.setWebView(mWvPage);
     }
 
     private void setTitle(){
