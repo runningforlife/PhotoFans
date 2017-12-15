@@ -1,18 +1,27 @@
 package com.github.runningforlife.photosniffer.presenter;
 
+import android.annotation.TargetApi;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.webkit.WebView;
 
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
+import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
@@ -34,9 +43,15 @@ import com.github.runningforlife.photosniffer.service.ImageRetrieveService;
 import com.github.runningforlife.photosniffer.service.MyThreadFactory;
 import com.github.runningforlife.photosniffer.service.ServiceStatus;
 import com.github.runningforlife.photosniffer.service.SimpleResultReceiver;
+import com.github.runningforlife.photosniffer.service.WallpaperCacheService;
+import com.github.runningforlife.photosniffer.service.WallpaperUpdaterService;
 import com.github.runningforlife.photosniffer.ui.AllPictureView;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
+import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
+
+import static android.content.Context.ALARM_SERVICE;
+import static android.content.Context.JOB_SCHEDULER_SERVICE;
 
 /**
  * a presenter to bridge UI and data repository
@@ -109,6 +124,10 @@ public class AllPicturesPresenterImpl extends PresenterBase
             // ah, something wrong
             ((AllPictureView)mView).onRefreshDone(false);
         }
+
+        // start wallpaper cache service
+        Message message = mMainHandler.obtainMessage(H.EVENT_START_WALLPAPER_CACHE);
+        mMainHandler.sendMessageDelayed(message, 1500);
     }
 
     @Override
@@ -222,6 +241,14 @@ public class AllPicturesPresenterImpl extends PresenterBase
         mReceiver.setReceiver(null);
     }
 
+
+    @Override
+    public void onImageSaveDone(String path) {
+        Log.v(TAG,"onImageSaveDone()");
+        ((AllPictureView)mView).onImageSaveDone(path);
+    }
+
+
     @Override
     public void onReceiveResult(int resultCode, Bundle data) {
         switch (resultCode) {
@@ -293,37 +320,31 @@ public class AllPicturesPresenterImpl extends PresenterBase
     }
 
     private void saveAllPolaUrls(final int start, final int end){
-
-        MyThreadFactory.getInstance().newThread(new Runnable() {
-            @Override
-            public void run() {
-                List<ImageRealm> pola = new ArrayList<>();
-                List<String> builtInWallpapers = SharedPrefUtil.getArrayList(mContext.getString(R.string.build_in_wallpaper_list));
-                int count = 0;
-                for(int c = start; c <= end; ++c) {
-                    for(int n = 1; n <= ImageSource.POLA_IMAGE_NUMBER_PER_COLLECTION; ++n) {
-                        ImageRealm ir = new ImageRealm();
-                        String url = buildPolaImageUrl(c,n,ImageSource.POLA_IMAGE_END);
-                        if (builtInWallpapers == null || !builtInWallpapers.contains(url)) {
-                            ir.setUrl(url);
-                            ir.setIsFavor(false);
-                            ir.setIsWallpaper(false);
-                            ir.setIsCached(false);
-                            ir.setTimeStamp(System.currentTimeMillis());
-                            if (count++ < 10) {
-                                ir.setUsed(true);
-                            } else {
-                                ir.setUsed(false);
-                            }
-                            ir.setName("unknown");
-                            pola.add(ir);
-                        }
+        List<ImageRealm> pola = new ArrayList<>();
+        List<String> builtInWallpapers = SharedPrefUtil.getArrayList(mContext.getString(R.string.build_in_wallpaper_list));
+        int count = 0;
+        for(int c = start; c <= end; ++c) {
+            for(int n = 1; n <= ImageSource.POLA_IMAGE_NUMBER_PER_COLLECTION; ++n) {
+                ImageRealm ir = new ImageRealm();
+                String url = buildPolaImageUrl(c,n,ImageSource.POLA_IMAGE_END);
+                if (builtInWallpapers == null || !builtInWallpapers.contains(url)) {
+                    ir.setUrl(url);
+                    ir.setIsFavor(false);
+                    ir.setIsWallpaper(false);
+                    ir.setIsCached(false);
+                    ir.setTimeStamp(System.currentTimeMillis());
+                    if (count++ < 10) {
+                        ir.setUsed(true);
+                    } else {
+                        ir.setUsed(false);
                     }
+                    ir.setName("unknown");
+                    pola.add(ir);
                 }
-
-                mRealmApi.insertAsync(pola);
             }
-        }).start();
+        }
+
+        mRealmApi.insertAsync(pola);
     }
 
     private String buildPolaImageUrl(int collection, int number, String end){
@@ -338,16 +359,23 @@ public class AllPicturesPresenterImpl extends PresenterBase
         return builder.toString();
     }
 
-    @Override
-    public void onImageSaveDone(String path) {
-        Log.v(TAG,"onImageSaveDone()");
-        ((AllPictureView)mView).onImageSaveDone(path);
+
+    private void startUpdateWallpaperCache() {
+        // firstly, we try to fill wallpaper cache, and then
+        // start a scheduled job to update cache
+        WallpaperUtils.startWallpaperCacheUpdaterService(mContext);
+        if (Build.VERSION.SDK_INT >= 21) {
+            WallpaperUtils.startWallpaperUpdaterJob(mContext, MiscUtil.getJobId());
+        } else {
+            WallpaperUtils.startWallpaperCacheUpdaterAlarm(mContext);
+        }
     }
 
     private final class  H extends Handler{
 
         static final int EVENT_RETRIEVE_TIME_OUT = 1;
         static final int EVENT_STOP_SERVICE = 2;
+        static final int EVENT_START_WALLPAPER_CACHE = 3;
 
          H(Looper looper){
             super(looper);
@@ -365,6 +393,9 @@ public class AllPicturesPresenterImpl extends PresenterBase
                     if(mIsRefreshing){
                         ((AllPictureView)mView).onRefreshDone(false);
                     }
+                    break;
+                case EVENT_START_WALLPAPER_CACHE:
+                    startUpdateWallpaperCache();
                     break;
             }
         }

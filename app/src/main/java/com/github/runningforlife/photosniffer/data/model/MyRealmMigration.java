@@ -16,5 +16,12 @@ public class MyRealmMigration implements io.realm.RealmMigration {
     public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
         RealmSchema schema = realm.getSchema();
         Log.v(TAG, "migrate realm from version " + oldVersion + " to version " + newVersion);
+
+        if (oldVersion == 0) {
+            ++oldVersion;
+
+            schema.get("ImageRealm")
+                  .addField("mIsCached", Boolean.class);
+        }
     }
 }

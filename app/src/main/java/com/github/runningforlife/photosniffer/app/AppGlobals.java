@@ -1,27 +1,37 @@
 package com.github.runningforlife.photosniffer.app;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.Application;
+import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.avos.avoscloud.AVOSCloud;
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.data.local.RealmApi;
+import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
+import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.data.model.MyRealmMigration;
 import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.service.LockScreenUpdateService;
 import com.github.runningforlife.photosniffer.service.MyThreadFactory;
+import com.github.runningforlife.photosniffer.service.WallpaperCacheService;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
+import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,8 +39,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -48,7 +63,6 @@ public class AppGlobals extends Application {
     private static final String LEAN_CLOUD_APP_ID = "Pivxf9C9FGTTHtyg7QXI1ICI-gzGzoHsz";
     private static final String LEAN_CLOUD_APP_KEY = "KCjSyXjVTA9mCIJVs7tDVkGS";
     private static AppGlobals sInstance;
-    private static String sImagePath;
     // wifi state receiver
     private WifiStateReceiver mWifiStateReceiver;
 
@@ -71,15 +85,17 @@ public class AppGlobals extends Application {
         // it seems that we should init here
         sInstance = AppGlobals.this;
 
-        sImagePath = ROOT_PATH + File.separator + appName + File.separator + PATH_NAME;
-
         initExceptionHandler();
 
         initLeanCloud();
 
         saveUserInfo();
 
-        startLockScreenUpdater();
+        if (Build.VERSION.SDK_INT >= 24) {
+            WallpaperUtils.startLockScreenWallpaperService(getApplicationContext());
+        }
+
+        startUpdateWallpaperCache();
     }
 
     @Override
@@ -97,10 +113,7 @@ public class AppGlobals extends Application {
     }
 
     public String getImagePath(){
-        if(TextUtils.isEmpty(sImagePath)){
-            return getRootDir() + PATH_NAME;
-        }
-        return sImagePath;
+        return MiscUtil.getRootDir() + File.separator + PATH_NAME;
     }
 
     private void initExceptionHandler(){
@@ -115,9 +128,9 @@ public class AppGlobals extends Application {
         return "log_" + System.currentTimeMillis() + ".txt";
     }
 
-    private File getLogFile(){
+    private File getLogFile() {
         // save to path
-        String logPath = getRootDir() + PATH_CRASH_LOG;
+        String logPath = MiscUtil.getRootDir() + File.separator + PATH_CRASH_LOG;
         File path = new File(logPath);
         if(!path.exists()){
             path.mkdirs();
@@ -138,13 +151,13 @@ public class AppGlobals extends Application {
         return file;
     }
 
-    private void saveLog(Throwable t){
+    private void saveLog(Throwable t) {
         File file = getLogFile();
         new Thread(new FileSaveRunnable(file, t))
                 .start();
     }
 
-    private class FileSaveRunnable implements Runnable{
+    private class FileSaveRunnable implements Runnable {
         private File file;
         private Throwable throwable;
 
@@ -185,13 +198,8 @@ public class AppGlobals extends Application {
         }
     }
 
-    private String getRootDir(){
-        String appName = getString(R.string.app_name);
-        return ROOT_PATH + File.separator + appName + File.separator;
-    }
-
-    private void uploadLogToCloud(){
-        String logPath = getRootDir() + PATH_CRASH_LOG;
+    private void uploadLogToCloud() {
+        String logPath = MiscUtil.getRootDir() + File.separator + PATH_CRASH_LOG;
         File file = new File(logPath);
         if(file.exists()){
             File[] logs = file.listFiles();
@@ -208,33 +216,68 @@ public class AppGlobals extends Application {
 
         LeanCloudManager cloudManager = LeanCloudManager.getInstance();
         cloudManager.saveFile(file);
-        // deleteSync file
-        if(file.exists()){
-            file.delete();
-        }
     }
 
-    private void saveUserInfo(){
-        String key = getString(R.string.pref_new_user);
-        boolean isNewUser = SharedPrefUtil.getBoolean(key, true);
-        if(isNewUser && MiscUtil.isConnected(getApplicationContext())){
+    private void saveUserInfo() {
+        if(isNewUser() && MiscUtil.isConnected(getApplicationContext())){
             LeanCloudManager cloud = LeanCloudManager.getInstance();
             cloud.newUser(Build.FINGERPRINT);
         }
     }
 
-    // start lock screen updateAsync service
-    private void startLockScreenUpdater(){
-        Log.v(TAG,"startLockScreenUpdater()");
-        if(Build.VERSION.SDK_INT >= 24){
-            // start wallpaper service
-            Intent intent1 = new Intent(this, LockScreenUpdateService.class);
-            startService(intent1);
+    private boolean isNewUser() {
+        String key = getString(R.string.pref_new_user);
+        return SharedPrefUtil.getBoolean(key, true);
+    }
+
+    private void startUpdateWallpaperCache() {
+        if (isNewUser()) {
+            startWallpaperCacheUpdaterAlarm();
+
+        } else {
+            if(Build.VERSION.SDK_INT >= 24) {
+                int jobId = MiscUtil.getJobId();
+                JobScheduler js = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+                JobInfo jobInfo = js.getPendingJob(jobId);
+                if (jobInfo == null) {
+                    startWallpaperUpdaterJob(jobId);
+                }
+            }
+        }
+    }
+
+    @TargetApi(21)
+    private void startWallpaperUpdaterJob(int jobId) {
+        int interval = Integer.parseInt(getString(R.string.wallpaper_cache_update_interval));
+
+        ComponentName jobService = new ComponentName(getApplicationContext(), WallpaperCacheService.class);
+        JobInfo.Builder builder = new JobInfo.Builder(jobId, jobService);
+        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPeriodic(interval)
+                .setMinimumLatency(1000)
+                .setPersisted(true);
+
+        JobScheduler js = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+        //js.cancel(jobId);
+        js.schedule(builder.build());
+    }
+
+    private void startWallpaperCacheUpdaterAlarm() {
+        String action = "com.github.runningforlife.UPATE_WALLPAPER_CACHE";
+        Intent intent = new Intent(action);
+        PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+
+        AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
+        int interval = 100;
+        if (Build.VERSION.SDK_INT >= 21) {
+            am.setExact(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval, pi);
+        } else {
+            am.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 10, pi);
         }
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    private void waitForWifi(){
+    private void waitForWifi() {
         Log.v(TAG,"waitForWifi()");
         registerWifiStateReceiver();
     }

@@ -6,9 +6,11 @@ import android.preference.PreferenceManager;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.app.AppGlobals;
+import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -18,13 +20,33 @@ import java.util.Set;
 
 public class SharedPrefUtil {
 
+
+    @SuppressWarnings("unchecked")
+    public static List<String> getArrayList(String key) {
+        Context context = AppGlobals.getInstance();
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+        Set<String> list = pref.getStringSet(key, Collections.EMPTY_SET);
+
+        return new ArrayList<>(list);
+    }
+
+    public static void putArrayList(String key, Set<String> list) {
+        Context context = AppGlobals.getInstance();
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putStringSet(key, list);
+        editor.apply();
+    }
+
     @SuppressWarnings("unchecked")
     public static List<String> getImageSource(){
         Context context = AppGlobals.getInstance();
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 
         String key = context.getString(R.string.pref_choose_image_source);
-        Set<String> imgSrc = pref.getStringSet(key, null);
+        Set<String> imgSrc = pref.getStringSet(key, Collections.EMPTY_SET);
 
         if (imgSrc == null) {
             String[] src = context.getResources().getStringArray(R.array.default_source_url);

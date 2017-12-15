@@ -1,21 +1,39 @@
 package com.github.runningforlife.photosniffer.utils;
 
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.Environment;
 import android.widget.ImageView;
 
 import com.github.runningforlife.photosniffer.R;
+
+import java.io.File;
 
 /**
  * Created by jason on 6/5/17.
  */
 
 public class MiscUtil {
+
+    public static int getJobId() {
+        return "photosniffer".hashCode()%Integer.MAX_VALUE/2;
+    }
+
+    public static String getRootDir() {
+        return Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "photosniffer";
+    }
+
+    public static PendingIntent getPendingIntent(String action, Context context) {
+        Intent intent = new Intent(action);
+        return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
 
     public static void preloadImage(ImageView iv) {
         Resources res = iv.getContext().getResources();
@@ -29,7 +47,7 @@ public class MiscUtil {
         iv.setImageDrawable(d);
     }
 
-    public static boolean isConnected(Context context){
+    public static boolean isConnected(Context context) {
         ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo ni = cm.getActiveNetworkInfo();
@@ -37,7 +55,7 @@ public class MiscUtil {
         return ni != null && ni.isConnected();
     }
 
-    public static boolean isWifiConnected(Context context){
+    public static boolean isWifiConnected(Context context) {
         ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo ni = cm.getActiveNetworkInfo();
@@ -45,7 +63,7 @@ public class MiscUtil {
         return ni != null && ni.isConnected() && ni.getType() == ConnectivityManager.TYPE_WIFI;
     }
 
-    public static boolean isMobileConnected(Context context){
+    public static boolean isMobileConnected(Context context) {
         ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo ni = cm.getActiveNetworkInfo();

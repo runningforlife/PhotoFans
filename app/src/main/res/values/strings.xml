@@ -67,5 +67,8 @@
     <string name="hint_network_state_slow">Network is slow, please try it later</string>
     <string name="pref_enable_auto_lockscreen_wallpaper" translatable="false">pref_enable_auto_wallpaper_of_lockscreen</string>
     <string name="enable_auto_lockscreen_wallpaper">Enable auto lock screen wallpaper setting</string>
-    <string name="auto_wallpaper_default_interval" translatable="false">900000</string>
+    <string name="auto_wallpaper_default_interval" translatable="false">30000</string>
+    <string name="build_in_wallpaper_list" translatable="false">pref_built_in_wallpapers</string>
+    <string name="wallpaper_cache_update_interval">43200000</string>
+    <string name="pref_wallpaper_cache_index">pref_wallpaper_cache_index</string>
 </resources>

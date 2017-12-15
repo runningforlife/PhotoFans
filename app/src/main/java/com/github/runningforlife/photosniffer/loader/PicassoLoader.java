@@ -17,12 +17,11 @@ import com.squareup.picasso.Target;
 public class PicassoLoader{
     private static final String TAG = "PicassoLoader";
 
-    public static void load(Context context, ImageView iv, String url, int w, int h) {
+    public static void load(Context context, Target target, String url) {
         Picasso.with(context)
                 .load(url)
-                .config(Bitmap.Config.RGB_565)
-                .resize(w,h)
-                .into(iv);
+                .config(Bitmap.Config.ARGB_8888)
+                .into(target);
     }
 
     public static void load(Context context, Target target, String url, int w, int h){
