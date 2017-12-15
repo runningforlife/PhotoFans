@@ -43,7 +43,6 @@ import okhttp3.Response;
 public class WallpaperCacheRunnable implements Runnable {
     private static final String TAG = "WallpaperCache";
 
-    private Context mContext;
     private DiskWallpaperCache mDiskCache;
     private String mImageUrl;
     private CountDownLatch mCountLatch;
@@ -55,7 +54,6 @@ public class WallpaperCacheRunnable implements Runnable {
     }
 
     public WallpaperCacheRunnable(DiskWallpaperCache cache, String imgUrl, CountDownLatch latch) {
-        mContext = AppGlobals.getInstance().getApplicationContext();
         mDiskCache = cache;
         mImageUrl = imgUrl;
         mCountLatch = latch;

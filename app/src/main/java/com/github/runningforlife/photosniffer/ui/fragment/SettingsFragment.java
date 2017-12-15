@@ -115,7 +115,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 editor.putString(key,"");
                 editor.apply();
             }
-        } else if (keyAutoWallpaper.equals(key)){
+        } else if (keyAutoWallpaper.equals(key)) {
             boolean isAuto = sharedPreferences.getBoolean(keyAutoWallpaper, true);
             if (isAuto) {
                 WallpaperUtils.startAutoWallpaperAlarm(getActivity());

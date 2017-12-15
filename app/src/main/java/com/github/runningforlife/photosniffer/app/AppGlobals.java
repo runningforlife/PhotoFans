@@ -94,8 +94,6 @@ public class AppGlobals extends Application {
         if (Build.VERSION.SDK_INT >= 24) {
             WallpaperUtils.startLockScreenWallpaperService(getApplicationContext());
         }
-
-        startUpdateWallpaperCache();
     }
 
     @Override
@@ -228,52 +226,6 @@ public class AppGlobals extends Application {
     private boolean isNewUser() {
         String key = getString(R.string.pref_new_user);
         return SharedPrefUtil.getBoolean(key, true);
-    }
-
-    private void startUpdateWallpaperCache() {
-        if (isNewUser()) {
-            startWallpaperCacheUpdaterAlarm();
-
-        } else {
-            if(Build.VERSION.SDK_INT >= 24) {
-                int jobId = MiscUtil.getJobId();
-                JobScheduler js = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
-                JobInfo jobInfo = js.getPendingJob(jobId);
-                if (jobInfo == null) {
-                    startWallpaperUpdaterJob(jobId);
-                }
-            }
-        }
-    }
-
-    @TargetApi(21)
-    private void startWallpaperUpdaterJob(int jobId) {
-        int interval = Integer.parseInt(getString(R.string.wallpaper_cache_update_interval));
-
-        ComponentName jobService = new ComponentName(getApplicationContext(), WallpaperCacheService.class);
-        JobInfo.Builder builder = new JobInfo.Builder(jobId, jobService);
-        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPeriodic(interval)
-                .setMinimumLatency(1000)
-                .setPersisted(true);
-
-        JobScheduler js = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
-        //js.cancel(jobId);
-        js.schedule(builder.build());
-    }
-
-    private void startWallpaperCacheUpdaterAlarm() {
-        String action = "com.github.runningforlife.UPATE_WALLPAPER_CACHE";
-        Intent intent = new Intent(action);
-        PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
-
-        AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-        int interval = 100;
-        if (Build.VERSION.SDK_INT >= 21) {
-            am.setExact(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval, pi);
-        } else {
-            am.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 10, pi);
-        }
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

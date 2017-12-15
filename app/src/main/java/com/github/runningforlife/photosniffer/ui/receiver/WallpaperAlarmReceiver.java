@@ -51,12 +51,7 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver {
     private static final String TAG = "WallpaperAlarmReceiver";
 
     public static final String ALARM_AUTO_WALLPAPER = "com.github.runningforlife.AUTO_WALLPAPER";
-    private static final String ALARM_UPDATE_WALLPAPER_CACHE =
-            "com.github.runningforlife.UPATE_WALLPAPER_CACHE";
-
-    private static AtomicInteger sWallpaperCount = new AtomicInteger(0);
-    private static final DisplayMetrics dm = DisplayUtil.getScreenDimen();
-
+    private static final String ALARM_UPDATE_WALLPAPER_CACHE = "com.github.runningforlife.UPATE_WALLPAPER_CACHE";
 
     @Override
     public void onReceive(final Context context, Intent intent) {
@@ -70,8 +65,7 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver {
            new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    WallpaperUtils.setWallpaperFromCache(context);
-                    //setWallpaper(context);
+                    WallpaperUtils.setWallpaperFromCache(context, WallpaperManager.FLAG_SYSTEM);
                 }
             }).start();
         } else if (action.equals(Intent.ACTION_BOOT_COMPLETED)){
@@ -94,7 +88,6 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver {
             }
 
             WallpaperUtils.startWallpaperCacheUpdaterAlarm(context);
-
             // make sure that lock screen wallpaper service is active
             WallpaperUtils.startLockScreenWallpaperService(context);
         }

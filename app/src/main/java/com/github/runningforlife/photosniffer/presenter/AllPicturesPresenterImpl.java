@@ -363,7 +363,7 @@ public class AllPicturesPresenterImpl extends PresenterBase
     private void startUpdateWallpaperCache() {
         // firstly, we try to fill wallpaper cache, and then
         // start a scheduled job to update cache
-        WallpaperUtils.startWallpaperCacheUpdaterService(mContext);
+        //WallpaperUtils.startWallpaperCacheUpdaterService(mContext);
         if (Build.VERSION.SDK_INT >= 21) {
             WallpaperUtils.startWallpaperUpdaterJob(mContext, MiscUtil.getJobId());
         } else {

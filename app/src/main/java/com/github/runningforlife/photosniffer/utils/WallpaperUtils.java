@@ -119,7 +119,7 @@ public class WallpaperUtils {
         context.startService(intent);
     }
 
-    public static void setWallpaperFromCache(Context context) {
+    public static void setWallpaperFromCache(Context context, int flag) {
         String wallpaperDir = MiscUtil.getRootDir() + File.separator +  "wallpapers";
         File file = new File(wallpaperDir);
         if (file.exists()) {
@@ -135,7 +135,11 @@ public class WallpaperUtils {
             WallpaperManager wm = WallpaperManager.getInstance(context);
             try {
                 Bitmap bitmap = BitmapFactory.decodeFile(wallpapers[cacheIdx].getAbsolutePath());
-                wm.setBitmap(bitmap);
+                if (Build.VERSION.SDK_INT >= 24) {
+                    wm.setBitmap(bitmap, null, false, flag);
+                } else {
+                    wm.setBitmap(bitmap);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
