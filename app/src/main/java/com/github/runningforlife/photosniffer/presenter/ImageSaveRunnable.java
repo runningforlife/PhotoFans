@@ -7,6 +7,7 @@ import android.util.Log;
 import com.github.runningforlife.photosniffer.app.AppGlobals;
 import com.github.runningforlife.photosniffer.utils.BitmapUtil;
 import com.github.runningforlife.photosniffer.utils.MediaStoreUtil;
+import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.ThreadUtil;
 
 import java.io.File;
@@ -43,8 +44,8 @@ public class ImageSaveRunnable implements Runnable {
         ThreadUtil.start();
         Context context = AppGlobals.getInstance().getApplicationContext();
         try {
-            String imageDir = AppGlobals.getInstance().getImagePath();
-            String filePath = BitmapUtil.saveToFile(bitmap, imageDir,name);
+            String imageDir = MiscUtil.getPhotoDir();
+            String filePath = BitmapUtil.saveToFile(bitmap, imageDir, name);
             MediaStoreUtil.addImageToGallery(context,new File(filePath));
             //String path = MediaStoreUtil.addImageToGallery(context, bitmap, name);
             Log.d(TAG,"saving image takes " + ThreadUtil.getElapse() + "ms");

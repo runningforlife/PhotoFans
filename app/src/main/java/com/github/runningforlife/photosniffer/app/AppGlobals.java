@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Build;
-import android.os.Environment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -40,7 +39,6 @@ import io.realm.RealmConfiguration;
 public class AppGlobals extends Application {
     private static final String TAG = "AppGlobal";
 
-    private static final String ROOT_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
     private static final String PATH_NAME = "photos";
     private static final String PATH_CRASH_LOG = "log";
     private static final String LEAN_CLOUD_APP_ID = "Pivxf9C9FGTTHtyg7QXI1ICI-gzGzoHsz";
@@ -93,10 +91,6 @@ public class AppGlobals extends Application {
         unRegisterWifiStateReceiver();
     }
 
-    public String getImagePath(){
-        return MiscUtil.getRootDir() + File.separator + PATH_NAME;
-    }
-
     private void initExceptionHandler(){
         Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
     }
@@ -111,7 +105,7 @@ public class AppGlobals extends Application {
 
     private File getLogFile() {
         // save to path
-        String logPath = MiscUtil.getRootDir() + File.separator + PATH_CRASH_LOG;
+        String logPath = MiscUtil.getLogDir();
         File path = new File(logPath);
         if(!path.exists()){
             path.mkdirs();

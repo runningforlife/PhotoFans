@@ -10,11 +10,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.MessageDigest;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * a disk cache to cache wallpapers
@@ -69,6 +67,7 @@ public class DiskWallpaperCache implements cache {
             CacheInfo cacheInfo = new CacheInfo(key, entry.data.length);
             cacheInfo.lastModified = entry.lastModified;
             putEntry(key, cacheInfo);
+            Log.v(TAG,"put(): cache image done");
             return;
         } catch (IOException e) {
             e.printStackTrace();

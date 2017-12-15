@@ -28,6 +28,10 @@ public class MiscUtil {
     public static final String JOB_WALLPAPER_CACHE = "cache";
     public static final String JOB_WALLPAPER_SET = "setting";
 
+    private static final String PATH_WALLPAPER_CACHE = "wallpapers";
+    private static final String PATH_CRASH_LOG = "log";
+    private static final String PATH_PHOTOS = "photos";
+
     public static OkHttpClient buildOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.readTimeout(10000, TimeUnit.MILLISECONDS)
@@ -38,6 +42,18 @@ public class MiscUtil {
 
     public static int getJobId(@NonNull String jn) {
         return jn.hashCode();
+    }
+
+    public static String getPhotoDir() {
+        return getRootDir() + File.separator + PATH_PHOTOS;
+    }
+
+    public static String getWallpaperCacheDir() {
+        return getRootDir() + File.separator + PATH_WALLPAPER_CACHE;
+    }
+
+    public static String getLogDir() {
+        return getRootDir() + File.separator + PATH_CRASH_LOG;
     }
 
     public static String getRootDir() {

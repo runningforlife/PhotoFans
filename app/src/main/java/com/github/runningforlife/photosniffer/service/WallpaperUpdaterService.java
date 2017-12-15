@@ -31,8 +31,6 @@ import java.util.concurrent.Executors;
 public class WallpaperUpdaterService extends Service {
     private static final String TAG = "WallpaperUpdaterService";
 
-    static final String WALLPAPER_CACHE_DIR = "wallpapers";
-
     private DiskWallpaperCache mDiskCache;
     private Executor mUpdateExecutor;
     private RealmApi mRealmApi;
@@ -66,7 +64,7 @@ public class WallpaperUpdaterService extends Service {
         mLooper = handlerThread.getLooper();
         mHandler = new ServiceHandler(mLooper);
 
-        mDiskCache = new DiskWallpaperCache(new File(getWallpaperCacheDir()));
+        mDiskCache = new DiskWallpaperCache(new File(MiscUtil.getWallpaperCacheDir()));
 
         mUpdateExecutor = Executors.newFixedThreadPool(2);
 
@@ -143,10 +141,6 @@ public class WallpaperUpdaterService extends Service {
         HashMap<String, String> newValues = new HashMap<>();
         newValues.put("mIsCached", Boolean.toString(true));
         mRealmApi.updateAsync(ImageRealm.class, params, newValues);
-    }
-
-    private String getWallpaperCacheDir() {
-        return MiscUtil.getRootDir() + File.separator + WALLPAPER_CACHE_DIR;
     }
 
 }
