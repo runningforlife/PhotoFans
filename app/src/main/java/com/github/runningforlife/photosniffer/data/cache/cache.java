@@ -19,6 +19,10 @@ public interface cache {
 
     void clear();
 
+    String getCacheKey(String url);
+
+    boolean isExist(String url);
+
     final class Entry {
 
         public Entry(byte[] data, long lastModified) {
@@ -27,9 +31,9 @@ public interface cache {
         }
 
         /* data to put */
-        byte[] data;
+        public byte[] data;
 
         /* last modified time */
-        long lastModified;
+        public long lastModified;
     }
 }

@@ -3,12 +3,20 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
+import com.bumptech.glide.request.Request;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SizeReadyCallback;
+import com.bumptech.glide.request.target.Target;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
+import com.github.runningforlife.photosniffer.data.cache.DiskWallpaperCache;
+import com.github.runningforlife.photosniffer.data.cache.cache;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.local.RealmManager;
@@ -17,7 +25,12 @@ import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.ui.WallpaperView;
+import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -25,6 +38,10 @@ import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Response;
 
 /**
  * base class for presenter
@@ -39,6 +56,8 @@ abstract class PresenterBase implements Presenter {
     RealmResults<ImageRealm> mImageList;
     RealmManager mRealmMgr;
     RealmApi mRealmApi;
+    DiskWallpaperCache mDiskCache;
+    OkHttpClient mHttpClient;
 
     OrderReamChangeListener mOrderRealmChangeListener;
 
@@ -48,43 +67,75 @@ abstract class PresenterBase implements Presenter {
         mRealmMgr = RealmManager.getInstance();
         mOrderRealmChangeListener = new OrderReamChangeListener();
         mRealmApi = RealmApiImpl.getInstance();
+        mDiskCache = new DiskWallpaperCache(new File(MiscUtil.getRootDir()));
+        mHttpClient = MiscUtil.buildOkHttpClient();
     }
 
-    void setWallpaper(String url) {
+    void setWallpaper(final String url) {
         Log.v(TAG,"setWallpaper()");
 
         if(TextUtils.isEmpty(url)) return;
 
-        // for pixels, we can use URL to download hd images
-        if (url.startsWith(ImageSource.PIXELS_IMAGE_START)) {
-            int res = dm.heightPixels/2 > 1024 ?  1024 : dm.heightPixels;
-            url = buildHighResolutionPixelsUrl(url, res);
-        }
-
-        GlideLoaderListener listener = new GlideLoaderListener(null);
-        listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+        new Thread(new Runnable() {
             @Override
-            public void onImageLoadDone(Object o) {
-                Log.d(TAG,"onImageLoadDone()");
-                if (o instanceof Bitmap) {
-                    WallpaperManager wpm = WallpaperManager.getInstance(mContext);
-                    try {
-                        wpm.setBitmap((Bitmap)o);
-                        mView.onWallpaperSetDone(true);
-                    } catch (IOException e) {
-                        mView.onWallpaperSetDone(false);
-                        e.printStackTrace();
-                    }
+            public void run() {
+                // for pixels, we can use URL to download hd images
+                if (url.startsWith(ImageSource.PIXELS_IMAGE_START)) {
+                    int res = dm.heightPixels/2 > 1024 ?  1024 : dm.heightPixels;
+                    String imgUrl = buildHighResolutionPixelsUrl(url, res);
+                    setWallpaperAndCache(imgUrl);
                 } else {
-                    //FIXME: try again
-                    mView.onWallpaperSetDone(false);
+                    setWallpaperAndCache(url);
                 }
             }
-        });
-        GlideLoader.downloadOnly(mContext, url, listener, Priority.HIGH,
-                dm.widthPixels , dm.heightPixels, true);
+        }).start();
+    }
 
-        //markAsWallpaper(url);
+    private void setWallpaperAndCache(final String url) {
+        // cached?
+        if (!mDiskCache.isExist(url)) {
+
+            okhttp3.Request.Builder builder = new okhttp3.Request.Builder();
+            builder.url(url)
+                    .get();
+            mHttpClient.newCall(builder.build()).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    mView.onWallpaperSetDone(false);
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    Log.v(TAG,"onResponse()");
+                    if (response.isSuccessful()) {
+                        byte[] data = response.body().bytes();
+
+                        WallpaperManager wm = WallpaperManager.getInstance(mContext);
+                        wm.setStream(new ByteArrayInputStream(data));
+
+                        mView.onWallpaperSetDone(true);
+
+                        cache.Entry entry1 = new cache.Entry(data, System.currentTimeMillis());
+                        mDiskCache.put(url, entry1);
+                    } else {
+                        mView.onWallpaperSetDone(false);
+                    }
+                }
+            });
+        } else {
+            cache.Entry entry = mDiskCache.get(url);
+            WallpaperManager wm = WallpaperManager.getInstance(mContext);
+            ByteArrayInputStream bis = new ByteArrayInputStream(entry.data, 0, entry.data.length);
+            try {
+                wm.setStream(bis);
+                mView.onWallpaperSetDone(true);
+            } catch (IOException e) {
+                e.printStackTrace();
+                mView.onWallpaperSetDone(false);
+            }
+        }
+
+        markAsWallpaper(url);
     }
 
     void markAsFavor(String url) {

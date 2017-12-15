@@ -15,12 +15,23 @@ import android.widget.ImageView;
 import com.github.runningforlife.photosniffer.R;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 
 /**
  * Created by jason on 6/5/17.
  */
 
 public class MiscUtil {
+
+    public static OkHttpClient buildOkHttpClient() {
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.readTimeout(10000, TimeUnit.MILLISECONDS)
+                .connectTimeout(10000, TimeUnit.MILLISECONDS);
+
+        return builder.build();
+    }
 
     public static int getJobId() {
         return "photosniffer".hashCode()%Integer.MAX_VALUE/2;

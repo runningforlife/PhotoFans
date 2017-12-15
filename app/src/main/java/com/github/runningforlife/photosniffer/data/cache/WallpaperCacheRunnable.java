@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.util.MutableInt;
 
 import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader;
 import com.bumptech.glide.request.Request;
@@ -16,6 +17,7 @@ import com.github.runningforlife.photosniffer.app.AppGlobals;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.PicassoLoader;
 import com.github.runningforlife.photosniffer.utils.BitmapUtil;
+import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.squareup.picasso.Picasso;
 
@@ -57,7 +59,7 @@ public class WallpaperCacheRunnable implements Runnable {
         mDiskCache = cache;
         mImageUrl = imgUrl;
         mCountLatch = latch;
-        mHttpClient = new OkHttpClient();
+        mHttpClient = MiscUtil.buildOkHttpClient();
     }
 
     public void setLoadCallback(ImageLoadCallback callback) {

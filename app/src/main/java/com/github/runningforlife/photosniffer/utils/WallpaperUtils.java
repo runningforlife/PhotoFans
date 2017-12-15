@@ -15,6 +15,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
@@ -39,6 +40,7 @@ import static android.content.Context.JOB_SCHEDULER_SERVICE;
  */
 
 public class WallpaperUtils {
+    private static final String TAG = "WallpaperUtils";
     public static final String ALARM_AUTO_WALLPAPER = "com.github.runningforlife.AUTO_WALLPAPER";
 
     public static void startWallpaperCacheUpdaterService(Context context) {
@@ -120,21 +122,26 @@ public class WallpaperUtils {
     }
 
     public static void setWallpaperFromCache(Context context, int flag) {
+        Log.v(TAG, "setWallpaperFromCache()");
         String wallpaperDir = MiscUtil.getRootDir() + File.separator +  "wallpapers";
         File file = new File(wallpaperDir);
         if (file.exists()) {
             File[] wallpapers = file.listFiles();
+            if (wallpapers.length == 0) return;
+
             String keyCacheIdx = context.getString(R.string.pref_wallpaper_cache_index);
-            int cacheIdx = SharedPrefUtil.getInt(keyCacheIdx, 0);
+            int cacheIdx = SharedPrefUtil.getInt(keyCacheIdx, 0)%wallpapers.length;
             // find a wallpaper
-            while(!wallpapers[cacheIdx].exists() && cacheIdx < wallpapers.length){
+            while(!wallpapers[cacheIdx].exists()) {
                 ++cacheIdx;
+                cacheIdx %= wallpapers.length;
             }
-            cacheIdx %= wallpapers.length;
 
             WallpaperManager wm = WallpaperManager.getInstance(context);
             try {
-                Bitmap bitmap = BitmapFactory.decodeFile(wallpapers[cacheIdx].getAbsolutePath());
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inScaled = true;
+                Bitmap bitmap = BitmapFactory.decodeFile(wallpapers[cacheIdx].getAbsolutePath(), options);
                 if (Build.VERSION.SDK_INT >= 24) {
                     wm.setBitmap(bitmap, null, false, flag);
                 } else {

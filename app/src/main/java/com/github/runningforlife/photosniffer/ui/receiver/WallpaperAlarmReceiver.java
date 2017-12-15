@@ -68,7 +68,7 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver {
                     WallpaperUtils.setWallpaperFromCache(context, WallpaperManager.FLAG_SYSTEM);
                 }
             }).start();
-        } else if (action.equals(Intent.ACTION_BOOT_COMPLETED)){
+        } else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
             if (Build.VERSION.SDK_INT >= 24) {
                 WallpaperUtils.startLockScreenWallpaperService(context);
             }

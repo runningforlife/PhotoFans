@@ -154,6 +154,21 @@ public class DiskWallpaperCache implements cache {
         Log.v(TAG,"image cache cleared");
     }
 
+
+    /** get the cache key by image url */
+    @Override
+    public String getCacheKey(String imageUrl) {
+        int fistHalf = imageUrl.length()/2;
+        String key = String.valueOf(imageUrl.substring(0, fistHalf).hashCode());
+        key += String.valueOf(imageUrl.substring(fistHalf).hashCode());
+        return key;
+    }
+
+    @Override
+    public boolean isExist(String url) {
+        return mEntries.get(getCacheKey(url)) != null;
+    }
+
     private synchronized void initialize() {
         if (!mRootDir.exists()) {
             if (!mRootDir.mkdirs()) {
@@ -193,13 +208,6 @@ public class DiskWallpaperCache implements cache {
         }
     }
 
-    /** get the cache key by image url */
-    private String getCacheKey(String imageUrl) {
-        int fistHalf = imageUrl.length()/2;
-        String key = String.valueOf(imageUrl.substring(0, fistHalf).hashCode());
-        key += String.valueOf(imageUrl.substring(fistHalf).hashCode());
-        return key;
-    }
 
     private File getFileNameByKey(String key) {
         String fileName = key + DEFAULT_IMAGE_FORMAT;
