@@ -1,34 +1,22 @@
 package com.github.runningforlife.photosniffer.app;
 
 import android.annotation.TargetApi;
-import android.app.AlarmManager;
 import android.app.Application;
-import android.app.PendingIntent;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Environment;
-import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.avos.avoscloud.AVOSCloud;
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.data.local.RealmApi;
-import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
-import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.data.model.MyRealmMigration;
 import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
-import com.github.runningforlife.photosniffer.service.LockScreenUpdateService;
 import com.github.runningforlife.photosniffer.service.MyThreadFactory;
-import com.github.runningforlife.photosniffer.service.WallpaperCacheService;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
@@ -39,13 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;

@@ -10,6 +10,7 @@ import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.widget.ImageView;
 
 import com.github.runningforlife.photosniffer.R;
@@ -24,6 +25,8 @@ import okhttp3.OkHttpClient;
  */
 
 public class MiscUtil {
+    public static final String JOB_WALLPAPER_CACHE = "cache";
+    public static final String JOB_WALLPAPER_SET = "setting";
 
     public static OkHttpClient buildOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -33,8 +36,8 @@ public class MiscUtil {
         return builder.build();
     }
 
-    public static int getJobId() {
-        return "photosniffer".hashCode()%Integer.MAX_VALUE/2;
+    public static int getJobId(@NonNull String jn) {
+        return jn.hashCode();
     }
 
     public static String getRootDir() {

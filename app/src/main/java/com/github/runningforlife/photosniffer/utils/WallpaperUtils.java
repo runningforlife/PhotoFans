@@ -1,7 +1,6 @@
 package com.github.runningforlife.photosniffer.utils;
 
 import android.annotation.TargetApi;
-import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.WallpaperManager;
@@ -10,7 +9,6 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -20,7 +18,7 @@ import android.util.Log;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.service.LockScreenUpdateService;
-import com.github.runningforlife.photosniffer.service.WallpaperCacheService;
+import com.github.runningforlife.photosniffer.service.WallpaperJobService;
 import com.github.runningforlife.photosniffer.service.WallpaperUpdaterService;
 
 import java.io.File;
@@ -87,10 +85,24 @@ public class WallpaperUtils {
     }
 
     @TargetApi(21)
+    public static void startWallpaperSettingJob(Context context, int jobId) {
+        int interval = Integer.parseInt(context.getString(R.string.pref_auto_wallpaper_interval));
+
+        ComponentName jobService = new ComponentName(context, WallpaperJobService.class);
+        JobInfo.Builder builder = new JobInfo.Builder(jobId, jobService);
+        builder.setPeriodic(interval)
+                .setPersisted(true);
+
+        JobScheduler js = (JobScheduler) context.getSystemService(JOB_SCHEDULER_SERVICE);
+        js.cancel(jobId);
+        js.schedule(builder.build());
+    }
+
+    @TargetApi(21)
     public static void startWallpaperUpdaterJob(Context context, int jobId) {
         int interval = Integer.parseInt(context.getString(R.string.wallpaper_cache_update_interval));
 
-        ComponentName jobService = new ComponentName(context, WallpaperCacheService.class);
+        ComponentName jobService = new ComponentName(context, WallpaperJobService.class);
         JobInfo.Builder builder = new JobInfo.Builder(jobId, jobService);
         builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPeriodic(interval)
@@ -98,7 +110,7 @@ public class WallpaperUtils {
 
         JobScheduler js = (JobScheduler) context.getSystemService(JOB_SCHEDULER_SERVICE);
         // first we cancel current scheduled job
-        js.cancelAll();
+        js.cancel(jobId);
         js.schedule(builder.build());
     }
 
@@ -127,7 +139,11 @@ public class WallpaperUtils {
         File file = new File(wallpaperDir);
         if (file.exists()) {
             File[] wallpapers = file.listFiles();
-            if (wallpapers.length == 0) return;
+            if (wallpapers.length == 0) {
+                // try to cache images
+                startWallpaperCacheUpdaterService(context);
+                return;
+            }
 
             String keyCacheIdx = context.getString(R.string.pref_wallpaper_cache_index);
             int cacheIdx = SharedPrefUtil.getInt(keyCacheIdx, 0)%wallpapers.length;

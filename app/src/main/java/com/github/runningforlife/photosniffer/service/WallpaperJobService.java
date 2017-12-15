@@ -1,6 +1,7 @@
 package com.github.runningforlife.photosniffer.service;
 
 import android.annotation.TargetApi;
+import android.app.WallpaperManager;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Context;
@@ -25,8 +26,8 @@ import io.realm.RealmResults;
  */
 
 @TargetApi(21)
-public class WallpaperCacheService extends JobService {
-    private static final String TAG = "WallpaperCacheService";
+public class WallpaperJobService extends JobService {
+    private static final String TAG = "WallpaperJobService";
 
     @Override
     public void onCreate() {
@@ -38,10 +39,15 @@ public class WallpaperCacheService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         Log.v(TAG,"onStartJob()");
-        String prefWifi = getString(R.string.pref_wifi_download);
-        boolean isWifiOnly = SharedPrefUtil.getBoolean(prefWifi, true);
-        if ((isWifiOnly && MiscUtil.isWifiConnected(getApplicationContext())) || (MiscUtil.isConnected(getApplicationContext()))) {
-            WallpaperUtils.startWallpaperCacheUpdaterService(getApplicationContext());
+        int jobId = params.getJobId();
+        if (jobId == MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE)) {
+            String prefWifi = getString(R.string.pref_wifi_download);
+            boolean isWifiOnly = SharedPrefUtil.getBoolean(prefWifi, true);
+            if ((isWifiOnly && MiscUtil.isWifiConnected(getApplicationContext())) || (MiscUtil.isConnected(getApplicationContext()))) {
+                WallpaperUtils.startWallpaperCacheUpdaterService(getApplicationContext());
+            }
+        } else if (jobId == MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET)) {
+            WallpaperUtils.setWallpaperFromCache(getApplicationContext(), WallpaperManager.FLAG_SYSTEM);
         }
 
         return true;

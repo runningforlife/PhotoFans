@@ -60,7 +60,7 @@ public class WifiStateReceiver extends BroadcastReceiver {
                 (MiscUtil.isConnected(context))) {
 
                 if (Build.VERSION.SDK_INT >= 21) {
-                    WallpaperUtils.startWallpaperUpdaterJob(context, MiscUtil.getJobId());
+                    WallpaperUtils.startWallpaperUpdaterJob(context, MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
                 } else {
                     WallpaperUtils.startWallpaperCacheUpdaterAlarm(context);
                 }

@@ -1,17 +1,11 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
-import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.text.TextUtils;
@@ -21,9 +15,7 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.data.local.RealmManager;
 import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
-import com.github.runningforlife.photosniffer.service.WallpaperCacheService;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
-import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
 
 import java.util.Iterator;
@@ -32,7 +24,6 @@ import java.util.Set;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-import static android.content.Context.JOB_SCHEDULER_SERVICE;
 import static com.github.runningforlife.photosniffer.ui.receiver.WallpaperAlarmReceiver.ALARM_AUTO_WALLPAPER;
 
 /**
@@ -117,14 +108,19 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         } else if (keyAutoWallpaper.equals(key)) {
             boolean isAuto = sharedPreferences.getBoolean(keyAutoWallpaper, true);
-            if (isAuto) {
-                WallpaperUtils.startAutoWallpaperAlarm(getActivity());
+            // for OS >= LL, use JobScheduler to do wallpaper setting
+            if (Build.VERSION.SDK_INT >= 21) {
+                WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
             } else {
-                cancelAutoWallpaperAlarm();
+                if (isAuto) {
+                    WallpaperUtils.startAutoWallpaperAlarm(getActivity());
+                } else {
+                    cancelAutoWallpaperAlarm();
+                }
             }
         } else if (keyWifiOnly.equals(key)) {
             if (Build.VERSION.SDK_INT >= 21) {
-                WallpaperUtils.startWallpaperUpdaterJob(getActivity(), MiscUtil.getJobId());
+                WallpaperUtils.startWallpaperUpdaterJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
             } else {
                 WallpaperUtils.startWallpaperCacheUpdaterAlarm(getActivity());
             }

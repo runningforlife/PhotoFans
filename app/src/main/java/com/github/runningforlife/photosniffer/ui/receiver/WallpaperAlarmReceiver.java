@@ -1,47 +1,16 @@
 package com.github.runningforlife.photosniffer.ui.receiver;
 
-import android.annotation.TargetApi;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.WallpaperManager;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Build;
-import android.os.SystemClock;
-import android.util.DisplayMetrics;
 import android.util.Log;
 
-import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.loader.GlideLoader;
-import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
-import com.github.runningforlife.photosniffer.data.model.ImageRealm;
-import com.github.runningforlife.photosniffer.service.LockScreenUpdateService;
-import com.github.runningforlife.photosniffer.service.MyThreadFactory;
-import com.github.runningforlife.photosniffer.service.WallpaperCacheService;
-import com.github.runningforlife.photosniffer.service.WallpaperUpdaterService;
-import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import io.realm.Realm;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
-
-import static android.content.Context.ALARM_SERVICE;
-import static android.content.Context.JOB_SCHEDULER_SERVICE;
 
 /**
  * auto wallpaper alarm receiver

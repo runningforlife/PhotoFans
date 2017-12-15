@@ -1,11 +1,5 @@
 package com.github.runningforlife.photosniffer.presenter;
 
-import android.annotation.TargetApi;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,19 +8,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.SystemClock;
 import android.util.Log;
-import android.webkit.WebView;
 
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
-import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,18 +30,12 @@ import io.realm.RealmResults;
 
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.service.ImageRetrieveService;
-import com.github.runningforlife.photosniffer.service.MyThreadFactory;
 import com.github.runningforlife.photosniffer.service.ServiceStatus;
 import com.github.runningforlife.photosniffer.service.SimpleResultReceiver;
-import com.github.runningforlife.photosniffer.service.WallpaperCacheService;
-import com.github.runningforlife.photosniffer.service.WallpaperUpdaterService;
 import com.github.runningforlife.photosniffer.ui.AllPictureView;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
-
-import static android.content.Context.ALARM_SERVICE;
-import static android.content.Context.JOB_SCHEDULER_SERVICE;
 
 /**
  * a presenter to bridge UI and data repository
@@ -365,7 +349,7 @@ public class AllPicturesPresenterImpl extends PresenterBase
         // start a scheduled job to update cache
         //WallpaperUtils.startWallpaperCacheUpdaterService(mContext);
         if (Build.VERSION.SDK_INT >= 21) {
-            WallpaperUtils.startWallpaperUpdaterJob(mContext, MiscUtil.getJobId());
+            WallpaperUtils.startWallpaperUpdaterJob(mContext, MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
         } else {
             WallpaperUtils.startWallpaperCacheUpdaterAlarm(mContext);
         }
