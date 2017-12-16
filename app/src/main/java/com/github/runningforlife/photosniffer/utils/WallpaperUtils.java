@@ -136,7 +136,7 @@ public class WallpaperUtils {
 
     public static void setWallpaperFromCache(Context context, int flag) {
         Log.v(TAG, "setWallpaperFromCache()");
-        String wallpaperDir = MiscUtil.getRootDir() + File.separator +  "wallpapers";
+        String wallpaperDir = MiscUtil.getWallpaperCacheDir();
         File file = new File(wallpaperDir);
         if (file.exists()) {
             File[] wallpapers = file.listFiles();

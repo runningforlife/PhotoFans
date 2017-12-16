@@ -69,7 +69,7 @@ public class WifiStateReceiver extends BroadcastReceiver {
     }
 
     private void uploadLogToCloud() {
-        String logPath = MiscUtil.getRootDir() + File.separator + PATH_CRASH_LOG;
+        String logPath = MiscUtil.getLogDir();
         File file = new File(logPath);
         if(file.exists()){
             File[] logs = file.listFiles();

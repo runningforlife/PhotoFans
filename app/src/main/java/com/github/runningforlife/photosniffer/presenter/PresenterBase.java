@@ -62,7 +62,7 @@ abstract class PresenterBase implements Presenter {
         mRealmMgr = RealmManager.getInstance();
         mOrderRealmChangeListener = new OrderReamChangeListener();
         mRealmApi = RealmApiImpl.getInstance();
-        mDiskCache = new DiskWallpaperCache(new File(MiscUtil.getRootDir()));
+        mDiskCache = new DiskWallpaperCache(new File(MiscUtil.getWallpaperCacheDir()));
         mHttpClient = MiscUtil.buildOkHttpClient();
 
         mNetworkErrorCount = 0;

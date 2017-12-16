@@ -71,4 +71,6 @@
     <string name="build_in_wallpaper_list" translatable="false">pref_built_in_wallpapers</string>
     <string name="wallpaper_cache_update_interval">43200000</string>
     <string name="pref_wallpaper_cache_index">pref_wallpaper_cache_index</string>
+    <string name="mesage_file_deletion_progress">File is being deleted, please wait...</string>
+    <string name="pref_cache_clear">pref_cache_clear</string>
 </resources>

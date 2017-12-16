@@ -40,13 +40,13 @@ public class EmptyListPreference extends MultiSelectListPreference{
     }
 
     @Override
-    public void onClick(){
+    public void onClick() {
         CharSequence[] sourceName = getEntries();
         CharSequence[] sourceUrl = getEntryValues();
         Set<String> defaultValues = getValues();
 
         List<ImageWebSite> sources = new ArrayList<>(sourceName.length);
-        for(int i = 0; i < sourceName.length; ++i){
+        for(int i = 0; i < sourceName.length; ++i) {
             //String src = sourceUrl[i].toString();
             ImageWebSite iw = new ImageWebSite(sourceName[i].toString(), sourceUrl[i].toString());
             sources.add(iw);

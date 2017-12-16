@@ -44,6 +44,7 @@
         android:inputType="numberDecimal"/>
 
     <com.github.runningforlife.photosniffer.ui.preference.MessagePreference
+        android:key="@string/pref_cache_clear"
         android:dialogTitle="@string/want_to_clear_cache"
         android:summary="@string/clear_image_caches"
         android:title="@string/clear_image_caches"/>

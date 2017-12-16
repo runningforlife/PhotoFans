@@ -45,7 +45,7 @@ public class ActionListDialogFragment extends DialogFragment{
         void onActionClick(String action, int pos);
     }
 
-    public ActionListDialogFragment(){
+    public ActionListDialogFragment() {
     }
 
     public static DialogFragment newInstance(List<String> actions){
