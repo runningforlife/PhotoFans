@@ -10,12 +10,12 @@ android {
             storePassword 'mama521a'
         }
     }
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.github.runningforlife.photosniffer"
-        minSdkVersion 15
-        targetSdkVersion 24
+        minSdkVersion 16
+        targetSdkVersion 26
         versionCode 2
         versionName "1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -40,30 +40,38 @@ android {
     }
 }
 
+ext {
+    supportLibVersion = "26.0.2"
+    glideVersion = "4.1.1"
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:cardview-v7:24.2.1'
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
-    compile 'com.android.support:support-annotations:24.2.1'
+    compile "com.android.support:cardview-v7:$supportLibVersion"
+    compile "com.android.support:appcompat-v7:$supportLibVersion"
+    compile "com.android.support:design:$supportLibVersion"
+    compile "com.android.support:support-annotations:$supportLibVersion"
     testCompile 'junit:junit:4.12'
     // mockito
     androidTestCompile 'org.mockito:mockito-android:2.8.9'
     testCompile 'org.mockito:mockito-core:2.8.9'
-    compile 'us.codecraft:webmagic-core:0.6.1'
-    compile 'com.squareup.okhttp3:okhttp:3.6.0'
-    //compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    compile 'com.jakewharton:butterknife:8.5.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    compile 'us.codecraft:webmagic-core:0.7.3'
+    compile 'com.squareup.okhttp3:okhttp:3.9.0'
+    compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    annotationProcessor "com.github.bumptech.glide:compiler:$glideVersion"
+    compile "com.github.bumptech.glide:glide:$glideVersion"
     compile 'in.srain.cube:ultra-ptr:1.0.11'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.github.bumptech.glide:glide:3.8.0'
     compile 'com.github.bumptech.glide:okhttp3-integration:1.5.0@aar'
     compile 'com.github.rahatarmanahmed:circularprogressview:2.5.0'
     // LeanCloud 基础包
     compile 'cn.leancloud.android:avoscloud-sdk:v4.1.0'
-    compile 'com.android.support:palette-v7:24.2.1'
+    compile "com.android.support:palette-v7:$supportLibVersion"
+    // photo picker
+    compile 'me.iwf.photopicker:PhotoPicker:0.9.10@aar'
+    compile 'com.nineoldandroids:library:2.4.0'
 }
