@@ -21,6 +21,8 @@ public interface cache {
 
     String getCacheKey(String url);
 
+    String getFileName(String key);
+
     boolean isExist(String url);
 
     final class Entry {

@@ -13,7 +13,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/grid_margin"
         android:layoutAnimation="@anim/anim_rcv_layout"
-        android:background="@color/colorLightGrey"
         android:scrollbars="vertical"
         android:scrollbarStyle="insideInset"
         android:scrollbarSize="@dimen/scroll_bar_size"/>

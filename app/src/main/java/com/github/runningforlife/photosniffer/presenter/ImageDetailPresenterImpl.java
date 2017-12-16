@@ -28,13 +28,13 @@ import java.util.concurrent.Executors;
 
 public class ImageDetailPresenterImpl extends PresenterBase implements ImageDetailPresenter {
     private static final String TAG = "ImageDetailPresenter";
-    //private ImageDetailView mView;
+    private ImageDetailView mView;
     private ExecutorService mExecutor;
 
     public ImageDetailPresenterImpl(Context context, ImageDetailView view){
         super(context, view);
         mContext = context;
-        //mView = view;
+        mView = view;
         mExecutor = Executors.newSingleThreadExecutor();
     }
 
@@ -72,7 +72,7 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
                     r.addCallback(ImageDetailPresenterImpl.this);
                     mExecutor.submit(r);
                 }else{
-                    ((ImageDetailView)mView).onImageSaveDone(null);
+                    mView.onImageSaveDone(null);
                 }
             }
         });
@@ -122,7 +122,19 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     @Override
     public void onImageSaveDone(String path) {
         Log.d(TAG,"onImageSaveDone()");
-        ((ImageDetailView)mView).onImageSaveDone(path);
+        mView.onImageSaveDone(path);
+    }
+
+    @Override
+    public void onImageLoadStart(int pos) {
+        Log.v(TAG,"onImageLoadStart()");
+        mView.onImageLoadStart(pos);
+    }
+
+    @Override
+    public void onImageLoadDone(int pos, boolean isSuccess) {
+        Log.v(TAG,"onImageLoadDone()");
+        mView.onImageLoadDone(pos, isSuccess);
     }
 
 }

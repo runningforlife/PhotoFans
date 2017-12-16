@@ -24,12 +24,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Priority;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
-import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenter;
 import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl;
+import com.github.runningforlife.photosniffer.presenter.NetState;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
 
@@ -38,7 +40,6 @@ import butterknife.ButterKnife;
 import io.realm.RealmObject;
 
 import com.github.runningforlife.photosniffer.ui.adapter.ImagePagerAdapter;
-import com.github.runningforlife.photosniffer.ui.adapter.NetworkStateCallback;
 import com.github.runningforlife.photosniffer.ui.adapter.PageAdapterCallback;
 import com.github.runningforlife.photosniffer.ui.adapter.PreviewAdapter;
 import com.github.runningforlife.photosniffer.ui.fragment.ActionListDialogFragment;
@@ -152,7 +153,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
         if(id == android.R.id.home){
@@ -164,7 +165,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 /*            Intent intent = new Intent(this, GalleryActivity.class);
             NavUtils.navigateUpTo(this,intent);*/
             return true;
-        }else if(id == R.id.action_more){
+        }else if(id == R.id.action_more) {
             showActionDialog();
         }
 
@@ -200,13 +201,17 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
     @Override
     public void onWallpaperSetDone(boolean isOk) {
-        if(isOk){
-            ToastUtil.showToast(this,
-                    getString(R.string.set_wallpaper_success));
-        }else{
-            ToastUtil.showToast(this,
-                    getString(R.string.set_wallpaper_fail));
+        Log.v(TAG,"onWallpaperSetDone()");
+        String toastMsg;
+        if (isOk) {
+            toastMsg = getString(R.string.set_wallpaper_success);
+        } else {
+            toastMsg = getString(R.string.set_wallpaper_fail);
         }
+
+        Message message = mMainHandler.obtainMessage(EventHandler.EVENT_SHOW_TOAST);
+        message.obj = toastMsg;
+        message.sendToTarget();
     }
 
     @Override
@@ -258,7 +263,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     @Override
     public void onImageLoadDone(int pos, boolean isSuccess) {
         Log.v(TAG,"onImageLoadDone()");
-
         mCpvLoad.stopAnimation();
         mCpvLoad.setVisibility(View.INVISIBLE);
     }
@@ -304,6 +308,12 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     @Override
+    public void loadImageIntoView(int pos, ImageView iv, Priority priority, int w, int h, ImageView.ScaleType scaleType) {
+        Log.v(TAG,"loadImageIntoView():pos = " + pos);
+        mPresenter.loadImageIntoView(pos, iv, priority, w, h, scaleType);
+    }
+
+    @Override
     public void onActionClick(String action, int pos) {
         Log.v(TAG,"onActionClick(): action = " + action);
 
@@ -334,7 +344,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
           .commit();
     }
 
-    private void initView(){
+    private void initView() {
         Log.v(TAG,"initView()");
         mAdapter = new PreviewAdapter(this,ImageDetailActivity.this);
         mPagerAdapter = new ImagePagerAdapter(this ,this);
@@ -382,7 +392,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mLvImgPreview.setAdapter(mAdapter);
     }
 
-    private void initActionList(){
+    private void initActionList() {
         mUserActionList = new ArrayList<>();
         String share = getString(R.string.action_share);
         String save = getString(R.string.action_save);
@@ -411,32 +421,41 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     @Override
     public void onImageSaveDone(String path) {
         Log.v(TAG,"onImageSaveDone(): isOk = " + !TextUtils.isEmpty(path));
-
+        String toastString;
         if(!TextUtils.isEmpty(path)) {
-            Message msg = mMainHandler.obtainMessage(EventHandler.IMAGE_SAVE_COMPLETE,path);
-            msg.sendToTarget();
+            toastString = getString(R.string.save_image_Success) + path;
         }else{
-            Message msg = mMainHandler.obtainMessage(EventHandler.IMAGE_SAVE_FAIL);
-            msg.sendToTarget();
+            toastString = getString(R.string.save_image_fail);
         }
+        Message msg = mMainHandler.obtainMessage(EventHandler.EVENT_SHOW_TOAST);
+        msg.obj = toastString;
+        msg.sendToTarget();
     }
 
     @Override
-    public void onNetworkState(@NetworkState String state) {
+    public void onNetworkState(@NetState String state) {
         Log.v(TAG,"onNetworkState(): state=" + state);
+        String toastString = null;
         switch (state) {
-            case NetworkStateCallback.STATE_DISCONNECT:
-                showToast(getString(R.string.network_not_connected));
+            case NetState.STATE_DISCONNECT:
+                toastString = getString(R.string.network_not_connected);
                 break;
-            case NetworkStateCallback.STATE_HUNG:
-                showToast(getString(R.string.hint_network_state_hung));
+            case NetState.STATE_HUNG:
+                toastString = getString(R.string.hint_network_state_hung);
                 break;
-            case NetworkStateCallback.STATE_SLOW:
-                showToast(getString(R.string.hint_network_state_slow));
+            case NetState.STATE_SLOW:
+                toastString = getString(R.string.hint_network_state_slow);
                 break;
             default:
                 break;
         }
+
+        if (!TextUtils.isEmpty(toastString)) {
+            Message message = mMainHandler.obtainMessage(EventHandler.EVENT_SHOW_TOAST);
+            message.obj = toastString;
+            message.sendToTarget();
+        }
+
     }
 
     private void showToast(String msg) {
@@ -510,6 +529,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mPresenter.setWallpaperAtPos(pos);
     }
 
+
     private class EventHandler extends Handler{
 
         static final int IMAGE_SAVE_COMPLETE = 1;
@@ -518,6 +538,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         static final int IMAGE_DELETE_COMPLETE = 4;
         static final int IMAGE_SHARE_COMPLETE = 5;
         static final int EVENT_HIDE_PREVIEW = 6;
+        static final int EVENT_SHOW_TOAST = 10;
 
         EventHandler(Looper looper){
             super(looper);
@@ -537,6 +558,9 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
                     ToastUtil.showToast(ImageDetailActivity.this,toast1);
                 case EVENT_HIDE_PREVIEW:
                     hidePreview();
+                    break;
+                case EVENT_SHOW_TOAST:
+                    showToast((String)msg.obj);
                     break;
                 default:
                     break;

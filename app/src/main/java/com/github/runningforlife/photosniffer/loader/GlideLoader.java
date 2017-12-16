@@ -4,7 +4,9 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.app.Fragment;
+import android.widget.ImageView;
 
+import com.bumptech.glide.BitmapTypeRequest;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.Priority;
@@ -23,29 +25,25 @@ import java.text.DecimalFormat;
 
 public class GlideLoader {
 
-    public static void load(Context context, ImagePagerAdapter.ImageLoaderListener listener, String url,
-                            Priority priority, int w, int h) {
-        Glide.with(context)
-                .load(url)
-                .asBitmap()
-                .listener(listener)
-                .priority(priority)
-                .crossFade()
-                .thumbnail((float)0.3)
-                .into(w,h);
-    }
-
     public static void load(Context context, String url, GlideLoaderListener listener,
-                            Priority priority, int w, int h){
-        Glide.with(context)
+                            Priority priority, int w, int h, ImageView.ScaleType scaleType){
+        BitmapTypeRequest<String> btr = (BitmapTypeRequest<String>) Glide.with(context)
                 .load(url)
                 .asBitmap()
                 .priority(priority)
-                .listener(listener)
-                .centerCrop()
+                .listener(listener);
+        if (scaleType == ImageView.ScaleType.CENTER_CROP) {
+             btr.centerCrop()
                 .crossFade()
                 .thumbnail((float)0.3)
                 .into(w,h);
+        } else {
+             btr.fitCenter()
+                .crossFade()
+                .thumbnail((float)0.3)
+                .into(w,h);
+        }
+
     }
 
     public static void load(Fragment fragment, String url, GlideLoaderListener listener,
@@ -79,12 +77,6 @@ public class GlideLoader {
                     .listener(listener)
                     .into(w, h);
         }
-    }
-
-    public static void downloadOriginalImage(Context context, String url, Target<File> target) {
-        Glide.with(context)
-             .load(url)
-             .downloadOnly(target);
     }
 
     public static void pauseRequest(Context context){

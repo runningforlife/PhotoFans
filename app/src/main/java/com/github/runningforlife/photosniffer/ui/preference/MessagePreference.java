@@ -29,6 +29,8 @@ public class MessagePreference extends DialogPreference {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public MessagePreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+
+        mDeletionExecutor = Executors.newSingleThreadExecutor();
     }
 
     public MessagePreference(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -42,8 +44,6 @@ public class MessagePreference extends DialogPreference {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public MessagePreference(Context context) {
         super(context);
-
-        mDeletionExecutor = Executors.newSingleThreadExecutor();
     }
 
     @Override
@@ -55,13 +55,18 @@ public class MessagePreference extends DialogPreference {
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                DeleteRunnable cache = new DeleteRunnable(cacheDir);
-                DeleteRunnable log = new DeleteRunnable(logDir);
-                DeleteRunnable wallpaper = new DeleteRunnable(wallpaperDir);
-
-                mDeletionExecutor.submit(cache);
-                mDeletionExecutor.submit(log);
-                mDeletionExecutor.submit(wallpaper);
+                if (cacheDir.exists()) {
+                    DeleteRunnable cache = new DeleteRunnable(cacheDir);
+                    mDeletionExecutor.submit(cache);
+                }
+                if (logDir.exists()) {
+                    DeleteRunnable log = new DeleteRunnable(logDir);
+                    mDeletionExecutor.submit(log);
+                }
+                if (wallpaperDir.exists()) {
+                    DeleteRunnable wallpaper = new DeleteRunnable(wallpaperDir);
+                    mDeletionExecutor.submit(wallpaper);
+                }
             }
         });
     }
@@ -75,7 +80,7 @@ public class MessagePreference extends DialogPreference {
         }
     }
 
-    private final class DeleteRunnable implements Runnable{
+    private final class DeleteRunnable implements Runnable {
         private File file;
 
         DeleteRunnable(File file){

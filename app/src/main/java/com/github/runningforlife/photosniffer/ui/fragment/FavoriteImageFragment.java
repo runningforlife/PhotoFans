@@ -34,8 +34,7 @@ import io.realm.RealmObject;
  * a fragment containing all favorite images
  */
 
-public class FavoriteImageFragment extends BaseFragment
-        implements GalleryAdapterCallback, FavorPictureView {
+public class FavoriteImageFragment extends BaseFragment implements FavorPictureView {
     public static final String TAG = "FavorImageFragment";
     @BindView(R.id.rcv_gallery) RecyclerView mRcvFavorList;
     GalleryAdapter mAdapter;
@@ -62,20 +61,6 @@ public class FavoriteImageFragment extends BaseFragment
 
         return root;
     }
-
-    @Override
-    public void onAttach(Context context){
-        super.onAttach(context);
-
-        Log.v(TAG,"onAttach()");
-        try {
-            mCallback = (FragmentCallback)context;
-        } catch (ClassCastException e){
-            Log.e(TAG,"parent activity must implement FragmentCallback");
-            throw new IllegalStateException("parent activity must implement FragmentCallback");
-        }
-    }
-
 
     @Override
     public void onResume(){
@@ -105,20 +90,9 @@ public class FavoriteImageFragment extends BaseFragment
         mRcvFavorList.setBackgroundResource(R.color.colorLightGrey);
 
         mAdapter = new GalleryAdapter(getActivity(),this);
-        mAdapter.setImageLoader(Loader.GLIDE);
         mRcvFavorList.setAdapter(mAdapter);
         //option menu
         setHasOptionsMenu(true);
-    }
-
-    @Override
-    public int getCount() {
-        return mPresenter.getItemCount();
-    }
-
-    @Override
-    public RealmObject getItemAtPos(int pos) {
-        return mPresenter.getItemAtPos(pos);
     }
 
     @Override
@@ -128,11 +102,6 @@ public class FavoriteImageFragment extends BaseFragment
         if(mCallback != null){
             mCallback.onItemClick(view,pos, ((ImageRealm)mPresenter.getItemAtPos(pos)).getUrl());
         }
-    }
-
-    @Override
-    public void removeItemAtPos(int pos) {
-        mPresenter.removeItemAtPos(pos);
     }
 
     @Override
@@ -148,16 +117,6 @@ public class FavoriteImageFragment extends BaseFragment
         } else {
             mAdapter.notifyDataSetChanged();
         }
-    }
-
-    @Override
-    public boolean isRefreshing() {
-        return false;
-    }
-
-    @Override
-    public void setRefreshing(boolean enable) {
-        //empty
     }
 
     @Override
@@ -189,24 +148,6 @@ public class FavoriteImageFragment extends BaseFragment
     }
 
     @Override
-    public void onImageSaveDone(String path) {
-        if(!TextUtils.isEmpty(path)){
-            mCallback.showToast(getString(R.string.save_image_Success));
-        }else{
-            mCallback.showToast(getString(R.string.save_image_fail));
-        }
-    }
-
-    @Override
-    public void onWallpaperSetDone(boolean isOk) {
-        if(isOk){
-            mCallback.showToast(getString(R.string.set_wallpaper_success));
-        }else{
-            mCallback.showToast(getString(R.string.set_wallpaper_fail));
-        }
-    }
-
-    @Override
     public void onContextMenuCreated(int pos, String adapter) {
         Log.v(TAG,"onContextMenuCreated()");
 
@@ -214,10 +155,10 @@ public class FavoriteImageFragment extends BaseFragment
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item){
+    public boolean onContextItemSelected(MenuItem item) {
         Log.v(TAG,"onContextItemSelected()");
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.menu_save:
                 mPresenter.saveImageAtPos(mCurrentPos);
                 break;
@@ -237,7 +178,7 @@ public class FavoriteImageFragment extends BaseFragment
     private void initPresenter(){
         mPresenter = new FavorImagePresenterImpl(getContext(),this);
         mPresenter.init();
-
+        setPresenter(mPresenter);
         mPresenter.onStart();
     }
 

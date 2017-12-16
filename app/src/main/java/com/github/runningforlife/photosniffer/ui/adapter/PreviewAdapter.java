@@ -58,12 +58,11 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
         String url = ((ImageRealm)mCallback.getItemAtPos(position)).getUrl();
         // preload
         MiscUtil.preloadImage(holder.preview);
-        //holder.preview.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_view_alpha));
         GlideLoaderListener listener = new GlideLoaderListener(holder.preview);
         listener.setReqWidth(DEFAULT_IMAGE_WIDTH);
         listener.setReqHeight(DEFAULT_IMAGE_HEIGHT);
         GlideLoader.load(mContext.getApplicationContext(),url, listener, Priority.NORMAL,
-                DEFAULT_IMAGE_MEDIUM_WIDTH,DEFAULT_IMAGE_MEDIUM_WIDTH);
+                DEFAULT_IMAGE_MEDIUM_WIDTH,DEFAULT_IMAGE_MEDIUM_WIDTH, ImageView.ScaleType.CENTER_CROP);
     }
 
     @Override

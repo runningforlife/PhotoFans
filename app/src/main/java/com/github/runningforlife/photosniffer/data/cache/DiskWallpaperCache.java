@@ -168,6 +168,11 @@ public class DiskWallpaperCache implements cache {
         return mEntries.get(getCacheKey(url)) != null;
     }
 
+    @Override
+    public String getFileName(String key) {
+        return key + DEFAULT_IMAGE_FORMAT;
+    }
+
     private synchronized void initialize() {
         if (!mRootDir.exists()) {
             if (!mRootDir.mkdirs()) {

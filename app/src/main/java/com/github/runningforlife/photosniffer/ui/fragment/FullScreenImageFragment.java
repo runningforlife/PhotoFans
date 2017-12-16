@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
@@ -47,7 +48,7 @@ import static com.github.runningforlife.photosniffer.data.model.UserAction.WALLP
  * a dialog to show full screen image
  */
 
-public class FullScreenImageFragment extends BaseFragment implements ActionListDialogFragment.ActionCallback{
+public class FullScreenImageFragment extends Fragment implements ActionListDialogFragment.ActionCallback{
     public static final String TAG = "FullScreenImageFragment";
     public static final String POSITION = "position";
     public static final String IMAGE_URL = "image_url";
@@ -79,7 +80,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         Log.v(TAG, "onResume()");
         //setHasOptionsMenu(true);
@@ -97,7 +98,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
         return root;
     }
 
-    private void initDialogWindow(){
+    private void initDialogWindow() {
         Log.v(TAG,"initDialogWindow()");
         Window window = getActivity().getWindow();
         if(window != null) {
@@ -112,7 +113,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
     }
 
 
-    private void initView(){
+    private void initView() {
         Log.v(TAG,"initView()");
         if(Build.VERSION.SDK_INT >= 21) {
             // transition name
@@ -139,7 +140,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
         });
     }
 
-    private void showActionListFragment(){
+    private void showActionListFragment() {
         if(getActivity() != null) {
             FragmentManager fragmentMgr = getActivity().getSupportFragmentManager();
 
@@ -157,7 +158,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
         }
     }
 
-    private void initActionList(){
+    private void initActionList() {
         mUserActionList = new ArrayList<>();
         //String share = getString(R.string.action_share);
         String save = getString(R.string.action_save);
@@ -189,7 +190,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
         }
     }
 
-    private void saveImage(){
+    private void saveImage() {
         String url = getArguments().getString(IMAGE_URL);
         if(!TextUtils.isEmpty(url)){
             GlideLoaderListener listener = new GlideLoaderListener(null);
@@ -220,7 +221,7 @@ public class FullScreenImageFragment extends BaseFragment implements ActionListD
         }
     }
 
-    private void setWallpaper(){
+    private void setWallpaper() {
         Log.v(TAG,"setWallpaperAtPos()");
         final String url = getArguments().getString(IMAGE_URL);
         if(!TextUtils.isEmpty(url)){

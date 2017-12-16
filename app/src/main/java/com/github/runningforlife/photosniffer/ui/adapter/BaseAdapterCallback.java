@@ -1,6 +1,9 @@
 package com.github.runningforlife.photosniffer.ui.adapter;
 
 import android.view.View;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Priority;
 
 import io.realm.RealmObject;
 
@@ -30,4 +33,9 @@ public interface BaseAdapterCallback {
      * remove item at pos
      */
     void removeItemAtPos(int pos);
+
+    /**
+     * load image into view
+     */
+    void loadImageIntoView(int pos, ImageView iv, Priority priority, int w, int h, ImageView.ScaleType scaleType);
 }

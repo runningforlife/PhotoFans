@@ -3,17 +3,11 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
-import com.bumptech.glide.request.Request;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SizeReadyCallback;
-import com.bumptech.glide.request.target.Target;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.data.cache.DiskWallpaperCache;
 import com.github.runningforlife.photosniffer.data.cache.cache;
@@ -24,20 +18,18 @@ import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.ui.UI;
-import com.github.runningforlife.photosniffer.ui.WallpaperView;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.RealmResults;
-import io.realm.Sort;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -49,6 +41,9 @@ import okhttp3.Response;
 
 abstract class PresenterBase implements Presenter {
     private static final String TAG = "PresenterBase";
+
+    private int mNetworkErrorCount;
+    private ExecutorService mDecodeExecutor;
 
     Context mContext;
     UI mView;
@@ -69,6 +64,72 @@ abstract class PresenterBase implements Presenter {
         mRealmApi = RealmApiImpl.getInstance();
         mDiskCache = new DiskWallpaperCache(new File(MiscUtil.getRootDir()));
         mHttpClient = MiscUtil.buildOkHttpClient();
+
+        mNetworkErrorCount = 0;
+        mDecodeExecutor = Executors.newFixedThreadPool(2);
+    }
+
+
+    @Override
+    public void onImageLoadStart(int pos) {
+       // for detail presenter to use
+    }
+
+    @Override
+    public void onImageLoadDone(int pos, boolean isSuccess) {
+        // for detail presenter to use
+    }
+
+    @Override
+    public void loadImageIntoView(final int pos, final ImageView iv, Priority priority, int w, int h, ImageView.ScaleType scaleType) {
+        Log.v(TAG,"loadImageIntoView()");
+        final String url = mImageList.get(pos).getUrl();
+        if (!mDiskCache.isExist(url)) {
+            GlideLoaderListener listener = new GlideLoaderListener(iv);
+            listener.setScaleType(scaleType);
+            listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+                @Override
+                public void onImageLoadDone(Object o) {
+                    Log.v(TAG,"onImageLoadDone()");
+                    // 404 or socket timeout
+                    if (o instanceof Exception) {
+                        ++mNetworkErrorCount;
+                        if (MiscUtil.isConnected(mContext)) {
+                            // network is slow
+                            ++mNetworkErrorCount;
+                            if (mNetworkErrorCount >= NETWORK_SLOW_ERROR_COUNT && mNetworkErrorCount < NETWORK_HUNG_ERROR_COUNT) {
+                                mView.onNetworkState(NetState.STATE_SLOW);
+                            } else if (mNetworkErrorCount >= NETWORK_HUNG_ERROR_COUNT) {
+                                mView.onNetworkState(NetState.STATE_HUNG);
+                            }
+                        } else {
+                            mView.onNetworkState(NetState.STATE_DISCONNECT);
+                        }
+                        PresenterBase.this.onImageLoadDone(pos, false);
+                    } else {
+                        PresenterBase.this.onImageLoadDone(pos, true);
+                    }
+                }
+            });
+
+            onImageLoadStart(pos);
+            GlideLoader.load(mContext.getApplicationContext(), url, listener, priority, w, h, scaleType);
+        } else {
+            final String key = mDiskCache.getCacheKey(url);
+            final String fileName = mDiskCache.getFileName(key);
+            ImageDecodeRunnable idr = new ImageDecodeRunnable(fileName, w, h);
+            mDecodeExecutor.submit(idr);
+            idr.setDecodeCallback(new ImageDecodeRunnable.DecodeCallback() {
+                @Override
+                public void onDecodeDone(Bitmap bitmap) {
+                    if (bitmap != null) {
+                        iv.setImageBitmap(bitmap);
+                    } else {
+                        Log.e(TAG,"fail to decode cache file:" + fileName);
+                    }
+                }
+            });
+        }
     }
 
     void setWallpaper(final String url) {

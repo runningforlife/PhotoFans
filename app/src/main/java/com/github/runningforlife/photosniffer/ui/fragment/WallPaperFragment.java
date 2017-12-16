@@ -30,8 +30,7 @@ import io.realm.RealmObject;
  * fragment to manager wallpaper
  */
 
-public class WallPaperFragment extends BaseFragment
-        implements GalleryAdapterCallback, WallpaperView{
+public class WallPaperFragment extends BaseFragment implements WallpaperView {
     public static final String TAG = "WallpaperFragment";
 
     @BindView(R.id.rcv_gallery) RecyclerView mRcvWallpaper;
@@ -57,18 +56,6 @@ public class WallPaperFragment extends BaseFragment
         return root;
     }
 
-    @Override
-    public void onAttach(Context context){
-        super.onAttach(context);
-
-        Log.v(TAG,"onAttach()");
-        try {
-            mCallback = (FragmentCallback)context;
-        }catch (ClassCastException e){
-            Log.e(TAG,"parent activity must implement FragmentCallback");
-            throw new IllegalStateException("refresh callback must be implemented");
-        }
-    }
 
     @Override
     public void onResume() {
@@ -89,26 +76,11 @@ public class WallPaperFragment extends BaseFragment
     }
 
     @Override
-    public int getCount() {
-        return mPresenter.getItemCount();
-    }
-
-    @Override
-    public RealmObject getItemAtPos(int pos) {
-        return mPresenter.getItemAtPos(pos);
-    }
-
-    @Override
     public void onItemClicked(View view, int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
         if(mCallback != null){
             mCallback.onItemClick(view,pos, mPresenter.getItemAtPos(pos).getUrl());
         }
-    }
-
-    @Override
-    public void removeItemAtPos(int pos) {
-        mPresenter.removeItemAtPos(pos);
     }
 
     @Override
@@ -123,24 +95,6 @@ public class WallPaperFragment extends BaseFragment
             mAdapter.notifyItemRangeChanged(start, len);
         } else {
             mAdapter.notifyDataSetChanged();
-        }
-    }
-
-    @Override
-    public void onImageSaveDone(String path) {
-        if(!TextUtils.isEmpty(path)){
-            mCallback.showToast(getString(R.string.save_image_Success));
-        }else{
-            mCallback.showToast(getString(R.string.save_image_fail));
-        }
-    }
-
-    @Override
-    public void onWallpaperSetDone(boolean isOk) {
-        if(isOk){
-            mCallback.showToast(getString(R.string.set_wallpaper_success));
-        }else{
-            mCallback.showToast(getString(R.string.set_wallpaper_fail));
         }
     }
 
@@ -186,6 +140,7 @@ public class WallPaperFragment extends BaseFragment
     private void initPresenter() {
         mPresenter = new WallpaperPresenterImpl(getContext(), this);
         mPresenter.init();
+        setPresenter(mPresenter);
         mPresenter.onStart();
     }
 }

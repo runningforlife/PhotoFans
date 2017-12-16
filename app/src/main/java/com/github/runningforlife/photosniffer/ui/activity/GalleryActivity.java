@@ -129,7 +129,7 @@ public class GalleryActivity extends BaseActivity
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         Log.v(TAG,"onDestroy()");
     }
@@ -204,10 +204,7 @@ public class GalleryActivity extends BaseActivity
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                if(!mIsToastShowing) {
-                    ToastUtil.showToast(GalleryActivity.this, msg);
-                    mIsToastShowing = true;
-                }
+                ToastUtil.showToast(GalleryActivity.this, msg);
             }
         });
 

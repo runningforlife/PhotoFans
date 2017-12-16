@@ -19,17 +19,13 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.presenter.AllPicturesPresenter;
 import com.github.runningforlife.photosniffer.presenter.AllPicturesPresenterImpl;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.AllPictureView;
 import com.github.runningforlife.photosniffer.ui.activity.ImageDetailActivity;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
-import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
-import com.github.runningforlife.photosniffer.ui.adapter.NetworkStateCallback;
 import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
@@ -41,8 +37,7 @@ import io.realm.RealmObject;
  * a fragment to display all pictures
  */
 
-public class AllPicturesFragment extends BaseFragment implements AllPictureView,
-        GalleryAdapterCallback {
+public class AllPicturesFragment extends BaseFragment implements AllPictureView {
     public static final String TAG = "AllPicturesFragment";
 
     @BindView(R.id.rcv_gallery) RecyclerView mRvImgList;
@@ -227,21 +222,6 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
     }
 
     @Override
-    public int getCount() {
-        return mPresenter.getItemCount();
-    }
-
-    @Override
-    public RealmObject getItemAtPos(int pos) {
-        return mPresenter.getItemAtPos(pos);
-    }
-
-    @Override
-    public void removeItemAtPos(int pos) {
-        mPresenter.removeItemAtPos(pos);
-    }
-
-    @Override
     public void onImageSaveDone(String path) {
         Log.v(TAG,"onImageSaveDone(): isOk = " + !TextUtils.isEmpty(path));
         if(!TextUtils.isEmpty(path)) {
@@ -325,12 +305,13 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView,
         setHasOptionsMenu(true);
     }
 
-    private void initPresenter(){
+    private void initPresenter() {
         mPresenter = new AllPicturesPresenterImpl(getContext(),this);
         mPresenter.init();
+        setPresenter(mPresenter);
     }
 
-    private void setTitle(){
+    private void setTitle() {
         String appName = getString(R.string.app_name);
         Activity activity = getActivity();
         if(activity != null){

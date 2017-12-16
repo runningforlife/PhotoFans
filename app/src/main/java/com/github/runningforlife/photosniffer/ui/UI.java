@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.ui;
 
+import com.github.runningforlife.photosniffer.presenter.NetState;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 
 /**
@@ -15,7 +16,17 @@ public interface UI {
     void onDataSetChange(int start, int end, RealmOp op);
 
     /*
+    * image save is done
+    */
+    void onImageSaveDone(String path);
+
+    /*
     * notify user the result of setting wallpaper
     */
     void onWallpaperSetDone(boolean isOk);
+
+    /**
+     * notify user the current network state
+     */
+    void onNetworkState(@NetState String state);
 }
