@@ -86,7 +86,8 @@ public class WallpaperUtils {
 
     @TargetApi(21)
     public static void startWallpaperSettingJob(Context context, int jobId) {
-        int interval = Integer.parseInt(context.getString(R.string.pref_auto_wallpaper_interval));
+        String keyWallpaperInterval = context.getString(R.string.pref_auto_wallpaper_interval);
+        int interval = Integer.parseInt(SharedPrefUtil.getString(keyWallpaperInterval, "900000"));
 
         ComponentName jobService = new ComponentName(context, WallpaperJobService.class);
         JobInfo.Builder builder = new JobInfo.Builder(jobId, jobService);
