@@ -87,7 +87,7 @@ public class LockScreenUpdateService extends Service {
             Log.v(TAG,"handleMessage()");
             if (message.what == EVENT_SET_LOCK_SCREEN_WALLPAPER) {
                 // set wallpaper from cache
-                if (Build.VERSION.SDK_INT >= 21) {
+                if (Build.VERSION.SDK_INT >= 24) {
                     WallpaperUtils.setWallpaperFromCache(getApplicationContext(), WallpaperManager.FLAG_LOCK);
                 }
             }

@@ -69,13 +69,6 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        mPresenter.onDestroy();
-    }
-
-    @Override
     public void onItemClicked(View view, int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
         if(mCallback != null){
@@ -139,7 +132,6 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
 
     private void initPresenter() {
         mPresenter = new WallpaperPresenterImpl(getContext(), this);
-        mPresenter.init();
         setPresenter(mPresenter);
         mPresenter.onStart();
     }

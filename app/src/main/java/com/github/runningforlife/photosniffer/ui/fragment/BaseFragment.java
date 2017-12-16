@@ -55,9 +55,8 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         //setRetainInstance(true);
     }
 
-
     @Override
-    public void onAttach(Context context){
+    public void onAttach(Context context) {
         super.onAttach(context);
         Log.v(TAG,"onAttach()");
         try {
@@ -69,9 +68,15 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        Log.v(TAG,"onResume()");
+    }
+
+    @Override
     public void onDestroy(){
         super.onDestroy();
-        //GlideLoader.pauseRequest(getContext());
+        mPresenter.onDestroy();
     }
 
     @Override

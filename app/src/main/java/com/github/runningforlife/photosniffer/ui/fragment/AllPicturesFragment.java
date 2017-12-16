@@ -79,26 +79,9 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     @Override
     public void onResume(){
         super.onResume();
-
-        mRvImgList.invalidate();
+        //mRvImgList.invalidate();
 
         setTitle();
-        //mRvImgList.removeAllViews();
-        mPresenter.onStart();
-    }
-
-    @Override
-    public void onDestroyView(){
-        super.onDestroyView();
-        Log.v(TAG,"onDestroyView()");
-        //mPresenter.onDestroy();
-    }
-
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-        Log.v(TAG,"onDestroy()");
-        mPresenter.onDestroy();
     }
 
     @Override
@@ -307,8 +290,8 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
 
     private void initPresenter() {
         mPresenter = new AllPicturesPresenterImpl(getContext(),this);
-        mPresenter.init();
         setPresenter(mPresenter);
+        mPresenter.onStart();
     }
 
     private void setTitle() {

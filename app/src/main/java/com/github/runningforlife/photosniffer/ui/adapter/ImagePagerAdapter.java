@@ -58,7 +58,7 @@ public class ImagePagerAdapter extends PagerAdapter {
 
         // preload image
         ImageView iv = (ImageView)view;
-        MiscUtil.preloadImage(iv);
+        //MiscUtil.preloadImage(iv);
         view.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_scale_in));
         mCallback.loadImageIntoView(position, iv, Priority.IMMEDIATE,
                 DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT, ImageView.ScaleType.FIT_CENTER);

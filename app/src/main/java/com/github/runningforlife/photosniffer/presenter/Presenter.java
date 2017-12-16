@@ -25,11 +25,6 @@ public interface Presenter extends ImageSaveRunnable.ImageSaveCallback, LifeCycl
     DisplayMetrics dm = DisplayUtil.getScreenDimen();
 
     /*
-     * init presenter
-     */
-    void init();
-
-    /*
      * get total item
      */
     int getItemCount();

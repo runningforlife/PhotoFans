@@ -121,10 +121,8 @@ public class AllPicturesPresenterImpl extends PresenterBase
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void init() {
-        Log.v(TAG,"init()");
-
+    public void onStart() {
+        Log.v(TAG,"onStart()");
         HashMap<String,String> params = new HashMap<>();
         params.put("mIsUsed", Boolean.toString(true));
         params.put("mIsFavor", Boolean.toString(false));
@@ -149,11 +147,6 @@ public class AllPicturesPresenterImpl extends PresenterBase
     }
 
     @Override
-    public void onStart() {
-        Log.v(TAG,"onStart()");
-    }
-
-    @Override
     public void onDestroy() {
         Log.v(TAG,"onDestroy()");
         // stop service
@@ -167,7 +160,7 @@ public class AllPicturesPresenterImpl extends PresenterBase
     @Override
     public void onImageSaveDone(String path) {
         Log.v(TAG,"onImageSaveDone()");
-        ((AllPictureView)mView).onImageSaveDone(path);
+        mView.onImageSaveDone(path);
     }
 
 

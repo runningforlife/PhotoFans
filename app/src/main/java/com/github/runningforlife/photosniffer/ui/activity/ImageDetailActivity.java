@@ -110,7 +110,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         Log.v(TAG,"onResume()");
         mPresenter.onStart();
@@ -128,7 +128,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         Log.v(TAG,"onDestroy()");
         //mMainHandler = null;
@@ -162,8 +162,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
             }else {
                 finish();
             }
-/*            Intent intent = new Intent(this, GalleryActivity.class);
-            NavUtils.navigateUpTo(this,intent);*/
             return true;
         }else if(id == R.id.action_more) {
             showActionDialog();
@@ -383,13 +381,9 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         getPreviewScrollParams();
     }
 
-    private void initPresenter(){
+    private void initPresenter() {
         mPresenter = new ImageDetailPresenterImpl(getApplicationContext(),ImageDetailActivity.this);
         // may have null pointer exception
-        mPresenter.init();
-        // set adapter to bind data
-        mImgPager.setAdapter(mPagerAdapter);
-        mLvImgPreview.setAdapter(mAdapter);
     }
 
     private void initActionList() {
@@ -483,9 +477,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         @Override
         public void onPageScrollStateChanged(int state) {
-            // FIXME:java.lang.IllegalStateException: The application's PagerAdapter changed the adapter's contents
-            //without calling PagerAdapter#notifyDataSetChanged!
-            //Expected adapter item count: 101, found: 99
             if(state == ViewPager.SCROLL_STATE_IDLE){
                 mPagerAdapter.notifyDataSetChanged();
             }

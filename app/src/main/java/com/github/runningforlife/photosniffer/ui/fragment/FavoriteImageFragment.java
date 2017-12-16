@@ -73,13 +73,6 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
         setTitle(getString(R.string.my_favorite_images));
     }
 
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-
-        mPresenter.onDestroy();
-    }
-
     private void initView(){
         GridLayoutManager glm = new GridLayoutManager(getContext(), 2);
         glm.setAutoMeasureEnabled(true);
@@ -177,7 +170,6 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
 
     private void initPresenter(){
         mPresenter = new FavorImagePresenterImpl(getContext(),this);
-        mPresenter.init();
         setPresenter(mPresenter);
         mPresenter.onStart();
     }

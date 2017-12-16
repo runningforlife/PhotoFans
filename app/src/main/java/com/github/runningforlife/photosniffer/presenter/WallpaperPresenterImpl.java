@@ -34,12 +34,6 @@ public class WallpaperPresenterImpl extends PresenterBase {
     }
 
     @Override
-    public void init() {
-        Log.v(TAG,"init()");
-        //mRealmMgr.onStart();
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public void onStart() {
         Log.v(TAG,"onStart()");

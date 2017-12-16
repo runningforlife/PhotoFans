@@ -27,24 +27,15 @@ import io.realm.RealmResults;
 
 public class FavorImagePresenterImpl extends PresenterBase {
     private static final String TAG = "FavorImagePresenter";
-    private ExecutorService mExecutor;
 
     public FavorImagePresenterImpl(Context context, FavorPictureView view){
         super(context, view);
-        mExecutor = Executors.newSingleThreadExecutor();
-    }
-
-    @Override
-    public void init() {
-        Log.v(TAG,"init()");
-        // start loading data
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void onStart() {
         Log.v(TAG,"onStart()");
-
         HashMap<String,String> params = new HashMap<>();
         params.put("mIsUsed", Boolean.toString(true));
         params.put("mIsFavor", Boolean.toString(true));

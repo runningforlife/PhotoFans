@@ -29,25 +29,17 @@ import java.util.concurrent.Executors;
 public class ImageDetailPresenterImpl extends PresenterBase implements ImageDetailPresenter {
     private static final String TAG = "ImageDetailPresenter";
     private ImageDetailView mView;
-    private ExecutorService mExecutor;
 
     public ImageDetailPresenterImpl(Context context, ImageDetailView view){
         super(context, view);
         mContext = context;
         mView = view;
-        mExecutor = Executors.newSingleThreadExecutor();
     }
 
     @Override
     public void favorImageAtPos(int pos) {
         Log.d(TAG,"favorImageAtPos(): pos = " + pos);
         markAsFavor(mImageList.get(pos).getUrl());
-    }
-
-    @Override
-    public void init() {
-        Log.v(TAG,"init()");
-        //mRealmMgr.onStart();
     }
 
     @Override
