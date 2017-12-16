@@ -17,6 +17,7 @@ import com.github.runningforlife.photosniffer.data.local.RealmManager;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
+import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
@@ -35,15 +36,19 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
+import static com.github.runningforlife.photosniffer.presenter.ImageSaveRunnable.*;
+
 /**
  * base class for presenter
  */
 
-abstract class PresenterBase implements Presenter {
+abstract class PresenterBase implements Presenter, ImageSaveCallback{
     private static final String TAG = "PresenterBase";
 
     private int mNetworkErrorCount;
     private ExecutorService mDecodeExecutor;
+    // for image save or wallpaper setting
+    private ExecutorService mImageExecutor;
 
     Context mContext;
     UI mView;
@@ -67,6 +72,7 @@ abstract class PresenterBase implements Presenter {
 
         mNetworkErrorCount = 0;
         mDecodeExecutor = Executors.newFixedThreadPool(2);
+        mImageExecutor = Executors.newSingleThreadExecutor();
     }
 
 
@@ -78,6 +84,41 @@ abstract class PresenterBase implements Presenter {
     @Override
     public void onImageLoadDone(int pos, boolean isSuccess) {
         // for detail presenter to use
+    }
+
+    @Override
+    public void onImageSaveDone(String path) {
+        Log.v(TAG,"onImageSaveDone()");
+        mView.onImageSaveDone(path);
+    }
+
+    @Override
+    public void setWallpaperAtPos(int pos) {
+        if(pos < 0) return;
+        String url = mImageList.get(pos).getUrl();
+        setWallpaper(url);
+    }
+
+    @Override
+    public void saveImageAtPos(final int pos) {
+        if (pos >= 0 && pos < mImageList.size()) {
+            GlideLoaderListener listener = new GlideLoaderListener(null);
+            listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+                @Override
+                public void onImageLoadDone(Object o) {
+                    Log.d(TAG, "onImageLoadDone()");
+                    if(o instanceof Bitmap) {
+                        ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mImageList.get(pos).getName());
+                        r.addCallback(PresenterBase.this);
+                        mImageExecutor.submit(r);
+                    }
+                }
+            });
+
+            String imgUrl = mImageList.get(pos).getUrl();
+            GlideLoader.downloadOnly(mContext, imgUrl, listener,Priority.HIGH,
+                    Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
+        }
     }
 
     @Override
@@ -132,7 +173,7 @@ abstract class PresenterBase implements Presenter {
         }
     }
 
-    void setWallpaper(final String url) {
+    private void setWallpaper(final String url) {
         Log.v(TAG,"setWallpaper()");
 
         if(TextUtils.isEmpty(url)) return;

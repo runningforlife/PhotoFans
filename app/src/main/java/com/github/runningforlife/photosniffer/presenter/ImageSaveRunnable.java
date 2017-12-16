@@ -24,7 +24,7 @@ public class ImageSaveRunnable implements Runnable {
     private String name;
     private ImageSaveCallback callback;
 
-    public interface ImageSaveCallback{
+    public interface ImageSaveCallback {
         void onImageSaveDone(String path);
     }
 

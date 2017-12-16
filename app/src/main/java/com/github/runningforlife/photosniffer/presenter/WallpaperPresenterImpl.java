@@ -82,12 +82,6 @@ public class WallpaperPresenterImpl extends PresenterBase {
     }
 
     @Override
-    public void onImageSaveDone(String path) {
-        Log.v(TAG,"onImageSaveDone()");
-        ((WallpaperView)mView).onImageSaveDone(path);
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public void onStart() {
         Log.v(TAG,"onStart()");
@@ -104,14 +98,5 @@ public class WallpaperPresenterImpl extends PresenterBase {
     public void onDestroy() {
         Log.v(TAG,"onDestroy()");
         //mRealmMgr.onDestroy();
-    }
-
-    @Override
-    public void setWallpaperAtPos(int pos) {
-        if(pos < 0) return;
-
-        String url = mImageList.get(pos).getUrl();
-
-        setWallpaper(url);
     }
 }

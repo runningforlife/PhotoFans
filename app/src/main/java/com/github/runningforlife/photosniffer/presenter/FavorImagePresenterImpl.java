@@ -56,34 +56,6 @@ public class FavorImagePresenterImpl extends PresenterBase {
     }
 
     @Override
-    public void saveImageAtPos(final int pos) {
-        if(pos < 0 || pos >= mImageList.size()) return;
-
-        GlideLoaderListener listener = new GlideLoaderListener(null);
-        listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
-            @Override
-            public void onImageLoadDone(Object o) {
-                Log.d(TAG,"onImageLoadDone()");
-                if(o instanceof Bitmap) {
-                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mImageList.get(pos).getName());
-                    r.addCallback(FavorImagePresenterImpl.this);
-                    mExecutor.submit(r);
-                }
-            }
-        });
-        GlideLoader.downloadOnly(mContext, mImageList.get(pos).getUrl(), listener,
-                Priority.HIGH,DEFAULT_WIDTH, DEFAULT_HEIGHT, false);
-    }
-
-    @Override
-    public void setWallpaperAtPos(int pos) {
-        Log.v(TAG,"setWallpaperAtPos()");
-        if(pos >= 0 && pos < mImageList.size()) {
-            setWallpaper(mImageList.get(pos).getUrl());
-        }
-    }
-
-    @Override
     public void init() {
         Log.v(TAG,"init()");
         // start loading data

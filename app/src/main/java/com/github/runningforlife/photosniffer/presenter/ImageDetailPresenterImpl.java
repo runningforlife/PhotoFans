@@ -88,13 +88,6 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     }
 
     @Override
-    public void setWallpaperAtPos(final int pos) {
-        Log.v(TAG,"setWallpaperAtPos(): pos = " + pos);
-
-        setWallpaper(mImageList.get(pos).getUrl());
-    }
-
-    @Override
     public void init() {
         Log.v(TAG,"init()");
         //mRealmMgr.onStart();
