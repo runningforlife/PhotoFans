@@ -39,51 +39,8 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     }
 
     @Override
-    public ImageRealm getItemAtPos(int pos) {
-        return mImageList.get(pos);
-    }
-
-    @Override
-    public int getItemCount() {
-        if(mImageList == null) return 0;
-
-        return mImageList.size();
-    }
-
-    @Override
-    public void removeItemAtPos(int pos) {
-        Log.d(TAG,"removeItemAtPos()");
-        if(pos >= 0 && pos < mImageList.size()) {
-            mRealmApi.deleteSync(mImageList.get(pos));
-        }
-    }
-
-    @Override
-    public void saveImageAtPos(final int pos) {
-        Log.v(TAG,"saveImageAtPos(): pos " + pos);
-
-        GlideLoaderListener listener = new GlideLoaderListener(null);
-        listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
-            @Override
-            public void onImageLoadDone(Object o) {
-                Log.d(TAG,"onImageLoadDone()");
-                if(o instanceof Bitmap) {
-                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mImageList.get(pos).getName());
-                    r.addCallback(ImageDetailPresenterImpl.this);
-                    mExecutor.submit(r);
-                }else{
-                    mView.onImageSaveDone(null);
-                }
-            }
-        });
-        GlideLoader.downloadOnly(mContext, mImageList.get(pos).getUrl(), listener,
-                Priority.HIGH,Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
-    }
-
-    @Override
     public void favorImageAtPos(int pos) {
         Log.d(TAG,"favorImageAtPos(): pos = " + pos);
-
         markAsFavor(mImageList.get(pos).getUrl());
     }
 
@@ -109,13 +66,6 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     public void onDestroy() {
         Log.v(TAG,"onDestroy()");
         //mRealmMgr.onDestroy();
-    }
-
-
-    @Override
-    public void onImageSaveDone(String path) {
-        Log.d(TAG,"onImageSaveDone()");
-        mView.onImageSaveDone(path);
     }
 
     @Override

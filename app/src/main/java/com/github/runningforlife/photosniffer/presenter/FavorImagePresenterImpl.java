@@ -35,36 +35,9 @@ public class FavorImagePresenterImpl extends PresenterBase {
     }
 
     @Override
-    public int getItemCount() {
-        if(mImageList == null) return 0;
-
-        return mImageList.size();
-    }
-
-    @Override
-    public ImageRealm getItemAtPos(int pos) {
-        if(mImageList == null) return null;
-
-        return mImageList.get(pos);
-    }
-
-    @Override
-    public void removeItemAtPos(int pos) {
-        if(pos >= 0 && pos <= mImageList.size()) {
-            mRealmApi.deleteSync(mImageList.get(pos));
-        }
-    }
-
-    @Override
     public void init() {
         Log.v(TAG,"init()");
         // start loading data
-    }
-
-    @Override
-    public void onImageSaveDone(String path) {
-        Log.v(TAG,"onImageSaveDone()");
-        ((FavorPictureView)mView).onImageSaveDone(path);
     }
 
     @Override

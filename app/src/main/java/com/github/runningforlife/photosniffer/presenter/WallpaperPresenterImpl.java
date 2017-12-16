@@ -28,12 +28,9 @@ import io.realm.RealmResults;
 
 public class WallpaperPresenterImpl extends PresenterBase {
     private static final String TAG = "WallpaperPresenter";
-    private ExecutorService mExecutor;
 
     public WallpaperPresenterImpl(Context context, WallpaperView view){
         super(context, view);
-        mContext = context;
-        mExecutor = Executors.newSingleThreadExecutor();
     }
 
     @Override
@@ -43,53 +40,14 @@ public class WallpaperPresenterImpl extends PresenterBase {
     }
 
     @Override
-    public int getItemCount() {
-        return mImageList.size();
-    }
-
-    @Override
-    public ImageRealm getItemAtPos(int pos) {
-        return mImageList.get(pos);
-    }
-
-    @Override
-    public void removeItemAtPos(int pos) {
-        if (pos >= 0 && pos < mImageList.size()) {
-            mRealmApi.deleteSync(mImageList.get(pos));
-        }
-    }
-
-    @Override
-    public void saveImageAtPos(final int pos) {
-        if (pos >= 0 && pos < mImageList.size()) {
-            GlideLoaderListener listener = new GlideLoaderListener(null);
-            listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
-                @Override
-                public void onImageLoadDone(Object o) {
-                    Log.d(TAG, "onImageLoadDone()");
-                    if(o instanceof Bitmap) {
-                        ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mImageList.get(pos).getName());
-                        r.addCallback(WallpaperPresenterImpl.this);
-                        mExecutor.submit(r);
-                    }
-                }
-            });
-
-            String imgUrl = mImageList.get(pos).getUrl();
-            GlideLoader.downloadOnly(mContext, imgUrl, listener,Priority.HIGH,
-                    Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
-        }
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public void onStart() {
         Log.v(TAG,"onStart()");
-
         HashMap<String,String> params = new HashMap<>();
         params.put("mIsUsed", Boolean.toString(true));
         params.put("mIsFavor", Boolean.toString(false));
         params.put("mIsWallpaper", Boolean.toString(true));
+        //params.put("mIsCached", Boolean.toString(true));
         mImageList = (RealmResults<ImageRealm>) mRealmApi.queryAsync(ImageRealm.class, params);
         mImageList.addChangeListener(mOrderRealmChangeListener);
     }

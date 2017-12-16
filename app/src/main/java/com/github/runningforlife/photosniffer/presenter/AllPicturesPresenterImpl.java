@@ -117,36 +117,7 @@ public class AllPicturesPresenterImpl extends PresenterBase
     @Override
     public void favorImageAtPos(int pos) {
         Log.v(TAG,"favorImageAtPos()");
-
-        Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-
-        ImageRealm item = mImageList.get(pos);
-        item.setIsFavor(true);
-
-        realm.commitTransaction();
-    }
-
-    @Override
-    public int getItemCount() {
-        if(mImageList == null) return 0;
-
-        return mImageList.size();
-    }
-
-    @Override
-    public ImageRealm getItemAtPos(int pos) {
-        if(mImageList == null) return null;
-
-        return mImageList.get(pos);
-    }
-
-    @Override
-    public void removeItemAtPos(int pos) {
-        Log.v(TAG,"removeItemAtPos(): position = " + pos);
-        if (pos >= 0 && pos < mImageList.size()) {
-            mRealmApi.deleteSync(mImageList.get(pos));
-        }
+        markAsFavor(mImageList.get(pos).getUrl());
     }
 
     @Override
@@ -185,8 +156,6 @@ public class AllPicturesPresenterImpl extends PresenterBase
     @Override
     public void onDestroy() {
         Log.v(TAG,"onDestroy()");
-        //mView = null;
-        //mRealmMgr.onDestroy();
         // stop service
         stopRetrieveIfNeeded();
         // shut down thread pool
@@ -324,7 +293,7 @@ public class AllPicturesPresenterImpl extends PresenterBase
         }
     }
 
-    private final class  H extends Handler{
+    private final class  H extends Handler {
 
         static final int EVENT_RETRIEVE_TIME_OUT = 1;
         static final int EVENT_STOP_SERVICE = 2;

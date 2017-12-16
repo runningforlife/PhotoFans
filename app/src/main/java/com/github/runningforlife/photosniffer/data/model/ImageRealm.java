@@ -69,7 +69,7 @@ public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
         return mIsWallpaper;
     }
 
-    public boolean isCached() {
+    public boolean getIsCached() {
         return mIsCached;
     }
 
@@ -82,7 +82,7 @@ public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
         return "Image details:" +
                 "url = " + mUrl +
                 ",name = " + mName +
-                ", saved time = " + new Date(mTimeStamp);
+                ",saved time = " + new Date(mTimeStamp);
     }
 
     @Override

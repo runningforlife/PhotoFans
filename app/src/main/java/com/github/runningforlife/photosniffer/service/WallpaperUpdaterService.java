@@ -139,6 +139,7 @@ public class WallpaperUpdaterService extends Service {
         params.put("mUrl", url);
 
         HashMap<String, String> newValues = new HashMap<>();
+        newValues.put("mIsWallpaper", Boolean.toString(true));
         newValues.put("mIsCached", Boolean.toString(true));
         mRealmApi.updateAsync(ImageRealm.class, params, newValues);
     }

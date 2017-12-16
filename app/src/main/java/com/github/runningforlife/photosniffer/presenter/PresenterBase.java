@@ -87,6 +87,16 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     }
 
     @Override
+    public int getItemCount() {
+        return mImageList.size();
+    }
+
+    @Override
+    public ImageRealm getItemAtPos(int pos) {
+        return mImageList.get(pos);
+    }
+
+    @Override
     public void onImageSaveDone(String path) {
         Log.v(TAG,"onImageSaveDone()");
         mView.onImageSaveDone(path);
@@ -94,7 +104,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
 
     @Override
     public void setWallpaperAtPos(int pos) {
-        if(pos < 0) return;
+        if(pos >= 0 && pos < mImageList.size()) return;
         String url = mImageList.get(pos).getUrl();
         setWallpaper(url);
     }
@@ -118,6 +128,16 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
             String imgUrl = mImageList.get(pos).getUrl();
             GlideLoader.downloadOnly(mContext, imgUrl, listener,Priority.HIGH,
                     Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
+        }
+    }
+
+    @Override
+    public void removeItemAtPos(int pos) {
+        Log.d(TAG,"removeItemAtPos()");
+        if(pos >= 0 && pos < mImageList.size()) {
+            final ImageRealm ir = mImageList.get(pos);
+            mRealmApi.deleteSync(ir);
+            mDiskCache.remove(ir.getUrl());
         }
     }
 
