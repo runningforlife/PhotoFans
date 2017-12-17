@@ -3,21 +3,17 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.data.cache.DiskWallpaperCache;
 import com.github.runningforlife.photosniffer.data.cache.cache;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
-import com.github.runningforlife.photosniffer.data.local.RealmManager;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
@@ -60,7 +56,6 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     UI mView;
 
     RealmResults<ImageRealm> mImageList;
-    RealmManager mRealmMgr;
     RealmApi mRealmApi;
     DiskWallpaperCache mDiskCache;
     OkHttpClient mHttpClient;
@@ -70,7 +65,6 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     PresenterBase(Context context, UI view) {
         mContext = context;
         mView = view;
-        mRealmMgr = RealmManager.getInstance();
         mOrderRealmChangeListener = new OrderReamChangeListener();
         mRealmApi = RealmApiImpl.getInstance();
         mDiskCache = new DiskWallpaperCache(new File(MiscUtil.getWallpaperCacheDir()));
@@ -300,7 +294,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         HashMap<String,String> params = new HashMap<>();
         HashMap<String, String> updated = new HashMap<>();
 
-        params.put("mUrl", mDiskCache.getFileName(mDiskCache.getCacheKey(url)));
+        params.put("mUrl", DiskWallpaperCache.getFileName(DiskWallpaperCache.getCacheKey(url)));
         updated.put("mIsWallpaper", Boolean.toString(true));
         updated.put("mIsCached", Boolean.toString(Boolean.TRUE));
         mRealmApi.updateAsync(ImageRealm.class, params, updated);

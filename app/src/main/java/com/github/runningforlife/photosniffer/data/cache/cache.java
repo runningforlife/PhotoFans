@@ -19,10 +19,6 @@ public interface cache {
 
     void clear();
 
-    String getCacheKey(String url);
-
-    String getFileName(String key);
-
     boolean isExist(String url);
 
     final class Entry {

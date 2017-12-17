@@ -83,7 +83,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         Log.v(TAG,"onAttach()");
         try {
             mCallback = (FragmentCallback)context;
-        }catch (ClassCastException e){
+        }catch (ClassCastException e) {
             Log.e(TAG,"parent activity must implement FragmentCallback");
             throw new IllegalStateException("refresh callback must be implemented");
         }
@@ -131,7 +131,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         mPresenter = presenter;
     }
 
-    protected void setTitle(String title){
+    protected void setTitle(String title) {
         Activity activity = getActivity();
         if(activity != null){
             activity.setTitle(title);

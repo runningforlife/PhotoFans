@@ -13,18 +13,19 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.data.local.RealmApi;
+import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.data.model.ImageWebSite;
-import com.github.runningforlife.photosniffer.data.local.RealmManager;
 import com.github.runningforlife.photosniffer.ui.adapter.MultiSelectionListAdapter;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.realm.Realm;
 import io.realm.RealmResults;
 
 /**
@@ -39,6 +40,7 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
 
     private MultiSelectionListAdapter mAdapter;
     private SharedPreferences mSharePref;
+    private RealmApi mRealmApi;
 
     @Override
     public void onCreate(Bundle savedState){
@@ -56,6 +58,8 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
         initView();
 
         mSharePref = PreferenceManager.getDefaultSharedPreferences(this);
+
+        mRealmApi = RealmApiImpl.getInstance();
     }
 
 
@@ -73,6 +77,12 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
 
         // updateAsync database
         saveImageSource(values);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mRealmApi.decRef();
     }
 
 
@@ -109,7 +119,7 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
         startBrowser(src.url);
     }
 
-    private void startBrowser(String url){
+    private void startBrowser(String url) {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(url));
@@ -117,33 +127,32 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    private void saveImageSource(List<String> src){
+    private void saveImageSource(List<String> src) {
         Log.v(TAG,"saveImageSource()");
-        RealmManager helper = RealmManager.getInstance();
+        HashMap<String,String> params = new HashMap<>();
+        params.put("mIsVisited", Boolean.toString(Boolean.FALSE));
+        RealmResults<ImagePageInfo> pages = (RealmResults<ImagePageInfo>) mRealmApi.querySync(ImagePageInfo.class, params);
 
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<ImagePageInfo> pages = RealmManager.getAllUnvisitedImagePages(realm);
-
-        if(pages.size() > 0) {
+        if (pages.size() > 0) {
             Set<String> allUrls = new HashSet<>();
             for (ImagePageInfo p : pages) {
                 allUrls.add(p.getUrl());
             }
             // whether we should updateAsync database
             for (String url : src) {
-                if(!allUrls.contains(url)){
+                if (!allUrls.contains(url)) {
                     ImagePageInfo pageInfo = new ImagePageInfo(url);
-                    helper.savePageAsync(pageInfo);
+                    mRealmApi.insertAsync(pageInfo);
                 }
             }
-        }else{
+        } else {
             // save it to data base
-            for(String url : src){
+            for (String url : src) {
                 ImagePageInfo pageInfo = new ImagePageInfo(url);
-                helper.savePageAsync(pageInfo);
+                mRealmApi.insertAsync(pageInfo);
             }
         }
 
-        realm.close();
+        //realm.close();
     }
 }

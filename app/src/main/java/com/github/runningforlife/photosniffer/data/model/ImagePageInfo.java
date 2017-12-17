@@ -10,13 +10,15 @@ import io.realm.annotations.PrimaryKey;
 public class ImagePageInfo extends RealmObject {
     @PrimaryKey
     private String mUrl;
-    private long mVisitTime;
+    private long mTimeStamp;
     private boolean mIsVisited;
 
     public ImagePageInfo(){
+        mTimeStamp = System.currentTimeMillis();
     }
 
     public ImagePageInfo(String url){
+        mUrl = url;
         mIsVisited = false;
     }
 
@@ -29,11 +31,11 @@ public class ImagePageInfo extends RealmObject {
     }
 
     public void setVisitTime(long time){
-        mVisitTime = time;
+        mTimeStamp = time;
     }
 
     public long getVisitTime(){
-        return mVisitTime;
+        return mTimeStamp;
     }
 
     public void setIsVisited(boolean visited){

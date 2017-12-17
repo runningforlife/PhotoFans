@@ -1,14 +1,9 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
-import android.app.WallpaperManager;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -27,12 +22,10 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
-import com.github.runningforlife.photosniffer.data.local.RealmManager;
 import com.github.runningforlife.photosniffer.data.model.UserAction;
-import com.github.runningforlife.photosniffer.presenter.ImageSaveRunnable;
-import com.github.runningforlife.photosniffer.utils.ToastUtil;
+import com.github.runningforlife.photosniffer.presenter.FullScreenPresenter;
+import com.github.runningforlife.photosniffer.presenter.FullScreenPresenterImpl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,12 +41,15 @@ import static com.github.runningforlife.photosniffer.data.model.UserAction.WALLP
  * a dialog to show full screen image
  */
 
-public class FullScreenImageFragment extends Fragment implements ActionListDialogFragment.ActionCallback{
+public class FullScreenImageFragment extends Fragment
+        implements ActionListDialogFragment.ActionCallback {
     public static final String TAG = "FullScreenImageFragment";
     public static final String POSITION = "position";
     public static final String IMAGE_URL = "image_url";
 
     @BindView(R.id.iv_image) ImageView imageView;
+
+    private FullScreenPresenter mPresenter;
 
     private List<String> mUserActionList;
     private static UserAction ACTION_SAVE = SAVE;
@@ -71,7 +67,7 @@ public class FullScreenImageFragment extends Fragment implements ActionListDialo
     }
 
     @Override
-    public void onCreate(Bundle savedSate){
+    public void onCreate(Bundle savedSate) {
         super.onCreate(savedSate);
 
         initDialogWindow();
@@ -95,6 +91,8 @@ public class FullScreenImageFragment extends Fragment implements ActionListDialo
 
         initView();
 
+        initPresenter();
+
         return root;
     }
 
@@ -112,6 +110,10 @@ public class FullScreenImageFragment extends Fragment implements ActionListDialo
         }
     }
 
+    private void initPresenter() {
+        mPresenter = new FullScreenPresenterImpl(getContext());
+        mPresenter.onStart();
+    }
 
     private void initView() {
         Log.v(TAG,"initView()");
@@ -193,74 +195,15 @@ public class FullScreenImageFragment extends Fragment implements ActionListDialo
     private void saveImage() {
         String url = getArguments().getString(IMAGE_URL);
         if(!TextUtils.isEmpty(url)){
-            GlideLoaderListener listener = new GlideLoaderListener(null);
-            listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
-                @Override
-                public void onImageLoadDone(Object o) {
-                    Log.d(TAG,"onImageLoadDone()");
-                    if(o instanceof Bitmap) {
-                        final ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o),
-                                String.valueOf(System.currentTimeMillis()));
-                        r.addCallback(new ImageSaveRunnable.ImageSaveCallback() {
-                            @Override
-                            public void onImageSaveDone(String path) {
-                                Log.v(TAG,"onImageSaveDone()");
-                                String msg = getString(R.string.save_image_Success) + path;
-                                Message message = mHandler.obtainMessage(EVENT_SHOW_TOAST);
-                                message.obj = msg;
-                                message.sendToTarget();
-                            }
-                        });
-                        // starting save image
-                        new Thread(r).start();
-                    }
-                }
-            });
-            GlideLoader.downloadOnly(getContext(), url, listener,
-                    Priority.HIGH,Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
+            mPresenter.saveImage(url);
         }
     }
 
     private void setWallpaper() {
         Log.v(TAG,"setWallpaperAtPos()");
         final String url = getArguments().getString(IMAGE_URL);
-        if(!TextUtils.isEmpty(url)){
-            GlideLoaderListener listener = new GlideLoaderListener(null);
-            listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
-                @Override
-                public void onImageLoadDone(Object o) {
-                    Log.d(TAG,"onImageLoadDone()");
-                    if(o instanceof Bitmap) {
-                        WallpaperManager wpm = WallpaperManager.getInstance(getContext());
-                        try {
-                            wpm.setBitmap((Bitmap)o);
-                            // mark it as wall paper
-                            RealmManager.getInstance().setWallpaper(url);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            });
-            GlideLoader.downloadOnly(getContext(), url, listener,
-                    Priority.HIGH,Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, true);
+        if (!TextUtils.isEmpty(url)) {
+            mPresenter.setAsWallpaper(url);
         }
     }
-
-    private static final int EVENT_SHOW_TOAST = 1;
-    private Handler mHandler = new Handler(Looper.getMainLooper()) {
-
-        @Override
-        public void handleMessage(Message msg) {
-            int what = msg.what;
-            switch (what) {
-                case EVENT_SHOW_TOAST:
-                    String toast = (String) msg.obj;
-                    ToastUtil.showToast(getActivity(), toast);
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
 }

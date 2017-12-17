@@ -2,6 +2,7 @@ package com.github.runningforlife.photosniffer.data.local;
 
 import android.util.Log;
 
+import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 
 import java.util.HashMap;
@@ -63,8 +64,8 @@ public class RealmApiImpl implements RealmApi {
         RealmQuery<? extends RealmObject> query = mRealm.where(type);
 
         Set<Map.Entry<String, String>> entries = params.entrySet();
-        for(Map.Entry<String,String> entry : entries){
-            if(type == ImageRealm.class){
+        for (Map.Entry<String,String> entry : entries) {
+            if (type == ImageRealm.class) {
                 String field = entry.getKey();
                 switch (field){
                     case "mTimeStamp":
@@ -78,6 +79,19 @@ public class RealmApiImpl implements RealmApi {
                         break;
                     default:
                         query.equalTo(field, entry.getValue());
+                }
+            } else if (type == ImagePageInfo.class) {
+                String field = entry.getKey();
+                switch (field) {
+                    case "mTimeStamp":
+                        query.equalTo(field, Long.parseLong(entry.getValue()));
+                        break;
+                    case "mIsVisited":
+                        query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
+                        break;
+                    default:
+                        query.equalTo(field, entry.getValue());
+
                 }
             }
         }
@@ -105,6 +119,19 @@ public class RealmApiImpl implements RealmApi {
                         break;
                     default:
                         query.equalTo(field, entry.getValue());
+                }
+            } else if (type == ImagePageInfo.class) {
+                String field = entry.getKey();
+                switch (field) {
+                    case "mTimeStamp":
+                        query.equalTo(field, Long.parseLong(entry.getValue()));
+                        break;
+                    case "mIsVisited":
+                        query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
+                        break;
+                    default:
+                        query.equalTo(field, entry.getValue());
+
                 }
             }
         }

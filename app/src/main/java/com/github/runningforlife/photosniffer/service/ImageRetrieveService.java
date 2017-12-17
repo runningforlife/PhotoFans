@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.service;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +18,8 @@ import com.github.runningforlife.photosniffer.crawler.processor.ImageRetrievePag
 import java.util.List;
 
 import com.github.runningforlife.photosniffer.crawler.OkHttpDownloader;
+import com.github.runningforlife.photosniffer.data.local.RealmApi;
+import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import us.codecraft.webmagic.Spider;
@@ -43,6 +46,7 @@ public class ImageRetrieveService extends Service implements
     private ResultReceiver mReceiver;
     private ImageRetrievePageProcessor mProcessor;
     private Spider mSpider;
+    private RealmApi mRealApi;
 
     public ImageRetrieveService(){
         super();
@@ -60,6 +64,8 @@ public class ImageRetrieveService extends Service implements
         mServiceHandler = new H(mServiceLooper);
 
         mIsRetrieving = false;
+
+        mRealApi = RealmApiImpl.getInstance();
     }
 
     @Nullable
@@ -88,6 +94,8 @@ public class ImageRetrieveService extends Service implements
         }
 
         mServiceLooper.quit();
+
+        mRealApi.decRef();
     }
 
     @Override
@@ -123,6 +131,7 @@ public class ImageRetrieveService extends Service implements
         }
     }
 
+    @SuppressLint("RestrictedApi")
     private void handleIntent(Intent intent) {
         int max = intent.getIntExtra(EXTRA_EXPECTED_IMAGES, 10);
         mReceiver = intent.getParcelableExtra("receiver");
@@ -135,7 +144,7 @@ public class ImageRetrieveService extends Service implements
 
     private void startCrawler(int n) {
         Log.i(TAG,"startCrawler(): max images to be retrieved = " + n);
-        mProcessor = new ImageRetrievePageProcessor(n);
+        mProcessor = new ImageRetrievePageProcessor(mRealApi, n);
         mProcessor.addListener(this);
         List<String> lastUrl =  mProcessor.getStartUrl();
         if (lastUrl.size() <= 0) {
@@ -167,6 +176,7 @@ public class ImageRetrieveService extends Service implements
         stopSelf();
     }
 
+    @SuppressLint("RestrictedApi")
     private void sendResult(int size) {
         Log.v(TAG,"sendResult(): size = " + size);
 

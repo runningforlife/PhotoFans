@@ -156,8 +156,7 @@ public class DiskWallpaperCache implements cache {
 
 
     /** get the cache key by image url */
-    @Override
-    public String getCacheKey(String imageUrl) {
+    public static String getCacheKey(String imageUrl) {
         int fistHalf = imageUrl.length()/2;
         String key = String.valueOf(imageUrl.substring(0, fistHalf).hashCode());
         key += String.valueOf(imageUrl.substring(fistHalf).hashCode());
@@ -169,8 +168,7 @@ public class DiskWallpaperCache implements cache {
         return mEntries.get(getCacheKey(url)) != null;
     }
 
-    @Override
-    public String getFileName(String key) {
+    public static String getFileName(String key) {
         return CACHE_IMAGE_PREFIX + key + DEFAULT_IMAGE_FORMAT;
     }
 

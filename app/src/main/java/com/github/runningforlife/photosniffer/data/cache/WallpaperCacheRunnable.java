@@ -15,6 +15,8 @@ import java.util.concurrent.CountDownLatch;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
+import static com.github.runningforlife.photosniffer.data.cache.DiskWallpaperCache.getCacheKey;
+
 /**
  * Created by jason on 12/9/17.
  */
@@ -68,8 +70,8 @@ public class WallpaperCacheRunnable implements Runnable {
         params.put("mUrl", url);
 
         HashMap<String, String> newValues = new HashMap<>();
-        String fileKey = mDiskCache.getCacheKey(url);
-        newValues.put("mUrl", mDiskCache.getFileName(fileKey));
+        String fileKey = getCacheKey(url);
+        newValues.put("mUrl", DiskWallpaperCache.getFileName(fileKey));
         newValues.put("mIsUsed", Boolean.toString(Boolean.TRUE));
         newValues.put("mIsWallpaper", Boolean.toString(true));
         //newValues.put("mIsCached", Boolean.toString(true));

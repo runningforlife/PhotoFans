@@ -3,9 +3,9 @@ package com.github.runningforlife.photosniffer.crawler.processor;
 import android.util.Log;
 import android.webkit.URLUtil;
 
+import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
-import com.github.runningforlife.photosniffer.data.local.RealmManager;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -20,7 +20,6 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 
-import com.github.runningforlife.photosniffer.service.MyThreadFactory;
 import com.github.runningforlife.photosniffer.utils.UrlUtil;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
@@ -54,7 +53,9 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     private ImageRetrieverFactory mRetrieverFactory;
     private PageRetriever mPixelsRetriever;
 
-    public ImageRetrievePageProcessor(int expected){
+    private RealmApi mRealApi;
+
+    public ImageRetrievePageProcessor(RealmApi realmApi, int expected) {
         mExpectedImages = expected;
         mListeners = new ArrayList<>();
         mLastUrl = new ArrayList<>();
@@ -62,6 +63,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         mIsExpectedDone = false;
         mCurrentImages = 0;
         mExecutor = Executors.newSingleThreadExecutor();
+
+        mRealApi = realmApi;
 
         loadPages();
 
@@ -89,7 +92,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         return site;
     }
 
-    public List<String> getStartUrl(){
+    public List<String> getStartUrl() {
         Log.d(TAG,"getStartUrl(): url = " + mLastUrl.size());
         return mLastUrl;
     }
@@ -171,7 +174,11 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private void loadPages() {
         Realm realm = Realm.getDefaultInstance();
-        mUnvisitedPages = RealmManager.getAllUnvisitedImagePages(realm);
+        //mUnvisitedPages = RealmManager.getAllUnvisitedImagePages(realm);
+        HashMap<String,String> params = new HashMap<>();
+        params.put("mIsVisited", Boolean.toString(Boolean.FALSE));
+        mUnvisitedPages = (RealmResults<ImagePageInfo>) mRealApi.querySync(ImagePageInfo.class, params);
+
         mUnvisitedPages.addChangeListener(new RealmChangeListener<RealmResults<ImagePageInfo>>() {
             @Override
             public void onChange(RealmResults<ImagePageInfo> element) {
@@ -229,20 +236,6 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         return URLUtil.isValidUrl(url);
     }
 
-    private  class SaveRunnable implements  Runnable {
-        private List<? extends RealmObject> data;
-
-        SaveRunnable(List<? extends RealmObject> data) {
-            this.data = data;
-        }
-
-        @Override
-        public void run() {
-            RealmManager rm = RealmManager.getInstance();
-            rm.insertAsync(data);
-        }
-    }
-
     private List<ImagePageInfo> getPageList(Page page) {
 
         List<String> urlList = page.getHtml().links().all();
@@ -268,5 +261,18 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         }
 
         return pageList;
+    }
+
+    private final class SaveRunnable implements  Runnable {
+        private List<? extends RealmObject> data;
+
+        SaveRunnable(List<? extends RealmObject> data) {
+            this.data = data;
+        }
+
+        @Override
+        public void run() {
+            mRealApi.insertAsync(data);
+        }
     }
 }

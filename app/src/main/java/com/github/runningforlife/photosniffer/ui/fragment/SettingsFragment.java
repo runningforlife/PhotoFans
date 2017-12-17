@@ -12,16 +12,16 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.data.local.RealmApi;
+import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
-import com.github.runningforlife.photosniffer.data.local.RealmManager;
 import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
 
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.Set;
 
-import io.realm.Realm;
 import io.realm.RealmResults;
 
 import static com.github.runningforlife.photosniffer.ui.receiver.WallpaperAlarmReceiver.ALARM_AUTO_WALLPAPER;
@@ -34,6 +34,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private static final String TAG = "SettingsFragment";
 
     private AlarmManager mAlarmMgr;
+    private RealmApi mRealmApi;
 
     @Override
     public void onCreate(Bundle savedState){
@@ -42,6 +43,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         addPreferencesFromResource(R.xml.settings);
 
         mAlarmMgr = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+
+        mRealmApi = RealmApiImpl.getInstance();
     }
 
     @Override
@@ -69,6 +72,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         getPreferenceScreen()
                 .getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(this);
+
+        mRealmApi.decRef();
     }
 
     @Override
@@ -83,20 +88,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if (key.equals(keyImgSrc)) {
             Set<String> src = sharedPreferences.getStringSet(key,null);
             if (src != null) {
-                RealmManager helper = RealmManager.getInstance();
+                HashMap<String,String> params = new HashMap<>();
+                params.put("mIsVisited", Boolean.toString(Boolean.TRUE));
 
-                Realm realm = Realm.getDefaultInstance();
-                RealmResults<ImagePageInfo> visited = RealmManager.getAllVisitedPages(realm);
+                RealmResults<ImagePageInfo> visited = (RealmResults<ImagePageInfo>) mRealmApi.querySync(ImagePageInfo.class, params);
 
-                Iterator it = src.iterator();
-                while (it.hasNext()) {
-                    String url = (String) it.next();
+                for (String url : src) {
                     if (!visited.contains(url)) {
-                        helper.savePageAsync(new ImagePageInfo(url));
+                        mRealmApi.insertAsync(new ImagePageInfo(url));
                     }
                 }
-
-                realm.close();
             }
         }else if (keyAdvice.equals(key)){
             String data = sharedPreferences.getString(key,"");
@@ -127,7 +128,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
     }
 
-    private void uploadAdviceToCloud(String advice){
+    private void uploadAdviceToCloud(String advice) {
         LeanCloudManager cloud = LeanCloudManager.getInstance();
 
         cloud.saveAdvice(advice);
