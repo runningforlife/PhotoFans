@@ -53,7 +53,6 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     private static final String TAG = "PresenterBase";
 
     private int mNetworkErrorCount;
-    private ExecutorService mDecodeExecutor;
     // for image save or wallpaper setting
     private ExecutorService mImageExecutor;
 
@@ -78,7 +77,6 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         mHttpClient = MiscUtil.buildOkHttpClient();
 
         mNetworkErrorCount = 0;
-        mDecodeExecutor = Executors.newFixedThreadPool(2);
         mImageExecutor = Executors.newSingleThreadExecutor();
     }
 

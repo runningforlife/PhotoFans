@@ -11,16 +11,8 @@
   <component name="ChangeListManager">
     <list default="true" id="98f3193c-c14d-48f3-b6e8-06b7920b3a60" name="Default" comment="">
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/data/local/RealmApi.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/data/local/RealmApi.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/data/local/RealmApiImpl.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/data/local/RealmApiImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/loader/GlideLoaderListener.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/loader/GlideLoaderListener.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/AllPicturesPresenterImpl.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/AllPicturesPresenterImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/FavorImagePresenterImpl.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/FavorImagePresenterImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/ImageDetailPresenterImpl.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/ImageDetailPresenterImpl.java" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/ImageDecodeRunnable.java" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/PresenterBase.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/PresenterBase.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/WallpaperPresenterImpl.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/WallpaperPresenterImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/service/WallpaperUpdaterService.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/service/WallpaperUpdaterService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/fragment/FullScreenImageFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/fragment/FullScreenImageFragment.java" />
     </list>
     <list id="ef732e6d-c57d-4585-95c4-5eb53d93506b" name="WallpaperCache" comment="refactor presenter &amp; fragment: clear codes&#10;" />
     <list id="e5abd030-4bca-4180-851f-e2d9267edfa6" name="Revert: update glide to 4.1.1" comment="add wallpaper picker from gallery" />
@@ -120,12 +112,15 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ImageRetrievePageProcessor.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ImageRetrievePageProcessor.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/crawler/processor/ImageRetrievePageProcessor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
-              <caret line="173" column="26" lean-forward="false" selection-start-line="173" selection-start-column="26" selection-end-line="173" selection-end-column="26" />
-              <folding />
+            <state relative-caret-position="78">
+              <caret line="173" column="64" lean-forward="false" selection-start-line="173" selection-start-column="39" selection-end-line="173" selection-end-column="64" />
+              <folding>
+                <element signature="e#5575#5985#0" expanded="true" />
+                <element signature="e#5984#5985#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -133,21 +128,23 @@
       <file leaf-file-name="RealmManager.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/data/local/RealmManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-97">
-              <caret line="26" column="16" lean-forward="false" selection-start-line="26" selection-start-column="13" selection-end-line="26" selection-end-column="25" />
+            <state relative-caret-position="162">
+              <caret line="313" column="44" lean-forward="true" selection-start-line="313" selection-start-column="44" selection-end-line="313" selection-end-column="44" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PresenterBase.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="PresenterBase.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/PresenterBase.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-591">
-              <caret line="55" column="43" lean-forward="false" selection-start-line="55" selection-start-column="28" selection-end-line="55" selection-end-column="43" />
+            <state relative-caret-position="-528">
+              <caret line="230" column="48" lean-forward="false" selection-start-line="230" selection-start-column="48" selection-end-line="230" selection-end-column="48" />
               <folding>
-                <element signature="e#5393#7078#0" expanded="true" />
-                <element signature="e#7077#7078#0" expanded="true" />
+                <element signature="e#5289#6974#0" expanded="true" />
+                <element signature="e#6973#6974#0" expanded="true" />
+                <element signature="e#7969#8499#0" expanded="true" />
+                <element signature="e#8498#8499#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -2781,7 +2778,7 @@
       <option name="ACTIVITY_CLASS" value="" />
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1513509399802" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1513509534925" />
       </method>
     </configuration>
     <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
@@ -2829,7 +2826,7 @@
       </Profilers>
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1513509399802" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1513509534925" />
       </method>
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -3021,7 +3018,7 @@
       <option name="ACTIVITY_CLASS" value="" />
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1513509399803" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1513509534926" />
       </method>
     </configuration>
     <list size="1">
@@ -3311,7 +3308,14 @@
       <option name="project" value="LOCAL" />
       <updated>1513509396035</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="add lifecycle to RealmApi to avoid memory leak">
+      <created>1513509434555</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1513509434555</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TodoView">
@@ -3328,7 +3332,7 @@
     <layout>
       <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.6407767" sideWeight="0.60796815" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.54530746" sideWeight="0.47011954" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23786408" sideWeight="0.47330678" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.6003236" sideWeight="0.8103586" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -3342,12 +3346,12 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16612904" sideWeight="0.4621514" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.54530746" sideWeight="0.52988046" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23786408" sideWeight="0.5266932" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34142396" sideWeight="0.4685259" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="12" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3378486" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5226537" sideWeight="0.5681275" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2868526" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31877023" sideWeight="0.5649402" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
@@ -3412,7 +3416,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <confirmRemoveEmptyChangelist value="2" />
-    <MESSAGE value="keep lockscreen updater service at foreground" />
     <MESSAGE value="change glide request lifecycle context to fix &quot;java.lang.IllegalArgumentException: You cannot start a load for a destroyed activity&quot;" />
     <MESSAGE value="updated APK file" />
     <MESSAGE value="fix wallpaper alarm &amp; service" />
@@ -3437,7 +3440,8 @@
     <MESSAGE value="revert glide to 3.8.0" />
     <MESSAGE value="add wallpaper picker from gallery" />
     <MESSAGE value="bound image ripple effect animation" />
-    <option name="LAST_COMMIT_MESSAGE" value="bound image ripple effect animation" />
+    <MESSAGE value="add lifecycle to RealmApi to avoid memory leak" />
+    <option name="LAST_COMMIT_MESSAGE" value="add lifecycle to RealmApi to avoid memory leak" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -3869,29 +3873,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/crawler/processor/ImageRetrievePageProcessor.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/PresenterBase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="173" column="26" lean-forward="false" selection-start-line="173" selection-start-column="26" selection-end-line="173" selection-end-column="26" />
-          <folding />
+        <state relative-caret-position="-528">
+          <caret line="230" column="48" lean-forward="false" selection-start-line="230" selection-start-column="48" selection-end-line="230" selection-end-column="48" />
+          <folding>
+            <element signature="e#5289#6974#0" expanded="true" />
+            <element signature="e#6973#6974#0" expanded="true" />
+            <element signature="e#7969#8499#0" expanded="true" />
+            <element signature="e#8498#8499#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/data/local/RealmManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-97">
-          <caret line="26" column="16" lean-forward="false" selection-start-line="26" selection-start-column="13" selection-end-line="26" selection-end-column="25" />
+        <state relative-caret-position="162">
+          <caret line="313" column="44" lean-forward="true" selection-start-line="313" selection-start-column="44" selection-end-line="313" selection-end-column="44" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/PresenterBase.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/crawler/processor/ImageRetrievePageProcessor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-591">
-          <caret line="55" column="43" lean-forward="false" selection-start-line="55" selection-start-column="28" selection-end-line="55" selection-end-column="43" />
+        <state relative-caret-position="78">
+          <caret line="173" column="64" lean-forward="false" selection-start-line="173" selection-start-column="39" selection-end-line="173" selection-end-column="64" />
           <folding>
-            <element signature="e#5393#7078#0" expanded="true" />
-            <element signature="e#7077#7078#0" expanded="true" />
+            <element signature="e#5575#5985#0" expanded="true" />
+            <element signature="e#5984#5985#0" expanded="true" />
           </folding>
         </state>
       </provider>
