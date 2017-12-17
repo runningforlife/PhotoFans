@@ -3,6 +3,7 @@ package com.github.runningforlife.photosniffer.ui.adapter;
 import android.content.Context;
 import android.os.Build;
 import android.support.v4.view.PagerAdapter;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,9 @@ import com.bumptech.glide.Priority;;
 import com.github.runningforlife.photosniffer.R;
 
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 import static com.github.runningforlife.photosniffer.loader.Loader.*;
 
@@ -49,6 +53,7 @@ public class ImagePagerAdapter extends PagerAdapter {
 
         final View view = LayoutInflater.from(mContext)
                 .inflate(R.layout.item_image_detail,parent,false);
+        ImageHolder imageHolder = new ImageHolder(view);
         // transition name
         if(Build.VERSION.SDK_INT >= 21) {
             String transitionName = mContext.getString(R.string.activity_image_transition)
@@ -57,7 +62,7 @@ public class ImagePagerAdapter extends PagerAdapter {
         }
 
         // preload image
-        ImageView iv = (ImageView)view;
+        ImageView iv = imageHolder.imageView;
         //MiscUtil.preloadImage(iv);
         view.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_scale_in));
         mCallback.loadImageIntoView(position, iv, Priority.IMMEDIATE,
@@ -89,5 +94,15 @@ public class ImagePagerAdapter extends PagerAdapter {
     @Override
     public void destroyItem(ViewGroup parent,int position, Object object){
         parent.removeView((View)object);
+    }
+
+    final class ImageHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.iv_image_detail) ImageView imageView;
+
+        ImageHolder(View itemView) {
+            super(itemView);
+
+            ButterKnife.bind(this, itemView);
+        }
     }
 }
