@@ -21,6 +21,11 @@ public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
     private boolean mIsWallpaper;
     private boolean mIsCached;
 
+    public ImageRealm() {
+        mName = "unknown";
+        mTimeStamp = System.currentTimeMillis();
+    }
+
     public void setUrl(String url){
         mUrl = url;
     }
@@ -95,10 +100,10 @@ public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return (int) (mName.hashCode()
-                        + mUrl.hashCode()
-                        + mTimeStamp >>> 2);
+                + mUrl.hashCode()
+                + mTimeStamp >>> 2);
     }
 
     // time descending

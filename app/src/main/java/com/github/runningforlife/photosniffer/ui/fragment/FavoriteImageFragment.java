@@ -2,7 +2,9 @@ package com.github.runningforlife.photosniffer.ui.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.MenuRes;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -63,6 +65,12 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
     }
 
     @Override
+    boolean onOptionsMenuSelected(MenuItem menu) {
+        Log.v(TAG,"onOptionsMenuSelected()");
+        return optionsItemSelected(menu);
+    }
+
+    @Override
     public void onResume(){
         super.onResume();
 
@@ -78,14 +86,13 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
         glm.setAutoMeasureEnabled(true);
         mRcvFavorList.setHasFixedSize(true);
         mRcvFavorList.setLayoutManager(glm);
-        mRcvFavorList.setItemAnimator(new ScaleInOutItemAnimator());
+        mRcvFavorList.setItemAnimator(new DefaultItemAnimator());
+        //mRcvFavorList.setItemAnimator(new ScaleInOutItemAnimator());
         // restore back ground
         mRcvFavorList.setBackgroundResource(R.color.colorLightGrey);
 
         mAdapter = new GalleryAdapter(getActivity(),this);
         mRcvFavorList.setAdapter(mAdapter);
-        //option menu
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -93,7 +100,7 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
         Log.v(TAG,"onItemClicked(): pos = " + pos);
 
         if(mCallback != null){
-            mCallback.onItemClick(view,pos, ((ImageRealm)mPresenter.getItemAtPos(pos)).getUrl());
+            mCallback.onItemClick(view,pos, mPresenter.getItemAtPos(pos).getUrl());
         }
     }
 
@@ -112,8 +119,7 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    private boolean optionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         switch (id){
@@ -137,7 +143,7 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
         mRcvFavorList.removeAllViews();
         mAdapter.notifyDataSetChanged();
 
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
     @Override

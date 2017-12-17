@@ -68,6 +68,7 @@ public class RealmApiImpl implements RealmApi {
                     case "mIsUsed":
                     case "mIsFavor":
                     case "mIsWallpaper":
+                    case "mIsCached":
                         query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
                         break;
                     default:
@@ -86,7 +87,7 @@ public class RealmApiImpl implements RealmApi {
 
         Set<Map.Entry<String, String>> entries = params.entrySet();
         for(Map.Entry<String,String> entry : entries){
-            if(type == ImageRealm.class){
+            if (type == ImageRealm.class) {
                 String field = entry.getKey();
                 switch (field){
                     case "mTimeStamp":
@@ -95,6 +96,7 @@ public class RealmApiImpl implements RealmApi {
                     case "mIsUsed":
                     case "mIsFavor":
                     case "mIsWallpaper":
+                    case "mIsCached":
                         query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
                         break;
                     default:
@@ -113,17 +115,18 @@ public class RealmApiImpl implements RealmApi {
             @Override
             public void execute(Realm realm) {
                 RealmQuery<? extends RealmObject> query = realm.where(type);
-                if(type == ImageRealm.class){
+                if (type == ImageRealm.class) {
                     Set<Map.Entry<String, String>> entries = params.entrySet();
                     for(Map.Entry<String,String> entry : entries){
                         String field = entry.getKey();
-                        switch (field){
+                        switch (field) {
                             case "mTimeStamp":
                                 query.equalTo(field, Long.parseLong(entry.getValue()));
                                 break;
                             case "mIsUsed":
                             case "mIsFavor":
                             case "mIsWallpaper":
+                            case "mIsCached":
                                 query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
                                 break;
                             default:
@@ -134,6 +137,7 @@ public class RealmApiImpl implements RealmApi {
                     RealmResults<? extends RealmObject> rr = query.findAll();
                     for(int i = 0; i < rr.size(); ++i) {
                         ImageRealm ir = (ImageRealm) rr.get(i);
+                        if (ir == null) continue;
                         // updateAsync values
                         Set<Map.Entry<String, String>> entrySet = updatedValues.entrySet();
                         for (Map.Entry<String, String> entry : entrySet) {
@@ -150,6 +154,8 @@ public class RealmApiImpl implements RealmApi {
                                 case "mIsWallpaper":
                                     ir.setIsWallpaper(Boolean.parseBoolean(entry.getValue()));
                                     break;
+                                case "mIsCached":
+                                    ir.setIsCached(Boolean.parseBoolean(entry.getValue()));
                                 case "mName":
                                     ir.setName(entry.getValue());
                                 default:
@@ -190,13 +196,16 @@ public class RealmApiImpl implements RealmApi {
                     Set<Map.Entry<String, String>> entries = params.entrySet();
                     for(Map.Entry<String,String> entry : entries){
                         String field = entry.getKey();
-                        switch (field){
+                        switch (field) {
+                            case "mUrl":
+                                query.equalTo(field, entry.getValue());
                             case "mTimeStamp":
                                 query.equalTo(field, Long.parseLong(entry.getValue()));
                                 break;
                             case "mIsUsed":
                             case "mIsFavor":
                             case "mIsWallpaper":
+                            case "mIsCached":
                                 query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
                                 break;
                             default:
@@ -250,6 +259,7 @@ public class RealmApiImpl implements RealmApi {
                     case "mIsUsed":
                     case "mIsFavor":
                     case "mIsWallpaper":
+                    case "mIsCached":
                         query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
                         break;
                     default:

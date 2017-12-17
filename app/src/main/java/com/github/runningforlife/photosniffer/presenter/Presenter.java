@@ -6,6 +6,8 @@ import android.widget.ImageView;
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 
+import java.util.List;
+
 import io.realm.RealmObject;
 
 /**
@@ -63,4 +65,9 @@ public interface Presenter extends ImageSaveRunnable.ImageSaveCallback, LifeCycl
      * image loading complete
      */
     void onImageLoadDone(int pos, boolean isSuccess);
+
+    /**
+     * save user selected photos to realm
+     */
+    void saveUserPickedPhotos(List<String> photoUris);
 }

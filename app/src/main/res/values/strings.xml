@@ -73,4 +73,5 @@
     <string name="pref_wallpaper_cache_index">pref_wallpaper_cache_index</string>
     <string name="mesage_file_deletion_progress">File is being deleted, please wait...</string>
     <string name="pref_cache_clear">pref_cache_clear</string>
+    <string name="add_wallpapers_from_gallery">Add images from gallery</string>
 </resources>

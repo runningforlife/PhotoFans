@@ -48,4 +48,5 @@
     <string name="hint_network_state_slow">网络有点慢，请稍后再试</string>
     <string name="enable_auto_lockscreen_wallpaper">开启锁屏自动壁纸</string>
     <string name="mesage_file_deletion_progress">File is being deleted, please wait...</string>
+    <string name="add_wallpapers_from_gallery">Add images from gallery</string>
 </resources>

@@ -55,8 +55,7 @@ public class WallpaperUtils {
         if (wallpaper.size() == 0) {
             wallpaper = query
                     .or()
-                    .equalTo("mIsUsed", true)
-                    .equalTo("mIsCached", false)
+                    .equalTo("mIsUsed", false)
                     .findAll();
         }
         // 10 image cached a time

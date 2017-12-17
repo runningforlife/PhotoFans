@@ -123,8 +123,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     @Override
     public void onPause(){
         super.onPause();
-
-        GlideLoader.pauseRequest(this);
     }
 
     @Override

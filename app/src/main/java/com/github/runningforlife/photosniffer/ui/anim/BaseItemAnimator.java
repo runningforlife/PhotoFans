@@ -19,16 +19,17 @@ package com.github.runningforlife.photosniffer.ui.anim;
  */
 
 
-        import android.support.v4.animation.AnimatorCompatHelper;
-        import android.support.v4.view.ViewCompat;
-        import android.support.v4.view.ViewPropertyAnimatorCompat;
-        import android.support.v4.view.ViewPropertyAnimatorListener;
-        import android.support.v7.widget.RecyclerView;
-        import android.support.v7.widget.SimpleItemAnimator;
-        import android.view.View;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPropertyAnimatorCompat;
+import android.support.v4.view.ViewPropertyAnimatorListener;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
+import android.view.View;
 
-        import java.util.ArrayList;
-        import java.util.List;
+import com.nineoldandroids.view.animation.AnimatorProxy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This implementation of {@link android.support.v7.widget.RecyclerView.ItemAnimator} provides basic
@@ -496,7 +497,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     }
 
     private void resetAnimation(RecyclerView.ViewHolder holder) {
-        AnimatorCompatHelper.clearInterpolator(holder.itemView);
+        //AnimatorCompatHelper.clearInterpolator(holder.itemView);
         endAnimation(holder);
     }
 

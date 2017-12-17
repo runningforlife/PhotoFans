@@ -2,7 +2,11 @@ package com.github.runningforlife.photosniffer.ui.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.MenuRes;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
@@ -56,6 +60,11 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
         return root;
     }
 
+    @Override
+    boolean onOptionsMenuSelected(MenuItem menu) {
+        Log.v(TAG,"onOptionsMenuSelected()");
+        return optionsItemSelected(menu);
+    }
 
     @Override
     public void onResume() {
@@ -119,6 +128,33 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
         return true;
     }
 
+    private boolean optionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id){
+            case R.id.grid_view:
+                GridLayoutManager glm = new GridLayoutManager(getContext(),2);
+                mRcvWallpaper.setLayoutManager(glm);
+                glm.setAutoMeasureEnabled(true);
+                return true;
+            case R.id.list_view:
+                LinearLayoutManager ll = new LinearLayoutManager(getContext());
+                mRcvWallpaper.setLayoutManager(ll);
+                ll.setAutoMeasureEnabled(true);
+                return true;
+            case R.id.stagger_view:
+                StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+                mRcvWallpaper.setLayoutManager(sglm);
+                sglm.setAutoMeasureEnabled(true);
+                return true;
+        }
+
+        mRcvWallpaper.removeAllViews();
+        mAdapter.notifyDataSetChanged();
+
+        return false;
+    }
+
     private void initView() {
         StaggeredGridLayoutManager sgm = new StaggeredGridLayoutManager(
                 2, StaggeredGridLayoutManager.VERTICAL);
@@ -126,7 +162,8 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
 
         mAdapter = new GalleryAdapter(getActivity(), this);
         mRcvWallpaper.setAdapter(mAdapter);
-        mRcvWallpaper.setItemAnimator(new ScaleInOutItemAnimator());
+        mRcvWallpaper.setItemAnimator(new DefaultItemAnimator());
+        //mRcvWallpaper.setItemAnimator(new ScaleInOutItemAnimator());
         mRcvWallpaper.setBackgroundResource(R.color.colorLightGrey);
     }
 

@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.MenuRes;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -224,7 +226,13 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    boolean onOptionsMenuSelected(MenuItem menu) {
+        Log.v(TAG,"onOptionsMenuSelected()");
+        return optionsItemSelected(menu);
+    }
+
+
+    private boolean optionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         switch (id){
@@ -253,7 +261,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
         mRvImgList.removeAllViews();
         mAdapter.notifyDataSetChanged();
 
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
     private void initView(){
@@ -265,7 +273,8 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
         mRvImgList.setHasFixedSize(true);
 
         mRvImgList.setLayoutManager(gridLayoutMgr);
-        mRvImgList.setItemAnimator(new ScaleInOutItemAnimator());
+        mRvImgList.setItemAnimator(new DefaultItemAnimator());
+        //mRvImgList.setItemAnimator(new ScaleInOutItemAnimator());
         mRvImgList.setBackgroundResource(R.color.colorLightGrey);
 
         mAdapter = new GalleryAdapter(getActivity(),this);

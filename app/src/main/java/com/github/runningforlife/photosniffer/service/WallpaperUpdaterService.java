@@ -113,35 +113,14 @@ public class WallpaperUpdaterService extends Service {
         CountDownLatch latch = new CountDownLatch(wallpapers.size());
 
         for (int i = 0; i < wallpapers.size(); ++i) {
-            WallpaperCacheRunnable wc = new WallpaperCacheRunnable(mDiskCache,
+            WallpaperCacheRunnable wc = new WallpaperCacheRunnable(mRealmApi, mDiskCache,
                     wallpapers.get(i), latch);
-            wc.setLoadCallback(new WallpaperCacheRunnable.ImageLoadCallback() {
-                @Override
-                public void onLoadDone(String url, boolean isOk) {
-                    Log.d(TAG,"onLoadDone():url=" + url);
-                    synchronized (wallpapers) {
-                        if (isOk) {
-                            updateRealm(url);
-                        }
-                    }
-                }
-            });
             mUpdateExecutor.execute(wc);
         }
 
         // wait for all job is down
         latch.await();
         Log.v(TAG, "wallpaper cache updated done");
-    }
-
-    private void updateRealm(String url) {
-        HashMap<String, String> params = new HashMap<>();
-        params.put("mUrl", url);
-
-        HashMap<String, String> newValues = new HashMap<>();
-        newValues.put("mIsWallpaper", Boolean.toString(true));
-        newValues.put("mIsCached", Boolean.toString(true));
-        mRealmApi.updateAsync(ImageRealm.class, params, newValues);
     }
 
 }

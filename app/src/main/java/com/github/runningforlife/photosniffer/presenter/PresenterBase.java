@@ -3,11 +3,15 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.URLUtil;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.data.cache.DiskWallpaperCache;
 import com.github.runningforlife.photosniffer.data.cache.cache;
@@ -24,7 +28,10 @@ import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -145,15 +152,15 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     public void loadImageIntoView(final int pos, final ImageView iv, Priority priority, int w, int h, ImageView.ScaleType scaleType) {
         Log.v(TAG,"loadImageIntoView()");
         final String url = mImageList.get(pos).getUrl();
-        if (!mDiskCache.isExist(url)) {
-            GlideLoaderListener listener = new GlideLoaderListener(iv);
-            listener.setScaleType(scaleType);
-            listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
-                @Override
-                public void onImageLoadDone(Object o) {
-                    Log.v(TAG,"onImageLoadDone()");
-                    // 404 or socket timeout
-                    if (o instanceof Exception) {
+        GlideLoaderListener listener = new GlideLoaderListener(iv);
+        listener.setScaleType(scaleType);
+        listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+            @Override
+            public void onImageLoadDone(Object o) {
+                Log.v(TAG, "onImageLoadDone()");
+                // 404 or socket timeout
+                if (o instanceof Exception) {
+                    if (!URLUtil.isFileUrl(url)) {
                         ++mNetworkErrorCount;
                         if (MiscUtil.isConnected(mContext)) {
                             // network is slow
@@ -166,31 +173,43 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
                         } else {
                             mView.onNetworkState(NetState.STATE_DISCONNECT);
                         }
-                        PresenterBase.this.onImageLoadDone(pos, false);
                     } else {
-                        PresenterBase.this.onImageLoadDone(pos, true);
+                        // remove from database for image file may be removed by user
+                        Map<String, String> params = new HashMap<>();
+                        params.put("mUrl", url);
+                        params.put("mIsCached", Boolean.toString(Boolean.TRUE));
+                        mRealmApi.deleteAsync(ImageRealm.class, (HashMap<String, String>) params);
                     }
+                    PresenterBase.this.onImageLoadDone(pos, false);
+                } else {
+                    PresenterBase.this.onImageLoadDone(pos, true);
                 }
-            });
+            }
+        });
 
-            onImageLoadStart(pos);
-            GlideLoader.load(mContext.getApplicationContext(), url, listener, priority, w, h, scaleType);
-        } else {
-            final String key = mDiskCache.getCacheKey(url);
-            final String fileName = mDiskCache.getFileName(key);
-            ImageDecodeRunnable idr = new ImageDecodeRunnable(fileName, w, h);
-            mDecodeExecutor.submit(idr);
-            idr.setDecodeCallback(new ImageDecodeRunnable.DecodeCallback() {
-                @Override
-                public void onDecodeDone(Bitmap bitmap) {
-                    if (bitmap != null) {
-                        iv.setImageBitmap(bitmap);
-                    } else {
-                        Log.e(TAG,"fail to decode cache file:" + fileName);
-                    }
-                }
-            });
+        onImageLoadStart(pos);
+        GlideLoader.load(mContext, url, listener, priority, w, h, scaleType);
+    }
+
+    @Override
+    public void saveUserPickedPhotos(List<String> photoUris) {
+        Log.v(TAG,"saveUserPickedPhotos():size=" + photoUris.size());
+        if (photoUris.size() == 0) {
+            return;
         }
+
+        List<ImageRealm> photos = new ArrayList<>(photoUris.size());
+        for (int i = 0; i < photoUris.size(); ++i) {
+            ImageRealm ir = new ImageRealm();
+            ir.setUrl(photoUris.get(i));
+            ir.setIsWallpaper(true);
+            ir.setIsCached(true);
+            ir.setUsed(true);
+
+            photos.add(ir);
+        }
+
+        mRealmApi.insertAsync(photos);
     }
 
     private void setWallpaper(final String url) {
@@ -277,8 +296,9 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         HashMap<String,String> params = new HashMap<>();
         HashMap<String, String> updated = new HashMap<>();
 
-        params.put("mUrl", url);
+        params.put("mUrl", mDiskCache.getFileName(mDiskCache.getCacheKey(url)));
         updated.put("mIsWallpaper", Boolean.toString(true));
+        updated.put("mIsCached", Boolean.toString(Boolean.TRUE));
         mRealmApi.updateAsync(ImageRealm.class, params, updated);
     }
 

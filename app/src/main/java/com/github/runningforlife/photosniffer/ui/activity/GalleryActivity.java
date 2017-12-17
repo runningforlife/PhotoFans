@@ -108,7 +108,7 @@ public class GalleryActivity extends BaseActivity
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
 
         String key = getString(R.string.pref_new_user);
@@ -121,7 +121,7 @@ public class GalleryActivity extends BaseActivity
                     // tell user how to start retrieveImages images
                     showImageRetrieveHint();
                 }
-            }, 3000);
+            }, 2000);
             // set to false when first refresh done
             //SharedPrefUtil.putBoolean(key, false);
             checkStoragePermission();
@@ -181,9 +181,9 @@ public class GalleryActivity extends BaseActivity
     @Override
     public void onItemClick(View sharedView, int pos, String url) {
         Log.v(TAG,"onItemClick(): pos = " + pos);
-        if(!TextUtils.isEmpty(url)) {
+        if (!TextUtils.isEmpty(url)) {
             showFullScreenImage(sharedView, pos, url);
-        }else{
+        } else {
             Log.e(TAG,"onItemClick(): url is empty");
         }
     }
@@ -207,17 +207,6 @@ public class GalleryActivity extends BaseActivity
                 ToastUtil.showToast(GalleryActivity.this, msg);
             }
         });
-
-        String key = getString(R.string.pref_new_user);
-        boolean isNewUser = SharedPrefUtil.getBoolean(key, true);
-        if (isNewUser) {
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mIsToastShowing = false;
-                }
-            }, 3000);
-        }
         //ToastUtil.showToast(this, toast);
     }
 
@@ -289,7 +278,7 @@ public class GalleryActivity extends BaseActivity
                 .commit();
     }
 
-    private void startWallpaperFragment(){
+    private void startWallpaperFragment() {
         FragmentManager fragmentMgr = getSupportFragmentManager();
         WallPaperFragment fragment = (WallPaperFragment) fragmentMgr.findFragmentByTag(WallPaperFragment.TAG);
         if (fragment == null) {
@@ -329,7 +318,7 @@ public class GalleryActivity extends BaseActivity
 
             ft.setCustomAnimations(R.anim.anim_enter_from_top, android.R.anim.fade_out);
             ft.add(R.id.fragment_container, fragment, RetrieveHintFragment.TAG)
-                    .commit();
+                    .commitAllowingStateLoss();
 
             int dismissCount = getResources().getInteger(R.integer.dialog_dismiss_count_down);
             mHandler.postDelayed(new Runnable() {
@@ -342,7 +331,7 @@ public class GalleryActivity extends BaseActivity
 
     }
 
-    private void dismissRetrieveHintFragment(){
+    private void dismissRetrieveHintFragment() {
         Log.v(TAG,"dismissRetrieveHintFragment()");
 
         FragmentManager fm = getSupportFragmentManager();
@@ -355,7 +344,7 @@ public class GalleryActivity extends BaseActivity
         }
     }
 
-    private void makeAppDir(){
+    private void makeAppDir() {
         String appName = getString(R.string.app_name);
         String imgPath = ROOT_PATH + File.separator + appName + File.separator + PATH_NAME;
         File file = new File(imgPath);
@@ -364,14 +353,14 @@ public class GalleryActivity extends BaseActivity
         }
     }
 
-    private void checkStoragePermission(){
+    private void checkStoragePermission() {
         Log.v(TAG,"checkStoragePermission()");
-        if(ContextCompat.checkSelfPermission(getApplicationContext(),
+        if (ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
             String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE};
             ActivityCompat.requestPermissions(this,permissions, MY_STORAGE_PERMISSION_REQUEST);
-        }else{
+        } else {
             makeAppDir();
         }
     }

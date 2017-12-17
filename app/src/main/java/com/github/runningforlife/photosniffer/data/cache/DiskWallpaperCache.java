@@ -25,6 +25,7 @@ public class DiskWallpaperCache implements cache {
     private static final int DEFAULT_CACHE_SIZE = 50 * 1024 * 1024;
     /** default imag format */
     private static final String DEFAULT_IMAGE_FORMAT = ".jpg";
+    private static final String CACHE_IMAGE_PREFIX = "img";
 
     /** all cache entries info */
     private Map<String, CacheInfo> mEntries = new LinkedHashMap<>(30, 0.75f, true);
@@ -170,7 +171,7 @@ public class DiskWallpaperCache implements cache {
 
     @Override
     public String getFileName(String key) {
-        return key + DEFAULT_IMAGE_FORMAT;
+        return CACHE_IMAGE_PREFIX + key + DEFAULT_IMAGE_FORMAT;
     }
 
     private synchronized void initialize() {
@@ -212,9 +213,8 @@ public class DiskWallpaperCache implements cache {
         }
     }
 
-
     private File getFileNameByKey(String key) {
-        String fileName = key + DEFAULT_IMAGE_FORMAT;
+        String fileName = CACHE_IMAGE_PREFIX + key + DEFAULT_IMAGE_FORMAT;
         return new File(mRootDir, fileName);
     }
 

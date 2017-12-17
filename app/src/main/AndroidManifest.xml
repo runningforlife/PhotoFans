@@ -19,8 +19,7 @@
         android:theme="@style/AppTheme">
 
         <meta-data android:name="com.github.runningforlife.photosniffer.glide.DiskStorageModule"
-            android:value="GlideModule">
-        </meta-data>
+            android:value="GlideModule"/>
 
         <activity
             android:name="com.github.runningforlife.photosniffer.ui.activity.GalleryActivity"
@@ -36,24 +35,26 @@
         <activity android:name="com.github.runningforlife.photosniffer.ui.activity.ImageDetailActivity"
             android:theme="@style/AppTheme.NoActionBar.DarkStatusBar"
             android:label=""
-            android:parentActivityName="com.github.runningforlife.photosniffer.ui.activity.GalleryActivity">
-        </activity>
+            android:parentActivityName="com.github.runningforlife.photosniffer.ui.activity.GalleryActivity"/>
 
         <activity android:name="com.github.runningforlife.photosniffer.ui.activity.SettingsActivity"
             android:theme="@style/AppTheme"
-            android:label="@string/action_settings">
-        </activity>
+            android:label="@string/action_settings"/>
 
         <activity android:name="com.github.runningforlife.photosniffer.ui.activity.ImageSourceSelectionActivity"
             android:theme="@style/AppTheme"
-            android:label="@string/select_your_favorite_websites">
-        </activity>
+            android:label="@string/select_your_favorite_websites"/>
 
         <activity android:name=".ui.activity.FullScreenImageActivity"
             android:theme="@style/AppTheme.NoActionBar.DarkStatusBar"
             android:parentActivityName=".ui.activity.GalleryActivity"
-            android:label="">
-        </activity>
+            android:label=""/>
+
+        <activity android:name="me.iwf.photopicker.PhotoPickerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
+        <activity android:name="me.iwf.photopicker.PhotoPagerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"/>
 
         <service android:name="com.github.runningforlife.photosniffer.service.ImageRetrieveService"/>
 
@@ -61,11 +62,9 @@
             android:exported="false"/>
 
         <service android:name=".service.WallpaperJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE">
-        </service>
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
 
-        <service android:name=".service.WallpaperUpdaterService">
-        </service>
+        <service android:name=".service.WallpaperUpdaterService"/>
 
         <receiver android:name=".ui.receiver.WallpaperAlarmReceiver"
             android:exported="false">

@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -22,5 +23,10 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle saveState){
         super.onCreate(saveState);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

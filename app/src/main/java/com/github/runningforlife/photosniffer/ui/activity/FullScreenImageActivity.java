@@ -59,7 +59,7 @@ public class FullScreenImageActivity extends BaseActivity {
         return true;
     }
 
-    private void initView(){
+    private void initView() {
         FragmentManager fragmentMgr = getSupportFragmentManager();
         FullScreenImageFragment fragment = (FullScreenImageFragment) fragmentMgr.findFragmentByTag(FullScreenImageFragment.TAG);
         if(fragment == null){

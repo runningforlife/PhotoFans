@@ -2,12 +2,14 @@ package com.github.runningforlife.photosniffer.ui.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -15,15 +17,18 @@ import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.presenter.NetState;
 import com.github.runningforlife.photosniffer.presenter.Presenter;
-import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.ui.activity.Refresh;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.RealmObject;
+import me.iwf.photopicker.PhotoPicker;
+import me.iwf.photopicker.PhotoPickerActivity;
 
 import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
@@ -38,6 +43,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     public @interface RecycleLayout{}
     public static final String LinearManager = "linearManager";
     public static final String GridManager = "GridManager";
+
     // current context menu item view position
     protected int mCurrentPos = -1;
     protected FragmentCallback mCallback;
@@ -49,10 +55,26 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         void showToast(String toast);
     }
 
+    abstract boolean onOptionsMenuSelected(MenuItem menu);
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        int id = menuItem.getItemId();
+        switch (id) {
+            case R.id.add_wallpaper:
+                startPhotoPicker();
+                //startPickPhoto();
+                return true;
+            default:
+                return onOptionsMenuSelected(menuItem);
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedState){
         super.onCreate(savedState);
-        //setRetainInstance(true);
+        //option menu
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -77,6 +99,22 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     public void onDestroy(){
         super.onDestroy();
         mPresenter.onDestroy();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.v(TAG,"onActivityResult(): result code=" + resultCode);
+        if (resultCode == Activity.RESULT_OK) {
+            List<String> photoUris = null;
+            if (requestCode == PhotoPicker.REQUEST_CODE) {
+                photoUris = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
+            }
+
+            if (photoUris != null && photoUris.size() > 0) {
+                mPresenter.saveUserPickedPhotos(photoUris);
+            }
+        }
+
     }
 
     @Override
@@ -120,7 +158,6 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         }
     }
 
-
     @Override
     public void onImageSaveDone(String path) {
         Log.v(TAG,"onImageSaveDone(): isOk = " + !TextUtils.isEmpty(path));
@@ -163,6 +200,16 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     public void loadImageIntoView(int pos, ImageView iv, Priority priority, int w, int h, ImageView.ScaleType scaleType) {
         checkPresenter();
         mPresenter.loadImageIntoView(pos, iv, priority, w, h, scaleType);
+    }
+
+    private void startPhotoPicker() {
+        Log.v(TAG,"startPhotoPicker");
+        PhotoPicker.PhotoPickerBuilder builder = new PhotoPicker.PhotoPickerBuilder();
+        builder.setGridColumnCount(3)
+                .setPreviewEnabled(true)
+                .setShowCamera(false)
+                .setShowGif(false)
+                .start(getContext(), this, PhotoPicker.REQUEST_CODE);
     }
 
     private void checkPresenter() {
