@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
-import com.github.runningforlife.photosniffer.data.cache.DiskWallpaperCache;
+import com.github.runningforlife.photosniffer.data.cache.DiskCache;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
@@ -61,7 +61,7 @@ public class FullScreenPresenterImpl implements FullScreenPresenter {
         HashMap<String,String> params = new HashMap<>();
         HashMap<String, String> updated = new HashMap<>();
 
-        params.put("mUrl", DiskWallpaperCache.getFileName(DiskWallpaperCache.getCacheKey(url)));
+        params.put("mUrl", DiskCache.getFileName(DiskCache.getCacheKey(url)));
         updated.put("mIsWallpaper", Boolean.toString(true));
         updated.put("mIsCached", Boolean.toString(Boolean.TRUE));
         mRealmApi.updateAsync(ImageRealm.class, params, updated);
@@ -75,7 +75,7 @@ public class FullScreenPresenterImpl implements FullScreenPresenter {
             public void onImageLoadDone(Object o) {
                 Log.d(TAG, "onImageLoadDone()");
                 if(o instanceof Bitmap) {
-                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), DiskWallpaperCache.getCacheKey(url));
+                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), DiskCache.getCacheKey(url));
                     mImageExecutor.submit(r);
                 }
             }

@@ -10,15 +10,13 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.github.runningforlife.photosniffer.data.cache.DiskWallpaperCache;
+import com.github.runningforlife.photosniffer.data.cache.DiskCache;
 import com.github.runningforlife.photosniffer.data.cache.WallpaperCacheRunnable;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
-import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
@@ -31,7 +29,7 @@ import java.util.concurrent.Executors;
 public class WallpaperUpdaterService extends Service {
     private static final String TAG = "WallpaperUpdaterService";
 
-    private DiskWallpaperCache mDiskCache;
+    private DiskCache mDiskCache;
     private Executor mUpdateExecutor;
     private RealmApi mRealmApi;
     private volatile ServiceHandler mHandler;
@@ -64,7 +62,7 @@ public class WallpaperUpdaterService extends Service {
         mLooper = handlerThread.getLooper();
         mHandler = new ServiceHandler(mLooper);
 
-        mDiskCache = new DiskWallpaperCache(new File(MiscUtil.getWallpaperCacheDir()));
+        mDiskCache = new DiskCache(new File(MiscUtil.getWallpaperCacheDir()));
 
         mUpdateExecutor = Executors.newFixedThreadPool(2);
 

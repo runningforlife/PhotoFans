@@ -10,7 +10,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
-import com.github.runningforlife.photosniffer.data.cache.DiskWallpaperCache;
+import com.github.runningforlife.photosniffer.data.cache.DiskCache;
 import com.github.runningforlife.photosniffer.data.cache.cache;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
@@ -57,7 +57,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
 
     RealmResults<ImageRealm> mImageList;
     RealmApi mRealmApi;
-    DiskWallpaperCache mDiskCache;
+    DiskCache mDiskCache;
     OkHttpClient mHttpClient;
 
     OrderReamChangeListener mOrderRealmChangeListener;
@@ -67,7 +67,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         mView = view;
         mOrderRealmChangeListener = new OrderReamChangeListener();
         mRealmApi = RealmApiImpl.getInstance();
-        mDiskCache = new DiskWallpaperCache(new File(MiscUtil.getWallpaperCacheDir()));
+        mDiskCache = new DiskCache(new File(MiscUtil.getWallpaperCacheDir()));
         mHttpClient = MiscUtil.buildOkHttpClient();
 
         mNetworkErrorCount = 0;
@@ -294,7 +294,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         HashMap<String,String> params = new HashMap<>();
         HashMap<String, String> updated = new HashMap<>();
 
-        params.put("mUrl", DiskWallpaperCache.getFileName(DiskWallpaperCache.getCacheKey(url)));
+        params.put("mUrl", DiskCache.getFileName(DiskCache.getCacheKey(url)));
         updated.put("mIsWallpaper", Boolean.toString(true));
         updated.put("mIsCached", Boolean.toString(Boolean.TRUE));
         mRealmApi.updateAsync(ImageRealm.class, params, updated);

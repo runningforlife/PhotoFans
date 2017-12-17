@@ -18,9 +18,9 @@ import java.util.Map;
  * a disk cache to cache wallpapers
  */
 
-public class DiskWallpaperCache implements cache {
+public class DiskCache implements cache {
 
-    private static final String TAG = "DiskWallpaperCache";
+    private static final String TAG = "DiskCache";
     /** default size is 50MB */
     private static final int DEFAULT_CACHE_SIZE = 50 * 1024 * 1024;
     /** default imag format */
@@ -33,14 +33,14 @@ public class DiskWallpaperCache implements cache {
     private int mMaxSize;
     private int mTotalSize;
 
-    public DiskWallpaperCache(File rootDir, int maxSize) {
+    public DiskCache(File rootDir, int maxSize) {
         mRootDir = rootDir;
         mMaxSize = maxSize;
 
         initialize();
     }
 
-    public DiskWallpaperCache(File rootDir) {
+    public DiskCache(File rootDir) {
         this(rootDir, DEFAULT_CACHE_SIZE);
     }
 
