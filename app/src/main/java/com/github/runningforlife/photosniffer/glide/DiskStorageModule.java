@@ -3,21 +3,37 @@ package com.github.runningforlife.photosniffer.glide;
 import android.content.Context;
 import android.util.Log;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
-import com.bumptech.glide.module.AppGlideModule;
+import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader;
+import com.bumptech.glide.load.DecodeFormat;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.module.GlideModule;
+import com.github.runningforlife.photosniffer.utils.DisplayUtil;
+
+import java.io.InputStream;
 
 /**
  *  a module to setup our own glide params
  */
 
-@com.bumptech.glide.annotation.GlideModule
-public class DiskStorageModule extends AppGlideModule {
+public class DiskStorageModule implements GlideModule {
     private static final String TAG = "DiskStorageModule";
     @Override
     public void applyOptions(Context context, GlideBuilder builder) {
         Log.d(TAG,"applyOptions()");
 
-        builder.setDiskCache(new DiskLruFactory(context));
+        if(DisplayUtil.isDeviceHighPerf()) {
+            builder.setDecodeFormat(DecodeFormat.PREFER_ARGB_8888)
+                    .setDiskCache(new DiskLruFactory(context));
+        }else{
+            builder.setDecodeFormat(DecodeFormat.PREFER_RGB_565)
+                    .setDiskCache(new DiskLruFactory(context));
+        }
     }
 
+    @Override
+    public void registerComponents(Context context, Glide glide) {
+        glide.register(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory());
+    }
 }

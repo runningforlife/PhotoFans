@@ -37,7 +37,7 @@ public class OkHttpDownloader extends AbstractDownloader {
     public Page download(us.codecraft.webmagic.Request request, Task task) {
         Log.v(LOG_TAG,"download()");
 
-        if(isPossibleImageUrl(request.getUrl())){
+        if (isPossibleImageUrl(request.getUrl())) {
             Page page = new Page();
             page.setRawText("");
             // bad request
@@ -62,12 +62,11 @@ public class OkHttpDownloader extends AbstractDownloader {
 
             Log.v(LOG_TAG,"download(): status code = " + statusCode);
 
-            if(response.isSuccessful()){
+            if (response.isSuccessful()) {
                 onSuccess(request);
-                request.putExtra(us.codecraft.webmagic.Request.STATUS_CODE, statusCode);
-
+                //request.putExtra(us.codecraft.webmagic.Request.STATUS_CODE, statusCode);
                 return handleResponse(request,response);
-            }else{
+            } else {
                 onError(request);
             }
 
