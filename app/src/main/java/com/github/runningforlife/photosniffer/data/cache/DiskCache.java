@@ -4,6 +4,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 
+import com.github.runningforlife.photosniffer.utils.MiscUtil;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -15,10 +17,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * a disk cache to cache wallpapers
+ * a disk Cache to Cache wallpapers
  */
 
-public class DiskCache implements cache {
+public class DiskCache implements Cache {
 
     private static final String TAG = "DiskCache";
     /** default size is 50MB */
@@ -27,7 +29,7 @@ public class DiskCache implements cache {
     private static final String DEFAULT_IMAGE_FORMAT = ".jpg";
     private static final String CACHE_IMAGE_PREFIX = "img";
 
-    /** all cache entries info */
+    /** all Cache entries info */
     private Map<String, CacheInfo> mEntries = new LinkedHashMap<>(30, 0.75f, true);
     private File mRootDir;
     private int mMaxSize;
@@ -37,7 +39,7 @@ public class DiskCache implements cache {
         mRootDir = rootDir;
         mMaxSize = maxSize;
 
-        initialize();
+        //initialize();
     }
 
     public DiskCache(File rootDir) {
@@ -46,7 +48,7 @@ public class DiskCache implements cache {
 
     @Override
     public synchronized void put(String url, Entry entry) {
-        // make sure cache is under limited space
+        // make sure Cache is under limited space
         trim(entry.data.length);
 
         String key = getCacheKey(url);
@@ -68,7 +70,7 @@ public class DiskCache implements cache {
             CacheInfo cacheInfo = new CacheInfo(key, entry.data.length);
             cacheInfo.lastModified = entry.lastModified;
             putEntry(key, cacheInfo);
-            Log.v(TAG,"put(): cache image done");
+            Log.v(TAG,"put(): Cache image done");
             return;
         } catch (IOException e) {
             e.printStackTrace();
@@ -102,6 +104,12 @@ public class DiskCache implements cache {
     }
 
     @Override
+    public String getFilePath(String url) {
+        String key = getCacheKey(url);
+        return getFileNameByKey(key).getAbsolutePath();
+    }
+
+    @Override
     public synchronized void remove(String url) {
         String key = getCacheKey(url);
         File file = getFileNameByKey(key);
@@ -126,7 +134,7 @@ public class DiskCache implements cache {
             File file = getFileNameByKey(key);
 
             if(!file.delete()) {
-                Log.e(TAG,"could not delete cache entry key=" + key + ", file=" + file.getAbsolutePath());
+                Log.e(TAG,"could not delete Cache entry key=" + key + ", file=" + file.getAbsolutePath());
             } else {
                 mTotalSize -= cacheInfo.size;
             }
@@ -151,11 +159,11 @@ public class DiskCache implements cache {
         mEntries.clear();
         mTotalSize = 0;
 
-        Log.v(TAG,"image cache cleared");
+        Log.v(TAG,"image Cache cleared");
     }
 
 
-    /** get the cache key by image url */
+    /** get the Cache key by image url */
     public static String getCacheKey(String imageUrl) {
         int fistHalf = imageUrl.length()/2;
         String key = String.valueOf(imageUrl.substring(0, fistHalf).hashCode());
@@ -168,14 +176,11 @@ public class DiskCache implements cache {
         return mEntries.get(getCacheKey(url)) != null;
     }
 
-    public static String getFileName(String key) {
-        return CACHE_IMAGE_PREFIX + key + DEFAULT_IMAGE_FORMAT;
-    }
-
-    private synchronized void initialize() {
+    @Override
+    public synchronized void initialize() {
         if (!mRootDir.exists()) {
             if (!mRootDir.mkdirs()) {
-                Log.e(TAG,"fail to create disk cache dir:" + mRootDir.getAbsolutePath());
+                Log.e(TAG,"fail to create disk Cache dir:" + mRootDir.getAbsolutePath());
             }
         }
 
@@ -217,10 +222,10 @@ public class DiskCache implements cache {
     }
 
     private static class CacheInfo {
-        /** key to get cache item, here is cache file name */
+        /** key to get Cache item, here is Cache file name */
         String key;
 
-        /* cache item size */
+        /* Cache item size */
         long size;
 
         /** last modified time */

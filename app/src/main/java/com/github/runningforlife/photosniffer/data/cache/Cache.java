@@ -1,20 +1,24 @@
 package com.github.runningforlife.photosniffer.data.cache;
 
-import android.graphics.Bitmap;
-
 /**
  * Created by jason on 12/8/17.
  */
 
-public interface cache {
+public interface Cache {
 
-    /** put a image with url to cache */
+    /** initialize the cache */
+    void initialize();
+
+    /** put a image with url to Cache */
     void put(String url, Entry entry);
 
-    /** get cache by url */
+    /** get Cache by url */
     Entry get(String url);
 
-    /** remove a image cache */
+    /** get file path by url */
+    String getFilePath(String url);
+
+    /** remove a image Cache */
     void remove(String url);
 
     void clear();
