@@ -10,8 +10,10 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
+import com.github.runningforlife.photosniffer.data.cache.Cache;
+import com.github.runningforlife.photosniffer.data.cache.CacheApi;
 import com.github.runningforlife.photosniffer.data.cache.DiskCache;
-import com.github.runningforlife.photosniffer.data.cache.cache;
+import com.github.runningforlife.photosniffer.data.cache.DiskCacheManager;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
@@ -51,14 +53,15 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     private int mNetworkErrorCount;
     // for image save or wallpaper setting
     private ExecutorService mImageExecutor;
+    //DiskCache mDiskCache;
+    private CacheApi mCacheMgr;
+    private OkHttpClient mHttpClient;
 
     Context mContext;
     UI mView;
 
     RealmResults<ImageRealm> mImageList;
     RealmApi mRealmApi;
-    DiskCache mDiskCache;
-    OkHttpClient mHttpClient;
 
     OrderReamChangeListener mOrderRealmChangeListener;
 
@@ -67,8 +70,8 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         mView = view;
         mOrderRealmChangeListener = new OrderReamChangeListener();
         mRealmApi = RealmApiImpl.getInstance();
-        mDiskCache = new DiskCache(new File(MiscUtil.getWallpaperCacheDir()));
-        mHttpClient = MiscUtil.buildOkHttpClient();
+        //mDiskCache = new DiskCache(new File(MiscUtil.getWallpaperCacheDir()));
+        mCacheMgr = DiskCacheManager.getInstance();
 
         mNetworkErrorCount = 0;
         mImageExecutor = Executors.newSingleThreadExecutor();
@@ -103,9 +106,10 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
 
     @Override
     public void setWallpaperAtPos(int pos) {
-        if(pos >= 0 && pos < mImageList.size()) return;
-        String url = mImageList.get(pos).getUrl();
-        setWallpaper(url);
+        if(pos >= 0 && pos < mImageList.size()) {
+            String url = mImageList.get(pos).getUrl();
+            setWallpaper(url);
+        }
     }
 
     @Override
@@ -135,8 +139,11 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         Log.d(TAG,"removeItemAtPos()");
         if(pos >= 0 && pos < mImageList.size()) {
             final ImageRealm ir = mImageList.get(pos);
+            String url = ir.getUrl();
+            if (mCacheMgr.isExist(url)) {
+                mCacheMgr.remove(url);
+            }
             mRealmApi.deleteSync(ir);
-            mDiskCache.remove(ir.getUrl());
         }
     }
 
@@ -179,8 +186,8 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
             }
         });
 
-        onImageLoadStart(pos);
         GlideLoader.load(mContext, url, listener, priority, w, h, scaleType);
+        onImageLoadStart(pos);
     }
 
     @Override
@@ -208,6 +215,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     public void onDestroy() {
         Log.v(TAG,"onDestroy()");
         mRealmApi.decRef();
+        //mOrderRealmChangeListener = null;
     }
 
     private void setWallpaper(final String url) {
@@ -231,9 +239,11 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     }
 
     private void setWallpaperAndCache(final String url) {
+        if (mHttpClient == null) {
+            mHttpClient = MiscUtil.buildOkHttpClient();
+        }
         // cached?
-        if (!mDiskCache.isExist(url)) {
-
+        if (!mCacheMgr.isExist(url)) {
             okhttp3.Request.Builder builder = new okhttp3.Request.Builder();
             builder.url(url)
                     .get();
@@ -254,15 +264,15 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
 
                         mView.onWallpaperSetDone(true);
 
-                        cache.Entry entry1 = new cache.Entry(data, System.currentTimeMillis());
-                        mDiskCache.put(url, entry1);
+                        Cache.Entry entry1 = new Cache.Entry(data, System.currentTimeMillis());
+                        mCacheMgr.put(url, entry1);
                     } else {
                         mView.onWallpaperSetDone(false);
                     }
                 }
             });
         } else {
-            cache.Entry entry = mDiskCache.get(url);
+            Cache.Entry entry = mCacheMgr.get(url);
             WallpaperManager wm = WallpaperManager.getInstance(mContext);
             ByteArrayInputStream bis = new ByteArrayInputStream(entry.data, 0, entry.data.length);
             try {
@@ -294,10 +304,10 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         HashMap<String,String> params = new HashMap<>();
         HashMap<String, String> updated = new HashMap<>();
 
-        params.put("mUrl", DiskCache.getFileName(DiskCache.getCacheKey(url)));
+        params.put("mUrl", mCacheMgr.getFilePath(url));
         updated.put("mIsWallpaper", Boolean.toString(true));
         updated.put("mIsCached", Boolean.toString(Boolean.TRUE));
-        mRealmApi.updateAsync(ImageRealm.class, params, updated);
+        RealmApiImpl.getInstance().updateAsync(ImageRealm.class, params, updated);
     }
 
     private String buildHighResolutionPixelsUrl(String url, int px){

@@ -65,7 +65,7 @@ public class ImageRetrieveService extends Service implements
 
         mIsRetrieving = false;
 
-        mRealApi = RealmApiImpl.getInstance();
+        //mRealApi = RealmApiImpl.getInstance();
     }
 
     @Nullable
@@ -95,7 +95,7 @@ public class ImageRetrieveService extends Service implements
 
         mServiceLooper.quit();
 
-        mRealApi.decRef();
+        //mRealApi.decRef();
     }
 
     @Override
@@ -144,7 +144,7 @@ public class ImageRetrieveService extends Service implements
 
     private void startCrawler(int n) {
         Log.i(TAG,"startCrawler(): max images to be retrieved = " + n);
-        mProcessor = new ImageRetrievePageProcessor(mRealApi, n);
+        mProcessor = new ImageRetrievePageProcessor(n);
         mProcessor.addListener(this);
         List<String> lastUrl =  mProcessor.getStartUrl();
         if (lastUrl.size() <= 0) {

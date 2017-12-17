@@ -194,7 +194,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     @Override
     public void onItemClicked(View view, int pos,String adapter) {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
-        if(mRefresher.isRefreshing()){
+        if (mRefresher.isRefreshing()) {
             mRefresher.setRefreshing(false);
         }
 

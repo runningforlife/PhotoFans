@@ -97,7 +97,6 @@ public class GalleryActivity extends BaseActivity
             @Override
             public void onDrawerClosed(View drawerView) {
                 Log.v(TAG,"onDrawerClosed()");
-
             }
 
             @Override
@@ -110,7 +109,7 @@ public class GalleryActivity extends BaseActivity
     @Override
     public void onResume() {
         super.onResume();
-
+        Log.v(TAG,"onResume()");
         String key = getString(R.string.pref_new_user);
         boolean isNewUser = SharedPrefUtil.getBoolean(key, true);
 

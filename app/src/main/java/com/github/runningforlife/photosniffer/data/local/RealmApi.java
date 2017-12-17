@@ -39,6 +39,11 @@ public interface RealmApi {
     boolean updateAsync(Class<? extends RealmObject> type, HashMap<String,String> params, HashMap<String, String> updatedValues);
 
     /**
+     * update realm sync
+     */
+    boolean updateSync(Class<? extends RealmObject> type, HashMap<String,String> params, HashMap<String, String> updatedValues);
+
+    /**
      * deleteSync realm object
      */
     boolean deleteSync(RealmObject data);

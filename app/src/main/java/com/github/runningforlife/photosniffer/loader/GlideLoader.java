@@ -43,7 +43,6 @@ public class GlideLoader {
                 .thumbnail((float)0.3)
                 .into(w,h);
         }
-
     }
 
     public static void load(Fragment fragment, String url, GlideLoaderListener listener,
@@ -60,7 +59,7 @@ public class GlideLoader {
     }
 
     public static void downloadOnly(Context context, String url, RequestListener<String,Bitmap> listener,
-                                    Priority priority, int w, int h, boolean isWallpaper){
+                                    Priority priority, int w, int h, boolean isWallpaper) {
         if (isWallpaper) {
             Glide.with(context)
                     .load(url)

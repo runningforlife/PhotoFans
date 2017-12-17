@@ -2,6 +2,7 @@ package com.github.runningforlife.photosniffer.ui.activity;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -405,6 +406,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         ACTION_WALLPAPER.setAction(wallpaper);
     }
 
+    @SuppressLint("RestrictedApi")
     private void setTitle(){
         String title = (mCurrentImgIdx + 1) + "/" + mPresenter.getItemCount();
         mActionBar.setWindowTitle(title);

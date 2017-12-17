@@ -65,8 +65,6 @@ public class WallpaperUpdaterService extends Service {
         mDiskCache = new DiskCache(new File(MiscUtil.getWallpaperCacheDir()));
 
         mUpdateExecutor = Executors.newFixedThreadPool(2);
-
-        mRealmApi = RealmApiImpl.getInstance();
     }
 
     @Override
@@ -74,8 +72,6 @@ public class WallpaperUpdaterService extends Service {
         super.onDestroy();
 
         mLooper.quit();
-
-        mRealmApi.decRef();
     }
 
 
@@ -113,8 +109,7 @@ public class WallpaperUpdaterService extends Service {
         CountDownLatch latch = new CountDownLatch(wallpapers.size());
 
         for (int i = 0; i < wallpapers.size(); ++i) {
-            WallpaperCacheRunnable wc = new WallpaperCacheRunnable(mRealmApi, mDiskCache,
-                    wallpapers.get(i), latch);
+            WallpaperCacheRunnable wc = new WallpaperCacheRunnable(mDiskCache, wallpapers.get(i), latch);
             mUpdateExecutor.execute(wc);
         }
 

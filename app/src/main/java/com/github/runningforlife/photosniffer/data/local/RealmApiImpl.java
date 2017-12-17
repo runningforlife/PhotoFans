@@ -24,7 +24,7 @@ import io.realm.Sort;
 public class RealmApiImpl implements RealmApi {
     private static final String TAG = "RealmApi";
 
-    private static RealmApiImpl sInstance = new RealmApiImpl();
+    //private static RealmApiImpl sInstance = new RealmApiImpl();
     private static AtomicInteger sRefCount = new AtomicInteger(0);
     private Realm mRealm;
 
@@ -34,7 +34,7 @@ public class RealmApiImpl implements RealmApi {
 
     public static RealmApiImpl getInstance() {
         sRefCount.incrementAndGet();
-        return sInstance;
+        return new RealmApiImpl();
     }
 
     @Override
@@ -201,6 +201,67 @@ public class RealmApiImpl implements RealmApi {
     }
 
     @Override
+    public boolean updateSync(final Class<? extends RealmObject> type, final HashMap<String, String> params, final HashMap<String, String> updatedValues) {
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmQuery<? extends RealmObject> query = realm.where(type);
+                if (type == ImageRealm.class) {
+                    Set<Map.Entry<String, String>> entries = params.entrySet();
+                    for(Map.Entry<String,String> entry : entries){
+                        String field = entry.getKey();
+                        switch (field) {
+                            case "mTimeStamp":
+                                query.equalTo(field, Long.parseLong(entry.getValue()));
+                                break;
+                            case "mIsUsed":
+                            case "mIsFavor":
+                            case "mIsWallpaper":
+                            case "mIsCached":
+                                query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
+                                break;
+                            default:
+                                query.equalTo(field, entry.getValue());
+                        }
+                    }
+
+                    RealmResults<? extends RealmObject> rr = query.findAll();
+                    for(int i = 0; i < rr.size(); ++i) {
+                        ImageRealm ir = (ImageRealm) rr.get(i);
+                        if (ir == null) continue;
+                        // updateAsync values
+                        Set<Map.Entry<String, String>> entrySet = updatedValues.entrySet();
+                        for (Map.Entry<String, String> entry : entrySet) {
+                            String field = entry.getKey();
+                            switch (field) {
+                                case "mTimeStamp":
+                                    ir.setTimeStamp(Long.parseLong(entry.getValue()));
+                                    break;
+                                case "mIsUsed":
+                                    ir.setUsed(Boolean.parseBoolean(entry.getValue()));
+                                    break;
+                                case "mIsFavor":
+                                    ir.setIsFavor(Boolean.parseBoolean(entry.getValue()));
+                                case "mIsWallpaper":
+                                    ir.setIsWallpaper(Boolean.parseBoolean(entry.getValue()));
+                                    break;
+                                case "mIsCached":
+                                    ir.setIsCached(Boolean.parseBoolean(entry.getValue()));
+                                case "mName":
+                                    ir.setName(entry.getValue());
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        return true;
+    }
+
+    @Override
     public boolean deleteSync(final RealmObject data) {
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -225,8 +286,6 @@ public class RealmApiImpl implements RealmApi {
                     for(Map.Entry<String,String> entry : entries){
                         String field = entry.getKey();
                         switch (field) {
-                            case "mUrl":
-                                query.equalTo(field, entry.getValue());
                             case "mTimeStamp":
                                 query.equalTo(field, Long.parseLong(entry.getValue()));
                                 break;
@@ -305,7 +364,7 @@ public class RealmApiImpl implements RealmApi {
     @Override
     public void decRef() {
         Log.v(TAG,"decRef()");
-        if (sRefCount.decrementAndGet() == 0) {
+        if (sRefCount.decrementAndGet() == 0 && !mRealm.isClosed()) {
             mRealm.close();
         }
     }

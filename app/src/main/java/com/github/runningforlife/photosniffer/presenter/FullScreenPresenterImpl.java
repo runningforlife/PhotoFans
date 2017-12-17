@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.data.cache.DiskCache;
+import com.github.runningforlife.photosniffer.data.cache.DiskCacheManager;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
@@ -61,7 +62,7 @@ public class FullScreenPresenterImpl implements FullScreenPresenter {
         HashMap<String,String> params = new HashMap<>();
         HashMap<String, String> updated = new HashMap<>();
 
-        params.put("mUrl", DiskCache.getFileName(DiskCache.getCacheKey(url)));
+        params.put("mUrl", DiskCacheManager.getInstance().getFilePath(url));
         updated.put("mIsWallpaper", Boolean.toString(true));
         updated.put("mIsCached", Boolean.toString(Boolean.TRUE));
         mRealmApi.updateAsync(ImageRealm.class, params, updated);

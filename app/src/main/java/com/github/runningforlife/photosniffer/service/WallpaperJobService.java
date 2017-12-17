@@ -6,6 +6,7 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
 import com.github.runningforlife.photosniffer.R;
@@ -32,8 +33,10 @@ public class WallpaperJobService extends JobService {
     @Override
     public void onCreate() {
         super.onCreate();
-        // make sure that lock screen wallpaper service is active
-        WallpaperUtils.startLockScreenWallpaperService(getApplicationContext());
+        if (Build.VERSION.SDK_INT >= 24) {
+            // make sure that lock screen wallpaper service is active
+            WallpaperUtils.startLockScreenWallpaperService(getApplicationContext());
+        }
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.util.Log;
 import android.webkit.URLUtil;
 
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
+import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 
@@ -55,7 +56,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private RealmApi mRealApi;
 
-    public ImageRetrievePageProcessor(RealmApi realmApi, int expected) {
+    public ImageRetrievePageProcessor(int expected) {
         mExpectedImages = expected;
         mListeners = new ArrayList<>();
         mLastUrl = new ArrayList<>();
@@ -63,8 +64,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         mIsExpectedDone = false;
         mCurrentImages = 0;
         mExecutor = Executors.newSingleThreadExecutor();
-
-        mRealApi = realmApi;
+        //mRealApi = realmApi;
 
         loadPages();
 
@@ -177,7 +177,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         //mUnvisitedPages = RealmManager.getAllUnvisitedImagePages(realm);
         HashMap<String,String> params = new HashMap<>();
         params.put("mIsVisited", Boolean.toString(Boolean.FALSE));
-        mUnvisitedPages = (RealmResults<ImagePageInfo>) mRealApi.querySync(ImagePageInfo.class, params);
+        mUnvisitedPages = (RealmResults<ImagePageInfo>) RealmApiImpl.getInstance().querySync(ImagePageInfo.class, params);
 
         mUnvisitedPages.addChangeListener(new RealmChangeListener<RealmResults<ImagePageInfo>>() {
             @Override
@@ -272,7 +272,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
         @Override
         public void run() {
-            mRealApi.insertAsync(data);
+            RealmApiImpl.getInstance().insertAsync(data);
         }
     }
 }

@@ -5,6 +5,7 @@ import android.util.Log;
 
 
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
+import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.util.concurrent.CountDownLatch;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
-import static com.github.runningforlife.photosniffer.data.cache.DiskWallpaperCache.getCacheKey;
+import static com.github.runningforlife.photosniffer.data.cache.DiskCache.getCacheKey;
 
 /**
  * Created by jason on 12/9/17.
@@ -24,14 +25,13 @@ import static com.github.runningforlife.photosniffer.data.cache.DiskWallpaperCac
 public class WallpaperCacheRunnable implements Runnable {
     private static final String TAG = "WallpaperCache";
 
-    private DiskWallpaperCache mDiskCache;
+    private DiskCache mDiskCache;
     private String mImageUrl;
     private CountDownLatch mCountLatch;
     private OkHttpClient mHttpClient;
     private RealmApi mRealmApi;
 
-    public WallpaperCacheRunnable(RealmApi realmApi, DiskWallpaperCache cache, String imgUrl, CountDownLatch latch) {
-        mRealmApi = realmApi;
+    public WallpaperCacheRunnable(DiskCache cache, String imgUrl, CountDownLatch latch) {
         mDiskCache = cache;
         mImageUrl = imgUrl;
         mCountLatch = latch;
@@ -40,6 +40,8 @@ public class WallpaperCacheRunnable implements Runnable {
 
     @Override
     public void run() {
+        mRealmApi = RealmApiImpl.getInstance();
+
         okhttp3.Request.Builder builder = new okhttp3.Request.Builder();
         builder.url(mImageUrl)
                 .get();
@@ -55,12 +57,14 @@ public class WallpaperCacheRunnable implements Runnable {
         }
         // job is done
         mCountLatch.countDown();
+
+        mRealmApi.decRef();
     }
 
 
     private void saveStreamToFile(byte[] data) {
         Log.v(TAG,"saveStreamToFile()");
-        cache.Entry entry = new cache.Entry(data, System.currentTimeMillis());
+        Cache.Entry entry = new Cache.Entry(data, System.currentTimeMillis());
         mDiskCache.put(mImageUrl, entry);
     }
 
@@ -70,8 +74,7 @@ public class WallpaperCacheRunnable implements Runnable {
         params.put("mUrl", url);
 
         HashMap<String, String> newValues = new HashMap<>();
-        String fileKey = getCacheKey(url);
-        newValues.put("mUrl", DiskWallpaperCache.getFileName(fileKey));
+        newValues.put("mUrl", mDiskCache.getFilePath(url));
         newValues.put("mIsUsed", Boolean.toString(Boolean.TRUE));
         newValues.put("mIsWallpaper", Boolean.toString(true));
         //newValues.put("mIsCached", Boolean.toString(true));
