@@ -148,6 +148,7 @@ public class AllPicturesPresenterImpl extends PresenterBase
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         Log.v(TAG,"onDestroy()");
         // stop service
         stopRetrieveIfNeeded();

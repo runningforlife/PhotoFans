@@ -76,6 +76,8 @@ public class WallpaperUpdaterService extends Service {
         super.onDestroy();
 
         mLooper.quit();
+
+        mRealmApi.decRef();
     }
 
 

@@ -212,6 +212,12 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         mRealmApi.insertAsync(photos);
     }
 
+    @Override
+    public void onDestroy() {
+        Log.v(TAG,"onDestroy()");
+        mRealmApi.decRef();
+    }
+
     private void setWallpaper(final String url) {
         Log.v(TAG,"setWallpaper()");
 

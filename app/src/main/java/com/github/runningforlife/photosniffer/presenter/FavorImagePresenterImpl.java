@@ -46,6 +46,7 @@ public class FavorImagePresenterImpl extends PresenterBase {
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         Log.v(TAG,"onDestroy()");
         //mRealmMgr.onDestroy();
     }

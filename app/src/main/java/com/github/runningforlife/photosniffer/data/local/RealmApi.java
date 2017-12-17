@@ -58,4 +58,8 @@ public interface RealmApi {
      */
     void trimData(Class<? extends RealmObject> type, HashMap<String, String> params, int max);
 
+    /**
+     * decrease reference
+     */
+    void decRef();
 }

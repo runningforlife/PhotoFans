@@ -248,12 +248,12 @@ public class FullScreenImageFragment extends Fragment implements ActionListDialo
     }
 
     private static final int EVENT_SHOW_TOAST = 1;
-    private Handler mHandler = new Handler(Looper.getMainLooper()){
+    private Handler mHandler = new Handler(Looper.getMainLooper()) {
 
         @Override
-        public void handleMessage(Message msg){
+        public void handleMessage(Message msg) {
             int what = msg.what;
-            switch (what){
+            switch (what) {
                 case EVENT_SHOW_TOAST:
                     String toast = (String) msg.obj;
                     ToastUtil.showToast(getActivity(), toast);

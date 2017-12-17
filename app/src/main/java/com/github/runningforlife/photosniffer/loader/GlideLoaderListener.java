@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.app.AppGlobals;
 import com.github.runningforlife.photosniffer.utils.BitmapUtil;
 
 /**
@@ -59,13 +58,13 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
     @TargetApi(21)
     @Override
     public boolean onException(Exception e, String model, com.bumptech.glide.request.target.Target<Bitmap> target, boolean isFirstResource) {
-        Log.v(TAG,"onException(): " + e);
+        Log.v(TAG, "onException(): " + e);
         // 404 IO exception
-        if(imageView != null) {
+        if (imageView != null) {
             imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             imageView.setImageResource(R.drawable.ic_photo_grey_24dp);
         }
-        if(callback != null){
+        if (callback != null) {
             callback.onImageLoadDone(e);
         }
         return false;
@@ -73,6 +72,10 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
 
     @Override
     public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
+        Log.d(TAG,"onResourceReady(): from memory = " + isFromMemoryCache);
+        if(callback != null){
+            callback.onImageLoadDone(resource);
+        }
         if(imageView != null) {
             // scale bitmap
             imageView.setScaleType(mScaleType);
@@ -93,11 +96,6 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
                     rd.setColorFilter(dc, PorterDuff.Mode.DST_IN);
                 }
             }
-        }
-
-        Log.d(TAG,"onResourceReady(): from memory = " + isFromMemoryCache);
-        if(callback != null){
-            callback.onImageLoadDone(resource);
         }
         return true;
     }

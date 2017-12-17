@@ -48,6 +48,7 @@ public class WallpaperPresenterImpl extends PresenterBase {
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         Log.v(TAG,"onDestroy()");
         //mRealmMgr.onDestroy();
     }

@@ -56,6 +56,7 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         Log.v(TAG,"onDestroy()");
         //mRealmMgr.onDestroy();
     }

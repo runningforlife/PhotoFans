@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
@@ -23,16 +24,22 @@ public class RealmApiImpl implements RealmApi {
     private static final String TAG = "RealmApi";
 
     private static RealmApiImpl sInstance = new RealmApiImpl();
+    private static AtomicInteger sRefCount = new AtomicInteger(0);
+    private Realm mRealm;
+
+    private RealmApiImpl() {
+        mRealm = Realm.getDefaultInstance();
+    }
 
     public static RealmApiImpl getInstance() {
+        sRefCount.incrementAndGet();
         return sInstance;
     }
 
     @Override
     public void insertAsync(final RealmObject data) {
         Log.v(TAG,"insertAsync()");
-        Realm r = Realm.getDefaultInstance();
-        r.executeTransactionAsync(new Realm.Transaction() {
+        mRealm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 realm.insertOrUpdate(data);
@@ -43,8 +50,7 @@ public class RealmApiImpl implements RealmApi {
     @Override
     public void insertAsync(final List<? extends RealmObject> data) {
         Log.v(TAG,"insertAsync()");
-        Realm r = Realm.getDefaultInstance();
-        r.executeTransactionAsync(new Realm.Transaction() {
+        mRealm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 realm.insertOrUpdate(data);
@@ -54,8 +60,7 @@ public class RealmApiImpl implements RealmApi {
 
     @Override
     public RealmResults<? extends RealmObject> queryAsync(Class<? extends RealmObject> type, HashMap<String, String> params) {
-        Realm realm = Realm.getDefaultInstance();
-        RealmQuery<? extends RealmObject> query = realm.where(type);
+        RealmQuery<? extends RealmObject> query = mRealm.where(type);
 
         Set<Map.Entry<String, String>> entries = params.entrySet();
         for(Map.Entry<String,String> entry : entries){
@@ -82,8 +87,7 @@ public class RealmApiImpl implements RealmApi {
 
     @Override
     public RealmResults<? extends RealmObject> querySync(Class<? extends RealmObject> type, HashMap<String, String> params) {
-        Realm realm = Realm.getDefaultInstance();
-        RealmQuery<? extends RealmObject> query = realm.where(type);
+        RealmQuery<? extends RealmObject> query = mRealm.where(type);
 
         Set<Map.Entry<String, String>> entries = params.entrySet();
         for(Map.Entry<String,String> entry : entries){
@@ -110,8 +114,7 @@ public class RealmApiImpl implements RealmApi {
 
     @Override
     public boolean updateAsync(final Class<? extends RealmObject> type, final HashMap<String, String> params, final HashMap<String, String> updatedValues) {
-        Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        mRealm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 RealmQuery<? extends RealmObject> query = realm.where(type);
@@ -172,8 +175,7 @@ public class RealmApiImpl implements RealmApi {
 
     @Override
     public boolean deleteSync(final RealmObject data) {
-        Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
+        mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 data.deleteFromRealm();
@@ -186,11 +188,10 @@ public class RealmApiImpl implements RealmApi {
     @Override
     public void deleteAsync(Class<? extends RealmObject> type, final HashMap<String, String> params) {
         Log.v(TAG,"deleteAsync()");
-        Realm realm = Realm.getDefaultInstance();
-        final RealmQuery<? extends RealmObject> query = realm.where(type);
+        final RealmQuery<? extends RealmObject> query = mRealm.where(type);
 
         if (ImageRealm.class == type) {
-            realm.executeTransactionAsync(new Realm.Transaction() {
+            mRealm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
                     Set<Map.Entry<String, String>> entries = params.entrySet();
@@ -245,8 +246,7 @@ public class RealmApiImpl implements RealmApi {
     public void trimData(Class<? extends RealmObject> type, HashMap<String, String> params, int max) {
         Log.v(TAG,"trimData()");
 
-        Realm realm = Realm.getDefaultInstance();
-        RealmQuery<? extends RealmObject> query = realm.where(type);
+        RealmQuery<? extends RealmObject> query = mRealm.where(type);
 
         if (ImageRealm.class == type) {
             Set<Map.Entry<String, String>> entries = params.entrySet();
@@ -272,6 +272,14 @@ public class RealmApiImpl implements RealmApi {
             for (int i = max; i < rr.size(); ++i) {
                 rr.get(i).deleteFromRealm();
             }
+        }
+    }
+
+    @Override
+    public void decRef() {
+        Log.v(TAG,"decRef()");
+        if (sRefCount.decrementAndGet() == 0) {
+            mRealm.close();
         }
     }
 }
