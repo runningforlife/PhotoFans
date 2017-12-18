@@ -52,7 +52,8 @@ public class FullScreenPresenterImpl implements FullScreenPresenter {
 
     @Override
     public void onDestroy() {
-        mRealmApi.decRef();
+        mImgList.removeAllChangeListeners();
+        mRealmApi.closeRealm();
     }
 
     //FIXME: also cache it

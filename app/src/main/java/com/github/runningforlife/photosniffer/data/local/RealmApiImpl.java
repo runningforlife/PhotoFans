@@ -25,7 +25,6 @@ public class RealmApiImpl implements RealmApi {
     private static final String TAG = "RealmApi";
 
     //private static RealmApiImpl sInstance = new RealmApiImpl();
-    private static AtomicInteger sRefCount = new AtomicInteger(0);
     private Realm mRealm;
 
     private RealmApiImpl() {
@@ -33,7 +32,6 @@ public class RealmApiImpl implements RealmApi {
     }
 
     public static RealmApiImpl getInstance() {
-        sRefCount.incrementAndGet();
         return new RealmApiImpl();
     }
 
@@ -67,7 +65,7 @@ public class RealmApiImpl implements RealmApi {
         for (Map.Entry<String,String> entry : entries) {
             if (type == ImageRealm.class) {
                 String field = entry.getKey();
-                switch (field){
+                switch (field) {
                     case "mTimeStamp":
                         query.equalTo(field, Long.parseLong(entry.getValue()));
                         break;
@@ -181,14 +179,15 @@ public class RealmApiImpl implements RealmApi {
                                     break;
                                 case "mIsFavor":
                                     ir.setIsFavor(Boolean.parseBoolean(entry.getValue()));
+                                    break;
                                 case "mIsWallpaper":
                                     ir.setIsWallpaper(Boolean.parseBoolean(entry.getValue()));
                                     break;
                                 case "mIsCached":
                                     ir.setIsCached(Boolean.parseBoolean(entry.getValue()));
-                                case "mName":
-                                    ir.setName(entry.getValue());
+                                    break;
                                 default:
+                                    ir.setName(entry.getValue());
                                     break;
                             }
                         }
@@ -222,6 +221,7 @@ public class RealmApiImpl implements RealmApi {
                                 break;
                             default:
                                 query.equalTo(field, entry.getValue());
+                                break;
                         }
                     }
 
@@ -242,13 +242,16 @@ public class RealmApiImpl implements RealmApi {
                                     break;
                                 case "mIsFavor":
                                     ir.setIsFavor(Boolean.parseBoolean(entry.getValue()));
+                                    break;
                                 case "mIsWallpaper":
                                     ir.setIsWallpaper(Boolean.parseBoolean(entry.getValue()));
                                     break;
                                 case "mIsCached":
                                     ir.setIsCached(Boolean.parseBoolean(entry.getValue()));
+                                    break;
                                 case "mName":
                                     ir.setName(entry.getValue());
+                                    break;
                                 default:
                                     break;
                             }
@@ -274,14 +277,13 @@ public class RealmApiImpl implements RealmApi {
     }
 
     @Override
-    public void deleteAsync(Class<? extends RealmObject> type, final HashMap<String, String> params) {
+    public void deleteAsync(final Class<? extends RealmObject> type, final HashMap<String, String> params) {
         Log.v(TAG,"deleteAsync()");
-        final RealmQuery<? extends RealmObject> query = mRealm.where(type);
-
         if (ImageRealm.class == type) {
             mRealm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
+                    final RealmQuery<? extends RealmObject> query = realm.where(type);
                     Set<Map.Entry<String, String>> entries = params.entrySet();
                     for(Map.Entry<String,String> entry : entries){
                         String field = entry.getKey();
@@ -311,8 +313,7 @@ public class RealmApiImpl implements RealmApi {
     @Override
     public void markUnusedRealm(final int num) {
         Log.v(TAG,"markUnusedRealm()");
-        Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        mRealm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 RealmResults<ImageRealm> unused = realm.where(ImageRealm.class)
@@ -329,42 +330,47 @@ public class RealmApiImpl implements RealmApi {
     }
 
     @Override
-    public void trimData(Class<? extends RealmObject> type, HashMap<String, String> params, int max) {
+    public void trimData(final Class<? extends RealmObject> type, final HashMap<String, String> params, final int max) {
         Log.v(TAG,"trimData()");
+        mRealm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmQuery<? extends RealmObject> query = realm.where(type);
 
-        RealmQuery<? extends RealmObject> query = mRealm.where(type);
+                if (ImageRealm.class == type) {
+                    Set<Map.Entry<String, String>> entries = params.entrySet();
+                    for (Map.Entry<String,String> entry : entries) {
+                        String field = entry.getKey();
+                        switch (field) {
+                            case "mTimeStamp":
+                                query.equalTo(field, Long.parseLong(entry.getValue()));
+                                break;
+                            case "mIsUsed":
+                            case "mIsFavor":
+                            case "mIsWallpaper":
+                            case "mIsCached":
+                                query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
+                                break;
+                            default:
+                                query.equalTo(field, entry.getValue());
+                        }
+                    }
 
-        if (ImageRealm.class == type) {
-            Set<Map.Entry<String, String>> entries = params.entrySet();
-            for(Map.Entry<String,String> entry : entries){
-                String field = entry.getKey();
-                switch (field) {
-                    case "mTimeStamp":
-                        query.equalTo(field, Long.parseLong(entry.getValue()));
-                        break;
-                    case "mIsUsed":
-                    case "mIsFavor":
-                    case "mIsWallpaper":
-                    case "mIsCached":
-                        query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
-                        break;
-                    default:
-                        query.equalTo(field, entry.getValue());
+                    RealmResults<? extends RealmObject> rr = query.findAll().sort("mTimeStamp", Sort.DESCENDING);
+
+                    for (int i = max; i < rr.size(); ++i) {
+                        rr.get(i).deleteFromRealm();
+                    }
                 }
             }
+        });
 
-            RealmResults<? extends RealmObject> rr = query.findAll().sort("mTimeStamp", Sort.DESCENDING);
-
-            for (int i = max; i < rr.size(); ++i) {
-                rr.get(i).deleteFromRealm();
-            }
-        }
     }
 
     @Override
-    public void decRef() {
-        Log.v(TAG,"decRef()");
-        if (sRefCount.decrementAndGet() == 0 && !mRealm.isClosed()) {
+    public void closeRealm() {
+        Log.v(TAG,"closeRealm()");
+        if (!mRealm.isClosed()) {
             mRealm.close();
         }
     }

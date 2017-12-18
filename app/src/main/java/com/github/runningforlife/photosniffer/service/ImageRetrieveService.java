@@ -95,7 +95,7 @@ public class ImageRetrieveService extends Service implements
 
         mServiceLooper.quit();
 
-        //mRealApi.decRef();
+        //mRealApi.closeRealm();
     }
 
     @Override

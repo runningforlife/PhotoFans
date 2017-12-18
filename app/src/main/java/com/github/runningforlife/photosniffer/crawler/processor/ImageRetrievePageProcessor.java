@@ -65,6 +65,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         mCurrentImages = 0;
         mExecutor = Executors.newSingleThreadExecutor();
         //mRealApi = realmApi;
+        mRealApi = RealmApiImpl.getInstance();
 
         loadPages();
 
@@ -117,7 +118,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     }
 
     public void stopGracefully(){
-        mExecutor.shutdown();
+        mRealApi.closeRealm();
+        //mExecutor.shutdown();
     }
 
     private void retrieveImages(Page page) {
@@ -129,11 +131,13 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                 result = mPixelsRetriever.retrieveImages(page);
                 // save pages we get
                 List<ImagePageInfo> pages = mPixelsRetriever.retrieveLinks(page);
-                mExecutor.submit(new SaveRunnable(pages));
+                //mExecutor.submit(new SaveRunnable(pages));
+                mRealApi.insertAsync(pages);
             } else {
                 result = mRetrieverFactory.retrieveImages(page);
                 // save to disk
-                mExecutor.submit(new SaveRunnable(getPageList(page)));
+                mRealApi.insertAsync(getPageList(page));
+                //mExecutor.submit(new SaveRunnable(getPageList(page)));
             }
 
             if (result != null && result.size() > 0) {
@@ -144,7 +148,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                     ++mCurrentImages;
                 }
 
-                mExecutor.submit(new SaveRunnable(result));
+                //mExecutor.submit(new SaveRunnable(result));
+                mRealApi.insertAsync(result);
 
                 if (mCurrentImages >= mExpectedImages && !mIsExpectedDone) {
                     mIsExpectedDone = true;
@@ -177,7 +182,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         //mUnvisitedPages = RealmManager.getAllUnvisitedImagePages(realm);
         HashMap<String,String> params = new HashMap<>();
         params.put("mIsVisited", Boolean.toString(Boolean.FALSE));
-        mUnvisitedPages = (RealmResults<ImagePageInfo>) RealmApiImpl.getInstance().querySync(ImagePageInfo.class, params);
+        mUnvisitedPages = (RealmResults<ImagePageInfo>) mRealApi.querySync(ImagePageInfo.class, params);
 
         mUnvisitedPages.addChangeListener(new RealmChangeListener<RealmResults<ImagePageInfo>>() {
             @Override
@@ -213,8 +218,6 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                 mPagesState.put(info.getUrl(),info.getIsVisited());
             }
         }
-
-        realm.close();
     }
 
     private boolean isVisited(Page page) {
@@ -222,7 +225,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                 && mPagesState.get(page.getUrl().get()));
     }
 
-    private boolean isValidPage(Page page){
+    private boolean isValidPage(Page page) {
         try {
             String baseUrl = UrlUtil.getRootUrl(page.getUrl().get());
             return URLUtil.isValidUrl(baseUrl) && mPageFilter.accept(baseUrl);
@@ -232,7 +235,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         }
     }
 
-    private boolean isValidPageUrl(String url){
+    private boolean isValidPageUrl(String url) {
         return URLUtil.isValidUrl(url);
     }
 
@@ -263,7 +266,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         return pageList;
     }
 
-    private final class SaveRunnable implements  Runnable {
+/*    private final class SaveRunnable implements  Runnable {
         private List<? extends RealmObject> data;
 
         SaveRunnable(List<? extends RealmObject> data) {
@@ -274,5 +277,5 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         public void run() {
             RealmApiImpl.getInstance().insertAsync(data);
         }
-    }
+    }*/
 }

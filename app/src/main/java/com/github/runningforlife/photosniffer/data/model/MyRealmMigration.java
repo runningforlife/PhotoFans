@@ -22,6 +22,10 @@ public class MyRealmMigration implements io.realm.RealmMigration {
 
             schema.get("ImageRealm")
                   .addField("mIsCached", Boolean.class);
+
+            schema.get("ImagePageInfo")
+                  .removeField("mVisitTime")
+                  .addField("mTimeStamp", Long.class);
         }
     }
 }

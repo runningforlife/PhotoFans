@@ -148,7 +148,7 @@ public class WallpaperUtils {
             String keyCacheIdx = context.getString(R.string.pref_wallpaper_cache_index);
             int cacheIdx = SharedPrefUtil.getInt(keyCacheIdx, 0)%wallpapers.length;
             // find a wallpaper
-            while(!wallpapers[cacheIdx].exists()) {
+            while (!wallpapers[cacheIdx].exists()) {
                 ++cacheIdx;
                 cacheIdx %= wallpapers.length;
             }

@@ -83,6 +83,13 @@ public class FullScreenImageFragment extends Fragment
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        mPresenter.onDestroy();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedState){
         Log.v(TAG,"onCreateView()");
         View root = inflater.inflate(R.layout.fragment_full_screen,parent,false);

@@ -41,8 +41,6 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
     @BindView(R.id.rcv_gallery) RecyclerView mRcvFavorList;
     GalleryAdapter mAdapter;
     private FavorImagePresenterImpl mPresenter;
-
-    private List<String> mUserActionList;
     private int mCurrentPos;
 
 
@@ -81,7 +79,7 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
         setTitle(getString(R.string.my_favorite_images));
     }
 
-    private void initView(){
+    private void initView() {
         GridLayoutManager glm = new GridLayoutManager(getContext(), 2);
         glm.setAutoMeasureEnabled(true);
         mRcvFavorList.setHasFixedSize(true);
@@ -122,7 +120,7 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
     private boolean optionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        switch (id){
+        switch (id) {
             case R.id.grid_view:
                 GridLayoutManager glm = new GridLayoutManager(getContext(),2);
                 mRcvFavorList.setLayoutManager(glm);
@@ -174,7 +172,7 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
         return true;
     }
 
-    private void initPresenter(){
+    private void initPresenter() {
         mPresenter = new FavorImagePresenterImpl(getContext(),this);
         setPresenter(mPresenter);
         mPresenter.onStart();

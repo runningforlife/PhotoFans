@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -54,15 +55,19 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ImageVie
     @Override
     public void onBindViewHolder(ImageViewHolder holder, int position) {
         Log.v(TAG,"onBindViewHolder(): position = " + position);
-
-        String url = ((ImageRealm)mCallback.getItemAtPos(position)).getUrl();
         // preload
         MiscUtil.preloadImage(holder.preview);
-        GlideLoaderListener listener = new GlideLoaderListener(holder.preview);
-        listener.setReqWidth(DEFAULT_IMAGE_WIDTH);
-        listener.setReqHeight(DEFAULT_IMAGE_HEIGHT);
-        GlideLoader.load(mContext,url, listener, Priority.NORMAL,
-                DEFAULT_IMAGE_MEDIUM_WIDTH,DEFAULT_IMAGE_MEDIUM_WIDTH, ImageView.ScaleType.CENTER_CROP);
+        AppCompatActivity parent = (AppCompatActivity)mContext;
+        boolean stopLoading = Build.VERSION.SDK_INT >= 17 ?
+                parent.isDestroyed() : parent.isFinishing();
+        if (!stopLoading) {
+            String url = ((ImageRealm) mCallback.getItemAtPos(position)).getUrl();
+            GlideLoaderListener listener = new GlideLoaderListener(holder.preview);
+            listener.setReqWidth(DEFAULT_IMAGE_WIDTH);
+            listener.setReqHeight(DEFAULT_IMAGE_HEIGHT);
+            GlideLoader.load(mContext, url, listener, Priority.NORMAL,
+                    DEFAULT_IMAGE_MEDIUM_WIDTH, DEFAULT_IMAGE_MEDIUM_WIDTH, ImageView.ScaleType.CENTER_CROP);
+        }
     }
 
     @Override

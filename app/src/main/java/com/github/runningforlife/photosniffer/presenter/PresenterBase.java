@@ -3,6 +3,7 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.renderscript.BaseObj;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
@@ -12,7 +13,6 @@ import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.data.cache.Cache;
 import com.github.runningforlife.photosniffer.data.cache.CacheApi;
-import com.github.runningforlife.photosniffer.data.cache.DiskCache;
 import com.github.runningforlife.photosniffer.data.cache.DiskCacheManager;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
@@ -24,7 +24,6 @@ import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -214,14 +213,18 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     @Override
     public void onDestroy() {
         Log.v(TAG,"onDestroy()");
-        mRealmApi.decRef();
+        mImageList.removeChangeListener(mOrderRealmChangeListener);
+        mRealmApi.closeRealm();
         //mOrderRealmChangeListener = null;
+        mOrderRealmChangeListener = null;
     }
 
     private void setWallpaper(final String url) {
         Log.v(TAG,"setWallpaper()");
 
         if(TextUtils.isEmpty(url)) return;
+
+        markAsWallpaper(url);
 
         new Thread(new Runnable() {
             @Override
@@ -283,8 +286,6 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
                 mView.onWallpaperSetDone(false);
             }
         }
-
-        markAsWallpaper(url);
     }
 
     void markAsFavor(String url) {
@@ -294,20 +295,24 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         HashMap<String, String> updated = new HashMap<>();
 
         params.put("mUrl", url);
+
+        updated.put("mIsUsed", Boolean.toString(Boolean.TRUE));
         updated.put("mIsFavor", Boolean.toString(true));
         mRealmApi.updateAsync(ImageRealm.class, params, updated);
     }
 
-    void markAsWallpaper(String url) {
+    private void markAsWallpaper(String url) {
         Log.v(TAG,"markAsWallpaper()");
         // mark it as wall paper
         HashMap<String,String> params = new HashMap<>();
         HashMap<String, String> updated = new HashMap<>();
 
-        params.put("mUrl", mCacheMgr.getFilePath(url));
+        params.put("mUrl", url);
+
+        updated.put("mUrl", mCacheMgr.getFilePath(url));
         updated.put("mIsWallpaper", Boolean.toString(true));
         updated.put("mIsCached", Boolean.toString(Boolean.TRUE));
-        RealmApiImpl.getInstance().updateAsync(ImageRealm.class, params, updated);
+        mRealmApi.updateAsync(ImageRealm.class, params, updated);
     }
 
     private String buildHighResolutionPixelsUrl(String url, int px){

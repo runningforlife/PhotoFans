@@ -16,8 +16,6 @@ import java.util.concurrent.CountDownLatch;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
-import static com.github.runningforlife.photosniffer.data.cache.DiskCache.getCacheKey;
-
 /**
  * Created by jason on 12/9/17.
  */
@@ -54,11 +52,12 @@ public class WallpaperCacheRunnable implements Runnable {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            mRealmApi.closeRealm();
         }
         // job is done
         mCountLatch.countDown();
 
-        mRealmApi.decRef();
     }
 
 

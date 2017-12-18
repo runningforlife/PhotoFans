@@ -16,7 +16,7 @@ android {
         applicationId "com.github.runningforlife.photosniffer"
         minSdkVersion 16
         targetSdkVersion 26
-        multiDexEnabled true
+        //multiDexEnabled true
         versionCode 2
         versionName "1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

@@ -19,6 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             style="@style/StyledToolbar"/>
+
     </android.support.design.widget.AppBarLayout>
 
 
@@ -26,9 +27,8 @@
         android:id="@+id/vp_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center">
-
-    </android.support.v4.view.ViewPager>
+        android:background="@color/colorDarkBlack"
+        android:layout_gravity="center"/>
 
     <com.github.rahatarmanahmed.cpv.CircularProgressView
         android:id="@+id/cpv_load"

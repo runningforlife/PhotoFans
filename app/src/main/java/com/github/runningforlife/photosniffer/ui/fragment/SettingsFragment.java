@@ -48,7 +48,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
 
         if (Build.VERSION.SDK_INT < 24) {
@@ -73,7 +73,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 .getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(this);
 
-        mRealmApi.decRef();
+        mRealmApi.closeRealm();
     }
 
     @Override

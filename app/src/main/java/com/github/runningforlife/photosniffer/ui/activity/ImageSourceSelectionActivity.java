@@ -82,7 +82,7 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mRealmApi.decRef();
+        mRealmApi.closeRealm();
     }
 
 

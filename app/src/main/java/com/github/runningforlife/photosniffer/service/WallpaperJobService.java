@@ -46,7 +46,8 @@ public class WallpaperJobService extends JobService {
         if (jobId == MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE)) {
             String prefWifi = getString(R.string.pref_wifi_download);
             boolean isWifiOnly = SharedPrefUtil.getBoolean(prefWifi, true);
-            if ((isWifiOnly && MiscUtil.isWifiConnected(getApplicationContext())) || (MiscUtil.isConnected(getApplicationContext()))) {
+            if ((isWifiOnly && MiscUtil.isWifiConnected(getApplicationContext())) ||
+                (!isWifiOnly && MiscUtil.isConnected(getApplicationContext()))) {
                 WallpaperUtils.startWallpaperCacheUpdaterService(getApplicationContext());
             }
         } else if (jobId == MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET)) {

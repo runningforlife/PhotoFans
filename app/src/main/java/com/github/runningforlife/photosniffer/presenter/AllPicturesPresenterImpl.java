@@ -150,6 +150,7 @@ public class AllPicturesPresenterImpl extends PresenterBase
     public void onDestroy() {
         super.onDestroy();
         Log.v(TAG,"onDestroy()");
+        mUnUsedImages.removeAllChangeListeners();
         // stop service
         stopRetrieveIfNeeded();
         // shut down thread pool
@@ -243,7 +244,7 @@ public class AllPicturesPresenterImpl extends PresenterBase
             for(int n = 1; n <= ImageSource.POLA_IMAGE_NUMBER_PER_COLLECTION; ++n) {
                 ImageRealm ir = new ImageRealm();
                 String url = buildPolaImageUrl(c,n,ImageSource.POLA_IMAGE_END);
-                if (builtInWallpapers == null || !builtInWallpapers.contains(url)) {
+                if (!builtInWallpapers.contains(url)) {
                     ir.setUrl(url);
                     ir.setIsFavor(false);
                     ir.setIsWallpaper(false);

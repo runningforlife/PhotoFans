@@ -66,5 +66,5 @@ public interface RealmApi {
     /**
      * decrease reference
      */
-    void decRef();
+    void closeRealm();
 }
