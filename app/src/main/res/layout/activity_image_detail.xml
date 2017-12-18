@@ -40,22 +40,4 @@
         app:cpv_color="@color/colorLightGrey"
         android:layout_gravity="center"/>
 
-    <!-- this list view contains a list of image preview -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/image_small"
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        android:gravity="bottom"
-        android:layout_marginBottom="@dimen/grid_margin">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_images"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layoutAnimation="@anim/anim_rcv_layout"
-            android:visibility="invisible"/>
-
-    </LinearLayout>
-
 </FrameLayout>

@@ -15,9 +15,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -30,7 +27,6 @@ import android.widget.ImageView;
 import com.bumptech.glide.Priority;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl;
 import com.github.runningforlife.photosniffer.presenter.NetState;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
@@ -42,7 +38,6 @@ import io.realm.RealmObject;
 
 import com.github.runningforlife.photosniffer.ui.adapter.ImagePagerAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.PageAdapterCallback;
-import com.github.runningforlife.photosniffer.ui.adapter.PreviewAdapter;
 import com.github.runningforlife.photosniffer.ui.fragment.ActionListDialogFragment;
 import com.github.runningforlife.photosniffer.data.model.UserAction;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
@@ -63,13 +58,11 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         PageAdapterCallback,ActionListDialogFragment.ActionCallback {
     private static final String TAG = "ImageDetailActivity";
 
-    @BindView(R.id.rv_images) RecyclerView mLvImgPreview;
     @BindView(R.id.vp_image) ViewPager mImgPager;
     @BindView(R.id.cpv_load) CircularProgressView mCpvLoad;
 
     private ImagePagerAdapter mPagerAdapter;
     private ImageDetailPresenterImpl mPresenter;
-    private PreviewAdapter mAdapter;
     private int mCurrentImgIdx;
     private ActionBar mActionBar;
     private Handler mMainHandler;
@@ -114,7 +107,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     public void onResume() {
         super.onResume();
         Log.v(TAG,"onResume()");
-        mPresenter.onStart();
+        //mPresenter.onStart();
 
         initActionList();
 
@@ -174,24 +167,11 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         Log.v(TAG, "onDataSetChange(): op=" + op);
         if (mImgPager.getAdapter() == null) {
             mImgPager.setAdapter(mPagerAdapter);
-            mLvImgPreview.setAdapter(mAdapter);
-        }
-
-        if (op == RealmOp.OP_INSERT) {
-            mAdapter.notifyItemRangeInserted(start, len);
-        } else if (op == RealmOp.OP_DELETE) {
-            mAdapter.notifyItemRangeRemoved(start, len);
-        } else if (op == RealmOp.OP_MODIFY) {
-            mAdapter.notifyItemRangeChanged(start, len);
-        } else {
-            mAdapter.notifyDataSetChanged();
         }
 
         mPagerAdapter.notifyDataSetChanged();
         // current index is changed
         mImgPager.setCurrentItem(mCurrentImgIdx);
-        mLvImgPreview.smoothScrollToPosition(mCurrentImgIdx);
-
         // update title
         setTitle();
     }
@@ -227,19 +207,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         mCurrentImgIdx = pos;
         // loading image
         mImgPager.setCurrentItem(pos);
-        mLvImgPreview.scrollToPosition(pos);
-
-        if(ImagePagerAdapter.TAG.equals(adapter)){
-            int visible = mLvImgPreview.getVisibility();
-            if(visible != View.VISIBLE){
-                mLvImgPreview.setVisibility(View.VISIBLE);
-                //after given time, preview should be hidden
-                Message msg = mMainHandler.obtainMessage(EventHandler.EVENT_HIDE_PREVIEW);
-                mMainHandler.sendMessageDelayed(msg,PREVIEW_HIDE_COUNT_DOWN);
-            }
-        }
-
-        getPreviewScrollParams();
         // change title
         setTitle();
     }
@@ -287,7 +254,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
                 mPagerAdapter.notifyDataSetChanged();
 
                 mImgPager.setCurrentItem(pos + 1);
-                mLvImgPreview.smoothScrollToPosition(pos + 1);
             }
 
             @Override
@@ -316,20 +282,20 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         mCurrentImgIdx = mImgPager.getCurrentItem();
 
-        if(action.equals(ACTION_SAVE.action())){
+        if (action.equals(ACTION_SAVE.action())) {
             // save image
             saveImage(mCurrentImgIdx);
-        }else if(action.equals(ACTION_DELETE.action())){
+        } else if(action.equals(ACTION_DELETE.action())) {
             // remove image
            removeItemAtPos(mCurrentImgIdx);
             // refresh data at once
             //mPresenter.onStart();
-        }else if(action.equals(ACTION_FAVOR.action())){
+        } else if(action.equals(ACTION_FAVOR.action())) {
             // favor this image FIXME: delay action to activity exit
             mPresenter.favorImageAtPos(mCurrentImgIdx);
-        }else if(action.equals(ACTION_SHARE.action())){
+        } else if (action.equals(ACTION_SHARE.action())) {
 
-        }else if(action.equals(ACTION_WALLPAPER.action())){
+        } else if (action.equals(ACTION_WALLPAPER.action())) {
             setWallpaper(mCurrentImgIdx);
         }
 
@@ -343,46 +309,21 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
     private void initView() {
         Log.v(TAG,"initView()");
-        mAdapter = new PreviewAdapter(this,ImageDetailActivity.this);
         mPagerAdapter = new ImagePagerAdapter(this ,this);
-
         mImgPager.addOnPageChangeListener(new ImagePageStateListener());
-        LinearLayoutManager llMgr = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        mLvImgPreview.setVisibility(View.INVISIBLE);
-        mLvImgPreview.setLayoutManager(llMgr);
-        mLvImgPreview.setItemAnimator(new DefaultItemAnimator());
 
         Intent data = getIntent();
         mCurrentImgIdx = data.getIntExtra("image",0);
         Log.v(TAG,"initView(): current image index = " + mCurrentImgIdx);
         mImgPager.setCurrentItem(mCurrentImgIdx);
-
-        mLvImgPreview.scrollToPosition(mCurrentImgIdx);
-        mLvImgPreview.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                Log.d(TAG,"onScrollStateChanged(): new state " + newState);
-                if(newState == RecyclerView.SCROLL_STATE_DRAGGING){
-                    // dragging state, no hide
-                    if(mMainHandler != null && mMainHandler.hasMessages(EventHandler.EVENT_HIDE_PREVIEW)){
-                        mMainHandler.removeMessages(EventHandler.EVENT_HIDE_PREVIEW);
-                    }
-                }else if(newState == RecyclerView.SCROLL_STATE_IDLE){
-                    if (mMainHandler != null &&
-                            !mMainHandler.hasMessages(EventHandler.EVENT_HIDE_PREVIEW)) {
-                        Message msg = mMainHandler.obtainMessage(EventHandler.EVENT_HIDE_PREVIEW);
-                        mMainHandler.sendMessageDelayed(msg,PREVIEW_HIDE_COUNT_DOWN);
-                    }
-                }
-            }
-        });
-
-        getPreviewScrollParams();
     }
 
     private void initPresenter() {
         mPresenter = new ImageDetailPresenterImpl(getApplicationContext(),ImageDetailActivity.this);
         // may have null pointer exception
+        mPresenter.onStart();
+
+        mImgPager.setAdapter(mPagerAdapter);
     }
 
     private void initActionList() {
@@ -407,7 +348,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     @SuppressLint("RestrictedApi")
-    private void setTitle(){
+    private void setTitle() {
         String title = (mCurrentImgIdx + 1) + "/" + mPresenter.getItemCount();
         mActionBar.setWindowTitle(title);
     }
@@ -470,9 +411,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
             Log.v(TAG,"onPageSelected()");
             mCurrentImgIdx = position;
             setTitle();
-            if(mLvImgPreview.isShown()) {
-                mLvImgPreview.scrollToPosition(position);
-            }
         }
 
         @Override
@@ -481,16 +419,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
                 mPagerAdapter.notifyDataSetChanged();
             }
         }
-    }
-
-    private int getPreviewScrollParams(){
-        int hOffset = mLvImgPreview.computeHorizontalScrollOffset();
-        int hRange = mLvImgPreview.computeHorizontalScrollRange();
-        int hExtent = mLvImgPreview.computeHorizontalScrollExtent();
-
-        Log.v(TAG,"getPreviewScrollParams(): horizontal offset = " + hOffset + ", range = " + hRange + ", extent = " + hExtent);
-
-        return mLvImgPreview.computeHorizontalScrollRange();
     }
 
     private void showActionDialog(){
@@ -504,10 +432,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
           //.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_to_bottom)
           .add(fragment,"ActionList")
           .commit();
-    }
-
-    private void hidePreview(){
-        mLvImgPreview.setVisibility(View.INVISIBLE);
     }
 
     private void saveImage(int pos){
@@ -525,8 +449,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         static final int IMAGE_SAVE_COMPLETE = 1;
         static final int IMAGE_SAVE_FAIL = 2;
-        static final int IMAGE_FAVOR_COMPLETE = 3;
-        static final int IMAGE_DELETE_COMPLETE = 4;
         static final int IMAGE_SHARE_COMPLETE = 5;
         static final int EVENT_HIDE_PREVIEW = 6;
         static final int EVENT_SHOW_TOAST = 10;
@@ -548,7 +470,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
                     String toast1 = getString(R.string.save_image_fail);
                     ToastUtil.showToast(ImageDetailActivity.this,toast1);
                 case EVENT_HIDE_PREVIEW:
-                    hidePreview();
                     break;
                 case EVENT_SHOW_TOAST:
                     showToast((String)msg.obj);
