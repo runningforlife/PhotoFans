@@ -84,6 +84,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         String keyAdvice = getString(R.string.pref_give_your_advice);
         String keyAutoWallpaper = getString(R.string.pref_automatic_wallpaper);
         String keyWifiOnly = getString(R.string.pref_wifi_download);
+        String keyWallpaerInterval = getString(R.string.pref_auto_wallpaper_interval);
 
         if (key.equals(keyImgSrc)) {
             Set<String> src = sharedPreferences.getStringSet(key,null);
@@ -124,6 +125,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 WallpaperUtils.startWallpaperUpdaterJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
             } else {
                 WallpaperUtils.startWallpaperCacheUpdaterAlarm(getActivity());
+            }
+        } else if (keyWallpaerInterval.equals(key)) {
+            if (Build.VERSION.SDK_INT >= 21) {
+                WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
+            } else {
+                WallpaperUtils.startAutoWallpaperAlarm(getActivity());
             }
         }
     }

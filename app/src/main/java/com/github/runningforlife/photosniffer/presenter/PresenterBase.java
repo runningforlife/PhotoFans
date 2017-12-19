@@ -352,6 +352,8 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
             if (changeSet == null) {
                 mImageList = images;
                 mView.onDataSetChange(0, mImageList.size(), RealmOp.OP_REFRESH);
+                // trim data if needed
+                trimData();
             } else {
                 // For deletions, the adapter has to be notified in reverse order.
                 OrderedCollectionChangeSet.Range[] deletions = changeSet.getDeletionRanges();
