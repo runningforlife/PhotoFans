@@ -103,9 +103,9 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         mMainHandler = new EventHandler(Looper.getMainLooper());
 
-        if (Build.VERSION.SDK_INT >= 21) {
+/*        if (Build.VERSION.SDK_INT >= 21) {
             getWindow().setEnterTransition(null);
-        }
+        }*/
     }
 
     @Override
