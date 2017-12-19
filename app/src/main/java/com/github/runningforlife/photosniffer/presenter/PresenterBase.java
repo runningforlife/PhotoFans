@@ -10,6 +10,7 @@ import android.webkit.URLUtil;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
+import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.data.cache.Cache;
 import com.github.runningforlife.photosniffer.data.cache.CacheApi;
@@ -22,6 +23,7 @@ import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
+import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -55,6 +57,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     //DiskCache mDiskCache;
     private CacheApi mCacheMgr;
     private OkHttpClient mHttpClient;
+    private int mMaxImagesAllowed;
 
     Context mContext;
     UI mView;
@@ -74,6 +77,8 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
 
         mNetworkErrorCount = 0;
         mImageExecutor = Executors.newSingleThreadExecutor();
+
+        mMaxImagesAllowed = Integer.parseInt(SharedPrefUtil.getString(context.getString(R.string.pref_max_reserved_images), "1000"));
     }
 
 
@@ -214,9 +219,10 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     public void onDestroy() {
         Log.v(TAG,"onDestroy()");
         mImageList.removeChangeListener(mOrderRealmChangeListener);
+
+        trimData();
+
         mRealmApi.closeRealm();
-        //mOrderRealmChangeListener = null;
-        mOrderRealmChangeListener = null;
     }
 
     private void setWallpaper(final String url) {
@@ -301,6 +307,17 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         mRealmApi.updateAsync(ImageRealm.class, params, updated);
     }
 
+    private void trimData() {
+        if (mImageList.size() > mMaxImagesAllowed) {
+            ImageRealm ir = mImageList.get(0);
+            HashMap<String,String> params = new HashMap<>();
+            params.put("mIsUsed", Boolean.toString(ir.getUsed()));
+            params.put("mIsFavor", Boolean.toString(ir.getIsFavor()));
+            params.put("mIsWallpaper", Boolean.toString(ir.getIsWallpaper()));
+            mRealmApi.trimData(ImageRealm.class, params, mMaxImagesAllowed);
+        }
+    }
+
     private void markAsWallpaper(String url) {
         Log.v(TAG,"markAsWallpaper()");
         // mark it as wall paper
@@ -315,7 +332,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         mRealmApi.updateAsync(ImageRealm.class, params, updated);
     }
 
-    private String buildHighResolutionPixelsUrl(String url, int px){
+    private String buildHighResolutionPixelsUrl(String url, int px) {
         int hIdx = url.indexOf("?");
 
         return url.substring(0, hIdx)
