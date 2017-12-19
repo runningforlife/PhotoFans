@@ -66,6 +66,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     private int mCurrentImgIdx;
     private ActionBar mActionBar;
     private Handler mMainHandler;
+    private ImagePageStateListener mPageListener;
 
     /**
      * user action to do operations allowed at the images
@@ -125,6 +126,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         Log.v(TAG,"onDestroy()");
         //mMainHandler = null;
         mPresenter.onDestroy();
+        mImgPager.removeOnPageChangeListener(mPageListener);
     }
 
     @Override
@@ -310,7 +312,9 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     private void initView() {
         Log.v(TAG,"initView()");
         mPagerAdapter = new ImagePagerAdapter(this ,this);
-        mImgPager.addOnPageChangeListener(new ImagePageStateListener());
+
+        mPageListener = new ImagePageStateListener();
+        mImgPager.addOnPageChangeListener(mPageListener);
 
         Intent data = getIntent();
         mCurrentImgIdx = data.getIntExtra("image",0);
@@ -415,7 +419,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         @Override
         public void onPageScrollStateChanged(int state) {
-            if(state == ViewPager.SCROLL_STATE_IDLE){
+            if (state == ViewPager.SCROLL_STATE_IDLE) {
                 mPagerAdapter.notifyDataSetChanged();
             }
         }
@@ -445,7 +449,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
 
-    private class EventHandler extends Handler{
+    private class EventHandler extends Handler {
 
         static final int IMAGE_SAVE_COMPLETE = 1;
         static final int IMAGE_SAVE_FAIL = 2;
