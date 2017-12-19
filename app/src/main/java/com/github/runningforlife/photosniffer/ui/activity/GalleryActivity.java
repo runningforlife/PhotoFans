@@ -55,7 +55,6 @@ public class GalleryActivity extends BaseActivity
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
-    private boolean mIsToastShowing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +78,6 @@ public class GalleryActivity extends BaseActivity
         initView();
 
         mHintFragmentAdded = new AtomicBoolean(false);
-
-        mIsToastShowing = false;
         //initPresenter();
 
         drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
@@ -104,6 +101,10 @@ public class GalleryActivity extends BaseActivity
 
             }
         });
+
+/*        if (Build.VERSION.SDK_INT >= 21) {
+            getWindow().setExitTransition(null);
+        }*/
     }
 
     @Override

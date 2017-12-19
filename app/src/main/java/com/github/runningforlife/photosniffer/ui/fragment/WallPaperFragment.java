@@ -108,10 +108,10 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item){
+    public boolean onContextItemSelected(MenuItem item) {
         Log.v(TAG,"onContextItemSelected()");
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.menu_save:
                 mPresenter.saveImageAtPos(mCurrentPos);
                 break;

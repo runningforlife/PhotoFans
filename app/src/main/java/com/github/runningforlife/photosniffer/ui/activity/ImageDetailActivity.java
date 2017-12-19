@@ -102,6 +102,10 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         initPresenter();
 
         mMainHandler = new EventHandler(Looper.getMainLooper());
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            getWindow().setEnterTransition(null);
+        }
     }
 
     @Override
@@ -113,11 +117,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         initActionList();
 
         setTitle();
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
     }
 
     @Override

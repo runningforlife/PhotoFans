@@ -35,12 +35,11 @@ public class GlideLoader {
         if (scaleType == ImageView.ScaleType.CENTER_CROP) {
              btr.centerCrop()
                 .crossFade()
-                .thumbnail((float)0.3)
+                .dontAnimate()
                 .into(w,h);
         } else {
              btr.fitCenter()
                 .crossFade()
-                .thumbnail((float)0.3)
                 .into(w,h);
         }
     }
@@ -55,6 +54,8 @@ public class GlideLoader {
              .centerCrop()
              .crossFade()
              .thumbnail((float)0.3)
+             .dontAnimate()
+             .dontTransform()
              .into(w,h);
     }
 
@@ -67,6 +68,8 @@ public class GlideLoader {
                     .centerCrop()
                     .priority(priority)
                     .listener(listener)
+                    .dontAnimate()
+                    .dontTransform()
                     .into(w, h);
         } else {
             Glide.with(context)
@@ -74,6 +77,8 @@ public class GlideLoader {
                     .asBitmap()
                     .priority(priority)
                     .listener(listener)
+                    .dontAnimate()
+                    .dontTransform()
                     .into(w, h);
         }
     }

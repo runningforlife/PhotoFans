@@ -22,6 +22,7 @@
         <item name="android:windowEnterTransition">@android:transition/fade</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@color/colorDarkBlack</item>
+        <item name="android:windowBackground">@color/colorDarkBlack</item>
     </style>
 
 </resources>
