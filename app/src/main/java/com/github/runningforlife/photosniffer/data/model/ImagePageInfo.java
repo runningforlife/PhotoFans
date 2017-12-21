@@ -34,7 +34,7 @@ public class ImagePageInfo extends RealmObject {
         mTimeStamp = time;
     }
 
-    public long getVisitTime(){
+    public long getVisitTime() {
         return mTimeStamp;
     }
 
@@ -47,8 +47,8 @@ public class ImagePageInfo extends RealmObject {
     }
 
     @Override
-    public boolean equals(Object o){
-        if(!(o instanceof ImagePageInfo)){
+    public boolean equals(Object o) {
+        if (!(o instanceof ImagePageInfo)) {
             return false;
         }
 
