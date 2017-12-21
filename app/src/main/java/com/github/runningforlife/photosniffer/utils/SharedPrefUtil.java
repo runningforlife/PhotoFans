@@ -71,6 +71,15 @@ public class SharedPrefUtil {
         return pref.getString(key, val);
     }
 
+    public static void putString(String key, String val) {
+        Context context = AppGlobals.getInstance();
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(key, val);
+        editor.apply();
+    }
+
     public static boolean getBoolean(String key, boolean def){
         Context context = AppGlobals.getInstance();
         SharedPreferences pref = PreferenceManager.

@@ -117,8 +117,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         return mCurrentImages;
     }
 
-    public void stopGracefully(){
-        mRealApi.closeRealm();
+    public void stopGracefully() {
+        //mRealApi.closeRealm();
         //mExecutor.shutdown();
     }
 
@@ -132,11 +132,13 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                 // save pages we get
                 List<ImagePageInfo> pages = mPixelsRetriever.retrieveLinks(page);
                 //mExecutor.submit(new SaveRunnable(pages));
-                mRealApi.insertAsync(pages);
+                //mRealApi.insertAsync(pages);
+                insertToRealm(pages);
             } else {
                 result = mRetrieverFactory.retrieveImages(page);
                 // save to disk
-                mRealApi.insertAsync(getPageList(page));
+                insertToRealm(getPageList(page));
+                //mRealApi.insertAsync(getPageList(page));
                 //mExecutor.submit(new SaveRunnable(getPageList(page)));
             }
 
@@ -149,7 +151,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                 }
 
                 //mExecutor.submit(new SaveRunnable(result));
-                mRealApi.insertAsync(result);
+                insertToRealm(result);
+                //mRealApi.insertAsync(result);
 
                 if (mCurrentImages >= mExpectedImages && !mIsExpectedDone) {
                     mIsExpectedDone = true;
@@ -174,6 +177,15 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         // notify jobs are done
         for (RetrieveCompleteListener listener : mListeners) {
             listener.onRetrieveComplete(mCurrentImages);
+        }
+    }
+
+    private void insertToRealm(List<? extends RealmObject> data) {
+        RealmApi realmApi = RealmApiImpl.getInstance();
+        try {
+            realmApi.insertAsync(data);
+        } finally {
+            realmApi.closeRealm();
         }
     }
 
@@ -247,7 +259,7 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         page.addTargetRequests(urlList);
 
         urlList.add(page.getUrl().get());
-        for(String url : urlList){
+        for (String url : urlList) {
             if(!mPagesState.containsKey(url) && isValidPageUrl(url)) {
                 ImagePageInfo info = new ImagePageInfo();
                 info.setUrl(url);

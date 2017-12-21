@@ -20,7 +20,10 @@ public class MyRealmMigration implements io.realm.RealmMigration {
         if (oldVersion == 0) {
             ++oldVersion;
 
-            schema.create("ImagePageInfo");
+            schema.create("ImagePageInfo")
+                  .addField("mUrl", String.class)
+                  .addField("mTimeStamp", Long.class)
+                  .addField("mIsVisited", Boolean.class);
 
             schema.get("ImageRealm")
                   .addField("mIsCached", Boolean.class);

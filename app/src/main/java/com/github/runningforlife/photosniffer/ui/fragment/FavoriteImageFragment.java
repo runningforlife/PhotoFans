@@ -25,6 +25,7 @@ import com.github.runningforlife.photosniffer.ui.FavorPictureView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
 import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
+import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.util.List;
 
@@ -80,16 +81,29 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
     }
 
     private void initView() {
-        GridLayoutManager glm = new GridLayoutManager(getContext(), 2);
-        glm.setAutoMeasureEnabled(true);
-        mRcvFavorList.setHasFixedSize(true);
-        mRcvFavorList.setLayoutManager(glm);
+        mUserAdapterPrefKey = TAG + "-" +  USER_SETTING_ADAPTER;
+        mUserAdapter = SharedPrefUtil.getString(mUserAdapterPrefKey, GridManager);
+
+        if (GridManager.equals(mUserAdapter)) {
+            //LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
+            GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
+            gridLayoutMgr.setSmoothScrollbarEnabled(true);
+            mRcvFavorList.setHasFixedSize(true);
+            mRcvFavorList.setLayoutManager(gridLayoutMgr);
+        } else if (LinearManager.equals(mUserAdapter)) {
+            LinearLayoutManager ll = new LinearLayoutManager(getContext());
+            mRcvFavorList.setLayoutManager(ll);
+            ll.setAutoMeasureEnabled(true);
+            ll.setSmoothScrollbarEnabled(true);
+        }
         mRcvFavorList.setItemAnimator(new DefaultItemAnimator());
         //mRcvFavorList.setItemAnimator(new ScaleInOutItemAnimator());
         // restore back ground
         mRcvFavorList.setBackgroundResource(R.color.colorLightGrey);
 
         mAdapter = new GalleryAdapter(getActivity(),this);
+        mAdapter.setLayoutManager(mUserAdapter);
+
         mRcvFavorList.setAdapter(mAdapter);
     }
 
@@ -125,18 +139,24 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
                 GridLayoutManager glm = new GridLayoutManager(getContext(),2);
                 mRcvFavorList.setLayoutManager(glm);
                 glm.setAutoMeasureEnabled(true);
+                mUserAdapter = GridManager;
                 return true;
             case R.id.list_view:
                 LinearLayoutManager ll = new LinearLayoutManager(getContext());
                 mRcvFavorList.setLayoutManager(ll);
                 ll.setAutoMeasureEnabled(true);
+                mUserAdapter = LinearManager;
                 return true;
             case R.id.stagger_view:
                 StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
                 mRcvFavorList.setLayoutManager(sglm);
                 sglm.setAutoMeasureEnabled(true);
+                mUserAdapter = StaggeredManager;
                 return true;
         }
+
+        mAdapter.setLayoutManager(mUserAdapter);
+        SharedPrefUtil.putString(mUserAdapterPrefKey, GridManager);
 
         mRcvFavorList.removeAllViews();
         mAdapter.notifyDataSetChanged();

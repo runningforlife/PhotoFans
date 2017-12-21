@@ -99,6 +99,12 @@ public class WallpaperUtils {
     }
 
     @TargetApi(21)
+    public static void cancelSchedulerJob(Context context, int jobId) {
+        JobScheduler js = (JobScheduler) context.getSystemService(JOB_SCHEDULER_SERVICE);
+        js.cancel(jobId);
+    }
+
+    @TargetApi(21)
     public static void startWallpaperUpdaterJob(Context context, int jobId) {
         int interval = Integer.parseInt(context.getString(R.string.wallpaper_cache_update_interval));
 
@@ -113,6 +119,7 @@ public class WallpaperUtils {
         js.cancel(jobId);
         js.schedule(builder.build());
     }
+
 
     public static void startAutoWallpaperAlarm(Context context) {
         PendingIntent pi = MiscUtil.getPendingIntent(ALARM_AUTO_WALLPAPER, context);
@@ -131,6 +138,11 @@ public class WallpaperUtils {
         // start wallpaper service
         Intent intent = new Intent(context, LockScreenUpdateService.class);
         context.startService(intent);
+    }
+
+    public static void stopLockScreenWallpaperService(Context context) {
+        Intent intent = new Intent(context, LockScreenUpdateService.class);
+        context.stopService(intent);
     }
 
     public static void setWallpaperFromCache(Context context, int flag) {

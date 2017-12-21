@@ -84,7 +84,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         String keyAdvice = getString(R.string.pref_give_your_advice);
         String keyAutoWallpaper = getString(R.string.pref_automatic_wallpaper);
         String keyWifiOnly = getString(R.string.pref_wifi_download);
-        String keyWallpaerInterval = getString(R.string.pref_auto_wallpaper_interval);
+        String keyWallpaperInterval = getString(R.string.pref_auto_wallpaper_interval);
+        String keyLockScreenWallpaper = getString(R.string.pref_enable_auto_lockscreen_wallpaper);
 
         if (key.equals(keyImgSrc)) {
             Set<String> src = sharedPreferences.getStringSet(key,null);
@@ -112,7 +113,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             boolean isAuto = sharedPreferences.getBoolean(keyAutoWallpaper, true);
             // for OS >= LL, use JobScheduler to do wallpaper setting
             if (Build.VERSION.SDK_INT >= 21) {
-                WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
+                if (isAuto) {
+                    WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
+                } else {
+                    WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
+                }
             } else {
                 if (isAuto) {
                     WallpaperUtils.startAutoWallpaperAlarm(getActivity());
@@ -126,11 +131,20 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             } else {
                 WallpaperUtils.startWallpaperCacheUpdaterAlarm(getActivity());
             }
-        } else if (keyWallpaerInterval.equals(key)) {
+        } else if (keyWallpaperInterval.equals(key)) {
             if (Build.VERSION.SDK_INT >= 21) {
                 WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
             } else {
                 WallpaperUtils.startAutoWallpaperAlarm(getActivity());
+            }
+        } else if (keyLockScreenWallpaper.equals(key)) {
+            boolean isEnabled = sharedPreferences.getBoolean(key, true);
+            if (isEnabled) {
+                WallpaperUtils.startLockScreenWallpaperService(getActivity());
+                WallpaperUtils.startWallpaperUpdaterJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
+            } else {
+                WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
+                WallpaperUtils.stopLockScreenWallpaperService(getActivity());
             }
         }
     }

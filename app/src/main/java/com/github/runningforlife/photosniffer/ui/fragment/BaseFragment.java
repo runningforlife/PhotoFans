@@ -20,6 +20,7 @@ import com.github.runningforlife.photosniffer.presenter.Presenter;
 import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.ui.activity.Refresh;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
+import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -39,15 +40,21 @@ import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 public abstract class BaseFragment extends Fragment implements Refresh, UI, GalleryAdapterCallback {
 
     @Retention(RetentionPolicy.SOURCE)
-    @StringDef({LinearManager,GridManager})
+    @StringDef({LinearManager,GridManager, StaggeredManager})
     public @interface RecycleLayout{}
     public static final String LinearManager = "linearManager";
     public static final String GridManager = "GridManager";
+    public static final String StaggeredManager = "StaggeredManager";
+
+    static final String USER_SETTING_ADAPTER = "adapter";
 
     // current context menu item view position
     protected int mCurrentPos = -1;
     protected FragmentCallback mCallback;
     private Presenter mPresenter;
+    // user setted adapter
+    String mUserAdapter;
+    String mUserAdapterPrefKey;
 
     public interface FragmentCallback {
         void onItemClick(View view, int pos, String url);
@@ -71,7 +78,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     }
 
     @Override
-    public void onCreate(Bundle savedState){
+    public void onCreate(Bundle savedState) {
         super.onCreate(savedState);
         //option menu
         setHasOptionsMenu(true);
@@ -96,7 +103,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         mPresenter.onDestroy();
     }

@@ -83,7 +83,7 @@ public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "Image details:" +
                 "url = " + mUrl +
                 ",name = " + mName +

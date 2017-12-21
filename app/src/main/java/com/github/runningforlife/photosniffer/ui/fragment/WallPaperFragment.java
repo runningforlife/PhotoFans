@@ -25,6 +25,7 @@ import com.github.runningforlife.photosniffer.ui.WallpaperView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
 import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
+import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -56,6 +57,9 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
         initView();
 
         initPresenter();
+
+        mUserAdapterPrefKey = TAG + USER_SETTING_ADAPTER;
+        mUserAdapter = SharedPrefUtil.getString(mUserAdapterPrefKey, GridManager);
 
         return root;
     }
@@ -136,18 +140,25 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
                 GridLayoutManager glm = new GridLayoutManager(getContext(),2);
                 mRcvWallpaper.setLayoutManager(glm);
                 glm.setAutoMeasureEnabled(true);
+                mUserAdapter = GridManager;
                 return true;
             case R.id.list_view:
                 LinearLayoutManager ll = new LinearLayoutManager(getContext());
                 mRcvWallpaper.setLayoutManager(ll);
                 ll.setAutoMeasureEnabled(true);
+                mUserAdapter = LinearManager;
                 return true;
             case R.id.stagger_view:
                 StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
                 mRcvWallpaper.setLayoutManager(sglm);
                 sglm.setAutoMeasureEnabled(true);
+                mUserAdapter = StaggeredManager;
                 return true;
         }
+
+
+        mAdapter.setLayoutManager(mUserAdapter);
+        SharedPrefUtil.putString(mUserAdapterPrefKey, GridManager);
 
         mRcvWallpaper.removeAllViews();
         mAdapter.notifyDataSetChanged();
@@ -156,11 +167,25 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
     }
 
     private void initView() {
-        StaggeredGridLayoutManager sgm = new StaggeredGridLayoutManager(
-                2, StaggeredGridLayoutManager.VERTICAL);
-        mRcvWallpaper.setLayoutManager(sgm);
+        mUserAdapterPrefKey = TAG + "-" +  USER_SETTING_ADAPTER;
+        mUserAdapter = SharedPrefUtil.getString(mUserAdapterPrefKey, GridManager);
+
+        if (GridManager.equals(mUserAdapter)) {
+            //LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
+            GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
+            gridLayoutMgr.setSmoothScrollbarEnabled(true);
+            mRcvWallpaper.setHasFixedSize(true);
+            mRcvWallpaper.setLayoutManager(gridLayoutMgr);
+        } else if (LinearManager.equals(mUserAdapter)) {
+            LinearLayoutManager ll = new LinearLayoutManager(getContext());
+            mRcvWallpaper.setLayoutManager(ll);
+            ll.setAutoMeasureEnabled(true);
+            ll.setSmoothScrollbarEnabled(true);
+        }
 
         mAdapter = new GalleryAdapter(getActivity(), this);
+        mAdapter.setLayoutManager(mUserAdapter);
+
         mRcvWallpaper.setAdapter(mAdapter);
         mRcvWallpaper.setItemAnimator(new DefaultItemAnimator());
         //mRcvWallpaper.setItemAnimator(new ScaleInOutItemAnimator());

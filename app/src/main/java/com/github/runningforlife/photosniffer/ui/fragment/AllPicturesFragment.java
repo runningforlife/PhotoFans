@@ -29,11 +29,14 @@ import com.github.runningforlife.photosniffer.ui.AllPictureView;
 import com.github.runningforlife.photosniffer.ui.activity.ImageDetailActivity;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
+import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.RealmObject;
+
+import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
 /**
  * a fragment to display all pictures
@@ -65,7 +68,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     }
 
     @Override
-    public void onAttach(Context context){
+    public void onAttach(Context context) {
         super.onAttach(context);
         Log.v(TAG,"onAttach()");
         //initView(context);
@@ -79,7 +82,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         //mRvImgList.invalidate();
 
@@ -171,7 +174,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     @Override
     public boolean onContextItemSelected(MenuItem item){
         Log.v(TAG,"onContextItemSelected()");
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.menu_save:
                 mPresenter.saveImageAtPos(mCurrentPos);
                 break;
@@ -235,28 +238,31 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     private boolean optionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        switch (id){
+        switch (id) {
             case R.id.grid_view:
                 GridLayoutManager glm = new GridLayoutManager(getContext(),2);
                 mRvImgList.setLayoutManager(glm);
                 glm.setAutoMeasureEnabled(true);
                 glm.setSmoothScrollbarEnabled(true);
-                mAdapter.setLayoutManager(GridManager);
+                mUserAdapter = GridManager;
                 return true;
             case R.id.list_view:
                 LinearLayoutManager ll = new LinearLayoutManager(getContext());
                 mRvImgList.setLayoutManager(ll);
                 ll.setAutoMeasureEnabled(true);
                 ll.setSmoothScrollbarEnabled(true);
-                mAdapter.setLayoutManager(LinearManager);
+                mUserAdapter = LinearManager;
                 return true;
             case R.id.stagger_view:
                 StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
                 mRvImgList.setLayoutManager(sglm);
                 sglm.setAutoMeasureEnabled(true);
+                mUserAdapter = StaggeredManager;
                 return true;
         }
 
+        mAdapter.setLayoutManager(mUserAdapter);
+        SharedPrefUtil.putString(mUserAdapterPrefKey, mUserAdapter);
         //mRvImgList.invalidate();
         mRvImgList.removeAllViews();
         mAdapter.notifyDataSetChanged();
@@ -266,18 +272,27 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
 
     private void initView(){
         Log.v(TAG,"initView()");
+        mUserAdapterPrefKey = TAG + "-" +  USER_SETTING_ADAPTER;
+        mUserAdapter = SharedPrefUtil.getString(mUserAdapterPrefKey, GridManager);
 
-        //LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
-        GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(),2, GridLayoutManager.VERTICAL,false);
-        gridLayoutMgr.setSmoothScrollbarEnabled(true);
-        mRvImgList.setHasFixedSize(true);
-
-        mRvImgList.setLayoutManager(gridLayoutMgr);
+        if (GridManager.equals(mUserAdapter)) {
+            //LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
+            GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
+            gridLayoutMgr.setSmoothScrollbarEnabled(true);
+            mRvImgList.setHasFixedSize(true);
+            mRvImgList.setLayoutManager(gridLayoutMgr);
+        } else if (LinearManager.equals(mUserAdapter)) {
+            LinearLayoutManager ll = new LinearLayoutManager(getContext());
+            mRvImgList.setLayoutManager(ll);
+            ll.setAutoMeasureEnabled(true);
+            ll.setSmoothScrollbarEnabled(true);
+        }
         mRvImgList.setItemAnimator(new DefaultItemAnimator());
         //mRvImgList.setItemAnimator(new ScaleInOutItemAnimator());
         mRvImgList.setBackgroundResource(R.color.colorLightGrey);
 
         mAdapter = new GalleryAdapter(getActivity(),this);
+        mAdapter.setLayoutManager(mUserAdapter);
         mAdapter.setContextMenuRes(R.menu.menu_context_gallery);
 
         mRvImgList.setAdapter(mAdapter);
