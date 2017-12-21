@@ -3,14 +3,12 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.renderscript.BaseObj;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
-import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.data.cache.Cache;
 import com.github.runningforlife.photosniffer.data.cache.CacheApi;
@@ -23,7 +21,6 @@ import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
-import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -57,7 +54,8 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     //DiskCache mDiskCache;
     private CacheApi mCacheMgr;
     private OkHttpClient mHttpClient;
-    private int mMaxImagesAllowed;
+
+    int mMaxImagesAllowed;
 
     Context mContext;
     UI mView;
@@ -78,7 +76,8 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         mNetworkErrorCount = 0;
         mImageExecutor = Executors.newSingleThreadExecutor();
 
-        mMaxImagesAllowed = Integer.parseInt(SharedPrefUtil.getString(context.getString(R.string.pref_max_reserved_images), "1000"));
+        // default value
+        mMaxImagesAllowed = Integer.MAX_VALUE;
     }
 
 

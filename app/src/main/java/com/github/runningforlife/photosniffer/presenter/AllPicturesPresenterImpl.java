@@ -68,6 +68,16 @@ public class AllPicturesPresenterImpl extends PresenterBase
         mExecutor = Executors.newSingleThreadExecutor();
 
         mMainHandler = new H(Looper.myLooper());
+
+        String maxImages = SharedPrefUtil.getString(context.getString(R.string.pref_max_reserved_images), "1000");
+        int maxIntLen = Integer.toString(Integer.MAX_VALUE).length();
+        if (maxImages.length() < maxIntLen) {
+            try {
+                mMaxImagesAllowed = Integer.parseInt(maxImages);
+            } catch (Exception e) {
+                // number exception, just ingore
+            }
+        }
     }
 
     @Override
