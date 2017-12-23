@@ -20,7 +20,6 @@ import com.github.runningforlife.photosniffer.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
@@ -75,15 +74,11 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         Log.d(TAG,"onBindViewHolder(): pos = " + position);
 
         if(!TextUtils.isEmpty(url)) {
-            if(LinearManager.equals(mLayoutMgr)) {
-                vh.img.setMinimumHeight((int) mContext.getResources().
-                        getDimension(R.dimen.list_view_image_min_height));
-            }
             // preload image
             MiscUtil.preloadImage(vh.img);
             mCallback.loadImageIntoView(position, vh.img, Priority.HIGH,
                     DEFAULT_IMAGE_MEDIUM_WIDTH, DEFAULT_IMAGE_MEDIUM_HEIGHT, ImageView.ScaleType.CENTER_CROP);
-        }else if(getItemCount() > 0){
+        }else if (getItemCount() > 0) {
             // remove from the list
             mCallback.removeItemAtPos(position);
         }

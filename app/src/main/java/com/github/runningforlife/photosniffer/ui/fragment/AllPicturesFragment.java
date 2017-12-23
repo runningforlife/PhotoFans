@@ -242,23 +242,26 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
             case R.id.grid_view:
                 GridLayoutManager glm = new GridLayoutManager(getContext(),2);
                 mRvImgList.setLayoutManager(glm);
+                mRvImgList.setHasFixedSize(true);
                 glm.setAutoMeasureEnabled(true);
                 glm.setSmoothScrollbarEnabled(true);
                 mUserAdapter = GridManager;
-                return true;
+                break;
             case R.id.list_view:
                 LinearLayoutManager ll = new LinearLayoutManager(getContext());
                 mRvImgList.setLayoutManager(ll);
                 ll.setAutoMeasureEnabled(true);
                 ll.setSmoothScrollbarEnabled(true);
                 mUserAdapter = LinearManager;
-                return true;
+                break;
             case R.id.stagger_view:
                 StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
                 mRvImgList.setLayoutManager(sglm);
                 sglm.setAutoMeasureEnabled(true);
                 mUserAdapter = StaggeredManager;
-                return true;
+                break;
+            default:
+                return false;
         }
 
         mAdapter.setLayoutManager(mUserAdapter);
@@ -267,7 +270,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
         mRvImgList.removeAllViews();
         mAdapter.notifyDataSetChanged();
 
-        return false;
+        return true;
     }
 
     private void initView(){

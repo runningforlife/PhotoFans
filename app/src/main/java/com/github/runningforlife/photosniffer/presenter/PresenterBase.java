@@ -217,7 +217,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     @Override
     public void onDestroy() {
         Log.v(TAG,"onDestroy()");
-        if (mImageList.isValid() ) {
+        if (mImageList.isValid()) {
             mImageList.removeChangeListener(mOrderRealmChangeListener);
         }
         mRealmApi.closeRealm();

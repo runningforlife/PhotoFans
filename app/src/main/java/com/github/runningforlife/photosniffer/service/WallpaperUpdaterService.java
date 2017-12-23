@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * fetch images from web and cache them
@@ -31,7 +32,6 @@ public class WallpaperUpdaterService extends Service {
 
     private DiskCache mDiskCache;
     private Executor mUpdateExecutor;
-    private RealmApi mRealmApi;
     private volatile ServiceHandler mHandler;
     private volatile Looper mLooper;
 
@@ -77,6 +77,7 @@ public class WallpaperUpdaterService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.v(TAG,"onStartCommand()");
         Message message = mHandler.obtainMessage();
         message.obj = intent;
         message.sendToTarget();
@@ -90,7 +91,7 @@ public class WallpaperUpdaterService extends Service {
 
     private void onHandleIntent(Intent intent) {
         Log.v(TAG,"onHandleIntent()");
-        // every time we try to download & cache 10 images
+        // every time we try to download & cache 15 images
         List<String> wallpapers = intent.getStringArrayListExtra("wallpapers");
         if (wallpapers != null && wallpapers.size() > 0) {
             try {
@@ -105,17 +106,22 @@ public class WallpaperUpdaterService extends Service {
 
     private void downloadAndCacheWallpapers(final List<String> wallpapers) throws InterruptedException {
         Log.v(TAG,"downloadAndCacheWallpapers()");
+        if (MiscUtil.isConnected(getApplicationContext())) {
+            CountDownLatch latch = new CountDownLatch(wallpapers.size());
 
-        CountDownLatch latch = new CountDownLatch(wallpapers.size());
+            for (int i = 0; i < wallpapers.size(); ++i) {
+                WallpaperCacheRunnable wc = new WallpaperCacheRunnable(mDiskCache, wallpapers.get(i), latch);
+                mUpdateExecutor.execute(wc);
+            }
 
-        for (int i = 0; i < wallpapers.size(); ++i) {
-            WallpaperCacheRunnable wc = new WallpaperCacheRunnable(mDiskCache, wallpapers.get(i), latch);
-            mUpdateExecutor.execute(wc);
+            // wait for all job is down
+            try {
+                latch.await(8000, TimeUnit.MILLISECONDS);
+            } catch (Exception e) {
+
+            }
+            Log.v(TAG, "wallpaper cache updated done");
         }
-
-        // wait for all job is down
-        latch.await();
-        Log.v(TAG, "wallpaper cache updated done");
     }
 
 }

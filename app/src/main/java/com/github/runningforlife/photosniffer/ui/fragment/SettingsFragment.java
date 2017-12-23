@@ -101,7 +101,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     }
                 }
             }
-        }else if (keyAdvice.equals(key)){
+        }else if (keyAdvice.equals(key)) {
             String data = sharedPreferences.getString(key,"");
             if (!TextUtils.isEmpty(data)) {
                 uploadAdviceToCloud(data);

@@ -58,9 +58,6 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
 
         initPresenter();
 
-        mUserAdapterPrefKey = TAG + USER_SETTING_ADAPTER;
-        mUserAdapter = SharedPrefUtil.getString(mUserAdapterPrefKey, GridManager);
-
         return root;
     }
 
@@ -135,35 +132,37 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
     private boolean optionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        switch (id){
+        switch (id) {
             case R.id.grid_view:
                 GridLayoutManager glm = new GridLayoutManager(getContext(),2);
                 mRcvWallpaper.setLayoutManager(glm);
+                mRcvWallpaper.setHasFixedSize(true);
                 glm.setAutoMeasureEnabled(true);
                 mUserAdapter = GridManager;
-                return true;
+                break;
             case R.id.list_view:
                 LinearLayoutManager ll = new LinearLayoutManager(getContext());
                 mRcvWallpaper.setLayoutManager(ll);
                 ll.setAutoMeasureEnabled(true);
                 mUserAdapter = LinearManager;
-                return true;
+                break;
             case R.id.stagger_view:
                 StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
                 mRcvWallpaper.setLayoutManager(sglm);
                 sglm.setAutoMeasureEnabled(true);
                 mUserAdapter = StaggeredManager;
-                return true;
+                break;
+            default:
+                break;
         }
 
-
         mAdapter.setLayoutManager(mUserAdapter);
-        SharedPrefUtil.putString(mUserAdapterPrefKey, GridManager);
+        SharedPrefUtil.putString(mUserAdapterPrefKey, mUserAdapter);
 
         mRcvWallpaper.removeAllViews();
         mAdapter.notifyDataSetChanged();
 
-        return false;
+        return true;
     }
 
     private void initView() {

@@ -46,18 +46,17 @@ public class WallpaperCacheRunnable implements Runnable {
         try {
             Response response = mHttpClient.newCall(builder.build()).execute();
             if (response.isSuccessful()) {
-                saveStreamToFile(response.body().bytes());
                 // update realm
                 updateRealm(mImageUrl);
+                saveStreamToFile(response.body().bytes());
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             mRealmApi.closeRealm();
+            // job is done
+            mCountLatch.countDown();
         }
-        // job is done
-        mCountLatch.countDown();
-
     }
 
 

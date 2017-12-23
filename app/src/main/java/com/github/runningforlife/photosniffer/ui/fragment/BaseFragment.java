@@ -148,7 +148,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     @Override
     public void onNetworkState(@NetState String state) {
         Log.v(TAG,"onNetworkState():state = " + state);
-        if (mCallback != null) {
+        if (mCallback != null && isAdded()) {
             switch (state) {
                 case NetState.STATE_DISCONNECT:
                     mCallback.showToast(getString(R.string.network_not_connected));

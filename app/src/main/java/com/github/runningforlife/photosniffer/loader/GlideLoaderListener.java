@@ -73,7 +73,7 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
     @Override
     public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
         Log.d(TAG,"onResourceReady(): from memory = " + isFromMemoryCache);
-        if(callback != null){
+        if (callback != null) {
             callback.onImageLoadDone(resource);
         }
         if(imageView != null) {

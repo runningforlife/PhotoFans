@@ -138,30 +138,34 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
             case R.id.grid_view:
                 GridLayoutManager glm = new GridLayoutManager(getContext(),2);
                 mRcvFavorList.setLayoutManager(glm);
+                mRcvFavorList.setHasFixedSize(true);
                 glm.setAutoMeasureEnabled(true);
                 mUserAdapter = GridManager;
-                return true;
+                break;
             case R.id.list_view:
                 LinearLayoutManager ll = new LinearLayoutManager(getContext());
                 mRcvFavorList.setLayoutManager(ll);
                 ll.setAutoMeasureEnabled(true);
                 mUserAdapter = LinearManager;
-                return true;
+                break;
             case R.id.stagger_view:
                 StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
                 mRcvFavorList.setLayoutManager(sglm);
                 sglm.setAutoMeasureEnabled(true);
                 mUserAdapter = StaggeredManager;
-                return true;
+                break;
+            default:
+                return false;
+
         }
 
         mAdapter.setLayoutManager(mUserAdapter);
-        SharedPrefUtil.putString(mUserAdapterPrefKey, GridManager);
+        SharedPrefUtil.putString(mUserAdapterPrefKey, mUserAdapter);
 
         mRcvFavorList.removeAllViews();
         mAdapter.notifyDataSetChanged();
 
-        return false;
+        return true;
     }
 
     @Override

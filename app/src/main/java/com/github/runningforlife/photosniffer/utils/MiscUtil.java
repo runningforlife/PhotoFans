@@ -1,8 +1,10 @@
 package com.github.runningforlife.photosniffer.utils;
 
+import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -11,9 +13,13 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.app.AppGlobals;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
