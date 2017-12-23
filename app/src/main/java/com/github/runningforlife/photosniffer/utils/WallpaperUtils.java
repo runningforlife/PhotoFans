@@ -16,6 +16,8 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.data.local.RealmApi;
+import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.service.LockScreenUpdateService;
 import com.github.runningforlife.photosniffer.service.WallpaperJobService;
@@ -24,6 +26,7 @@ import com.github.runningforlife.photosniffer.service.WallpaperUpdaterService;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import io.realm.Realm;
@@ -155,39 +158,40 @@ public class WallpaperUtils {
 
     public static void setWallpaperFromCache(Context context, int flag) {
         Log.v(TAG, "setWallpaperFromCache()");
-        String wallpaperDir = MiscUtil.getWallpaperCacheDir();
-        File file = new File(wallpaperDir);
-        if (file.exists()) {
-            File[] wallpapers = file.listFiles();
-            if (wallpapers.length == 0) {
-                // try to cache images
-                startWallpaperCacheUpdaterService(context);
-                return;
-            }
+        RealmApi realmApi = RealmApiImpl.getInstance();
+        HashMap<String, String> params = new HashMap<>();
+        params.put("mIsWallpaper", Boolean.toString(Boolean.TRUE));
+        RealmResults<ImageRealm> wallpapers = (RealmResults<ImageRealm>) realmApi.queryAsync(ImageRealm.class, params);
 
-            String keyCacheIdx = context.getString(R.string.pref_wallpaper_cache_index);
-            int cacheIdx = SharedPrefUtil.getInt(keyCacheIdx, 0)%wallpapers.length;
-            // find a wallpaper
-            while (!wallpapers[cacheIdx].exists()) {
-                ++cacheIdx;
-                cacheIdx %= wallpapers.length;
-            }
 
-            WallpaperManager wm = WallpaperManager.getInstance(context);
-            try {
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inScaled = true;
-                Bitmap bitmap = BitmapFactory.decodeFile(wallpapers[cacheIdx].getAbsolutePath(), options);
-                if (Build.VERSION.SDK_INT >= 24) {
-                    wm.setBitmap(bitmap, null, false, flag);
-                } else {
-                    wm.setBitmap(bitmap);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            // save current idx
-            SharedPrefUtil.putInt(keyCacheIdx, ++cacheIdx);
+        if (wallpapers.size() == 0) {
+            // try to cache images
+            startWallpaperCacheUpdaterService(context);
+            return;
         }
+
+        String keyCacheIdx = context.getString(R.string.pref_wallpaper_cache_index);
+        int cacheIdx = SharedPrefUtil.getInt(keyCacheIdx, 0)%wallpapers.size();
+        // find a wallpaper
+        while (wallpapers.get(cacheIdx) != null) {
+            ++cacheIdx;
+            cacheIdx %= wallpapers.size();
+        }
+
+        WallpaperManager wm = WallpaperManager.getInstance(context);
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inScaled = true;
+            Bitmap bitmap = BitmapFactory.decodeFile(wallpapers.get(cacheIdx).getUrl(), options);
+            if (Build.VERSION.SDK_INT >= 24) {
+                wm.setBitmap(bitmap, null, false, flag);
+            } else {
+                wm.setBitmap(bitmap);
+            }
+        } catch (Exception e) {
+            Log.e(TAG,"fail to set wallpaper");
+        }
+        // save current idx
+        SharedPrefUtil.putInt(keyCacheIdx, ++cacheIdx);
     }
 }

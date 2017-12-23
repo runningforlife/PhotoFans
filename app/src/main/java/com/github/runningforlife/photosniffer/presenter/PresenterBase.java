@@ -216,6 +216,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
             ir.setIsWallpaper(true);
             ir.setIsCached(true);
             ir.setUsed(true);
+            ir.setTimeStamp(System.currentTimeMillis());
 
             photos.add(ir);
         }

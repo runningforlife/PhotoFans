@@ -75,6 +75,7 @@ public class WallpaperCacheRunnable implements Runnable {
         newValues.put("mUrl", mDiskCache.getFilePath(url));
         newValues.put("mIsUsed", Boolean.toString(Boolean.TRUE));
         newValues.put("mIsWallpaper", Boolean.toString(true));
+        newValues.put("mTimeStamp", Long.toString(System.currentTimeMillis()));
         //newValues.put("mIsCached", Boolean.toString(true));
         mRealmApi.updateAsync(ImageRealm.class, params, newValues);
     }
