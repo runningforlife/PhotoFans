@@ -54,6 +54,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     //DiskCache mDiskCache;
     private CacheApi mCacheMgr;
     private OkHttpClient mHttpClient;
+    private boolean mIsNetworkStateReported;
 
     int mMaxImagesAllowed;
 
@@ -78,6 +79,8 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
 
         // default value
         mMaxImagesAllowed = Integer.MAX_VALUE;
+
+        mIsNetworkStateReported = false;
     }
 
 
@@ -167,6 +170,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
                     if (!URLUtil.isFileUrl(url)) {
                         ++mNetworkErrorCount;
                         if (MiscUtil.isConnected(mContext)) {
+                            mIsNetworkStateReported = false;
                             // network is slow
                             ++mNetworkErrorCount;
                             if (mNetworkErrorCount >= NETWORK_SLOW_ERROR_COUNT && mNetworkErrorCount < NETWORK_HUNG_ERROR_COUNT) {
@@ -175,7 +179,10 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
                                 mView.onNetworkState(NetState.STATE_HUNG);
                             }
                         } else {
-                            mView.onNetworkState(NetState.STATE_DISCONNECT);
+                            if (!mIsNetworkStateReported) {
+                                mView.onNetworkState(NetState.STATE_DISCONNECT);
+                                mIsNetworkStateReported = true;
+                            }
                         }
                     } else {
                         // remove from database for image file may be removed by user
