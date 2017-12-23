@@ -1,13 +1,16 @@
 package com.github.runningforlife.photosniffer.app;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -39,8 +42,6 @@ import io.realm.RealmConfiguration;
 public class AppGlobals extends Application {
     private static final String TAG = "AppGlobal";
 
-    private static final String PATH_NAME = "photos";
-    private static final String PATH_CRASH_LOG = "log";
     private static final String LEAN_CLOUD_APP_ID = "Pivxf9C9FGTTHtyg7QXI1ICI-gzGzoHsz";
     private static final String LEAN_CLOUD_APP_KEY = "KCjSyXjVTA9mCIJVs7tDVkGS";
     private static AppGlobals sInstance;
@@ -127,9 +128,15 @@ public class AppGlobals extends Application {
     }
 
     private void saveLog(Throwable t) {
-        File file = getLogFile();
-        new Thread(new FileSaveRunnable(file, t))
-                .start();
+        Log.v(TAG,"saveLog()");
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            File file = getLogFile();
+            new Thread(new FileSaveRunnable(file, t))
+                    .start();
+        } else  {
+            Log.e(TAG,"no write permission");
+        }
     }
 
     private class FileSaveRunnable implements Runnable {
@@ -176,17 +183,17 @@ public class AppGlobals extends Application {
     private void uploadLogToCloud() {
         String logPath = MiscUtil.getLogDir();
         File file = new File(logPath);
-        if(file.exists()){
+        if (file.exists()) {
             File[] logs = file.listFiles();
-            for(File log : logs){
-                if(log.isFile()){
+            for (File log : logs) {
+                if (log.isFile()) {
                     saveLogToCloud(log);
                 }
             }
         }
     }
 
-    private void saveLogToCloud(File file){
+    private void saveLogToCloud(File file) {
         if(file.length() <= 0) return;
 
         LeanCloudManager cloudManager = LeanCloudManager.getInstance();
@@ -211,7 +218,7 @@ public class AppGlobals extends Application {
         registerWifiStateReceiver();
     }
 
-    private void registerWifiStateReceiver(){
+    private void registerWifiStateReceiver() {
         mWifiStateReceiver = new WifiStateReceiver();
         LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(this);
         lbm.registerReceiver(mWifiStateReceiver,
