@@ -50,7 +50,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     private AllPicturesPresenterImpl mPresenter;
     private GalleryAdapter mAdapter;
 
-    public static Fragment newInstance(){
+    public static AllPicturesFragment newInstance(){
         return new AllPicturesFragment();
     }
 

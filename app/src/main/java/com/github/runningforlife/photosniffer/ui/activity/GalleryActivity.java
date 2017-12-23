@@ -50,7 +50,8 @@ public class GalleryActivity extends BaseActivity
     private static final String TAG = "GalleryActivity";
     final static int MY_STORAGE_PERMISSION_REQUEST = 100;
 
-    private AtomicBoolean mHintFragmentAdded;
+    private boolean mHintFragmentAdded;
+    private FragmentManager mFragmentMgr;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
 
@@ -71,14 +72,14 @@ public class GalleryActivity extends BaseActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navView = findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(this);
         //headerView = navView.getHeaderView(0);
 
-        initView();
+        mHintFragmentAdded = false;
+        mFragmentMgr = getSupportFragmentManager();
 
-        mHintFragmentAdded = new AtomicBoolean(false);
-        //initPresenter();
+        initView();
 
         drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -118,10 +119,12 @@ public class GalleryActivity extends BaseActivity
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    // tell user how to start retrieveImages images
-                    showImageRetrieveHint();
+                    if (!isFinishing()) {
+                        // tell user how to start retrieveImages images
+                        showImageRetrieveHint();
+                    }
                 }
-            }, 2000);
+            }, 1000);
             // set to false when first refresh done
             //SharedPrefUtil.putBoolean(key, false);
             checkStoragePermission();
@@ -158,13 +161,13 @@ public class GalleryActivity extends BaseActivity
         int id = item.getItemId();
         switch (id){
             case R.id.nav_favorite:
-                startFavorFragment();
+                startFragmentByTag(FavoriteImageFragment.TAG);
                 break;
             case R.id.nav_gallery:
-                startGalleryFragment();
+                startFragmentByTag(AllPicturesFragment.TAG);
                 break;
             case R.id.nav_wallpaper:
-                startWallpaperFragment();
+                startFragmentByTag(WallPaperFragment.TAG);
                 break;
             case R.id.nav_settings:
                 startSetting();
@@ -207,7 +210,6 @@ public class GalleryActivity extends BaseActivity
                 ToastUtil.showToast(GalleryActivity.this, msg);
             }
         });
-        //ToastUtil.showToast(this, toast);
     }
 
     @Override
@@ -231,14 +233,13 @@ public class GalleryActivity extends BaseActivity
         }
     }
 
-    private void initView(){
+    private void initView() {
         Log.v(TAG,"initView()");
-        startGalleryFragment();
+        startFragmentByTag(AllPicturesFragment.TAG);
     }
 
-    private void startSetting(){
+    private void startSetting() {
         setRefreshing(false);
-
         Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
         startActivity(intent);
     }
@@ -251,45 +252,27 @@ public class GalleryActivity extends BaseActivity
         }
     }
 
-    private void startFavorFragment() {
-        FragmentManager fragmentMgr = getSupportFragmentManager();
-
-        FavoriteImageFragment fragment = (FavoriteImageFragment) fragmentMgr.findFragmentByTag(FavoriteImageFragment.TAG);
-
-        if(fragment == null){
-            fragment = FavoriteImageFragment.newInstance();
-        }
-        FragmentTransaction ft = fragmentMgr.beginTransaction()
-                .replace(R.id.fragment_container,fragment, FavoriteImageFragment.TAG);
-        if(Build.VERSION.SDK_INT >= 19) {
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        }
-        ft.commit();
-    }
-
-    private void startGalleryFragment() {
-        FragmentManager fragmentMgr = getSupportFragmentManager();
-        AllPicturesFragment fragment = (AllPicturesFragment)fragmentMgr.findFragmentByTag(AllPicturesFragment.TAG);
-        if(fragment == null) {
-            fragment = (AllPicturesFragment) AllPicturesFragment.newInstance();
-        }
-        fragmentMgr.beginTransaction()
-                .replace(R.id.fragment_container,fragment, AllPicturesFragment.TAG)
-                .commit();
-    }
-
-    private void startWallpaperFragment() {
-        FragmentManager fragmentMgr = getSupportFragmentManager();
-        WallPaperFragment fragment = (WallPaperFragment) fragmentMgr.findFragmentByTag(WallPaperFragment.TAG);
+    private void startFragmentByTag(String tag) {
+        Log.v(TAG,"startFragmentByTag()");
+        BaseFragment fragment = (BaseFragment) mFragmentMgr.findFragmentByTag(tag);
         if (fragment == null) {
-            fragment = WallPaperFragment.newInstance();
+            switch (tag) {
+                case FavoriteImageFragment.TAG:
+                    fragment = FavoriteImageFragment.newInstance();
+                    break;
+                case WallPaperFragment.TAG:
+                    fragment = WallPaperFragment.newInstance();
+                    break;
+                default:
+                    fragment = AllPicturesFragment.newInstance();
+                    break;
+            }
         }
-        FragmentTransaction ft = fragmentMgr.beginTransaction();
-        if (Build.VERSION.SDK_INT >= 19) {
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        }
-        ft.replace(R.id.fragment_container, fragment, WallPaperFragment.TAG)
-                .commit();
+
+        mFragmentMgr.beginTransaction()
+                    .replace(R.id.fragment_container, fragment, tag)
+                    .addToBackStack(null)
+                    .commit();
     }
 
     private void showFullScreenImage(View sharedView, int pos, String url){
@@ -311,7 +294,7 @@ public class GalleryActivity extends BaseActivity
 
         RetrieveHintFragment fragment = (RetrieveHintFragment)
                 fm.findFragmentByTag(RetrieveHintFragment.TAG);
-        if (fragment == null && mHintFragmentAdded.compareAndSet(false, true)) {
+        if (fragment == null && !mHintFragmentAdded) {
             fragment = (RetrieveHintFragment) RetrieveHintFragment.newInstance();
 
             FragmentTransaction ft = fm.beginTransaction();
