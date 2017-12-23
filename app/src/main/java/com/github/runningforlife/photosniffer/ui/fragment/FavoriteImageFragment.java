@@ -97,7 +97,6 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
             ll.setSmoothScrollbarEnabled(true);
         }
         mRcvFavorList.setItemAnimator(new DefaultItemAnimator());
-        //mRcvFavorList.setItemAnimator(new ScaleInOutItemAnimator());
         // restore back ground
         mRcvFavorList.setBackgroundResource(R.color.colorLightGrey);
 

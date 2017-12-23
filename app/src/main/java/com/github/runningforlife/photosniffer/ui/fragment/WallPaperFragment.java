@@ -1,15 +1,11 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.MenuRes;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -17,19 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.data.model.ImageRealm;
-
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.presenter.WallpaperPresenterImpl;
 import com.github.runningforlife.photosniffer.ui.WallpaperView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
-import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
-import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.realm.RealmObject;
 
 /**
  * fragment to manager wallpaper
@@ -187,7 +178,6 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
 
         mRcvWallpaper.setAdapter(mAdapter);
         mRcvWallpaper.setItemAnimator(new DefaultItemAnimator());
-        //mRcvWallpaper.setItemAnimator(new ScaleInOutItemAnimator());
         mRcvWallpaper.setBackgroundResource(R.color.colorLightGrey);
     }
 

@@ -299,7 +299,6 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
             ll.setSmoothScrollbarEnabled(true);
         }
         mRvImgList.setItemAnimator(new DefaultItemAnimator());
-        //mRvImgList.setItemAnimator(new ScaleInOutItemAnimator());
         mRvImgList.setBackgroundResource(R.color.colorLightGrey);
 
         mAdapter = new GalleryAdapter(getActivity(),this);
