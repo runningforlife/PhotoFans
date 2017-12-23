@@ -143,7 +143,10 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         if(pos >= 0 && pos < mImageList.size()) {
             final ImageRealm ir = mImageList.get(pos);
             String url = ir.getUrl();
-            if (mCacheMgr.isExist(url)) {
+            // donot remove user selected images;
+            // FIXME: why not copy user selected images to cache?
+            String wallpaperDir = MiscUtil.getWallpaperCacheDir();
+            if (mCacheMgr.isExist(url) && url.startsWith(wallpaperDir)) {
                 mCacheMgr.remove(url);
             }
             mRealmApi.deleteSync(ir);
@@ -318,16 +321,18 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
 
     private void markAsWallpaper(String url) {
         Log.v(TAG,"markAsWallpaper()");
-        // mark it as wall paper
-        HashMap<String,String> params = new HashMap<>();
-        HashMap<String, String> updated = new HashMap<>();
+        if (url != null && URLUtil.isNetworkUrl(url)) {
+            // mark it as wall paper
+            HashMap<String,String> params = new HashMap<>();
+            HashMap<String, String> updated = new HashMap<>();
 
-        params.put("mUrl", url);
+            params.put("mUrl", url);
 
-        updated.put("mUrl", mCacheMgr.getFilePath(url));
-        updated.put("mIsWallpaper", Boolean.toString(true));
-        updated.put("mIsCached", Boolean.toString(Boolean.TRUE));
-        mRealmApi.updateAsync(ImageRealm.class, params, updated);
+            updated.put("mUrl", mCacheMgr.getFilePath(url));
+            updated.put("mIsWallpaper", Boolean.toString(true));
+            updated.put("mIsCached", Boolean.toString(Boolean.TRUE));
+            mRealmApi.updateAsync(ImageRealm.class, params, updated);
+        }
     }
 
     private String buildHighResolutionPixelsUrl(String url, int px) {
