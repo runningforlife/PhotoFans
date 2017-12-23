@@ -79,6 +79,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     @Override
     public void onResume() {
         super.onResume();
+        Log.v(TAG,"onResume()");
         //mRvImgList.invalidate();
 
         setTitle();
@@ -276,7 +277,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
         return true;
     }
 
-    private void initView(){
+    private void initView() {
         Log.v(TAG,"initView()");
         mUserAdapterPrefKey = TAG + "-" +  USER_SETTING_ADAPTER;
         mUserAdapter = SharedPrefUtil.getString(mUserAdapterPrefKey, GridManager);
@@ -312,9 +313,6 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
                 mPresenter.refresh();
             }
         });
-
-        // option menu
-        setHasOptionsMenu(true);
     }
 
     private void initPresenter() {

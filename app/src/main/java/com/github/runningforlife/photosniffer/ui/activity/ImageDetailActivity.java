@@ -314,10 +314,10 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
 
         mPageListener = new ImagePageStateListener();
         mImgPager.addOnPageChangeListener(mPageListener);
+        mImgPager.setOffscreenPageLimit(3);
 
         Intent data = getIntent();
         mCurrentImgIdx = data.getIntExtra("image",0);
-        Log.v(TAG,"initView(): current image index = " + mCurrentImgIdx);
         mImgPager.setCurrentItem(mCurrentImgIdx);
     }
 

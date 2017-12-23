@@ -130,7 +130,7 @@ public class AppGlobals extends Application {
     private void saveLog(Throwable t) {
         Log.v(TAG,"saveLog()");
         if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             File file = getLogFile();
             new Thread(new FileSaveRunnable(file, t))
                     .start();

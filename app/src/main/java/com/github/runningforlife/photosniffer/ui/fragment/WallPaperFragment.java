@@ -34,7 +34,7 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
     private GalleryAdapter mAdapter;
     private WallpaperPresenterImpl mPresenter;
 
-    public static WallPaperFragment newInstance(){
+    public static WallPaperFragment newInstance() {
         return new WallPaperFragment();
     }
 
@@ -72,7 +72,7 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
     @Override
     public void onItemClicked(View view, int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
-        if(isAdded() && mCallback != null){
+        if (isAdded() && mCallback != null) {
             mCallback.onItemClick(view,pos, mPresenter.getItemAtPos(pos).getUrl());
         }
     }

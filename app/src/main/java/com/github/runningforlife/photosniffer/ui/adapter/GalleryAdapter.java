@@ -20,6 +20,8 @@ import com.github.runningforlife.photosniffer.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import me.iwf.photopicker.utils.AndroidLifecycleUtils;
+
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
@@ -76,8 +78,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         if(!TextUtils.isEmpty(url)) {
             // preload image
             MiscUtil.preloadImage(vh.img);
-            mCallback.loadImageIntoView(position, vh.img, Priority.HIGH,
-                    DEFAULT_IMAGE_MEDIUM_WIDTH, DEFAULT_IMAGE_MEDIUM_HEIGHT, ImageView.ScaleType.CENTER_CROP);
+            if (AndroidLifecycleUtils.canLoadImage(mContext)) {
+                mCallback.loadImageIntoView(position, vh.img, Priority.HIGH,
+                        DEFAULT_IMAGE_MEDIUM_WIDTH, DEFAULT_IMAGE_MEDIUM_HEIGHT, ImageView.ScaleType.CENTER_CROP);
+            }
         }else if (getItemCount() > 0) {
             // remove from the list
             mCallback.removeItemAtPos(position);

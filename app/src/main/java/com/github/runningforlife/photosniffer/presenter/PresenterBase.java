@@ -231,6 +231,10 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
             mImageList.removeChangeListener(mOrderRealmChangeListener);
         }
         mRealmApi.closeRealm();
+
+        if (mImageExecutor != null && !mImageExecutor.isTerminated()) {
+            mImageExecutor.shutdown();
+        }
     }
 
     private void setWallpaper(final String url) {
