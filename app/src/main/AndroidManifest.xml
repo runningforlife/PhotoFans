@@ -66,7 +66,7 @@
 
         <service android:name=".service.WallpaperUpdaterService"/>
 
-        <receiver android:name=".ui.receiver.WallpaperAlarmReceiver"
+        <receiver android:name=".receiver.WallpaperAlarmReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.github.runningforlife.AUTO_WALLPAPER"/>
@@ -77,7 +77,7 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".ui.receiver.WifiStateReceiver"
+        <receiver android:name=".receiver.WifiStateReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>

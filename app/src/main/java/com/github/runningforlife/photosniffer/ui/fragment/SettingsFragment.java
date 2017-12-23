@@ -1,8 +1,5 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,8 +22,6 @@ import java.util.HashMap;
 import java.util.Set;
 
 import io.realm.RealmResults;
-
-import static com.github.runningforlife.photosniffer.ui.receiver.WallpaperAlarmReceiver.ALARM_AUTO_WALLPAPER;
 
 /**
  * a fragment containing settings

@@ -1,4 +1,4 @@
-package com.github.runningforlife.photosniffer.ui.receiver;
+package com.github.runningforlife.photosniffer.receiver;
 
 import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;

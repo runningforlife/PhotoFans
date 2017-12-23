@@ -32,7 +32,6 @@ import io.realm.RealmResults;
 
 import static android.content.Context.ALARM_SERVICE;
 import static android.content.Context.JOB_SCHEDULER_SERVICE;
-import static com.github.runningforlife.photosniffer.ui.receiver.WallpaperAlarmReceiver.ALARM_AUTO_WALLPAPER;
 
 /**
  * a utility class related with wallpaper

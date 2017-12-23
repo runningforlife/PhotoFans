@@ -1,28 +1,21 @@
 package com.github.runningforlife.photosniffer.service;
 
 import android.annotation.TargetApi;
-import android.app.AlarmManager;
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.app.WallpaperManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.util.DisplayMetrics;
 import android.util.Log;
 
-import com.github.runningforlife.photosniffer.ui.receiver.LockScreenWallpaperReceiver;
+import com.github.runningforlife.photosniffer.receiver.LockScreenWallpaperReceiver;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
 
 
