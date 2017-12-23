@@ -34,9 +34,11 @@ public class MiscUtil {
     public static final String JOB_WALLPAPER_CACHE = "cache";
     public static final String JOB_WALLPAPER_SET = "setting";
 
+    private static final String APP_NAME = "PhotoSniffer";
     private static final String PATH_WALLPAPER_CACHE = "wallpapers";
     private static final String PATH_CRASH_LOG = "log";
     private static final String PATH_PHOTOS = "photos";
+    private static final String PATH_GLIDE_CACHE = "cache";
 
     public static OkHttpClient buildOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -58,12 +60,16 @@ public class MiscUtil {
         return getRootDir() + File.separator + PATH_WALLPAPER_CACHE;
     }
 
+    public static String getGlideCacheDir() {
+        return APP_NAME + File.separator + PATH_GLIDE_CACHE;
+    }
+
     public static String getLogDir() {
         return getRootDir() + File.separator + PATH_CRASH_LOG;
     }
 
     public static String getRootDir() {
-        return Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "photosniffer";
+        return Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + APP_NAME;
     }
 
     public static PendingIntent getPendingIntent(String action, Context context) {

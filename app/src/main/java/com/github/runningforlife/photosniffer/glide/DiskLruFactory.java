@@ -5,6 +5,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.bumptech.glide.load.engine.cache.DiskLruCacheFactory;
+import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.io.File;
 
@@ -12,13 +13,13 @@ import java.io.File;
  *  a LRU disk storage to save images
  */
 
-public class DiskLruFactory extends DiskLruCacheFactory{
+public class DiskLruFactory extends DiskLruCacheFactory {
     private static final String TAG = "DiskLru";
-    static final String DISK_CACHE_DIR = "PhotoSniffer/Pictures/Cache/";
-    static final int DEFAULT_CACHE_SIZE = 1024*1024*100;
-    static int DISK_CACHE_SIZE = getExternalCacheSize();
+    private static final String DISK_CACHE_DIR = MiscUtil.getGlideCacheDir();
+    private static final int DEFAULT_CACHE_SIZE = 1024*1024*100;
+    private static int DISK_CACHE_SIZE = getExternalCacheSize();
 
-    public DiskLruFactory(Context context) {
+    DiskLruFactory(Context context) {
         this(context, DISK_CACHE_DIR, DISK_CACHE_SIZE);
     }
 
@@ -26,7 +27,7 @@ public class DiskLruFactory extends DiskLruCacheFactory{
         this(context, DISK_CACHE_DIR,diskCacheSize);
     }
 
-    public DiskLruFactory(final Context context, final String diskCacheName, int diskCacheSize) {
+    DiskLruFactory(final Context context, final String diskCacheName, int diskCacheSize) {
         super(new CacheDirectoryGetter() {
             @Override
             public File getCacheDirectory() {
