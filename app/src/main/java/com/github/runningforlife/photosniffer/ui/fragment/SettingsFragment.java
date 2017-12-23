@@ -15,8 +15,10 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
+import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
+import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
 
 import java.util.HashMap;
@@ -33,7 +35,6 @@ import static com.github.runningforlife.photosniffer.ui.receiver.WallpaperAlarmR
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "SettingsFragment";
 
-    private AlarmManager mAlarmMgr;
     private RealmApi mRealmApi;
 
     @Override
@@ -41,8 +42,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         super.onCreate(savedState);
 
         addPreferencesFromResource(R.xml.settings);
-
-        mAlarmMgr = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
 
         mRealmApi = RealmApiImpl.getInstance();
     }
@@ -86,79 +85,112 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         String keyWifiOnly = getString(R.string.pref_wifi_download);
         String keyWallpaperInterval = getString(R.string.pref_auto_wallpaper_interval);
         String keyLockScreenWallpaper = getString(R.string.pref_enable_auto_lockscreen_wallpaper);
+        String keyMaxImages = getString(R.string.max_reserved_images);
 
         if (key.equals(keyImgSrc)) {
             Set<String> src = sharedPreferences.getStringSet(key,null);
-            if (src != null) {
-                HashMap<String,String> params = new HashMap<>();
-                params.put("mIsVisited", Boolean.toString(Boolean.TRUE));
-
-                RealmResults<ImagePageInfo> visited = (RealmResults<ImagePageInfo>) mRealmApi.querySync(ImagePageInfo.class, params);
-
-                for (String url : src) {
-                    if (!visited.contains(url)) {
-                        mRealmApi.insertAsync(new ImagePageInfo(url));
-                    }
-                }
-            }
+            checkImageSourceList(src);
         }else if (keyAdvice.equals(key)) {
             String data = sharedPreferences.getString(key,"");
-            if (!TextUtils.isEmpty(data)) {
-                uploadAdviceToCloud(data);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(key,"");
-                editor.apply();
-            }
+            checkUserAdvice(data);
         } else if (keyAutoWallpaper.equals(key)) {
             boolean isAuto = sharedPreferences.getBoolean(keyAutoWallpaper, true);
-            // for OS >= LL, use JobScheduler to do wallpaper setting
-            if (Build.VERSION.SDK_INT >= 21) {
-                if (isAuto) {
-                    WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
-                } else {
-                    WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
-                }
-            } else {
-                if (isAuto) {
-                    WallpaperUtils.startAutoWallpaperAlarm(getActivity());
-                } else {
-                    cancelAutoWallpaperAlarm();
-                }
-            }
+            checkAutoWallpaperSetting(isAuto);
         } else if (keyWifiOnly.equals(key)) {
-            if (Build.VERSION.SDK_INT >= 21) {
-                WallpaperUtils.startWallpaperUpdaterJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
-            } else {
-                WallpaperUtils.startWallpaperCacheUpdaterAlarm(getActivity());
-            }
+            checkWifiOnlyDownloadMode();
         } else if (keyWallpaperInterval.equals(key)) {
-            if (Build.VERSION.SDK_INT >= 21) {
-                WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
-            } else {
-                WallpaperUtils.startAutoWallpaperAlarm(getActivity());
-            }
+            checkWallpaperInterval();
         } else if (keyLockScreenWallpaper.equals(key)) {
             boolean isEnabled = sharedPreferences.getBoolean(key, true);
-            if (isEnabled) {
-                WallpaperUtils.startLockScreenWallpaperService(getActivity());
-                WallpaperUtils.startWallpaperUpdaterJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
-            } else {
-                WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
-                WallpaperUtils.stopLockScreenWallpaperService(getActivity());
+            checkLockScreenWallpaper(true);
+        } else if (keyMaxImages.equals(key)) {
+            int maxImages;
+            try {
+                maxImages = Integer.parseInt(SharedPrefUtil.getString(key, "2147483647"));
+            } catch (Exception e) {
+                maxImages = Integer.MAX_VALUE;
+            }
+            trimDataAsync(maxImages);
+        }
+    }
+
+    private void checkImageSourceList(Set<String> src) {
+        if (src != null) {
+            HashMap<String,String> params = new HashMap<>();
+            params.put("mIsVisited", Boolean.toString(Boolean.TRUE));
+            RealmResults<ImagePageInfo> visited = (RealmResults<ImagePageInfo>) mRealmApi.querySync(ImagePageInfo.class, params);
+
+            for (String url : src) {
+                if (!visited.contains(url)) {
+                    mRealmApi.insertAsync(new ImagePageInfo(url));
+                }
             }
         }
+    }
+
+    //FIXME: if no network connected, need persist user advice
+    private void checkUserAdvice(String data) {
+        if (!TextUtils.isEmpty(data) && MiscUtil.isConnected(getActivity())) {
+            uploadAdviceToCloud(data);
+        } else {
+            SharedPrefUtil.putString(getString(R.string.pref_give_your_advice), data);
+        }
+    }
+
+    private void checkAutoWallpaperSetting(boolean isEnabled) {
+        // for OS >= LL, use JobScheduler to do wallpaper setting
+        if (Build.VERSION.SDK_INT >= 21) {
+            if (isEnabled) {
+                WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
+            } else {
+                WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
+            }
+        } else {
+            if (isEnabled) {
+                WallpaperUtils.startAutoWallpaperAlarm(getActivity());
+            } else {
+                WallpaperUtils.cancelAutoWallpaperAlarm(getActivity());
+            }
+        }
+    }
+
+    private void checkWifiOnlyDownloadMode() {
+        if (Build.VERSION.SDK_INT >= 21) {
+            WallpaperUtils.startWallpaperUpdaterJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
+        } else {
+            WallpaperUtils.startWallpaperCacheUpdaterAlarm(getActivity());
+        }
+    }
+
+    private void checkWallpaperInterval() {
+        if (Build.VERSION.SDK_INT >= 21) {
+            WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
+        } else {
+            WallpaperUtils.startAutoWallpaperAlarm(getActivity());
+        }
+    }
+
+    private void checkLockScreenWallpaper(boolean isEnabled) {
+        if (isEnabled) {
+            WallpaperUtils.startLockScreenWallpaperService(getActivity());
+            WallpaperUtils.startWallpaperUpdaterJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
+        } else {
+            WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
+            WallpaperUtils.stopLockScreenWallpaperService(getActivity());
+        }
+    }
+
+    private void trimDataAsync(int maxImages) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("mIsUsed", Boolean.toString(Boolean.TRUE));
+        params.put("mIsFavor", Boolean.toString(Boolean.FALSE));
+        params.put("mIsWallpaper", Boolean.toString(Boolean.FALSE));
+        mRealmApi.trimData(ImageRealm.class, params, maxImages);
     }
 
     private void uploadAdviceToCloud(String advice) {
         LeanCloudManager cloud = LeanCloudManager.getInstance();
 
         cloud.saveAdvice(advice);
-    }
-
-    private void cancelAutoWallpaperAlarm() {
-        Log.v(TAG,"cancelAutoWallpaperAlarm()");
-        PendingIntent alarmIntent = MiscUtil.getPendingIntent(ALARM_AUTO_WALLPAPER, getActivity());
-
-        mAlarmMgr.cancel(alarmIntent);
     }
 }

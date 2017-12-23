@@ -23,8 +23,6 @@ import com.github.runningforlife.photosniffer.presenter.FavorImagePresenterImpl;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.FavorPictureView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
-import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
-import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.util.List;

@@ -144,7 +144,6 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
             final ImageRealm ir = mImageList.get(pos);
             String url = ir.getUrl();
             // donot remove user selected images;
-            // FIXME: why not copy user selected images to cache?
             String wallpaperDir = MiscUtil.getWallpaperCacheDir();
             if (mCacheMgr.isExist(url) && url.startsWith(wallpaperDir)) {
                 mCacheMgr.remove(url);
@@ -355,8 +354,13 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
             if (changeSet == null) {
                 mImageList = images;
                 mView.onDataSetChange(0, mImageList.size(), RealmOp.OP_REFRESH);
-                // trim data if needed
-                trimData();
+                // trim data if needed only for non-favor;non-wallpaper
+                if (mImageList.size() > 0) {
+                    ImageRealm ir = mImageList.get(0);
+                    if (ir != null && !ir.getIsWallpaper() && !ir.getIsFavor()) {
+                        trimData();
+                    }
+                }
             } else {
                 // For deletions, the adapter has to be notified in reverse order.
                 OrderedCollectionChangeSet.Range[] deletions = changeSet.getDeletionRanges();

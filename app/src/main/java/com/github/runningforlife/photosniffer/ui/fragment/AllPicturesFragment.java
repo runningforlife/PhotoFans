@@ -28,15 +28,10 @@ import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.AllPictureView;
 import com.github.runningforlife.photosniffer.ui.activity.ImageDetailActivity;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
-import com.github.runningforlife.photosniffer.ui.anim.ScaleInOutItemAnimator;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
-import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.realm.RealmObject;
-
-import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
 /**
  * a fragment to display all pictures

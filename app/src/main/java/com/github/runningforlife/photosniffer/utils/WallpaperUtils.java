@@ -32,6 +32,7 @@ import io.realm.RealmResults;
 
 import static android.content.Context.ALARM_SERVICE;
 import static android.content.Context.JOB_SCHEDULER_SERVICE;
+import static com.github.runningforlife.photosniffer.ui.receiver.WallpaperAlarmReceiver.ALARM_AUTO_WALLPAPER;
 
 /**
  * a utility class related with wallpaper
@@ -132,6 +133,14 @@ public class WallpaperUtils {
         } else {
             alarmManager.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + alarmInterval, pi);
         }
+    }
+
+    public static void cancelAutoWallpaperAlarm(Context context) {
+        Log.v(TAG,"cancelAutoWallpaperAlarm()");
+        PendingIntent alarmIntent = MiscUtil.getPendingIntent(ALARM_AUTO_WALLPAPER, context);
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        alarmManager.cancel(alarmIntent);
     }
 
     public static void startLockScreenWallpaperService(Context context) {
