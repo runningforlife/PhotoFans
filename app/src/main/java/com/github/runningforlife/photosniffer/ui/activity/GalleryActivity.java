@@ -136,7 +136,7 @@ public class GalleryActivity extends BaseActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -173,7 +173,7 @@ public class GalleryActivity extends BaseActivity
                 break;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -243,7 +243,7 @@ public class GalleryActivity extends BaseActivity
         startActivity(intent);
     }
 
-    private void setRefreshing(boolean refreshing){
+    private void setRefreshing(boolean refreshing) {
         FragmentManager fragmentMgr = getSupportFragmentManager();
         Fragment fragment =  fragmentMgr.findFragmentById(R.id.fragment_container);
         if(fragment != null && fragment instanceof BaseFragment){
@@ -251,7 +251,7 @@ public class GalleryActivity extends BaseActivity
         }
     }
 
-    private void startFavorFragment(){
+    private void startFavorFragment() {
         FragmentManager fragmentMgr = getSupportFragmentManager();
 
         FavoriteImageFragment fragment = (FavoriteImageFragment) fragmentMgr.findFragmentByTag(FavoriteImageFragment.TAG);
@@ -267,7 +267,7 @@ public class GalleryActivity extends BaseActivity
         ft.commit();
     }
 
-    private void startGalleryFragment(){
+    private void startGalleryFragment() {
         FragmentManager fragmentMgr = getSupportFragmentManager();
         AllPicturesFragment fragment = (AllPicturesFragment)fragmentMgr.findFragmentByTag(AllPicturesFragment.TAG);
         if(fragment == null) {
@@ -297,7 +297,7 @@ public class GalleryActivity extends BaseActivity
         intent.putExtra(FullScreenImageFragment.POSITION, pos);
         intent.putExtra(FullScreenImageFragment.IMAGE_URL, url);
 
-        if(Build.VERSION.SDK_INT >= 16){
+        if (Build.VERSION.SDK_INT >= 16) {
             ActivityOptionsCompat options = ActivityOptionsCompat.
                     makeSceneTransitionAnimation(this, sharedView,
                             getString(R.string.activity_image_transition) + String.valueOf(pos));

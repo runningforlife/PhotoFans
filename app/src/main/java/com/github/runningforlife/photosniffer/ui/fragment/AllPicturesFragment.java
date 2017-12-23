@@ -103,14 +103,16 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     public void onRefreshDone(boolean isSuccess) {
         Log.v(TAG,"onRefreshDone()");
 
-        if(mRefresher.isRefreshing()){
+        if (mRefresher.isRefreshing()) {
             mRefresher.setRefreshing(false);
         }
 
-        if(isSuccess){
-            mCallback.showToast(getString(R.string.refresh_success));
-        }else{
-            mCallback.showToast(getString(R.string.refresh_error));
+        if (isAdded()) {
+            if (isSuccess) {
+                mCallback.showToast(getString(R.string.refresh_success));
+            } else {
+                mCallback.showToast(getString(R.string.refresh_error));
+            }
         }
     }
 
@@ -120,7 +122,9 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
         if(mRefresher.isRefreshing()){
             mRefresher.setRefreshing(false);
         }
-        ToastUtil.showToast(getActivity(),getString(R.string.network_not_connected));
+        if (isAdded() && mCallback != null) {
+            mCallback.showToast(getString(R.string.network_not_connected));
+        }
     }
 
     @Override
@@ -172,7 +176,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item){
+    public boolean onContextItemSelected(MenuItem item) {
         Log.v(TAG,"onContextItemSelected()");
         switch (item.getItemId()) {
             case R.id.menu_save:
@@ -212,19 +216,23 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     @Override
     public void onImageSaveDone(String path) {
         Log.v(TAG,"onImageSaveDone(): isOk = " + !TextUtils.isEmpty(path));
-        if(!TextUtils.isEmpty(path)) {
-            mCallback.showToast(getString(R.string.save_image_Success) + path);
-        }else{
-            mCallback.showToast(getString(R.string.save_image_fail));
+        if (isAdded()) {
+            if (!TextUtils.isEmpty(path)) {
+                mCallback.showToast(getString(R.string.save_image_Success) + path);
+            } else {
+                mCallback.showToast(getString(R.string.save_image_fail));
+            }
         }
     }
 
     @Override
     public void onWallpaperSetDone(boolean isOk) {
-        if(isOk){
-            mCallback.showToast(getString(R.string.set_wallpaper_success));
-        }else{
-            mCallback.showToast(getString(R.string.set_wallpaper_fail));
+        if (isAdded()) {
+            if (isOk) {
+                mCallback.showToast(getString(R.string.set_wallpaper_success));
+            } else {
+                mCallback.showToast(getString(R.string.set_wallpaper_fail));
+            }
         }
     }
 

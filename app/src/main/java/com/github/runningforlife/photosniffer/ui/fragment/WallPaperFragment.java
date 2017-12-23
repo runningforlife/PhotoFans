@@ -81,7 +81,7 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
     @Override
     public void onItemClicked(View view, int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
-        if(mCallback != null){
+        if(isAdded() && mCallback != null){
             mCallback.onItemClick(view,pos, mPresenter.getItemAtPos(pos).getUrl());
         }
     }

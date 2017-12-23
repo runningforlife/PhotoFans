@@ -168,20 +168,24 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     @Override
     public void onImageSaveDone(String path) {
         Log.v(TAG,"onImageSaveDone(): isOk = " + !TextUtils.isEmpty(path));
-        if(!TextUtils.isEmpty(path)) {
-            mCallback.showToast(getString(R.string.save_image_Success) + path);
-        }else{
-            mCallback.showToast(getString(R.string.save_image_fail));
+        if (isAdded()) {
+            if (!TextUtils.isEmpty(path)) {
+                mCallback.showToast(getString(R.string.save_image_Success) + path);
+            } else {
+                mCallback.showToast(getString(R.string.save_image_fail));
+            }
         }
     }
 
     @Override
     public void onWallpaperSetDone(boolean isOk) {
         Log.v(TAG,"onWallpaperSetDone()");
-        if(isOk){
-            mCallback.showToast(getString(R.string.set_wallpaper_success));
-        }else{
-            mCallback.showToast(getString(R.string.set_wallpaper_fail));
+        if (isAdded()) {
+            if (isOk) {
+                mCallback.showToast(getString(R.string.set_wallpaper_success));
+            } else {
+                mCallback.showToast(getString(R.string.set_wallpaper_fail));
+            }
         }
     }
 
