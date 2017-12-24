@@ -97,7 +97,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             checkWallpaperInterval();
         } else if (keyLockScreenWallpaper.equals(key)) {
             boolean isEnabled = sharedPreferences.getBoolean(key, true);
-            checkLockScreenWallpaper(true);
+            checkLockScreenWallpaper(isEnabled);
         } else if (keyMaxImages.equals(key)) {
             int maxImages;
             try {

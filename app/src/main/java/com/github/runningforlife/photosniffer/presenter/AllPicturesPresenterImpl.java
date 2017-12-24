@@ -121,7 +121,7 @@ public class AllPicturesPresenterImpl extends PresenterBase
 
         // start wallpaper cache service
         Message message = mMainHandler.obtainMessage(H.EVENT_START_WALLPAPER_CACHE);
-        mMainHandler.sendMessageDelayed(message, 1500);
+        mMainHandler.sendMessageDelayed(message, 500);
     }
 
     @Override
