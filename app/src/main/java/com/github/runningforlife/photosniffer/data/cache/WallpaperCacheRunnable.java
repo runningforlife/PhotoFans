@@ -54,7 +54,7 @@ public class WallpaperCacheRunnable implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            mRealmApi.closeRealm();
+            //mRealmApi.closeRealm();
             // job is done
             mCountLatch.countDown();
         }
@@ -67,18 +67,15 @@ public class WallpaperCacheRunnable implements Runnable {
         mDiskCache.put(mImageUrl, entry);
     }
 
+    // primary key cannot be changed once the ream object is created
     private void updateRealm(String url) {
         Log.v(TAG,"updateRealm()");
-        HashMap<String, String> params = new HashMap<>();
-        params.put("mUrl", url);
-
-        HashMap<String, String> newValues = new HashMap<>();
-        newValues.put("mUrl", mDiskCache.getFilePath(url));
-        newValues.put("mIsUsed", Boolean.toString(Boolean.TRUE));
-        newValues.put("mIsWallpaper", Boolean.toString(true));
-        newValues.put("mIsCached", Boolean.toString(Boolean.TRUE));
-        newValues.put("mTimeStamp", Long.toString(System.currentTimeMillis()));
-        //newValues.put("mIsCached", Boolean.toString(true));
-        mRealmApi.updateAsync(ImageRealm.class, params, newValues);
+        ImageRealm ir = new ImageRealm();
+        ir.setUrl(mDiskCache.getFilePath(url));
+        ir.setUsed(true);
+        ir.setIsWallpaper(true);
+        ir.setIsFavor(false);
+        ir.setTimeStamp(System.currentTimeMillis());
+        mRealmApi.insertAsync(ir);
     }
 }

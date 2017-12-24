@@ -112,23 +112,7 @@ public class GalleryActivity extends BaseActivity
     public void onResume() {
         super.onResume();
         Log.v(TAG,"onResume()");
-        String key = getString(R.string.pref_new_user);
-        boolean isNewUser = SharedPrefUtil.getBoolean(key, true);
-
-        if(isNewUser) {
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (!isFinishing()) {
-                        // tell user how to start retrieveImages images
-                        showImageRetrieveHint();
-                    }
-                }
-            }, 1000);
-            // set to false when first refresh done
-            //SharedPrefUtil.putBoolean(key, false);
-            checkStoragePermission();
-        }
+        checkStoragePermission();
     }
 
     @Override
@@ -231,6 +215,8 @@ public class GalleryActivity extends BaseActivity
                 }
             }
         }
+        // show hint
+        showImageRetrieveHint();
     }
 
     private void initView() {
@@ -271,7 +257,6 @@ public class GalleryActivity extends BaseActivity
 
         mFragmentMgr.beginTransaction()
                     .replace(R.id.fragment_container, fragment, tag)
-                    .addToBackStack(null)
                     .commit();
     }
 

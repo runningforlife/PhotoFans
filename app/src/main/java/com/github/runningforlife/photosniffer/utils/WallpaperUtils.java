@@ -49,10 +49,9 @@ public class WallpaperUtils {
         Realm rm = Realm.getDefaultInstance();
         RealmQuery<ImageRealm> query = rm.where(ImageRealm.class);
         RealmResults<ImageRealm> wallpaper = query
-                .equalTo("mIsWallpaper", true)
+                .equalTo("mIsWallpaper", false)
                 .or()
                 .equalTo("mIsFavor", true)
-                .equalTo("mIsCached", false)
                 .findAll();
 
         if (wallpaper.size() == 0) {
@@ -172,10 +171,8 @@ public class WallpaperUtils {
         String keyCacheIdx = context.getString(R.string.pref_wallpaper_cache_index);
         int cacheIdx = SharedPrefUtil.getInt(keyCacheIdx, 0)%wallpapers.size();
         // find a wallpaper
-        while (wallpapers.get(cacheIdx) != null) {
-            ++cacheIdx;
-            cacheIdx %= wallpapers.size();
-        }
+        ++cacheIdx;
+        cacheIdx %= wallpapers.size();
 
         WallpaperManager wm = WallpaperManager.getInstance(context);
         try {
@@ -192,5 +189,7 @@ public class WallpaperUtils {
         }
         // save current idx
         SharedPrefUtil.putInt(keyCacheIdx, ++cacheIdx);
+
+        realmApi.closeRealm();
     }
 }

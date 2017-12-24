@@ -118,10 +118,6 @@ public class AllPicturesPresenterImpl extends PresenterBase
             // ah, something wrong
             ((AllPictureView)mView).onRefreshDone(false);
         }
-
-        // start wallpaper cache service
-        Message message = mMainHandler.obtainMessage(H.EVENT_START_WALLPAPER_CACHE);
-        mMainHandler.sendMessageDelayed(message, 500);
     }
 
     @Override
@@ -237,9 +233,6 @@ public class AllPicturesPresenterImpl extends PresenterBase
         boolean isFirstTimeUse = SharedPrefUtil.getBoolean(keyNewUser, true);
 
         if ((isFirstTimeUse || now >= lastTime + POLA_UPDATED_DURATION)) {
-            
-            SharedPrefUtil.putBoolean(keyNewUser, false);
-
             String polaRetrieved = mContext.getString(R.string.pref_pola_retrieved);
             boolean isPolaRetrieved = SharedPrefUtil.getBoolean(polaRetrieved, false);
             if (!isPolaRetrieved) {
@@ -247,6 +240,13 @@ public class AllPicturesPresenterImpl extends PresenterBase
                 SharedPrefUtil.putBoolean(polaRetrieved, true);
                 SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
             }
+            if (isFirstTimeUse) {
+                // start wallpaper cache service
+                Message message = mMainHandler.obtainMessage(H.EVENT_START_WALLPAPER_CACHE);
+                mMainHandler.sendMessageDelayed(message, 500);
+            }
+
+            SharedPrefUtil.putBoolean(keyNewUser, false);
         }
     }
 
@@ -294,9 +294,8 @@ public class AllPicturesPresenterImpl extends PresenterBase
     private void startUpdateWallpaperCache() {
         // firstly, we try to fill wallpaper cache, and then
         // start a scheduled job to update cache
-        //WallpaperUtils.startWallpaperCacheUpdaterService(mContext);
         if (Build.VERSION.SDK_INT >= 21) {
-            WallpaperUtils.startWallpaperUpdaterJob(mContext, MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
+            WallpaperUtils.startWallpaperCacheUpdaterService(mContext);
         } else {
             WallpaperUtils.startWallpaperCacheUpdaterAlarm(mContext);
         }

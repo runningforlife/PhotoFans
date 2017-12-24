@@ -39,7 +39,7 @@ public class DiskCache implements Cache {
         mRootDir = rootDir;
         mMaxSize = maxSize;
 
-        //initialize();
+        initialize();
     }
 
     public DiskCache(File rootDir) {

@@ -105,7 +105,7 @@ public class RealmApiImpl implements RealmApi {
         for(Map.Entry<String,String> entry : entries){
             if (type == ImageRealm.class) {
                 String field = entry.getKey();
-                switch (field){
+                switch (field) {
                     case "mTimeStamp":
                         query.equalTo(field, Long.parseLong(entry.getValue()));
                         break;
@@ -186,7 +186,9 @@ public class RealmApiImpl implements RealmApi {
                                 case "mIsCached":
                                     ir.setIsCached(Boolean.parseBoolean(entry.getValue()));
                                     break;
-                                default:
+                                case "mUrl":
+                                    //ir.setUrl(entry.getValue());
+                                case "mName":
                                     ir.setName(entry.getValue());
                                     break;
                             }
@@ -207,7 +209,7 @@ public class RealmApiImpl implements RealmApi {
                 RealmQuery<? extends RealmObject> query = realm.where(type);
                 if (type == ImageRealm.class) {
                     Set<Map.Entry<String, String>> entries = params.entrySet();
-                    for(Map.Entry<String,String> entry : entries){
+                    for(Map.Entry<String,String> entry : entries) {
                         String field = entry.getKey();
                         switch (field) {
                             case "mTimeStamp":
@@ -252,7 +254,8 @@ public class RealmApiImpl implements RealmApi {
                                 case "mName":
                                     ir.setName(entry.getValue());
                                     break;
-                                default:
+                                case "mUrl":
+                                    //ir.setUrl(entry.getValue());
                                     break;
                             }
                         }

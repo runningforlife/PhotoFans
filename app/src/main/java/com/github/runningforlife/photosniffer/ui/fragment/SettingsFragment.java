@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
+import android.app.WallpaperManager;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -136,6 +137,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // for OS >= LL, use JobScheduler to do wallpaper setting
         if (Build.VERSION.SDK_INT >= 21) {
             if (isEnabled) {
+                WallpaperUtils.setWallpaperFromCache(getActivity(), WallpaperManager.FLAG_SYSTEM);
                 WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
             } else {
                 WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
@@ -159,6 +161,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     private void checkWallpaperInterval() {
         if (Build.VERSION.SDK_INT >= 21) {
+            WallpaperUtils.setWallpaperFromCache(getActivity(), WallpaperManager.FLAG_SYSTEM);
             WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
         } else {
             WallpaperUtils.startAutoWallpaperAlarm(getActivity());
