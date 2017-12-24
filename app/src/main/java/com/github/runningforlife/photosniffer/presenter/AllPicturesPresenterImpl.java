@@ -160,11 +160,15 @@ public class AllPicturesPresenterImpl extends PresenterBase
     public void onDestroy() {
         super.onDestroy();
         Log.v(TAG,"onDestroy()");
-        mUnUsedImages.removeAllChangeListeners();
+        if (mUnUsedImages.isValid()) {
+            mUnUsedImages.removeAllChangeListeners();
+        }
         // stop service
         stopRetrieveIfNeeded();
         // shut down thread pool
-        mExecutor.shutdown();
+        if (!mExecutor.isShutdown()) {
+            mExecutor.shutdown();
+        }
         mReceiver.setReceiver(null);
     }
 
