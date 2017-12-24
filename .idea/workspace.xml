@@ -9,9 +9,11 @@
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4d3b6e18-0f47-45ad-b6bd-adaa1ae02d62" name="bugFix" comment="PagerFragment">
+    <list default="true" id="4d3b6e18-0f47-45ad-b6bd-adaa1ae02d62" name="bugFix" comment="BugFix: check realm data state before removing change listener.">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/release/app-release.apk" afterPath="$PROJECT_DIR$/app/release/app-release.apk" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/AllPicturesPresenterImpl.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/AllPicturesPresenterImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/build.gradle" afterPath="$PROJECT_DIR$/app/build.gradle" />
     </list>
     <ignored path="$PROJECT_DIR$/.idea/shelf/" />
     <ignored path=".gradle/2.14.1/taskArtifacts/" />
@@ -48,8 +50,8 @@
       <file leaf-file-name="GalleryAdapter.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/adapter/GalleryAdapter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="290">
-              <caret line="77" column="37" lean-forward="false" selection-start-line="77" selection-start-column="37" selection-end-line="77" selection-end-column="37" />
+            <state relative-caret-position="204">
+              <caret line="84" column="39" lean-forward="false" selection-start-line="84" selection-start-column="39" selection-end-line="84" selection-end-column="39" />
               <folding>
                 <element signature="e#3781#4057#0" expanded="true" />
                 <element signature="e#4056#4057#0" expanded="true" />
@@ -61,66 +63,30 @@
       <file leaf-file-name="BaseFragment.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/fragment/BaseFragment.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1040">
-              <caret line="80" column="45" lean-forward="false" selection-start-line="80" selection-start-column="45" selection-end-line="80" selection-end-column="45" />
+            <state relative-caret-position="-714">
+              <caret line="42" column="61" lean-forward="false" selection-start-line="42" selection-start-column="61" selection-end-line="42" selection-end-column="61" />
               <folding>
-                <marker date="1514112736518" expanded="true" signature="2812:2820" ph="{...}" />
-                <marker date="1514112736518" expanded="true" signature="2878:3225" ph="{...}" />
-                <marker date="1514112736518" expanded="true" signature="3268:3334" ph="{...}" />
-                <marker date="1514112736518" expanded="true" signature="3378:3444" ph="{...}" />
-                <marker date="1514112736518" expanded="true" signature="3539:4016" ph="{...}" />
-                <marker date="1514112736518" expanded="true" signature="4065:4076" ph=" { " />
-                <marker date="1514112736518" expanded="true" signature="4089:4095" ph=" }" />
-                <marker date="1514112736518" expanded="true" signature="4157:4181" ph="{...}" />
+                <element signature="e#4066#4067#0" expanded="true" />
+                <element signature="e#4094#4095#0" expanded="true" />
                 <marker date="1514112736518" expanded="false" signature="4244:4255" ph=" { " />
                 <marker date="1514112736518" expanded="false" signature="4278:4284" ph=" }" />
-                <marker date="1514112736518" expanded="true" signature="4328:4456" ph="{...}" />
-                <marker date="1514112736518" expanded="true" signature="4527:5210" ph="{...}" />
                 <marker date="1514112736518" expanded="false" signature="4748:4789" ph="&quot;Network is not connected&quot;" />
                 <marker date="1514112736518" expanded="false" signature="4901:4944" ph="&quot;Network is very slow, take a break and try it again&quot;" />
                 <marker date="1514112736518" expanded="false" signature="5056:5099" ph="&quot;Network is slow, please try it later&quot;" />
-                <marker date="1514112736518" expanded="true" signature="5271:5626" ph="{...}" />
                 <marker date="1514112736518" expanded="false" signature="5454:5492" ph="&quot;Image Saved To&quot;" />
                 <marker date="1514112736518" expanded="false" signature="5559:5594" ph="&quot;Fail to Save Image&quot;" />
-                <marker date="1514112736518" expanded="true" signature="5691:5992" ph="{...}" />
                 <marker date="1514112736518" expanded="false" signature="5821:5862" ph="&quot;Wallpaper Setting Success&quot;" />
                 <marker date="1514112736518" expanded="false" signature="5922:5960" ph="&quot;Fail to Set Wallpaper&quot;" />
-                <marker date="1514112736518" expanded="true" signature="6034:6109" ph="{...}" />
-                <marker date="1514112736518" expanded="true" signature="6170:6248" ph="{...}" />
-                <marker date="1514112736518" expanded="true" signature="6305:6379" ph="{...}" />
-                <marker date="1514112736518" expanded="true" signature="6516:6623" ph="{...}" />
-                <marker date="1514112736518" expanded="true" signature="6661:7015" ph="{...}" />
-                <marker date="1514112736518" expanded="true" signature="7051:7182" ph="{...}" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AllPicturesPresenterImpl.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="AllPicturesPresenterImpl.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/AllPicturesPresenterImpl.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="97">
-              <caret line="159" column="29" lean-forward="true" selection-start-line="159" selection-start-column="29" selection-end-line="159" selection-end-column="29" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ImageCaptureManager.java" pinned="false" current-in-tab="false">
-        <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/me.iwf.photopicker/PhotoPicker/0.9.5/ab00254f0fb1a6229addaf5cd8f80201fa309ab6/PhotoPicker-0.9.5-sources.jar!/me/iwf/photopicker/utils/ImageCaptureManager.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="167">
-              <caret line="101" column="14" lean-forward="false" selection-start-line="101" selection-start-column="14" selection-end-line="101" selection-end-column="14" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PhotoGridAdapter.java" pinned="false" current-in-tab="false">
-        <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/me.iwf.photopicker/PhotoPicker/0.9.5/ab00254f0fb1a6229addaf5cd8f80201fa309ab6/PhotoPicker-0.9.5-sources.jar!/me/iwf/photopicker/adapter/PhotoGridAdapter.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="239">
-              <caret line="221" column="24" lean-forward="false" selection-start-line="221" selection-start-column="10" selection-end-line="221" selection-end-column="24" />
+            <state relative-caret-position="475">
+              <caret line="159" column="29" lean-forward="false" selection-start-line="159" selection-start-column="29" selection-end-line="159" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -152,6 +118,26 @@
                 <marker date="1514112736506" expanded="false" signature="2546:2649" ph="(v) → {" />
                 <marker date="1514112736506" expanded="false" signature="2809:2824" ph="}" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GalleryActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/activity/GalleryActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-219">
+              <caret line="277" column="36" lean-forward="false" selection-start-line="277" selection-start-column="17" selection-end-line="277" selection-end-column="36" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/build.gradle">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="88">
+              <caret line="24" column="17" lean-forward="false" selection-start-line="24" selection-start-column="17" selection-end-line="24" selection-end-column="17" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -2030,7 +2016,6 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/crawler/processor/ImageRetrievePageProcessor.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/activity/ImageDetailActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/preference/MessagePreference.java" />
-        <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/data/model/ImagePageInfo.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/data/model/MyRealmMigration.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/data/model/ImageRealm.java" />
@@ -2054,6 +2039,7 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/PresenterBase.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/utils/WallpaperUtils.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/AllPicturesPresenterImpl.java" />
+        <option value="$PROJECT_DIR$/app/build.gradle" />
       </list>
     </option>
   </component>
@@ -2657,79 +2643,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="presenter" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PhotoFans" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PhotoFans" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="photosniffer" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="data" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PhotoFans" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PhotoFans" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="photosniffer" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="data" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cache" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -2767,7 +2681,7 @@
     <property name="android.project.structure.last.selected" value="app" />
     <property name="android.project.structure.proportion" value="0.15" />
     <property name="android.profiler.active" value="true" />
-    <property name="ExportApk.SignV2" value="true" />
+    <property name="ExportApk.SignV1" value="true" />
   </component>
   <component name="Push.Settings">
     <force-push-targets>
@@ -2865,7 +2779,7 @@
       <option name="ACTIVITY_CLASS" value="" />
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1514112869236" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1514113334558" />
       </method>
     </configuration>
     <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
@@ -2913,7 +2827,7 @@
       </Profilers>
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1514112869236" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1514113334558" />
       </method>
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -3084,7 +2998,7 @@
       <option name="ACTIVITY_CLASS" value="" />
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1514112869236" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1514113334559" />
       </method>
     </configuration>
     <list size="1">
@@ -3163,13 +3077,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1512395695944</updated>
-    </task>
-    <task id="LOCAL-00012" summary="remove useless codes&#10;">
-      <created>1513264025546</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1513264025546</updated>
     </task>
     <task id="LOCAL-00013" summary="add wallpaper cache">
       <created>1513330959460</created>
@@ -3507,7 +3414,14 @@
       <option name="project" value="LOCAL" />
       <updated>1514003108939</updated>
     </task>
-    <option name="localTasksCounter" value="61" />
+    <task id="LOCAL-00061" summary="BugFix: check realm data state before removing change listener.">
+      <created>1514112939197</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1514112939197</updated>
+    </task>
+    <option name="localTasksCounter" value="62" />
     <servers />
   </component>
   <component name="TodoView">
@@ -3524,7 +3438,7 @@
     <layout>
       <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.6569579" sideWeight="0.7824701" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.46763754" sideWeight="0.4812749" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31229773" sideWeight="0.48446214" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20064725" sideWeight="0.7585657" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -3532,13 +3446,13 @@
       <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39158577" sideWeight="0.52031875" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32847896" sideWeight="0.4812749" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.48220065" sideWeight="0.53864545" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1828479" sideWeight="0.5322709" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16612904" sideWeight="0.4621514" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.46763754" sideWeight="0.5187251" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31229773" sideWeight="0.51553786" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5080906" sideWeight="0.4557769" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="14" side_tool="true" content_ui="tabs" />
@@ -3634,7 +3548,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <confirmRemoveEmptyChangelist value="2" />
-    <MESSAGE value="remove old realm manager" />
     <MESSAGE value="refactor: rename DiskWallpaperCache to DiskCache" />
     <MESSAGE value="start new thread to load cache" />
     <MESSAGE value="fix realm: realm data only used in created thread" />
@@ -3659,7 +3572,8 @@
     <MESSAGE value="function: donot keep report network disconnection message" />
     <MESSAGE value="refactor: move receiver to the root package" />
     <MESSAGE value="function: remove all files when package is removed" />
-    <option name="LAST_COMMIT_MESSAGE" value="function: remove all files when package is removed" />
+    <MESSAGE value="BugFix: check realm data state before removing change listener." />
+    <option name="LAST_COMMIT_MESSAGE" value="BugFix: check realm data state before removing change listener." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -3669,20 +3583,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$USER_HOME$/Android/Sdk/platforms/android-26/android.jar!/java/util/concurrent/CountDownLatch.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="231">
-          <caret line="16" column="81" lean-forward="false" selection-start-line="16" selection-start-column="61" selection-end-line="16" selection-end-column="81" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.support/support-compat/26.0.2/ea2c1d3863413e64c17479312ee5e81c83ed35e9/support-compat-26.0.2-sources.jar!/android/support/v4/app/ActivityCompat.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7497">
-          <caret line="393" column="39" lean-forward="false" selection-start-line="393" selection-start-column="21" selection-end-line="393" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.realm/realm-android-library/4.1.0/fad8e62f5adea8d40f21897c393452df4e8eb3d6/realm-android-library-4.1.0-sources.jar!/io/realm/OrderedRealmCollectionImpl.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="945">
@@ -3741,14 +3641,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="861">
-          <caret line="41" column="5" lean-forward="false" selection-start-line="41" selection-start-column="5" selection-end-line="41" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/loader/GlideLoaderListener.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="210">
@@ -3776,6 +3668,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="124">
           <caret line="13" column="23" lean-forward="false" selection-start-line="13" selection-start-column="23" selection-end-line="13" selection-end-column="23" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -3791,44 +3684,6 @@
         <state relative-caret-position="2688">
           <caret line="187" column="13" lean-forward="false" selection-start-line="187" selection-start-column="13" selection-end-line="187" selection-end-column="13" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/adapter/GalleryAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="290">
-          <caret line="77" column="37" lean-forward="false" selection-start-line="77" selection-start-column="37" selection-end-line="77" selection-end-column="37" />
-          <folding>
-            <element signature="e#3781#4057#0" expanded="true" />
-            <element signature="e#4056#4057#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.support/support-fragment/26.0.2/d96375bf0998e393f8be3509581f498d39188620/support-fragment-26.0.2-sources.jar!/android/support/v4/app/FragmentTransaction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="91" column="40" lean-forward="false" selection-start-line="91" selection-start-column="40" selection-end-line="91" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/activity/GalleryActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="159">
-          <caret line="244" column="5" lean-forward="false" selection-start-line="244" selection-start-column="5" selection-end-line="244" selection-end-column="5" />
-          <folding>
-            <element signature="e#4248#4543#0" expanded="false" />
-            <element signature="e#4542#4543#0" expanded="false" />
-            <element signature="e#6892#7050#0" expanded="false" />
-            <element signature="e#7049#7050#0" expanded="false" />
-            <element signature="e#7121#7122#0" expanded="false" />
-            <element signature="e#7165#7166#0" expanded="false" />
-            <element signature="e#9777#9822#0" expanded="false" />
-            <element signature="e#10656#10718#0" expanded="false" />
-            <element signature="e#10753#10914#0" expanded="false" />
-            <element signature="e#10913#10914#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -3907,42 +3762,6 @@
           <caret line="30" column="0" lean-forward="false" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/fragment/BaseFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1040">
-          <caret line="80" column="45" lean-forward="false" selection-start-line="80" selection-start-column="45" selection-end-line="80" selection-end-column="45" />
-          <folding>
-            <marker date="1514112736518" expanded="true" signature="2812:2820" ph="{...}" />
-            <marker date="1514112736518" expanded="true" signature="2878:3225" ph="{...}" />
-            <marker date="1514112736518" expanded="true" signature="3268:3334" ph="{...}" />
-            <marker date="1514112736518" expanded="true" signature="3378:3444" ph="{...}" />
-            <marker date="1514112736518" expanded="true" signature="3539:4016" ph="{...}" />
-            <marker date="1514112736518" expanded="true" signature="4065:4076" ph=" { " />
-            <marker date="1514112736518" expanded="true" signature="4089:4095" ph=" }" />
-            <marker date="1514112736518" expanded="true" signature="4157:4181" ph="{...}" />
-            <marker date="1514112736518" expanded="false" signature="4244:4255" ph=" { " />
-            <marker date="1514112736518" expanded="false" signature="4278:4284" ph=" }" />
-            <marker date="1514112736518" expanded="true" signature="4328:4456" ph="{...}" />
-            <marker date="1514112736518" expanded="true" signature="4527:5210" ph="{...}" />
-            <marker date="1514112736518" expanded="false" signature="4748:4789" ph="&quot;Network is not connected&quot;" />
-            <marker date="1514112736518" expanded="false" signature="4901:4944" ph="&quot;Network is very slow, take a break and try it again&quot;" />
-            <marker date="1514112736518" expanded="false" signature="5056:5099" ph="&quot;Network is slow, please try it later&quot;" />
-            <marker date="1514112736518" expanded="true" signature="5271:5626" ph="{...}" />
-            <marker date="1514112736518" expanded="false" signature="5454:5492" ph="&quot;Image Saved To&quot;" />
-            <marker date="1514112736518" expanded="false" signature="5559:5594" ph="&quot;Fail to Save Image&quot;" />
-            <marker date="1514112736518" expanded="true" signature="5691:5992" ph="{...}" />
-            <marker date="1514112736518" expanded="false" signature="5821:5862" ph="&quot;Wallpaper Setting Success&quot;" />
-            <marker date="1514112736518" expanded="false" signature="5922:5960" ph="&quot;Fail to Set Wallpaper&quot;" />
-            <marker date="1514112736518" expanded="true" signature="6034:6109" ph="{...}" />
-            <marker date="1514112736518" expanded="true" signature="6170:6248" ph="{...}" />
-            <marker date="1514112736518" expanded="true" signature="6305:6379" ph="{...}" />
-            <marker date="1514112736518" expanded="true" signature="6516:6623" ph="{...}" />
-            <marker date="1514112736518" expanded="true" signature="6661:7015" ph="{...}" />
-            <marker date="1514112736518" expanded="true" signature="7051:7182" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -4102,8 +3921,79 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/AllPicturesPresenterImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="97">
-          <caret line="159" column="29" lean-forward="true" selection-start-line="159" selection-start-column="29" selection-end-line="159" selection-end-column="29" />
+        <state relative-caret-position="475">
+          <caret line="159" column="29" lean-forward="false" selection-start-line="159" selection-start-column="29" selection-end-line="159" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/fragment/BaseFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-714">
+          <caret line="42" column="61" lean-forward="false" selection-start-line="42" selection-start-column="61" selection-end-line="42" selection-end-column="61" />
+          <folding>
+            <element signature="e#4066#4067#0" expanded="true" />
+            <element signature="e#4094#4095#0" expanded="true" />
+            <marker date="1514112736518" expanded="false" signature="4244:4255" ph=" { " />
+            <marker date="1514112736518" expanded="false" signature="4278:4284" ph=" }" />
+            <marker date="1514112736518" expanded="false" signature="4748:4789" ph="&quot;Network is not connected&quot;" />
+            <marker date="1514112736518" expanded="false" signature="4901:4944" ph="&quot;Network is very slow, take a break and try it again&quot;" />
+            <marker date="1514112736518" expanded="false" signature="5056:5099" ph="&quot;Network is slow, please try it later&quot;" />
+            <marker date="1514112736518" expanded="false" signature="5454:5492" ph="&quot;Image Saved To&quot;" />
+            <marker date="1514112736518" expanded="false" signature="5559:5594" ph="&quot;Fail to Save Image&quot;" />
+            <marker date="1514112736518" expanded="false" signature="5821:5862" ph="&quot;Wallpaper Setting Success&quot;" />
+            <marker date="1514112736518" expanded="false" signature="5922:5960" ph="&quot;Fail to Set Wallpaper&quot;" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/me.iwf.photopicker/PhotoPicker/0.9.5/ab00254f0fb1a6229addaf5cd8f80201fa309ab6/PhotoPicker-0.9.5-sources.jar!/me/iwf/photopicker/utils/ImageCaptureManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="167">
+          <caret line="101" column="14" lean-forward="false" selection-start-line="101" selection-start-column="14" selection-end-line="101" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/me.iwf.photopicker/PhotoPicker/0.9.5/ab00254f0fb1a6229addaf5cd8f80201fa309ab6/PhotoPicker-0.9.5-sources.jar!/me/iwf/photopicker/adapter/PhotoGridAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="239">
+          <caret line="221" column="24" lean-forward="false" selection-start-line="221" selection-start-column="10" selection-end-line="221" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.support/support-fragment/26.0.2/d96375bf0998e393f8be3509581f498d39188620/support-fragment-26.0.2-sources.jar!/android/support/v4/app/FragmentTransaction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="191">
+          <caret line="267" column="39" lean-forward="true" selection-start-line="267" selection-start-column="39" selection-end-line="267" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/activity/GalleryActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-219">
+          <caret line="277" column="36" lean-forward="false" selection-start-line="277" selection-start-column="17" selection-end-line="277" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/adapter/GalleryAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="84" column="39" lean-forward="false" selection-start-line="84" selection-start-column="39" selection-end-line="84" selection-end-column="39" />
+          <folding>
+            <element signature="e#3781#4057#0" expanded="true" />
+            <element signature="e#4056#4057#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="88">
+          <caret line="24" column="17" lean-forward="false" selection-start-line="24" selection-start-column="17" selection-end-line="24" selection-end-column="17" />
           <folding />
         </state>
       </provider>
