@@ -3,6 +3,7 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
@@ -22,7 +23,12 @@ import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,7 +59,6 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     private ExecutorService mImageExecutor;
     //DiskCache mDiskCache;
     private CacheApi mCacheMgr;
-    private OkHttpClient mHttpClient;
     private boolean mIsNetworkStateReported;
 
     int mMaxImagesAllowed;
@@ -127,7 +132,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
                 public void onImageLoadDone(Object o) {
                     Log.d(TAG, "onImageLoadDone()");
                     if(o instanceof Bitmap) {
-                        ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), mImageList.get(pos).getName());
+                        ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o));
                         r.addCallback(PresenterBase.this);
                         mImageExecutor.submit(r);
                     }
@@ -148,7 +153,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
             String url = ir.getUrl();
             // donot remove user selected images;
             String wallpaperDir = MiscUtil.getWallpaperCacheDir();
-            if (mCacheMgr.isExist(url) && url.startsWith(wallpaperDir)) {
+            if (mCacheMgr.isExist(url)) {
                 mCacheMgr.remove(url);
             }
             mRealmApi.deleteSync(ir);
@@ -260,50 +265,37 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     }
 
     private void setWallpaperAndCache(final String url) {
-        if (mHttpClient == null) {
-            mHttpClient = MiscUtil.buildOkHttpClient();
-        }
-        // cached?
-        if (!mCacheMgr.isExist(url)) {
-            okhttp3.Request.Builder builder = new okhttp3.Request.Builder();
-            builder.url(url)
-                    .get();
-            mHttpClient.newCall(builder.build()).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
+        GlideLoaderListener listener = new GlideLoaderListener(null);
+        listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+            @Override
+            public void onImageLoadDone(Object o) {
+                Log.d(TAG, "onImageLoadDone()");
+                if(o instanceof Bitmap) {
+                    WallpaperManager wm = WallpaperManager.getInstance(mContext);
+                    try {
+                        Bitmap bitmap = (Bitmap)o;
+                        wm.setBitmap(bitmap);
+                        mView.onWallpaperSetDone(true);
+                        // cache it
+                        if (!mCacheMgr.isExist(url)) {
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream(bitmap.getByteCount());
+                            Cache.Entry entry = new Cache.Entry(bos.toByteArray(), System.currentTimeMillis());
+                            mCacheMgr.put(url, entry);
+                        }
+                        return;
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    // fail to set wallpaper
                     mView.onWallpaperSetDone(false);
                 }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    Log.v(TAG,"onResponse()");
-                    if (response.isSuccessful()) {
-                        byte[] data = response.body().bytes();
-
-                        WallpaperManager wm = WallpaperManager.getInstance(mContext);
-                        wm.setStream(new ByteArrayInputStream(data));
-
-                        mView.onWallpaperSetDone(true);
-
-                        Cache.Entry entry1 = new Cache.Entry(data, System.currentTimeMillis());
-                        mCacheMgr.put(url, entry1);
-                    } else {
-                        mView.onWallpaperSetDone(false);
-                    }
-                }
-            });
-        } else {
-            Cache.Entry entry = mCacheMgr.get(url);
-            WallpaperManager wm = WallpaperManager.getInstance(mContext);
-            ByteArrayInputStream bis = new ByteArrayInputStream(entry.data, 0, entry.data.length);
-            try {
-                wm.setStream(bis);
-                mView.onWallpaperSetDone(true);
-            } catch (IOException e) {
-                e.printStackTrace();
-                mView.onWallpaperSetDone(false);
             }
-        }
+        });
+
+        GlideLoader.downloadOnly(mContext, url, listener,Priority.HIGH,
+                Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
     }
 
     void markAsFavor(String url) {

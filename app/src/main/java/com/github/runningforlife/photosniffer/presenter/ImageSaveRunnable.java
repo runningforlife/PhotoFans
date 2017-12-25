@@ -21,16 +21,14 @@ public class ImageSaveRunnable implements Runnable {
     private static final String TAG = "ImageSave";
 
     private Bitmap bitmap;
-    private String name;
     private ImageSaveCallback callback;
 
     public interface ImageSaveCallback {
         void onImageSaveDone(String path);
     }
 
-    public ImageSaveRunnable(Bitmap bitmap, String name){
+    public ImageSaveRunnable(Bitmap bitmap){
         this.bitmap = bitmap;
-        this.name = name;
     }
 
     public void addCallback(ImageSaveCallback callback){
@@ -40,12 +38,11 @@ public class ImageSaveRunnable implements Runnable {
     @Override
     public void run() {
         //Looper.prepare();
-
         ThreadUtil.start();
         Context context = AppGlobals.getInstance().getApplicationContext();
         try {
             String imageDir = MiscUtil.getPhotoDir();
-            String filePath = BitmapUtil.saveToFile(bitmap, imageDir, name);
+            String filePath = BitmapUtil.saveToFile(bitmap, imageDir);
             MediaStoreUtil.addImageToGallery(context,new File(filePath));
             //String path = MediaStoreUtil.addImageToGallery(context, bitmap, name);
             Log.d(TAG,"saving image takes " + ThreadUtil.getElapse() + "ms");

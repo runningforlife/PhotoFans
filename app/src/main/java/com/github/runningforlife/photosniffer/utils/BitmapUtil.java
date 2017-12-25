@@ -66,8 +66,8 @@ public class BitmapUtil {
         bos.close();
     }
 
-    public static String saveToFile(Bitmap bitmap, String path, String name) throws FileNotFoundException {
-        String imgName = buildFileName(name);
+    public static String saveToFile(Bitmap bitmap, String path) throws FileNotFoundException {
+        String imgName = buildImageFileName();
         File file = new File(path, imgName);
         FileOutputStream fos = new FileOutputStream(file);
 
@@ -107,7 +107,7 @@ public class BitmapUtil {
         return bitmap;
     }
 
-    private static String buildFileName(String name) {
-        return name + "_" + System.currentTimeMillis() + ".jpg";
+    private static String buildImageFileName() {
+        return "img" + "_" + System.currentTimeMillis() + ".jpg";
     }
 }

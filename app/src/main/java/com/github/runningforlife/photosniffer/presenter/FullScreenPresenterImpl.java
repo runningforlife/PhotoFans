@@ -26,7 +26,7 @@ import io.realm.RealmResults;
  * Created by jason on 12/17/17.
  */
 
-public class FullScreenPresenterImpl implements FullScreenPresenter {
+public class FullScreenPresenterImpl implements FullScreenPresenter, ImageSaveRunnable.ImageSaveCallback {
     private static final String TAG = "FullScreenPresenter";
 
     private Context mContext;
@@ -77,7 +77,7 @@ public class FullScreenPresenterImpl implements FullScreenPresenter {
             public void onImageLoadDone(Object o) {
                 Log.d(TAG, "onImageLoadDone()");
                 if(o instanceof Bitmap) {
-                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o), DiskCache.getCacheKey(url));
+                    ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o));
                     mImageExecutor.submit(r);
                 }
             }
@@ -85,6 +85,11 @@ public class FullScreenPresenterImpl implements FullScreenPresenter {
 
         GlideLoader.downloadOnly(mContext, url, listener, Priority.HIGH,
                 Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
+    }
+
+    @Override
+    public void onImageSaveDone(String path) {
+
     }
 
     private final class OrderReamChangeListener implements OrderedRealmCollectionChangeListener<RealmResults<ImageRealm>> {
