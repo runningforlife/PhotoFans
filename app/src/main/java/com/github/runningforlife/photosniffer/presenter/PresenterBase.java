@@ -174,9 +174,15 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
                             // network is slow
                             ++mNetworkErrorCount;
                             if (mNetworkErrorCount >= NETWORK_SLOW_ERROR_COUNT && mNetworkErrorCount < NETWORK_HUNG_ERROR_COUNT) {
-                                mView.onNetworkState(NetState.STATE_SLOW);
+                                if (!mIsNetworkStateReported) {
+                                    mView.onNetworkState(NetState.STATE_SLOW);
+                                    mIsNetworkStateReported = true;
+                                }
                             } else if (mNetworkErrorCount >= NETWORK_HUNG_ERROR_COUNT) {
-                                mView.onNetworkState(NetState.STATE_HUNG);
+                                if (!mIsNetworkStateReported) {
+                                    mView.onNetworkState(NetState.STATE_HUNG);
+                                    mIsNetworkStateReported = true;
+                                }
                             }
                         } else {
                             if (!mIsNetworkStateReported) {
@@ -194,6 +200,10 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
                     PresenterBase.this.onImageLoadDone(pos, false);
                 } else {
                     PresenterBase.this.onImageLoadDone(pos, true);
+                    mNetworkErrorCount = mNetworkErrorCount <= 0 ? 0 ：(mNetworkErrorCount - 1);
+                    if (mNetworkErrorCount == 0) {
+                         mIsNetworkStateReported = false;
+                    }
                 }
             }
         });
