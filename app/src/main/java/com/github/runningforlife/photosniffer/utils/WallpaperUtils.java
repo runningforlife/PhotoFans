@@ -49,15 +49,15 @@ public class WallpaperUtils {
         Realm rm = Realm.getDefaultInstance();
         RealmQuery<ImageRealm> query = rm.where(ImageRealm.class);
         RealmResults<ImageRealm> wallpaper = query
-                .equalTo("mIsWallpaper", false)
-                .or()
                 .equalTo("mIsFavor", true)
+                .or()
+                .equalTo("mIsUsed", false)
                 .findAll();
 
         if (wallpaper.size() == 0) {
             wallpaper = query
                     .or()
-                    .equalTo("mIsUsed", false)
+                    .equalTo("mIsUsed", true)
                     .findAll();
         }
         // 10 image cached a time

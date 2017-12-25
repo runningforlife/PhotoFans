@@ -14,14 +14,20 @@ import com.github.runningforlife.photosniffer.data.cache.DiskCache;
 import com.github.runningforlife.photosniffer.data.cache.WallpaperCacheRunnable;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
+import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 
 /**
  * fetch images from web and cache them
@@ -31,9 +37,10 @@ public class WallpaperUpdaterService extends Service {
     private static final String TAG = "WallpaperUpdaterService";
 
     private DiskCache mDiskCache;
-    private Executor mUpdateExecutor;
+    private ExecutorService mUpdateExecutor;
     private volatile ServiceHandler mHandler;
     private volatile Looper mLooper;
+    private OkHttpClient mHttpClient;
 
 
     private  final class ServiceHandler extends Handler {
@@ -65,6 +72,8 @@ public class WallpaperUpdaterService extends Service {
         mDiskCache = new DiskCache(new File(MiscUtil.getWallpaperCacheDir()));
 
         mUpdateExecutor = Executors.newFixedThreadPool(2);
+
+        mHttpClient = MiscUtil.buildOkHttpClient();
     }
 
     @Override
@@ -108,20 +117,39 @@ public class WallpaperUpdaterService extends Service {
         Log.v(TAG,"downloadAndCacheWallpapers()");
         if (MiscUtil.isConnected(getApplicationContext())) {
             CountDownLatch latch = new CountDownLatch(wallpapers.size());
-
+            ArrayBlockingQueue<String> cachedUrls = new ArrayBlockingQueue<>(wallpapers.size());
             for (int i = 0; i < wallpapers.size(); ++i) {
-                WallpaperCacheRunnable wc = new WallpaperCacheRunnable(mDiskCache, wallpapers.get(i), latch);
-                mUpdateExecutor.execute(wc);
+                WallpaperCacheRunnable wc = new WallpaperCacheRunnable(mHttpClient,mDiskCache, wallpapers.get(i), latch ,
+                        cachedUrls);
+                mUpdateExecutor.submit(wc);
             }
-
             // wait for all job is down
             try {
                 latch.await(8000, TimeUnit.MILLISECONDS);
             } catch (Exception e) {
 
             }
+            // insert to realm
+            List<ImageRealm> imageRealms = new ArrayList<>(cachedUrls.size());
+            for (String url : cachedUrls) {
+                ImageRealm ir = new ImageRealm();
+                ir.setUrl(url);
+                ir.setTimeStamp(System.currentTimeMillis());
+                ir.setIsWallpaper(true);
+                ir.setIsFavor(false);
+                ir.setUsed(true);
+
+                imageRealms.add(ir);
+            }
+
+            RealmApi realmApi = RealmApiImpl.getInstance();
+            try {
+                realmApi.insertAsync(imageRealms);
+            } finally {
+                realmApi.closeRealm();
+                cachedUrls.clear();
+            }
             Log.v(TAG, "wallpaper cache updated done");
         }
     }
-
 }

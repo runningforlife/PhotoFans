@@ -12,6 +12,7 @@ import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import java.io.IOException;
 
 import java.util.HashMap;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 
 import okhttp3.OkHttpClient;
@@ -28,54 +29,39 @@ public class WallpaperCacheRunnable implements Runnable {
     private String mImageUrl;
     private CountDownLatch mCountLatch;
     private OkHttpClient mHttpClient;
-    private RealmApi mRealmApi;
+    private ArrayBlockingQueue<String> mCachedUrl;
 
-    public WallpaperCacheRunnable(DiskCache cache, String imgUrl, CountDownLatch latch) {
+    public WallpaperCacheRunnable(OkHttpClient httpClient, DiskCache cache, String imgUrl, CountDownLatch latch,
+                                  ArrayBlockingQueue<String> cachedUrl) {
         mDiskCache = cache;
         mImageUrl = imgUrl;
         mCountLatch = latch;
-        mHttpClient = MiscUtil.buildOkHttpClient();
+        mHttpClient = httpClient;
+        mCachedUrl = cachedUrl;
     }
 
     @Override
     public void run() {
-        mRealmApi = RealmApiImpl.getInstance();
-
         okhttp3.Request.Builder builder = new okhttp3.Request.Builder();
         builder.url(mImageUrl)
                 .get();
         try {
             Response response = mHttpClient.newCall(builder.build()).execute();
             if (response.isSuccessful()) {
-                // update realm
-                updateRealm(mImageUrl);
+                mCachedUrl.offer(mImageUrl);
                 saveStreamToFile(response.body().bytes());
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            //mRealmApi.closeRealm();
             // job is done
             mCountLatch.countDown();
         }
     }
 
-
     private void saveStreamToFile(byte[] data) {
         Log.v(TAG,"saveStreamToFile()");
         Cache.Entry entry = new Cache.Entry(data, System.currentTimeMillis());
         mDiskCache.put(mImageUrl, entry);
-    }
-
-    // primary key cannot be changed once the ream object is created
-    private void updateRealm(String url) {
-        Log.v(TAG,"updateRealm()");
-        ImageRealm ir = new ImageRealm();
-        ir.setUrl(mDiskCache.getFilePath(url));
-        ir.setUsed(true);
-        ir.setIsWallpaper(true);
-        ir.setIsFavor(false);
-        ir.setTimeStamp(System.currentTimeMillis());
-        mRealmApi.insertAsync(ir);
     }
 }
