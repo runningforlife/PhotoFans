@@ -3,6 +3,7 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.content.Context;
 import android.util.Log;
 
+import com.bumptech.glide.RequestManager;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.ui.FavorPictureView;
 
@@ -17,8 +18,8 @@ import io.realm.RealmResults;
 public class FavorImagePresenterImpl extends PresenterBase {
     private static final String TAG = "FavorImagePresenter";
 
-    public FavorImagePresenterImpl(Context context, FavorPictureView view){
-        super(context, view);
+    public FavorImagePresenterImpl(RequestManager requestManager, Context context, FavorPictureView view){
+        super(requestManager, context, view);
     }
 
     @Override

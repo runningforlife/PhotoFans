@@ -24,10 +24,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl;
+import com.github.runningforlife.photosniffer.presenter.ImageType;
 import com.github.runningforlife.photosniffer.presenter.NetState;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
@@ -322,7 +324,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     }
 
     private void initPresenter() {
-        mPresenter = new ImageDetailPresenterImpl(getApplicationContext(),ImageDetailActivity.this);
+        mPresenter = new ImageDetailPresenterImpl(Glide.with(this), getApplicationContext(),ImageDetailActivity.this, ImageType.IMAGE_GALLERY);
         // may have null pointer exception
         mPresenter.onStart();
 
@@ -424,7 +426,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         }
     }
 
-    private void showActionDialog(){
+    private void showActionDialog() {
         ActionListDialogFragment fragment = (ActionListDialogFragment)
                 ActionListDialogFragment.newInstance(mUserActionList);
         fragment.setCallback(this);

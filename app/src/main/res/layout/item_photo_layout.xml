@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<me.iwf.photopicker.widget.SquareItemLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:layout_margin="@dimen/image_item_margin">
 
     <ImageView android:id="@+id/iv_photo"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="@dimen/image_min_height"
+        android:layout_height="match_parent"
         android:foreground="@drawable/ripple_background"
         android:background="@drawable/ripple_background"
         android:contentDescription="@string/photo"
         android:scaleType="centerCrop"
-        android:elevation="3dp"
+        android:adjustViewBounds="true"
         android:layout_gravity="center"/>
 
-</LinearLayout>
+</me.iwf.photopicker.widget.SquareItemLayout>

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.github.runningforlife.photosniffer.R;
@@ -26,9 +27,15 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
 
     private ImageView imageView;
     private ImageLoadCallback callback;
-    private int mReqWidth;
-    private int mReqHeight;
     private ImageView.ScaleType mScaleType;
+
+    private RequestManager mRequestManager;
+
+    public GlideLoaderListener() {}
+
+    public GlideLoaderListener(RequestManager requestManager) {
+        mRequestManager = requestManager;
+    }
 
     public GlideLoaderListener(ImageView view){
         this.imageView = view;
@@ -37,14 +44,6 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
 
     public void addCallback(ImageLoadCallback callback){
         this.callback = callback;
-    }
-
-    public void setReqWidth(int width){
-        mReqWidth = width;
-    }
-
-    public void setReqHeight(int height){
-        mReqHeight = height ;
     }
 
     public void setScaleType(ImageView.ScaleType scaleType){
@@ -79,12 +78,7 @@ public final class GlideLoaderListener implements RequestListener<String,Bitmap>
         if(imageView != null) {
             // scale bitmap
             imageView.setScaleType(mScaleType);
-            if(mReqHeight >0 && mReqWidth > 0) {
-                Bitmap bm = BitmapUtil.scaleToFill(resource,mReqWidth,mReqHeight);
-                imageView.setImageBitmap(bm);
-            }else{
-                imageView.setImageBitmap(resource);
-            }
+            imageView.setImageBitmap(resource);
             // get the main color of the image
             Palette palette = Palette.from(resource).generate();
             if(Build.VERSION.SDK_INT >= 23) {

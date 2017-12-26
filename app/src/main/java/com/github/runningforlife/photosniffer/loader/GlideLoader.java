@@ -10,6 +10,7 @@ import com.bumptech.glide.BitmapTypeRequest;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.Priority;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
@@ -25,6 +26,27 @@ import java.text.DecimalFormat;
 
 public class GlideLoader {
 
+    public static void load(RequestManager requestManager, String url, GlideLoaderListener listener,
+                            Priority priority, int w, int h, ImageView.ScaleType scaleType){
+        BitmapTypeRequest<String> btr = (BitmapTypeRequest<String>) requestManager
+                .load(url)
+                .asBitmap()
+                .priority(priority)
+                .listener(listener);
+        if (scaleType == ImageView.ScaleType.CENTER_CROP) {
+            btr.centerCrop()
+                    .crossFade()
+                    .dontAnimate()
+                    .into(w,h);
+        } else {
+            btr.fitCenter()
+                    .dontAnimate()
+                    .dontTransform()
+                    .crossFade()
+                    .into(w,h);
+        }
+    }
+
     public static void load(Context context, String url, GlideLoaderListener listener,
                             Priority priority, int w, int h, ImageView.ScaleType scaleType){
         BitmapTypeRequest<String> btr = (BitmapTypeRequest<String>) Glide.with(context)
@@ -39,6 +61,8 @@ public class GlideLoader {
                 .into(w,h);
         } else {
              btr.fitCenter()
+                .dontAnimate()
+                .dontTransform()
                 .crossFade()
                 .into(w,h);
         }

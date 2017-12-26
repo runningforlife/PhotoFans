@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.presenter.AllPicturesPresenterImpl;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
@@ -316,7 +317,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     }
 
     private void initPresenter() {
-        mPresenter = new AllPicturesPresenterImpl(getContext(),this);
+        mPresenter = new AllPicturesPresenterImpl( Glide.with(this), getContext(),this);
         setPresenter(mPresenter);
         mPresenter.onStart();
     }

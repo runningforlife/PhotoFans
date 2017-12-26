@@ -3,8 +3,10 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.content.Context;
 import android.util.Log;
 
+import com.bumptech.glide.RequestManager;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.ui.WallpaperView;
+import com.github.runningforlife.photosniffer.ui.fragment.WallPaperFragment;
 
 import java.util.HashMap;
 
@@ -17,8 +19,8 @@ import io.realm.RealmResults;
 public class WallpaperPresenterImpl extends PresenterBase {
     private static final String TAG = "WallpaperPresenter";
 
-    public WallpaperPresenterImpl(Context context, WallpaperView view){
-        super(context, view);
+    public WallpaperPresenterImpl(RequestManager requestManager, Context context, WallpaperView view){
+        super(requestManager, context, view);
     }
 
     @Override

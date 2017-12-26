@@ -11,6 +11,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
+import com.bumptech.glide.RequestManager;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
@@ -62,8 +63,8 @@ public class AllPicturesPresenterImpl extends PresenterBase
     // last removed position
 
     @SuppressWarnings("unchecked")
-    public AllPicturesPresenterImpl(Context context, AllPictureView view) {
-        super(context, view);
+    public AllPicturesPresenterImpl(RequestManager requestManager, Context context, AllPictureView view) {
+        super(requestManager, context, view);
         // realm only allow one transaction a time
         mExecutor = Executors.newSingleThreadExecutor();
 
@@ -167,7 +168,6 @@ public class AllPicturesPresenterImpl extends PresenterBase
         }
         mReceiver.setReceiver(null);
     }
-
 
     @Override
     public void onImageSaveDone(String path) {

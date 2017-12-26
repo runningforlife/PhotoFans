@@ -27,11 +27,13 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.presenter.ImageType;
 import com.github.runningforlife.photosniffer.ui.GalleryView;
 import com.github.runningforlife.photosniffer.ui.fragment.AllPicturesFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.BaseFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FavoriteImageFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FullScreenImageFragment;
+import com.github.runningforlife.photosniffer.ui.fragment.ImageDetailPagerFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.RetrieveHintFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.WallPaperFragment;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
@@ -43,17 +45,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class GalleryActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback,
-        BaseFragment.FragmentCallback, GalleryView {
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_FAVOR;
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_GALLERY;
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_WALLPAPER;
+
+public class GalleryActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback, BaseFragment.FragmentCallback, GalleryView {
 
     private static final String TAG = "GalleryActivity";
     final static int MY_STORAGE_PERMISSION_REQUEST = 100;
 
     private boolean mHintFragmentAdded;
     private FragmentManager mFragmentMgr;
+    private ImageDetailPagerFragment mImagePagerFragment;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.drawer_layout) DrawerLayout mDrawer;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
 
@@ -66,11 +73,10 @@ public class GalleryActivity extends BaseActivity
 
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawer.addDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
 
         NavigationView navView = findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(this);
@@ -81,7 +87,7 @@ public class GalleryActivity extends BaseActivity
 
         initView();
 
-        drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+        mDrawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
             }
@@ -102,10 +108,6 @@ public class GalleryActivity extends BaseActivity
 
             }
         });
-
-/*        if (Build.VERSION.SDK_INT >= 21) {
-            getWindow().setExitTransition(null);
-        }*/
     }
 
     @Override
@@ -126,6 +128,18 @@ public class GalleryActivity extends BaseActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        } else if (mImagePagerFragment != null && mImagePagerFragment.isVisible()) {
+            mImagePagerFragment.runExitAnimation(new Runnable() {
+                @Override
+                public void run() {
+                    if (mFragmentMgr.getBackStackEntryCount() > 0) {
+                        mFragmentMgr.popBackStack();
+                    }
+                }
+            });
+            // restore home icon
+            mDrawerToggle.setDrawerIndicatorEnabled(true);
+            mDrawerToggle.syncState();
         } else {
             super.onBackPressed();
         }
@@ -166,13 +180,10 @@ public class GalleryActivity extends BaseActivity
     }
 
     @Override
-    public void onItemClick(View sharedView, int pos, String url) {
+    public void onItemClick(View sharedView, int pos, int type) {
         Log.v(TAG,"onItemClick(): pos = " + pos);
-        if (!TextUtils.isEmpty(url)) {
-            showFullScreenImage(sharedView, pos, url);
-        } else {
-            Log.e(TAG,"onItemClick(): url is empty");
-        }
+        mDrawerToggle.setDrawerIndicatorEnabled(false);
+        showImagePagerFragment(sharedView, pos, type);
     }
 
     @Override
@@ -271,6 +282,18 @@ public class GalleryActivity extends BaseActivity
                             getString(R.string.activity_image_transition) + String.valueOf(pos));
             startActivity(intent, options.toBundle());
         }
+    }
+
+    private void showImagePagerFragment(View iv, int pos, int type) {
+        int[] screenLocation = new int[2];
+        iv.getLocationOnScreen(screenLocation);
+        mImagePagerFragment = ImageDetailPagerFragment.newInstance(
+                pos, screenLocation, iv.getWidth(), iv.getHeight(), type);
+        mFragmentMgr.beginTransaction()
+                    .addToBackStack(null)
+                    .replace(R.id.fragment_container, mImagePagerFragment)
+                    .commit();
+
     }
 
     private void showImageRetrieveHint() {

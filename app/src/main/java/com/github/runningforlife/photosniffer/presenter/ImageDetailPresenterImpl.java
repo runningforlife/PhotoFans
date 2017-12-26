@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
+import com.bumptech.glide.RequestManager;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
@@ -22,6 +23,10 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_FAVOR;
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_GALLERY;
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_WALLPAPER;
+
 /**
  * Created by jason on 4/6/17.
  */
@@ -29,11 +34,13 @@ import java.util.concurrent.Executors;
 public class ImageDetailPresenterImpl extends PresenterBase implements ImageDetailPresenter {
     private static final String TAG = "ImageDetailPresenter";
     private ImageDetailView mView;
+    private @ImageType int mImageType;
 
-    public ImageDetailPresenterImpl(Context context, ImageDetailView view){
-        super(context, view);
+    public ImageDetailPresenterImpl(RequestManager requestManager, Context context, ImageDetailView view, @ImageType int imageType){
+        super(requestManager,context, view);
         mContext = context;
         mView = view;
+        mImageType = imageType;
     }
 
     @Override
@@ -47,9 +54,25 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     public void onStart() {
         Log.v(TAG,"onStart()");
         HashMap<String,String> params = new HashMap<>();
-        params.put("mIsUsed", Boolean.toString(true));
-        params.put("mIsFavor", Boolean.toString(false));
-        params.put("mIsWallpaper", Boolean.toString(false));
+        switch (mImageType) {
+            case IMAGE_WALLPAPER:
+                params.put("mIsUsed", Boolean.toString(true));
+                params.put("mIsFavor", Boolean.toString(false));
+                params.put("mIsWallpaper", Boolean.toString(true));
+                break;
+            case IMAGE_FAVOR:
+                params.put("mIsUsed", Boolean.toString(true));
+                params.put("mIsFavor", Boolean.toString(true));
+                params.put("mIsWallpaper", Boolean.toString(false));
+                break;
+            case IMAGE_GALLERY:
+                params.put("mIsUsed", Boolean.toString(true));
+                params.put("mIsFavor", Boolean.toString(false));
+                params.put("mIsWallpaper", Boolean.toString(false));
+                break;
+
+        }
+
         mImageList = (RealmResults<ImageRealm>) mRealmApi.queryAsync(ImageRealm.class, params);
         mImageList.addChangeListener(mOrderRealmChangeListener);
     }

@@ -71,7 +71,7 @@ public class FullScreenPresenterImpl implements FullScreenPresenter, ImageSaveRu
 
     @Override
     public void saveImage(final String url) {
-        GlideLoaderListener listener = new GlideLoaderListener(null);
+        GlideLoaderListener listener = new GlideLoaderListener();
         listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
             @Override
             public void onImageLoadDone(Object o) {

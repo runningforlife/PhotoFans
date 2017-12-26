@@ -33,8 +33,6 @@ public class DiskCacheManager implements CacheApi {
         mCacheExecutors.submit(car);
     }
 
-
-
     @Override
     public void put(String url, Cache.Entry entry) {
         CacheActionRunnable car = new CacheActionRunnable(url, null, ACTION_PUT, entry);

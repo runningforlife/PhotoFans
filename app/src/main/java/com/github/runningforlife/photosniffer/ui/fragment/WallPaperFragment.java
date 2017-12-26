@@ -12,7 +12,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.presenter.ImageType;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.presenter.WallpaperPresenterImpl;
 import com.github.runningforlife.photosniffer.ui.WallpaperView;
@@ -21,6 +23,8 @@ import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_WALLPAPER;
 
 /**
  * fragment to manager wallpaper
@@ -39,15 +43,30 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedState){
+    public void onCreate(Bundle savedState) {
+        super.onCreate(savedState);
+        Log.v(TAG,"onCreate()");
 
+        setRetainInstance(true);
+
+        mUserAdapterPrefKey = TAG + "-" +  USER_SETTING_ADAPTER;
+        mUserAdapter = SharedPrefUtil.getString(mUserAdapterPrefKey, GridManager);
+        mAdapter = new GalleryAdapter(getActivity(), this);
+        mAdapter.setLayoutManager(mUserAdapter);
+
+        mPresenter = new WallpaperPresenterImpl(Glide.with(this),getContext(), this);
+        setPresenter(mPresenter);
+        mPresenter.onStart();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedState){
+        Log.v(TAG,"onCreateView()");
         View root = inflater.inflate(R.layout.fragment_user_image, parent, false);
 
         ButterKnife.bind(this, root);
 
         initView();
-
-        initPresenter();
 
         return root;
     }
@@ -62,7 +81,7 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
     public void onResume() {
         super.onResume();
 
-        if(mCallback != null){
+        if (mCallback != null) {
             mCallback.onFragmentAttached();
         }
 
@@ -73,7 +92,7 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
     public void onItemClicked(View view, int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
         if (isAdded() && mCallback != null) {
-            mCallback.onItemClick(view,pos, mPresenter.getItemAtPos(pos).getUrl());
+            mCallback.onItemClick(view,pos, IMAGE_WALLPAPER);
         }
     }
 
@@ -157,9 +176,6 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
     }
 
     private void initView() {
-        mUserAdapterPrefKey = TAG + "-" +  USER_SETTING_ADAPTER;
-        mUserAdapter = SharedPrefUtil.getString(mUserAdapterPrefKey, GridManager);
-
         if (GridManager.equals(mUserAdapter)) {
             //LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
             GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
@@ -173,17 +189,8 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
             ll.setSmoothScrollbarEnabled(true);
         }
 
-        mAdapter = new GalleryAdapter(getActivity(), this);
-        mAdapter.setLayoutManager(mUserAdapter);
-
         mRcvWallpaper.setAdapter(mAdapter);
         mRcvWallpaper.setItemAnimator(new DefaultItemAnimator());
         mRcvWallpaper.setBackgroundResource(R.color.colorLightGrey);
-    }
-
-    private void initPresenter() {
-        mPresenter = new WallpaperPresenterImpl(getContext(), this);
-        setPresenter(mPresenter);
-        mPresenter.onStart();
     }
 }

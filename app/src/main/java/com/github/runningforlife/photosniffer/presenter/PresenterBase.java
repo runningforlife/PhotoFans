@@ -3,13 +3,13 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
+import com.bumptech.glide.RequestManager;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.data.cache.Cache;
 import com.github.runningforlife.photosniffer.data.cache.CacheApi;
@@ -21,45 +21,37 @@ import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.ui.UI;
-import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.RealmResults;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Response;
 
+import static com.github.runningforlife.photosniffer.loader.Loader.DEFAULT_IMG_WIDTH;
 import static com.github.runningforlife.photosniffer.presenter.ImageSaveRunnable.*;
 
 /**
  * base class for presenter
  */
 
-abstract class PresenterBase implements Presenter, ImageSaveCallback{
+abstract class PresenterBase implements Presenter, ImageSaveCallback {
     private static final String TAG = "PresenterBase";
 
     private int mNetworkErrorCount;
     // for image save or wallpaper setting
-    private ExecutorService mImageExecutor;
+    private ExecutorService mSavingExecutor;
     //DiskCache mDiskCache;
     private CacheApi mCacheMgr;
     private boolean mIsNetworkStateReported;
+    private RequestManager mGlideManager;
 
     int mMaxImagesAllowed;
 
@@ -71,21 +63,22 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
 
     OrderReamChangeListener mOrderRealmChangeListener;
 
-    PresenterBase(Context context, UI view) {
+    PresenterBase(RequestManager requestManager, Context context, UI view) {
         mContext = context;
         mView = view;
         mOrderRealmChangeListener = new OrderReamChangeListener();
         mRealmApi = RealmApiImpl.getInstance();
-        //mDiskCache = new DiskCache(new File(MiscUtil.getWallpaperCacheDir()));
         mCacheMgr = DiskCacheManager.getInstance();
 
         mNetworkErrorCount = 0;
-        mImageExecutor = Executors.newSingleThreadExecutor();
+        mSavingExecutor = Executors.newSingleThreadExecutor();
 
         // default value
         mMaxImagesAllowed = Integer.MAX_VALUE;
 
         mIsNetworkStateReported = false;
+
+        mGlideManager = requestManager;
     }
 
 
@@ -126,7 +119,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     @Override
     public void saveImageAtPos(final int pos) {
         if (pos >= 0 && pos < mImageList.size()) {
-            GlideLoaderListener listener = new GlideLoaderListener(null);
+            GlideLoaderListener listener = new GlideLoaderListener();
             listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
                 @Override
                 public void onImageLoadDone(Object o) {
@@ -134,14 +127,14 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
                     if(o instanceof Bitmap) {
                         ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o));
                         r.addCallback(PresenterBase.this);
-                        mImageExecutor.submit(r);
+                        mSavingExecutor.submit(r);
                     }
                 }
             });
 
             String imgUrl = mImageList.get(pos).getUrl();
             GlideLoader.downloadOnly(mContext, imgUrl, listener,Priority.HIGH,
-                    Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
+                    DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
         }
     }
 
@@ -151,8 +144,6 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         if(pos >= 0 && pos < mImageList.size()) {
             final ImageRealm ir = mImageList.get(pos);
             String url = ir.getUrl();
-            // donot remove user selected images;
-            String wallpaperDir = MiscUtil.getWallpaperCacheDir();
             if (mCacheMgr.isExist(url)) {
                 mCacheMgr.remove(url);
             }
@@ -161,60 +152,92 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     }
 
     @Override
-    public void loadImageIntoView(final int pos, final ImageView iv, Priority priority, int w, int h, ImageView.ScaleType scaleType) {
+    public void loadImageIntoView(final int pos, final ImageView iv, Priority priority, int w, int h, final ImageView.ScaleType scaleType) {
         Log.v(TAG,"loadImageIntoView()");
+
         final String url = mImageList.get(pos).getUrl();
-        GlideLoaderListener listener = new GlideLoaderListener(iv);
-        listener.setScaleType(scaleType);
-        listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
-            @Override
-            public void onImageLoadDone(Object o) {
-                Log.v(TAG, "onImageLoadDone()");
-                // 404 or socket timeout
-                if (o instanceof Exception) {
-                    if (!URLUtil.isFileUrl(url)) {
-                        ++mNetworkErrorCount;
-                        if (MiscUtil.isConnected(mContext)) {
-                            mIsNetworkStateReported = false;
-                            // network is slow
+        if (scaleType == ImageView.ScaleType.CENTER_CROP) {
+            mGlideManager.load(url)
+                         //.thumbnail(0.5f)
+                         .dontTransform()
+                         .dontAnimate()
+                         .override(800, 800)
+                         .centerCrop()
+                         .into(iv);
+        } else {
+            mGlideManager.load(url)
+                    //.thumbnail(0.5f)
+                    .dontTransform()
+                    .dontAnimate()
+                    .override(w, h)
+                    .fitCenter()
+                    .into(iv);
+        }
+
+/*        GlideLoaderListener listener;
+        if (mGlideListeners.get(pos) == null) {
+            listener = new GlideLoaderListener();
+            mGlideListeners.put(pos, listener);
+            listener.setScaleType(scaleType);
+            listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+                @Override
+                public void onImageLoadDone(Object o) {
+                    Log.v(TAG, "onImageLoadDone()");
+                    // 404 or socket timeout
+                    if (o instanceof Exception) {
+                        if (!URLUtil.isFileUrl(url)) {
                             ++mNetworkErrorCount;
-                            if (mNetworkErrorCount >= NETWORK_SLOW_ERROR_COUNT && mNetworkErrorCount < NETWORK_HUNG_ERROR_COUNT) {
+                            if (MiscUtil.isConnected(mContext)) {
+                                mIsNetworkStateReported = false;
+                                // network is slow
+                                ++mNetworkErrorCount;
+                                if (mNetworkErrorCount >= NETWORK_SLOW_ERROR_COUNT && mNetworkErrorCount < NETWORK_HUNG_ERROR_COUNT) {
+                                    if (!mIsNetworkStateReported) {
+                                        mView.onNetworkState(NetState.STATE_SLOW);
+                                        mIsNetworkStateReported = true;
+                                    }
+                                } else if (mNetworkErrorCount >= NETWORK_HUNG_ERROR_COUNT) {
+                                    if (!mIsNetworkStateReported) {
+                                        mView.onNetworkState(NetState.STATE_HUNG);
+                                        mIsNetworkStateReported = true;
+                                    }
+                                }
+                            } else {
                                 if (!mIsNetworkStateReported) {
-                                    mView.onNetworkState(NetState.STATE_SLOW);
+                                    mView.onNetworkState(NetState.STATE_DISCONNECT);
                                     mIsNetworkStateReported = true;
                                 }
-                            } else if (mNetworkErrorCount >= NETWORK_HUNG_ERROR_COUNT) {
-                                if (!mIsNetworkStateReported) {
-                                    mView.onNetworkState(NetState.STATE_HUNG);
-                                    mIsNetworkStateReported = true;
-                                }
-                            }
-                        } else {
-                            if (!mIsNetworkStateReported) {
-                                mView.onNetworkState(NetState.STATE_DISCONNECT);
-                                mIsNetworkStateReported = true;
                             }
                         }
+                        PresenterBase.this.onImageLoadDone(pos, false);
                     } else {
-                        // remove from database for image file may be removed by user
-                        Map<String, String> params = new HashMap<>();
-                        params.put("mUrl", url);
-                        params.put("mIsCached", Boolean.toString(Boolean.TRUE));
-                        mRealmApi.deleteAsync(ImageRealm.class, (HashMap<String, String>) params);
-                    }
-                    PresenterBase.this.onImageLoadDone(pos, false);
-                } else {
-                    PresenterBase.this.onImageLoadDone(pos, true);
-                    mNetworkErrorCount = mNetworkErrorCount <= 0 ? 0 ：(mNetworkErrorCount - 1);
-                    if (mNetworkErrorCount == 0) {
-                         mIsNetworkStateReported = false;
+                        iv.setScaleType(scaleType);
+                        iv.setImageBitmap((Bitmap) o);
+                        PresenterBase.this.onImageLoadDone(pos, true);
+                        // get the main color of the image
+                        Palette palette = Palette.from((Bitmap) o).generate();
+                        if (Build.VERSION.SDK_INT >= 23) {
+                            RippleDrawable rd = (RippleDrawable) iv.getForeground();
+                            if (rd != null) {
+                                int dc = palette.getDominantColor(Color.DKGRAY);
+                                ColorStateList csl = ColorStateList.valueOf(dc);
+                                rd.setColor(csl);
+                                rd.setColorFilter(dc, PorterDuff.Mode.DST_IN);
+                            }
+                        }
+                        mNetworkErrorCount = mNetworkErrorCount <= 0 ? 0 : (mNetworkErrorCount - 1);
+                        if (mNetworkErrorCount == 0) {
+                            mIsNetworkStateReported = false;
+                        }
                     }
                 }
-            }
-        });
+            });
+        } else {
+            listener = mGlideListeners.get(pos);
+        }
 
         GlideLoader.load(mContext, url, listener, priority, w, h, scaleType);
-        onImageLoadStart(pos);
+        onImageLoadStart(pos);*/
     }
 
     @Override
@@ -247,8 +270,8 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         }
         mRealmApi.closeRealm();
 
-        if (mImageExecutor != null && !mImageExecutor.isTerminated()) {
-            mImageExecutor.shutdown();
+        if (mSavingExecutor != null && !mSavingExecutor.isTerminated()) {
+            mSavingExecutor.shutdown();
         }
     }
 
@@ -275,7 +298,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
     }
 
     private void setWallpaperAndCache(final String url) {
-        GlideLoaderListener listener = new GlideLoaderListener(null);
+        GlideLoaderListener listener = new GlideLoaderListener(mGlideManager);
         listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
             @Override
             public void onImageLoadDone(Object o) {
@@ -305,7 +328,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback{
         });
 
         GlideLoader.downloadOnly(mContext, url, listener,Priority.HIGH,
-                Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
+                DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
     }
 
     void markAsFavor(String url) {

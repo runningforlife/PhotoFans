@@ -18,6 +18,7 @@ import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import me.iwf.photopicker.utils.AndroidLifecycleUtils;
 
 import static com.github.runningforlife.photosniffer.loader.Loader.*;
 
@@ -55,19 +56,21 @@ public class ImagePagerAdapter extends PagerAdapter {
                 .inflate(R.layout.item_image_detail,parent,false);
         ImageHolder imageHolder = new ImageHolder(view);
         // transition name
-        if(Build.VERSION.SDK_INT >= 21) {
+/*        if(Build.VERSION.SDK_INT >= 21) {
             String transitionName = mContext.getString(R.string.activity_image_transition)
                     + String.valueOf(position);
             view.setTransitionName(transitionName);
+        }*/
+
+        if (AndroidLifecycleUtils.canLoadImage(mContext)) {
+            // preload image
+            ImageView iv = imageHolder.imageView;
+            //MiscUtil.preloadImage(iv);
+            //view.setAnimation(AnimationUtils.loadAnimation(mContext, R.anim.anim_scale_in));
+            mCallback.loadImageIntoView(position, iv, Priority.IMMEDIATE,
+                    DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT, ImageView.ScaleType.FIT_CENTER);
+
         }
-
-        // preload image
-        ImageView iv = imageHolder.imageView;
-        //MiscUtil.preloadImage(iv);
-        view.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.anim_scale_in));
-        mCallback.loadImageIntoView(position, iv, Priority.IMMEDIATE,
-                DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT, ImageView.ScaleType.FIT_CENTER);
-
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -13,8 +13,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.data.model.ImageRealm;
+import com.github.runningforlife.photosniffer.presenter.ImageType;
 import com.github.runningforlife.photosniffer.presenter.NetState;
 import com.github.runningforlife.photosniffer.presenter.Presenter;
 import com.github.runningforlife.photosniffer.ui.UI;
@@ -57,7 +60,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     String mUserAdapterPrefKey;
 
     public interface FragmentCallback {
-        void onItemClick(View view, int pos, String url);
+        void onItemClick(View view, int pos, @ImageType int type);
         void onFragmentAttached();
         void showToast(String toast);
     }
@@ -82,6 +85,20 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         super.onCreate(savedState);
         //option menu
         setHasOptionsMenu(true);
+        // retain state; not recreate it again
+        setRetainInstance(true);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        Log.d(TAG,"onStateInstanceState()");
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle state) {
+        super.onViewStateRestored(state);
+        Log.d(TAG,"onViewStateRestored()");
     }
 
     @Override

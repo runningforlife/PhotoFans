@@ -16,10 +16,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.presenter.FavorImagePresenterImpl;
+import com.github.runningforlife.photosniffer.presenter.ImageType;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.FavorPictureView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
@@ -30,6 +32,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.RealmObject;
+
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_FAVOR;
 
 /**
  * a fragment containing all favorite images
@@ -109,7 +113,7 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
         Log.v(TAG,"onItemClicked(): pos = " + pos);
 
         if(isAdded() && mCallback != null){
-            mCallback.onItemClick(view,pos, mPresenter.getItemAtPos(pos).getUrl());
+            mCallback.onItemClick(view,pos, IMAGE_FAVOR);
         }
     }
 
@@ -117,7 +121,7 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
     public void onDataSetChange(int start, int len, RealmOp op) {
         Log.v(TAG,"onDataSetChange(): op=" + op);
         if (op == RealmOp.OP_INSERT) {
-            mAdapter.notifyItemRangeInserted(start, len );
+            mAdapter.notifyItemRangeInserted(start, len);
             mRcvFavorList.smoothScrollToPosition(0);
         } else if (op == RealmOp.OP_DELETE) {
             mAdapter.notifyItemRangeRemoved(start, len);
@@ -194,7 +198,7 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
     }
 
     private void initPresenter() {
-        mPresenter = new FavorImagePresenterImpl(getContext(),this);
+        mPresenter = new FavorImagePresenterImpl(Glide.with(this),getContext(),this);
         setPresenter(mPresenter);
         mPresenter.onStart();
     }

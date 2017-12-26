@@ -9,10 +9,4 @@ public interface ImageDetailPresenter {
      * favor image at pos
      */
     void favorImageAtPos(int pos);
-
-    /*
-     * set wallpaper
-     */
-    void setWallpaperAtPos(int pos);
-
 }
