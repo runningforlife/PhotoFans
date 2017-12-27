@@ -159,6 +159,8 @@ public class WallpaperUtils {
         Log.v(TAG, "setWallpaperFromCache()");
         RealmApi realmApi = RealmApiImpl.getInstance();
         HashMap<String, String> params = new HashMap<>();
+        params.put("mIsUsed", Boolean.toString(true));
+        params.put("mIsFavor", Boolean.toString(false));
         params.put("mIsWallpaper", Boolean.toString(Boolean.TRUE));
         RealmResults<ImageRealm> wallpapers = (RealmResults<ImageRealm>) realmApi.querySync(ImageRealm.class, params);
 

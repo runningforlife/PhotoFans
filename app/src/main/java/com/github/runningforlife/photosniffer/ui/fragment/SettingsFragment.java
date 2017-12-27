@@ -137,7 +137,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // for OS >= LL, use JobScheduler to do wallpaper setting
         if (Build.VERSION.SDK_INT >= 21) {
             if (isEnabled) {
-                WallpaperUtils.setWallpaperFromCache(getActivity(), WallpaperManager.FLAG_SYSTEM);
                 WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
             } else {
                 WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));

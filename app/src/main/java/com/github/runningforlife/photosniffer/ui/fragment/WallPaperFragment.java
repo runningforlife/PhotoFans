@@ -141,36 +141,40 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
 
     private boolean optionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
+        String adapter = GridManager;
         switch (id) {
             case R.id.grid_view:
                 GridLayoutManager glm = new GridLayoutManager(getContext(),2);
                 mRcvWallpaper.setLayoutManager(glm);
                 mRcvWallpaper.setHasFixedSize(true);
                 glm.setAutoMeasureEnabled(true);
-                mUserAdapter = GridManager;
                 break;
             case R.id.list_view:
                 LinearLayoutManager ll = new LinearLayoutManager(getContext());
                 mRcvWallpaper.setLayoutManager(ll);
-                ll.setAutoMeasureEnabled(true);
-                mUserAdapter = LinearManager;
+                //ll.setAutoMeasureEnabled(true);
+                adapter = LinearManager;
                 break;
             case R.id.stagger_view:
                 StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
                 mRcvWallpaper.setLayoutManager(sglm);
                 sglm.setAutoMeasureEnabled(true);
-                mUserAdapter = StaggeredManager;
+                adapter = StaggeredManager;
                 break;
             default:
                 break;
         }
 
-        mAdapter.setLayoutManager(mUserAdapter);
-        SharedPrefUtil.putString(mUserAdapterPrefKey, mUserAdapter);
+        if (!mUserAdapter.equals(adapter)) {
+            mAdapter.setLayoutManager(adapter);
+            SharedPrefUtil.putString(mUserAdapterPrefKey, adapter);
 
-        mRcvWallpaper.removeAllViews();
-        mAdapter.notifyDataSetChanged();
+            mRcvWallpaper.removeAllViews();
+            mAdapter.notifyDataSetChanged();
+
+            //Glide.with(this).onDestroy();
+            mUserAdapter = adapter;
+        }
 
         return true;
     }

@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,6 +24,7 @@ import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
@@ -31,9 +33,11 @@ import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl
 import com.github.runningforlife.photosniffer.presenter.ImageType;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
+import com.github.runningforlife.photosniffer.ui.activity.GalleryActivity;
 import com.github.runningforlife.photosniffer.ui.activity.UserAction;
 import com.github.runningforlife.photosniffer.ui.adapter.ImagePagerAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.PageAdapterCallback;
+import com.github.runningforlife.photosniffer.utils.ToastUtil;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.nineoldandroids.view.ViewHelper;
@@ -511,16 +515,33 @@ public class ImageDetailPagerFragment extends Fragment
 
     @Override
     public void onImageSaveDone(String path) {
-
+        if (!TextUtils.isEmpty(path)) {
+            showToast(getString(R.string.save_image_Success) + path);
+        } else {
+            showToast(getString(R.string.save_image_fail));
+        }
     }
 
     @Override
     public void onWallpaperSetDone(boolean isOk) {
-
+        if (isOk) {
+            showToast(getString(R.string.set_wallpaper_success));
+        } else {
+            showToast(getString(R.string.set_wallpaper_fail));
+        }
     }
 
     @Override
     public void onNetworkState(String state) {
 
+    }
+
+    private void showToast(String msg) {
+        if (isAdded()) {
+            GalleryActivity activity = (GalleryActivity) getActivity();
+            if (activity != null) {
+                activity.showToast(msg);
+            }
+        }
     }
 }

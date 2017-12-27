@@ -13,6 +13,7 @@ import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.target.Target;
+import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.data.cache.Cache;
 import com.github.runningforlife.photosniffer.data.cache.CacheApi;
@@ -175,6 +176,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback {
                         .dontTransform()
                         .dontAnimate()
                         .override(800, 800)
+                        .error(R.drawable.ic_broken_image_white_24dp)
                         .centerCrop()
                         .into(iv);
             } else {
@@ -183,75 +185,11 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback {
                         .dontTransform()
                         .dontAnimate()
                         .override(w, h)
+                        .error(R.drawable.ic_broken_image_white_24dp)
                         .fitCenter()
                         .into(iv);
             }
         }
-
-/*        GlideLoaderListener listener;
-        if (mGlideListeners.get(pos) == null) {
-            listener = new GlideLoaderListener();
-            mGlideListeners.put(pos, listener);
-            listener.setScaleType(scaleType);
-            listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
-                @Override
-                public void onImageLoadDone(Object o) {
-                    Log.v(TAG, "onImageLoadDone()");
-                    // 404 or socket timeout
-                    if (o instanceof Exception) {
-                        if (!URLUtil.isFileUrl(url)) {
-                            ++mNetworkErrorCount;
-                            if (MiscUtil.isConnected(mContext)) {
-                                mIsNetworkStateReported = false;
-                                // network is slow
-                                ++mNetworkErrorCount;
-                                if (mNetworkErrorCount >= NETWORK_SLOW_ERROR_COUNT && mNetworkErrorCount < NETWORK_HUNG_ERROR_COUNT) {
-                                    if (!mIsNetworkStateReported) {
-                                        mView.onNetworkState(NetState.STATE_SLOW);
-                                        mIsNetworkStateReported = true;
-                                    }
-                                } else if (mNetworkErrorCount >= NETWORK_HUNG_ERROR_COUNT) {
-                                    if (!mIsNetworkStateReported) {
-                                        mView.onNetworkState(NetState.STATE_HUNG);
-                                        mIsNetworkStateReported = true;
-                                    }
-                                }
-                            } else {
-                                if (!mIsNetworkStateReported) {
-                                    mView.onNetworkState(NetState.STATE_DISCONNECT);
-                                    mIsNetworkStateReported = true;
-                                }
-                            }
-                        }
-                        PresenterBase.this.onImageLoadDone(pos, false);
-                    } else {
-                        iv.setScaleType(scaleType);
-                        iv.setImageBitmap((Bitmap) o);
-                        PresenterBase.this.onImageLoadDone(pos, true);
-                        // get the main color of the image
-                        Palette palette = Palette.from((Bitmap) o).generate();
-                        if (Build.VERSION.SDK_INT >= 23) {
-                            RippleDrawable rd = (RippleDrawable) iv.getForeground();
-                            if (rd != null) {
-                                int dc = palette.getDominantColor(Color.DKGRAY);
-                                ColorStateList csl = ColorStateList.valueOf(dc);
-                                rd.setColor(csl);
-                                rd.setColorFilter(dc, PorterDuff.Mode.DST_IN);
-                            }
-                        }
-                        mNetworkErrorCount = mNetworkErrorCount <= 0 ? 0 : (mNetworkErrorCount - 1);
-                        if (mNetworkErrorCount == 0) {
-                            mIsNetworkStateReported = false;
-                        }
-                    }
-                }
-            });
-        } else {
-            listener = mGlideListeners.get(pos);
-        }
-
-        GlideLoader.load(mContext, url, listener, priority, w, h, scaleType);
-        onImageLoadStart(pos);*/
     }
 
     @Override
