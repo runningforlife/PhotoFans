@@ -51,6 +51,7 @@ import java.util.List;
 import io.realm.RealmObject;
 
 import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_FAVOR;
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_GALLERY;
 import static com.github.runningforlife.photosniffer.ui.activity.UserAction.DELETE;
 import static com.github.runningforlife.photosniffer.ui.activity.UserAction.FAVOR;
 import static com.github.runningforlife.photosniffer.ui.activity.UserAction.SAVE;
@@ -288,7 +289,7 @@ public class ImageDetailPagerFragment extends Fragment
         String favor = getString(R.string.action_favorite);
 
         mUserActions.add(wallpaper);
-        if (mImageType != IMAGE_FAVOR) {
+        if (mImageType == IMAGE_GALLERY) {
             mUserActions.add(favor);
         }
         mUserActions.add(save);

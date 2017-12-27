@@ -83,7 +83,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
         Log.v(TAG,"onResume()");
         //mRvImgList.invalidate();
 
-        setTitle();
+        setTitle(getString(R.string.app_name));
     }
 
     @Override
@@ -324,13 +324,5 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
         mPresenter = new AllPicturesPresenterImpl( Glide.with(this), getContext(),this);
         setPresenter(mPresenter);
         mPresenter.onStart();
-    }
-
-    private void setTitle() {
-        String appName = getString(R.string.app_name);
-        Activity activity = getActivity();
-        if(activity != null){
-            activity.setTitle(appName);
-        }
     }
 }
