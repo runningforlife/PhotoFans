@@ -99,7 +99,11 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback {
 
     @Override
     public ImageRealm getItemAtPos(int pos) {
-        return mImageList.get(pos);
+        if (pos >= 0 && pos < mImageList.size()) {
+            return mImageList.get(pos);
+        }
+
+        return null;
     }
 
     @Override
@@ -154,24 +158,26 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback {
     @Override
     public void loadImageIntoView(final int pos, final ImageView iv, Priority priority, int w, int h, final ImageView.ScaleType scaleType) {
         Log.v(TAG,"loadImageIntoView()");
-
-        final String url = mImageList.get(pos).getUrl();
-        if (scaleType == ImageView.ScaleType.CENTER_CROP) {
-            mGlideManager.load(url)
-                         //.thumbnail(0.5f)
-                         .dontTransform()
-                         .dontAnimate()
-                         .override(800, 800)
-                         .centerCrop()
-                         .into(iv);
-        } else {
-            mGlideManager.load(url)
-                    //.thumbnail(0.5f)
-                    .dontTransform()
-                    .dontAnimate()
-                    .override(w, h)
-                    .fitCenter()
-                    .into(iv);
+        final ImageRealm ir = getItemAtPos(pos);
+        if (ir != null) {
+            final String url = ir.getUrl();
+            if (scaleType == ImageView.ScaleType.CENTER_CROP) {
+                mGlideManager.load(url)
+                        //.thumbnail(0.5f)
+                        .dontTransform()
+                        .dontAnimate()
+                        .override(800, 800)
+                        .centerCrop()
+                        .into(iv);
+            } else {
+                mGlideManager.load(url)
+                        //.thumbnail(0.5f)
+                        .dontTransform()
+                        .dontAnimate()
+                        .override(w, h)
+                        .fitCenter()
+                        .into(iv);
+            }
         }
 
 /*        GlideLoaderListener listener;

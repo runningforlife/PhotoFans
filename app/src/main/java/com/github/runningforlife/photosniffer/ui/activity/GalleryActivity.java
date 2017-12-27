@@ -139,6 +139,7 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
             });
             // restore home icon
             mDrawerToggle.setDrawerIndicatorEnabled(true);
+            mDrawerToggle.setToolbarNavigationClickListener(null);
             mDrawerToggle.syncState();
         } else {
             super.onBackPressed();
@@ -183,6 +184,13 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
     public void onItemClick(View sharedView, int pos, int type) {
         Log.v(TAG,"onItemClick(): pos = " + pos);
         mDrawerToggle.setDrawerIndicatorEnabled(false);
+        mDrawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+        mDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_back_white_24dp);
         showImagePagerFragment(sharedView, pos, type);
     }
 

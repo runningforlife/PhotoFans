@@ -72,19 +72,21 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     @Override
     public void onBindViewHolder(final PhotoViewHolder vh, final int position) {
         final ImageRealm img = (ImageRealm)mCallback.getItemAtPos(position);
-        final String url = img.getUrl();
-        Log.d(TAG,"onBindViewHolder(): pos = " + position);
+        if (img != null) {
+            final String url = img.getUrl();
+            Log.d(TAG, "onBindViewHolder(): pos = " + position);
 
-        if(!TextUtils.isEmpty(url)) {
-            // preload image
-            MiscUtil.preloadImage(vh.img);
-            if (AndroidLifecycleUtils.canLoadImage(mContext)) {
-                mCallback.loadImageIntoView(position, vh.img, Priority.HIGH,
-                        DEFAULT_IMAGE_MEDIUM_WIDTH, DEFAULT_IMAGE_MEDIUM_HEIGHT, ImageView.ScaleType.CENTER_CROP);
+            if (!TextUtils.isEmpty(url)) {
+                // preload image
+                MiscUtil.preloadImage(vh.img);
+                if (AndroidLifecycleUtils.canLoadImage(mContext)) {
+                    mCallback.loadImageIntoView(position, vh.img, Priority.HIGH,
+                            DEFAULT_IMAGE_MEDIUM_WIDTH, DEFAULT_IMAGE_MEDIUM_HEIGHT, ImageView.ScaleType.CENTER_CROP);
+                }
+            } else if (getItemCount() > 0) {
+                // remove from the list
+                mCallback.removeItemAtPos(position);
             }
-        }else if (getItemCount() > 0) {
-            // remove from the list
-            mCallback.removeItemAtPos(position);
         }
     }
 

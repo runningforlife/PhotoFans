@@ -209,13 +209,9 @@ public class ImageDetailPagerFragment extends Fragment implements PageAdapterCal
     @Override
     public void onResume() {
         super.onResume();
-
         AppCompatActivity parent = (AppCompatActivity) getActivity();
         ActionBar toolbar = parent.getSupportActionBar();
         if (toolbar != null) {
-            toolbar.setHomeAsUpIndicator(R.drawable.ic_back_white_24dp);
-            toolbar.setDisplayHomeAsUpEnabled(true);
-
             mOriginalTitle = toolbar.getTitle();
         }
     }
@@ -248,9 +244,6 @@ public class ImageDetailPagerFragment extends Fragment implements PageAdapterCal
         switch (menuItem.getItemId()) {
             case R.id.action_more:
                 break;
-            case android.R.id.home:
-                (getActivity()).onBackPressed();
-                return true;
         }
 
         return super.onOptionsItemSelected(menuItem);
