@@ -10,6 +10,9 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.request.FutureTarget;
+import com.bumptech.glide.request.target.ImageViewTarget;
+import com.bumptech.glide.request.target.Target;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.data.cache.Cache;
 import com.github.runningforlife.photosniffer.data.cache.CacheApi;
@@ -21,6 +24,7 @@ import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.ui.UI;
+import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -28,13 +32,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.RealmResults;
 
+import static com.github.runningforlife.photosniffer.loader.Loader.DEFAULT_IMG_HEIGHT;
 import static com.github.runningforlife.photosniffer.loader.Loader.DEFAULT_IMG_WIDTH;
 import static com.github.runningforlife.photosniffer.presenter.ImageSaveRunnable.*;
 
@@ -304,37 +312,27 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback {
     }
 
     private void setWallpaperAndCache(final String url) {
-        GlideLoaderListener listener = new GlideLoaderListener(mGlideManager);
-        listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
-            @Override
-            public void onImageLoadDone(Object o) {
-                Log.d(TAG, "onImageLoadDone()");
-                if(o instanceof Bitmap) {
-                    WallpaperManager wm = WallpaperManager.getInstance(mContext);
-                    try {
-                        Bitmap bitmap = (Bitmap)o;
-                        wm.setBitmap(bitmap);
-                        mView.onWallpaperSetDone(true);
-                        // cache it
-                        if (!mCacheMgr.isExist(url)) {
-                            ByteArrayOutputStream bos = new ByteArrayOutputStream(bitmap.getByteCount());
-                            Cache.Entry entry = new Cache.Entry(bos.toByteArray(), System.currentTimeMillis());
-                            mCacheMgr.put(url, entry);
-                        }
-                        return;
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    // fail to set wallpaper
-                    mView.onWallpaperSetDone(false);
-                }
+        FutureTarget<Bitmap> bitmapTarget = mGlideManager.load(url)
+                     .asBitmap()
+                     .centerCrop()
+                     .into(DisplayUtil.getScreenDimen().widthPixels, DisplayUtil.getScreenDimen().heightPixels);
+        try {
+            Bitmap bitmap = bitmapTarget.get(5000, TimeUnit.MILLISECONDS);
+            WallpaperManager wm = WallpaperManager.getInstance(mContext);
+            wm.setBitmap(bitmap);
+            mView.onWallpaperSetDone(true);
+            // cache it
+            if (!mCacheMgr.isExist(url)) {
+                mCacheMgr.put(url, bitmap);
             }
-        });
+            return;
+        } catch (InterruptedException e) {
+        } catch (ExecutionException e) {
+        } catch (TimeoutException e) {
+        } catch (IOException e) {
+        }
 
-        GlideLoader.downloadOnly(mContext, url, listener,Priority.HIGH,
-                DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
+        mView.onWallpaperSetDone(false);
     }
 
     void markAsFavor(String url) {

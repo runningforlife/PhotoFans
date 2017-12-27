@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.data.cache;
 
+import android.graphics.Bitmap;
 import android.support.annotation.StringDef;
 
 import java.lang.annotation.Retention;
@@ -23,6 +24,9 @@ public interface CacheApi {
     interface CacheCallback {
         void onGetEntryDone(Cache.Entry entry);
     }
+
+    /** put a bitmap into cache */
+    void put(String url, Bitmap bitmap);
 
     /** put a image with url to Cache */
     void put(String url, Cache.Entry entry);

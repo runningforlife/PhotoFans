@@ -1,9 +1,11 @@
 package com.github.runningforlife.photosniffer.data.cache;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,12 @@ public class DiskCacheManager implements CacheApi {
         mCacheExecutors = Executors.newSingleThreadExecutor();
         CacheActionRunnable car = new CacheActionRunnable(null, null,
                 ACTION_INIT, null);
+        mCacheExecutors.submit(car);
+    }
+
+    @Override
+    public void put(String url, Bitmap bitmap) {
+        CacheActionRunnable car = new CacheActionRunnable(url, ACTION_PUT, bitmap);
         mCacheExecutors.submit(car);
     }
 
@@ -77,6 +85,13 @@ public class DiskCacheManager implements CacheApi {
         CacheCallback callback;
         @CacheAction String action;
         Cache.Entry entry;
+        Bitmap bitmap;
+
+        CacheActionRunnable(String url, @CacheAction String action, Bitmap bitmap) {
+            this.url = url;
+            this.action = action;
+            this.bitmap = bitmap;
+        }
 
         CacheActionRunnable(String url, CacheCallback callback,
                             @CacheAction String action, Cache.Entry entry) {
@@ -102,7 +117,14 @@ public class DiskCacheManager implements CacheApi {
                     mDiskCache.clear();
                     break;
                 case ACTION_PUT:
-                    mDiskCache.put(url, entry);
+                    if (bitmap != null) {
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream(bitmap.getByteCount());
+                        Cache.Entry entry2 = new Cache.Entry(bos.toByteArray(), System.currentTimeMillis());
+                        mDiskCache.put(url, entry2);
+                    }
+                    if (entry != null) {
+                        mDiskCache.put(url, entry);
+                    }
                     break;
                 case ACTION_REMOVE:
                     mDiskCache.remove(url);
