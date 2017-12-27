@@ -368,10 +368,10 @@ public class ImageDetailPagerFragment extends Fragment
      */
     public void runExitAnimation(final Runnable endAction) {
         // restore parent title
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+/*        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(mOriginalTitle);
-        }
+        }*/
 
         if (!getArguments().getBoolean(ARG_HAS_ANIM, false) || !hasAnim) {
             endAction.run();
@@ -486,10 +486,12 @@ public class ImageDetailPagerFragment extends Fragment
     }
 
     private void setTitle(int current) {
-        ActionBar toolbar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        if (toolbar != null) {
-            String title = (current + 1) + "/" + mPresenter.getItemCount();
-            toolbar.setTitle(title);
+        if (isAdded()) {
+            ActionBar toolbar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (toolbar != null) {
+                String title = (current + 1) + "/" + mPresenter.getItemCount();
+                toolbar.setTitle(title);
+            }
         }
     }
 
