@@ -279,19 +279,6 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
                     .commit();
     }
 
-    private void showFullScreenImage(View sharedView, int pos, String url){
-        Intent intent = new Intent(this, FullScreenImageActivity.class);
-        intent.putExtra(FullScreenImageFragment.POSITION, pos);
-        intent.putExtra(FullScreenImageFragment.IMAGE_URL, url);
-
-        if (Build.VERSION.SDK_INT >= 16) {
-            ActivityOptionsCompat options = ActivityOptionsCompat.
-                    makeSceneTransitionAnimation(this, sharedView,
-                            getString(R.string.activity_image_transition) + String.valueOf(pos));
-            startActivity(intent, options.toBundle());
-        }
-    }
-
     private void showImagePagerFragment(View iv, int pos, int type) {
         int[] screenLocation = new int[2];
         iv.getLocationOnScreen(screenLocation);

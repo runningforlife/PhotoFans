@@ -133,7 +133,7 @@ public class WallpaperUpdaterService extends Service {
             List<ImageRealm> imageRealms = new ArrayList<>(cachedUrls.size());
             for (String url : cachedUrls) {
                 ImageRealm ir = new ImageRealm();
-                ir.setUrl(url);
+                ir.setUrl(mDiskCache.getFilePath(url));
                 ir.setTimeStamp(System.currentTimeMillis());
                 ir.setIsWallpaper(true);
                 ir.setIsFavor(false);

@@ -22,7 +22,7 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
-import com.github.runningforlife.photosniffer.data.model.UserAction;
+import com.github.runningforlife.photosniffer.ui.activity.UserAction;
 import com.github.runningforlife.photosniffer.presenter.FullScreenPresenter;
 import com.github.runningforlife.photosniffer.presenter.FullScreenPresenterImpl;
 
@@ -32,10 +32,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.github.runningforlife.photosniffer.data.model.UserAction.DELETE;
-import static com.github.runningforlife.photosniffer.data.model.UserAction.FAVOR;
-import static com.github.runningforlife.photosniffer.data.model.UserAction.SAVE;
-import static com.github.runningforlife.photosniffer.data.model.UserAction.WALLPAPER;
+import static com.github.runningforlife.photosniffer.ui.activity.UserAction.DELETE;
+import static com.github.runningforlife.photosniffer.ui.activity.UserAction.FAVOR;
+import static com.github.runningforlife.photosniffer.ui.activity.UserAction.SAVE;
+import static com.github.runningforlife.photosniffer.ui.activity.UserAction.WALLPAPER;
 
 /**
  * a dialog to show full screen image

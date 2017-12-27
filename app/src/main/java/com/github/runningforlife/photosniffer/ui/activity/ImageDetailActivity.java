@@ -41,13 +41,12 @@ import io.realm.RealmObject;
 import com.github.runningforlife.photosniffer.ui.adapter.ImagePagerAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.PageAdapterCallback;
 import com.github.runningforlife.photosniffer.ui.fragment.ActionListDialogFragment;
-import com.github.runningforlife.photosniffer.data.model.UserAction;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.runningforlife.photosniffer.data.model.UserAction.*;
+import static com.github.runningforlife.photosniffer.ui.activity.UserAction.*;
 
 /**
  * activity to show the detail of the images
@@ -80,8 +79,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     private static UserAction ACTION_FAVOR = FAVOR;
     private static UserAction ACTION_DELETE = DELETE;
 
-    private static final int PREVIEW_HIDE_COUNT_DOWN = 5000; // 5s
-
     @Override
     public void onCreate(Bundle savedSate){
         super.onCreate(savedSate);
@@ -104,10 +101,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         initPresenter();
 
         mMainHandler = new EventHandler(Looper.getMainLooper());
-
-/*        if (Build.VERSION.SDK_INT >= 21) {
-            getWindow().setEnterTransition(null);
-        }*/
     }
 
     @Override
@@ -115,7 +108,6 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         super.onResume();
         Log.v(TAG,"onResume()");
         //mPresenter.onStart();
-
         initActionList();
 
         setTitle();
@@ -282,9 +274,7 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
     @Override
     public void onActionClick(String action, int pos) {
         Log.v(TAG,"onActionClick(): action = " + action);
-
         mCurrentImgIdx = mImgPager.getCurrentItem();
-
         if (action.equals(ACTION_SAVE.action())) {
             // save image
             saveImage(mCurrentImgIdx);
@@ -340,9 +330,9 @@ public class ImageDetailActivity extends AppCompatActivity implements ImageDetai
         String favor = getString(R.string.action_favorite);
 
         //mUserActionList.add(share);
-        mUserActionList.add(save);
-        mUserActionList.add(favor);
         mUserActionList.add(wallpaper);
+        mUserActionList.add(favor);
+        mUserActionList.add(save);
         mUserActionList.add(delete);
 
         ACTION_SHARE.setAction(share);

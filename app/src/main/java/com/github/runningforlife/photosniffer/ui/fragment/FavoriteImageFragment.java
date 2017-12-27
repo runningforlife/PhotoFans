@@ -72,7 +72,7 @@ public class FavoriteImageFragment extends BaseFragment implements FavorPictureV
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
 
         if(mCallback != null) {

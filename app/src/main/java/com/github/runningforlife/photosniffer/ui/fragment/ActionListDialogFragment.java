@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.BaseAdapter;
@@ -104,8 +105,8 @@ public class ActionListDialogFragment extends DialogFragment{
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             if(Build.VERSION.SDK_INT >= 21) {
                 Transition enterSlide = new Slide(Gravity.BOTTOM);
-                enterSlide.setInterpolator(new LinearOutSlowInInterpolator());
-                enterSlide.setDuration(1000);
+                enterSlide.setInterpolator(new DecelerateInterpolator());
+                enterSlide.setDuration(android.R.integer.config_mediumAnimTime);
                 window.setEnterTransition(enterSlide);
 
                 Transition fade = new Fade();

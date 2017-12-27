@@ -46,7 +46,9 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     @Override
     public void favorImageAtPos(int pos) {
         Log.d(TAG,"favorImageAtPos(): pos = " + pos);
-        markAsFavor(mImageList.get(pos).getUrl());
+        if (pos >= 0 && pos < mImageList.size()) {
+            markAsFavor(mImageList.get(pos).getUrl());
+        }
     }
 
     @Override

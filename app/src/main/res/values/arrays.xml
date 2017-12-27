@@ -41,31 +41,4 @@
         <item>86400000</item>
     </string-array>
 
-    <string-array name="build_in_wallpapers">
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/74/5/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/73/1/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/71/1/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/73/5/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/69/6/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/68/10/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/68/8/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/67/6/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/64/4/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/64/6/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/64/6/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/62/1/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/61/8/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/59/10/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/59/9/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/57/8/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/55/2/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/54/4/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/47/8/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/47/7/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/42/10/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/40/3/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/37/8/thumb.jpg</item>
-        <item>http://ppe.oss-cn-shenzhen.aliyuncs.com/collections/34/1/thumb.jpg</item>
-    </string-array>
-
 </resources>

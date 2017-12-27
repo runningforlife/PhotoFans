@@ -1,4 +1,4 @@
-package com.github.runningforlife.photosniffer.data.model;
+package com.github.runningforlife.photosniffer.ui.activity;
 
 /**
  * all user action like : save/share/deleteSync/Favor

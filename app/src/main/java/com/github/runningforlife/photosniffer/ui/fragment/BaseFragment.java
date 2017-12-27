@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -156,9 +158,10 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     }
 
     protected void setTitle(String title) {
-        Activity activity = getActivity();
-        if(activity != null){
-            activity.setTitle(title);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        ActionBar actionBar = activity.getSupportActionBar();
+        if(actionBar != null){
+            actionBar.setTitle(title);
         }
     }
 

@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -29,6 +31,7 @@ import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl
 import com.github.runningforlife.photosniffer.presenter.ImageType;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
+import com.github.runningforlife.photosniffer.ui.activity.UserAction;
 import com.github.runningforlife.photosniffer.ui.adapter.ImagePagerAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.PageAdapterCallback;
 import com.nineoldandroids.animation.Animator;
@@ -42,12 +45,21 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.realm.RealmObject;
+
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_FAVOR;
+import static com.github.runningforlife.photosniffer.ui.activity.UserAction.DELETE;
+import static com.github.runningforlife.photosniffer.ui.activity.UserAction.FAVOR;
+import static com.github.runningforlife.photosniffer.ui.activity.UserAction.SAVE;
+import static com.github.runningforlife.photosniffer.ui.activity.UserAction.SHARE;
+import static com.github.runningforlife.photosniffer.ui.activity.UserAction.WALLPAPER;
+
 /**
  * a fragment containing view pager,
  * refer to me.iwf.photopicker.fragment.ImagePagerFragment
  */
 
-public class ImageDetailPagerFragment extends Fragment implements PageAdapterCallback, ImageDetailView{
+public class ImageDetailPagerFragment extends Fragment
+        implements PageAdapterCallback, ImageDetailView, ActionListDialogFragment.ActionCallback{
     public static final String TAG = "ImagePagerFragment";
 
     public final static String ARG_PATH = "PATHS";
@@ -81,6 +93,13 @@ public class ImageDetailPagerFragment extends Fragment implements PageAdapterCal
     private @ImageType int mImageType;
     // to restore title
     private CharSequence mOriginalTitle;
+
+    private List<String> mUserActions;
+    private static UserAction ACTION_SHARE = SHARE;
+    private static UserAction ACTION_SAVE = SAVE;
+    private static UserAction ACTION_WALLPAPER = WALLPAPER;
+    private static UserAction ACTION_FAVOR = FAVOR;
+    private static UserAction ACTION_DELETE = DELETE;
 
 
     public static ImageDetailPagerFragment newInstance(int pos, int[] screenLocation, int thumbnailWidth, int thumbnailHeight, @ImageType int type) {
@@ -148,6 +167,8 @@ public class ImageDetailPagerFragment extends Fragment implements PageAdapterCal
         mPagerAdapter = new ImagePagerAdapter(getActivity(), this);
 
         setHasOptionsMenu(true);
+
+        initActionList();
     }
 
 
@@ -243,6 +264,7 @@ public class ImageDetailPagerFragment extends Fragment implements PageAdapterCal
         Log.v(TAG,"onOptionsItemSelected()");
         switch (menuItem.getItemId()) {
             case R.id.action_more:
+                showActionDialog();
                 break;
         }
 
@@ -253,6 +275,40 @@ public class ImageDetailPagerFragment extends Fragment implements PageAdapterCal
         mPresenter = new ImageDetailPresenterImpl(Glide.with(this), getActivity(), this, mImageType);
         mPresenter.onStart();
     }
+
+    private void initActionList() {
+        mUserActions = new ArrayList<>();
+        String save = getString(R.string.action_save);
+        String wallpaper = getString(R.string.action_wallpaper);
+        String delete = getString(R.string.action_delete);
+        String favor = getString(R.string.action_favorite);
+
+        mUserActions.add(wallpaper);
+        if (mImageType != IMAGE_FAVOR) {
+            mUserActions.add(favor);
+        }
+        mUserActions.add(save);
+        mUserActions.add(delete);
+
+        ACTION_DELETE.setAction(delete);
+        ACTION_FAVOR.setAction(favor);
+        ACTION_SAVE.setAction(save);
+        ACTION_WALLPAPER.setAction(wallpaper);
+    }
+
+    private void showActionDialog() {
+        ActionListDialogFragment fragment = (ActionListDialogFragment)
+                ActionListDialogFragment.newInstance(mUserActions);
+        fragment.setCallback(this);
+
+        FragmentManager fm = getChildFragmentManager();
+        fm.beginTransaction()
+                //.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_to_bottom)
+                .add(fragment,"ActionList")
+                .addToBackStack(null)
+                .commit();
+    }
+
 
     /**
      * The enter animation scales the picture in from its previous thumbnail
@@ -376,8 +432,26 @@ public class ImageDetailPagerFragment extends Fragment implements PageAdapterCal
     }
 
     @Override
-    public void onItemLongClicked(int pos, String adapter) {
+    public void onActionClick(String action, int pos) {
+        if (ACTION_WALLPAPER.action().equals(action)) {
+            mPresenter.setWallpaperAtPos(pos);
+        } else if (ACTION_FAVOR.action().equals(action)) {
+            mPresenter.favorImageAtPos(pos);
+        } else if (ACTION_SAVE.action().equals(action)) {
+            mPresenter.saveImageAtPos(pos);
+        } else if (ACTION_DELETE.action().equals(action)) {
+            mPresenter.removeItemAtPos(pos);
+        }
 
+        FragmentManager fragmentManager = getChildFragmentManager();
+        if (fragmentManager.getBackStackEntryCount() > 0) {
+            fragmentManager.popBackStack();
+        }
+    }
+
+    @Override
+    public void onItemLongClicked(int pos, String adapter) {
+        showActionDialog();
     }
 
     @Override
