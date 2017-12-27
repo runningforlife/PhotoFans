@@ -167,11 +167,12 @@ public class WallpaperUtils {
         if (wallpapers.size() == 0) {
             // try to cache images
             startWallpaperCacheUpdaterService(context);
+            realmApi.closeRealm();
             return;
         }
 
         String keyCacheIdx = context.getString(R.string.pref_wallpaper_cache_index);
-        int cacheIdx = SharedPrefUtil.getInt(keyCacheIdx, 0)%wallpapers.size();
+        int cacheIdx = SharedPrefUtil.getInt(keyCacheIdx, 0);
         // find a wallpaper
         ++cacheIdx;
         cacheIdx %= wallpapers.size();
@@ -190,7 +191,7 @@ public class WallpaperUtils {
             Log.e(TAG,"fail to set wallpaper");
         }
         // save current idx
-        SharedPrefUtil.putInt(keyCacheIdx, ++cacheIdx);
+        SharedPrefUtil.putInt(keyCacheIdx, cacheIdx);
 
         realmApi.closeRealm();
     }
