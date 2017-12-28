@@ -140,7 +140,7 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
             mImagePagerFragment.runExitAnimation(new Runnable() {
                 @Override
                 public void run() {
-                    if (mFragmentMgr.getBackStackEntryCount() > 0) {
+                    if (!mSavedState && mFragmentMgr.getBackStackEntryCount() > 0) {
                         mFragmentMgr. popBackStackImmediate();
                     }
                 }
