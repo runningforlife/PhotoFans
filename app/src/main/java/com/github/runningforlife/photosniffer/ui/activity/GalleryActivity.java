@@ -347,6 +347,11 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
                             Manifest.permission.WRITE_EXTERNAL_STORAGE};
             ActivityCompat.requestPermissions(this,permissions, MY_STORAGE_PERMISSION_REQUEST);
         } else {
+            String prefNewUser = getString(R.string.pref_new_user);
+            boolean isNewUser = SharePrefUtil.getBoolean(prefNewUser, true);
+            if (isNewUser) {
+                showImageRetrieveHint();
+            }
             makeAppDir();
         }
     }
