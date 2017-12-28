@@ -61,8 +61,8 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout mDrawer;
     private ActionBarDrawerToggle mDrawerToggle;
-
     private Handler mHandler = new Handler(Looper.getMainLooper());
+    private boolean mStateSaved;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +83,7 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
         //headerView = navView.getHeaderView(0);
 
         mHintFragmentAdded = false;
+        mStateSaved = false;
         mFragmentMgr = getSupportFragmentManager();
 
         initView();
@@ -114,7 +115,14 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
     public void onResume() {
         super.onResume();
         Log.v(TAG,"onResume()");
+        mStateSaved = false;
         checkStoragePermission();
+    }
+    
+    @Override
+    public void onStop() {
+        mStateSaved = true;
+        super.onStop();
     }
 
     @Override
@@ -133,7 +141,7 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
                 @Override
                 public void run() {
                     if (mFragmentMgr.getBackStackEntryCount() > 0) {
-                        mFragmentMgr.popBackStack();
+                        mFragmentMgr. popBackStackImmediate();
                     }
                 }
             });
@@ -240,6 +248,7 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
 
     private void initView() {
         Log.v(TAG,"initView()");
+        mFragmentMgr.executePendingTransactions();
         startFragmentByTag(AllPicturesFragment.TAG);
     }
 
@@ -301,7 +310,6 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
             fragment = (RetrieveHintFragment) RetrieveHintFragment.newInstance();
 
             FragmentTransaction ft = fm.beginTransaction();
-
             ft.setCustomAnimations(R.anim.anim_enter_from_top, android.R.anim.fade_out);
             ft.add(R.id.fragment_container, fragment, RetrieveHintFragment.TAG)
                     .commitAllowingStateLoss();
@@ -326,7 +334,7 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
             rhf.dismiss();
             fm.beginTransaction()
                 .remove(rhf)
-                .commit();
+                .commitAllowingStateLoss();
         }
     }
 
