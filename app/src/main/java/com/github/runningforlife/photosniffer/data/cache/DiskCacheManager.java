@@ -119,6 +119,7 @@ public class DiskCacheManager implements CacheApi {
                 case ACTION_PUT:
                     if (bitmap != null) {
                         ByteArrayOutputStream bos = new ByteArrayOutputStream(bitmap.getByteCount());
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
                         Cache.Entry entry2 = new Cache.Entry(bos.toByteArray(), System.currentTimeMillis());
                         mDiskCache.put(url, entry2);
                     }
