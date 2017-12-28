@@ -308,6 +308,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback {
 
             updated.put("mUrl", mCacheMgr.getFilePath(url));
             updated.put("mIsWallpaper", Boolean.toString(true));
+            updated.put("mIsFavor", Boolean.toString(Boolean.FALSE));
             updated.put("mIsCached", Boolean.toString(Boolean.TRUE));
             mRealmApi.updateAsync(ImageRealm.class, params, updated);
         }
