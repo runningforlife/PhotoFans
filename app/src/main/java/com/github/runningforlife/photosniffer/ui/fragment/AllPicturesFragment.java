@@ -27,12 +27,13 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.presenter.AllPicturesPresenterImpl;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.AllPictureView;
-import com.github.runningforlife.photosniffer.ui.activity.ImageDetailActivity;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_GALLERY;
 
 /**
  * a fragment to display all pictures
@@ -201,13 +202,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
         if (mRefresher.isRefreshing()) {
             mRefresher.setRefreshing(false);
         }
-
-        Intent intent = new Intent(getContext(),ImageDetailActivity.class);
-        intent.putExtra("image",pos);
-        ActivityOptionsCompat options = ActivityOptionsCompat.
-                makeSceneTransitionAnimation(getActivity(), view,
-                        getString(R.string.activity_image_transition) + String.valueOf(pos));
-        startActivity(intent, options.toBundle());
+        mCallback.onItemClick(view, pos, IMAGE_GALLERY);
     }
 
     @Override

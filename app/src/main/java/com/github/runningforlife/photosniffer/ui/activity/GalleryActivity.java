@@ -3,14 +3,12 @@ package com.github.runningforlife.photosniffer.ui.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.UiThread;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -20,19 +18,16 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.presenter.ImageType;
 import com.github.runningforlife.photosniffer.ui.GalleryView;
 import com.github.runningforlife.photosniffer.ui.fragment.AllPicturesFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.BaseFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.FavoriteImageFragment;
-import com.github.runningforlife.photosniffer.ui.fragment.FullScreenImageFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.ImageDetailPagerFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.RetrieveHintFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.WallPaperFragment;
@@ -40,14 +35,9 @@ import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
 import java.io.File;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_FAVOR;
-import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_GALLERY;
-import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_WALLPAPER;
 
 public class GalleryActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback, BaseFragment.FragmentCallback, GalleryView {
 
@@ -140,7 +130,7 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
             mImagePagerFragment.runExitAnimation(new Runnable() {
                 @Override
                 public void run() {
-                    if (!mSavedState && mFragmentMgr.getBackStackEntryCount() > 0) {
+                    if (!mStateSaved && mFragmentMgr.getBackStackEntryCount() > 0) {
                         mFragmentMgr. popBackStackImmediate();
                     }
                 }
@@ -356,7 +346,7 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
             ActivityCompat.requestPermissions(this,permissions, MY_STORAGE_PERMISSION_REQUEST);
         } else {
             String prefNewUser = getString(R.string.pref_new_user);
-            boolean isNewUser = SharePrefUtil.getBoolean(prefNewUser, true);
+            boolean isNewUser = SharedPrefUtil.getBoolean(prefNewUser, true);
             if (isNewUser) {
                 showImageRetrieveHint();
             }

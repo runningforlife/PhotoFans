@@ -32,11 +32,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.github.runningforlife.photosniffer.ui.activity.ImageDetailActivity"
-            android:theme="@style/AppTheme.NoActionBar.DarkStatusBar"
-            android:label=""
-            android:parentActivityName="com.github.runningforlife.photosniffer.ui.activity.GalleryActivity"/>
-
         <activity android:name="com.github.runningforlife.photosniffer.ui.activity.SettingsActivity"
             android:theme="@style/AppTheme"
             android:label="@string/action_settings"/>

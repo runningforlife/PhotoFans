@@ -39,6 +39,10 @@ import java.util.List;
 
 public class ActionListDialogFragment extends DialogFragment{
     public static final String TAG = "ActionList";
+
+    private static final String ARGS_POSITION = "position";
+    private static final String ARGS_ACTION_LIST = "action_list";
+
     private List<String> mActionList;
     private ActionCallback mCb;
 
@@ -49,10 +53,11 @@ public class ActionListDialogFragment extends DialogFragment{
     public ActionListDialogFragment() {
     }
 
-    public static DialogFragment newInstance(List<String> actions){
+    public static DialogFragment newInstance(List<String> actions, int pos){
         ActionListDialogFragment fragment = new ActionListDialogFragment();
         Bundle args = new Bundle();
-        args.putStringArrayList("action_list", new ArrayList<>(actions));
+        args.putStringArrayList(ARGS_ACTION_LIST, new ArrayList<>(actions));
+        args.putInt(ARGS_POSITION, pos);
 
         fragment.setArguments(args);
 
@@ -151,7 +156,7 @@ public class ActionListDialogFragment extends DialogFragment{
             if(view == null){
                 view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.item_dialog_action,parent,false);
-                TextView tv = (TextView)view.findViewById(R.id.tv_action);
+                TextView tv = view.findViewById(R.id.tv_action);
 
                 final String action = mActionList.get(position);
                 tv.setText(action);
@@ -160,7 +165,8 @@ public class ActionListDialogFragment extends DialogFragment{
                     @Override
                     public void onClick(View v) {
                         if(mCb != null){
-                            mCb.onActionClick(action,position);
+                            int pos = getArguments().getInt(ARGS_POSITION);
+                            mCb.onActionClick(action,pos);
                         }
                         // destroy dialog
                         dismiss();

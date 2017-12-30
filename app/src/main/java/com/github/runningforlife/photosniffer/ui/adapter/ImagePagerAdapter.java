@@ -5,6 +5,8 @@ import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseArray;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,13 @@ import com.bumptech.glide.Priority;;
 import com.github.runningforlife.photosniffer.R;
 
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,14 +42,21 @@ public class ImagePagerAdapter extends PagerAdapter {
     private Context mContext;
     private PageAdapterCallback mCallback;
 
-    public ImagePagerAdapter(Context context, BaseAdapterCallback callback) {
+    public ImagePagerAdapter(Context context, @Nonnull BaseAdapterCallback callback) {
         mCallback = (PageAdapterCallback) callback;
         mContext = context;
     }
 
+
     @Override
     public int getCount() {
         return mCallback.getCount();
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        // try to refresh all data set
+        return POSITION_NONE;
     }
 
     @Override
@@ -55,12 +71,6 @@ public class ImagePagerAdapter extends PagerAdapter {
         final View view = LayoutInflater.from(mContext)
                 .inflate(R.layout.item_image_detail,parent,false);
         ImageHolder imageHolder = new ImageHolder(view);
-        // transition name
-/*        if(Build.VERSION.SDK_INT >= 21) {
-            String transitionName = mContext.getString(R.string.activity_image_transition)
-                    + String.valueOf(position);
-            view.setTransitionName(transitionName);
-        }*/
 
         if (AndroidLifecycleUtils.canLoadImage(mContext)) {
             // preload image
@@ -95,7 +105,7 @@ public class ImagePagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public void destroyItem(ViewGroup parent,int position, Object object){
+    public void destroyItem(ViewGroup parent,int position, Object object) {
         parent.removeView((View)object);
     }
 

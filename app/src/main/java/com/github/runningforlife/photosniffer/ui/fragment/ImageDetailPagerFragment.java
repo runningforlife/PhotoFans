@@ -96,8 +96,6 @@ public class ImageDetailPagerFragment extends Fragment
     // presenter
     private ImageDetailPresenterImpl mPresenter;
     private @ImageType int mImageType;
-    // to restore title
-    private CharSequence mOriginalTitle;
 
     private List<String> mUserActions;
     private static UserAction ACTION_SHARE = SHARE;
@@ -134,16 +132,6 @@ public class ImageDetailPagerFragment extends Fragment
 
         return f;
     }
-
-    public void setPhotos(List<String> paths, int currentItem) {
-        this.mImageUrls.clear();
-        this.mImageUrls.addAll(paths);
-        this.currentItem = currentItem;
-
-        mViewPager.setCurrentItem(currentItem);
-        mViewPager.getAdapter().notifyDataSetChanged();
-    }
-
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -185,6 +173,7 @@ public class ImageDetailPagerFragment extends Fragment
 
         mViewPager = rootView.findViewById(me.iwf.photopicker.R.id.vp_photos);
         mViewPager.setOffscreenPageLimit(5);
+        mViewPager.setCurrentItem(currentItem);
 
         initPresenter();
         // Only run the animation if we're coming from the parent activity, not if
@@ -221,7 +210,7 @@ public class ImageDetailPagerFragment extends Fragment
             @Override public void onPageSelected(int position) {
                 hasAnim = currentItem == position;
 
-                setTitle(position);
+                setTitle();
             }
 
             @Override public void onPageScrollStateChanged(int state) {
@@ -235,12 +224,9 @@ public class ImageDetailPagerFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
-        AppCompatActivity parent = (AppCompatActivity) getActivity();
-        ActionBar toolbar = parent.getSupportActionBar();
-        if (toolbar != null) {
-            mOriginalTitle = toolbar.getTitle();
-        }
+
     }
+
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
@@ -269,7 +255,7 @@ public class ImageDetailPagerFragment extends Fragment
         Log.v(TAG,"onOptionsItemSelected()");
         switch (menuItem.getItemId()) {
             case R.id.action_more:
-                showActionDialog();
+                showActionDialog(mViewPager.getCurrentItem());
                 break;
         }
 
@@ -301,9 +287,9 @@ public class ImageDetailPagerFragment extends Fragment
         ACTION_WALLPAPER.setAction(wallpaper);
     }
 
-    private void showActionDialog() {
+    private void showActionDialog(int pos) {
         ActionListDialogFragment fragment = (ActionListDialogFragment)
-                ActionListDialogFragment.newInstance(mUserActions);
+                ActionListDialogFragment.newInstance(mUserActions, pos);
         fragment.setCallback(this);
 
         FragmentManager fm = getChildFragmentManager();
@@ -367,12 +353,6 @@ public class ImageDetailPagerFragment extends Fragment
      * when we actually switch activities)
      */
     public void runExitAnimation(final Runnable endAction) {
-        // restore parent title
-/*        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(mOriginalTitle);
-        }*/
-
         if (!getArguments().getBoolean(ARG_HAS_ANIM, false) || !hasAnim) {
             endAction.run();
             return;
@@ -456,7 +436,8 @@ public class ImageDetailPagerFragment extends Fragment
 
     @Override
     public void onItemLongClicked(int pos, String adapter) {
-        showActionDialog();
+        //currentItem = pos;
+        showActionDialog(pos);
     }
 
     @Override
@@ -477,6 +458,7 @@ public class ImageDetailPagerFragment extends Fragment
 
     @Override
     public void removeItemAtPos(int pos) {
+        //currentItem = pos;
         mPresenter.removeItemAtPos(pos);
     }
 
@@ -485,11 +467,11 @@ public class ImageDetailPagerFragment extends Fragment
         mPresenter.loadImageIntoView(pos, iv, priority, w, h, scaleType);
     }
 
-    private void setTitle(int current) {
+    private void setTitle() {
         if (isAdded()) {
             ActionBar toolbar = ((AppCompatActivity) getActivity()).getSupportActionBar();
             if (toolbar != null) {
-                String title = (current + 1) + "/" + mPresenter.getItemCount();
+                String title = (mViewPager.getCurrentItem() + 1) + "/" + mPresenter.getItemCount();
                 toolbar.setTitle(title);
             }
         }
@@ -506,14 +488,15 @@ public class ImageDetailPagerFragment extends Fragment
     }
 
     @Override
-    public void onDataSetChange(int start, int end, RealmOp op) {
+    public void onDataSetChange(int start, int len, RealmOp op) {
         if (mViewPager.getAdapter() == null) {
             mViewPager.setAdapter(mPagerAdapter);
         }
         mPagerAdapter.notifyDataSetChanged();
-        mViewPager.setCurrentItem(currentItem);
-
-        setTitle(currentItem);
+        if (hasAnim) {
+            mViewPager.setCurrentItem(currentItem);
+        }
+        setTitle();
     }
 
     @Override
