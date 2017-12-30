@@ -13,8 +13,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.SystemClock;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.FutureTarget;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
@@ -28,6 +31,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -179,9 +185,13 @@ public class WallpaperUtils {
 
         WallpaperManager wm = WallpaperManager.getInstance(context);
         try {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inScaled = true;
-            Bitmap bitmap = BitmapFactory.decodeFile(wallpapers.get(cacheIdx).getUrl(), options);
+            FutureTarget<Bitmap> futureTarget =
+                    Glide.with(context)
+                         .load(wallpapers.get(cacheIdx).getUrl())
+                         .asBitmap()
+                         .fitCenter()
+                         .into(DisplayUtil.getScreenDimen().widthPixels, DisplayUtil.getScreenDimen().heightPixels);
+            Bitmap bitmap = futureTarget.get(5000, TimeUnit.MILLISECONDS);
             if (Build.VERSION.SDK_INT >= 24) {
                 wm.setBitmap(bitmap, null, false, flag);
             } else {
@@ -192,7 +202,6 @@ public class WallpaperUtils {
         }
         // save current idx
         SharedPrefUtil.putInt(keyCacheIdx, cacheIdx);
-
         realmApi.closeRealm();
     }
 }

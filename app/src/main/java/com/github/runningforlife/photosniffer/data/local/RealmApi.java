@@ -48,6 +48,9 @@ public interface RealmApi {
      */
     boolean deleteSync(RealmObject data);
 
+    /** delete all object for the given urls */
+    void deleteSync(List<String> urls);
+
     /**
      * delete realm object async
      */

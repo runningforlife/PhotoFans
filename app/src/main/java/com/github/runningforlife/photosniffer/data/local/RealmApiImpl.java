@@ -280,6 +280,23 @@ public class RealmApiImpl implements RealmApi {
     }
 
     @Override
+    public void deleteSync(List<String> urls) {
+        for (String url : urls) {
+            final RealmObject realmObject = mRealm.where(ImageRealm.class)
+                                            .equalTo("mUrl", url)
+                                            .findFirst();
+            mRealm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    if (realmObject != null) {
+                        realmObject.deleteFromRealm();
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
     public void deleteAsync(final Class<? extends RealmObject> type, final HashMap<String, String> params) {
         Log.v(TAG,"deleteAsync()");
         if (ImageRealm.class == type) {
