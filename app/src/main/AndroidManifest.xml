@@ -45,11 +45,6 @@
             android:theme="@style/AppTheme"
             android:label="@string/select_your_favorite_websites"/>
 
-        <activity android:name=".ui.activity.FullScreenImageActivity"
-            android:theme="@style/AppTheme.NoActionBar.DarkStatusBar"
-            android:parentActivityName=".ui.activity.GalleryActivity"
-            android:label=""/>
-
         <activity android:name="me.iwf.photopicker.PhotoPickerActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
