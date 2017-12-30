@@ -4,7 +4,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
 
-import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 
 import org.jsoup.nodes.Document;
@@ -67,11 +66,11 @@ public class ImageRetrieverFactory implements PageRetriever,ImageSource{
     }
 
     @Override
-    public List<ImageRealm> retrieveImages(Page page) {
+    public List<String> retrieveImages(Page page) {
         if(page == null){
             throw new IllegalArgumentException("page should not be null");
         }
-        List<ImageRealm> imgList = Collections.EMPTY_LIST;
+        List<String> imgList = Collections.EMPTY_LIST;
 
         String url = page.getUrl().get();
         try {
@@ -115,11 +114,11 @@ public class ImageRetrieverFactory implements PageRetriever,ImageSource{
     }
 
     @Override
-    public List<ImagePageInfo> retrieveLinks(Page page) {
+    public List<String> retrieveLinks(Page page) {
         return null;
     }
 
-    private List<ImageRealm> retrieve(Page page,@IMAGE_SOURCE String imgSrc){
+    private List<String> retrieve(Page page,@IMAGE_SOURCE String imgSrc){
         Log.v(TAG,"retrieveImages(): page url = " + page.getUrl().get());
         // here we retrieveImages all those IMAGE urls
         String retrieveReg = sImgSource.get(imgSrc);
@@ -127,7 +126,7 @@ public class ImageRetrieverFactory implements PageRetriever,ImageSource{
         Elements images = doc.select(retrieveReg);
         Log.v(TAG, "retrieved images = " + images.size());
 
-        List<ImageRealm> imgList = new ArrayList<>();
+        List<String> imgList = new ArrayList<>();
         for (Element img : images) {
             // here, absolute URL and relative URL
             if (img.tagName().equals("img")) {
@@ -155,18 +154,7 @@ public class ImageRetrieverFactory implements PageRetriever,ImageSource{
                     continue;
                 }
 
-                ImageRealm imageRealm = new ImageRealm();
-
-                String imgName = img.attr("alt");
-                if (TextUtils.isEmpty(imgName)) {
-                    imageRealm.setName("unknown");
-                }
-                imageRealm.setName(imgName);
-                imageRealm.setUrl(url);
-                imageRealm.setTimeStamp(System.currentTimeMillis());
-                imageRealm.setUsed(false);
-
-                imgList.add(imageRealm);
+                imgList.add(url);
             }
         }
 
@@ -188,9 +176,9 @@ public class ImageRetrieverFactory implements PageRetriever,ImageSource{
         return false;
     }
 
-    private List<ImageRealm> retrieveMmImage(Page page, @IMAGE_SOURCE String src){
+    private List<String> retrieveMmImage(Page page, @IMAGE_SOURCE String src){
         Log.v(TAG,"retrieveMmImage(): url = " + page.getUrl());
-        List<ImageRealm> imgUrls = new ArrayList<>();
+        List<String> imgUrls = new ArrayList<>();
 
         Html html =  page.getHtml();
         Document doc = html.getDocument();
@@ -221,16 +209,7 @@ public class ImageRetrieverFactory implements PageRetriever,ImageSource{
                         url = src + relUrl;
                     }
 
-                    String name = img.attr("alt");
-                    if (TextUtils.isEmpty(name)) {
-                        name = "unknown";
-                    }
-                    imageRealm.setName(name);
-                    imageRealm.setUrl(url);
-                    imageRealm.setTimeStamp(System.currentTimeMillis());
-                    imageRealm.setUsed(false);
-
-                    imgUrls.add(imageRealm);
+                    imgUrls.add(url);
                 }
             }
         }

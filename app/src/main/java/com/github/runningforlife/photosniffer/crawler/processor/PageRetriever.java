@@ -1,8 +1,4 @@
 package com.github.runningforlife.photosniffer.crawler.processor;
-
-import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
-import com.github.runningforlife.photosniffer.data.model.ImageRealm;
-
 import java.util.List;
 
 import us.codecraft.webmagic.Page;
@@ -18,7 +14,7 @@ interface PageRetriever {
      * @param Page: downloaded pages
      * @return List<String> : a list of retrieved image urls
      */
-    List<ImageRealm> retrieveImages(Page page);
+    List<String> retrieveImages(Page page);
 
     /**
      * retrieveImages page link
@@ -26,5 +22,5 @@ interface PageRetriever {
      * @param page html page to retrieveImages
      * @return return a list page url
      */
-    List<ImagePageInfo> retrieveLinks(Page page);
+    List<String> retrieveLinks(Page page);
 }

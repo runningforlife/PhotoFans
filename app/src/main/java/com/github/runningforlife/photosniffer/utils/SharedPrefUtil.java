@@ -48,7 +48,7 @@ public class SharedPrefUtil {
         String key = context.getString(R.string.pref_choose_image_source);
         Set<String> imgSrc = pref.getStringSet(key, Collections.EMPTY_SET);
 
-        if (imgSrc == null) {
+        if (imgSrc == null || imgSrc.isEmpty()) {
             String[] src = context.getResources().getStringArray(R.array.default_source_url);
             return Arrays.asList(src);
         }else{

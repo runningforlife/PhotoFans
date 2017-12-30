@@ -2,10 +2,9 @@ package com.github.runningforlife.photosniffer.crawler;
 
 import android.util.Log;
 
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.github.runningforlife.photosniffer.utils.UrlUtil;
 
+import java.io.IOException;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import us.codecraft.webmagic.Page;
@@ -31,13 +30,13 @@ import okhttp3.Request;
 public class OkHttpDownloader extends AbstractDownloader {
     private static final String LOG_TAG = "OkHttpDownloader";
 
-    private final static String REG_IMAGES = "(?m)(?s)<img\\s+(.*)src\\s*=\\s*\"([^\"]+)\"(.*)(\\.(gif|jpg|png))$";
+    private final static String REG_IMAGES = "(?m)(?s)<img\\s+(.*)src\\s*=\\s*\"([^\"]+)\"(.*)(\\.(gif|jpg|png|jpeg))$";
 
     @Override
     public Page download(us.codecraft.webmagic.Request request, Task task) {
         Log.v(LOG_TAG,"download()");
 
-        if (isPossibleImageUrl(request.getUrl())) {
+        if (UrlUtil.isPossibleImageUrl(request.getUrl())) {
             Page page = new Page();
             page.setRawText("");
             // bad request
@@ -115,12 +114,5 @@ public class OkHttpDownloader extends AbstractDownloader {
         }
 
         return page;
-    }
-
-    private boolean isPossibleImageUrl(String url){
-        Pattern pattern = Pattern.compile(REG_IMAGES);
-        Matcher matcher = pattern.matcher(url);
-
-        return matcher.matches();
     }
 }

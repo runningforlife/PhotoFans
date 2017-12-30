@@ -24,6 +24,7 @@ public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
     public ImageRealm() {
         mName = "unknown";
         mTimeStamp = System.currentTimeMillis();
+        mIsUsed = false;
     }
 
     public void setUrl(String url){

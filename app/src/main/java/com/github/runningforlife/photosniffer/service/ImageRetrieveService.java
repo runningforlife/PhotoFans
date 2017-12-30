@@ -12,16 +12,31 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.os.ResultReceiver;
 import android.util.Log;
+import android.webkit.URLUtil;
 
+import com.github.runningforlife.photosniffer.crawler.processor.ImagePageFilter;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageRetrievePageProcessor;
 
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.github.runningforlife.photosniffer.crawler.OkHttpDownloader;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
+import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
+import com.github.runningforlife.photosniffer.data.model.ImageRealm;
+import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
+import com.github.runningforlife.photosniffer.utils.UrlUtil;
 
+import io.realm.RealmChangeListener;
+import io.realm.RealmObject;
+import io.realm.RealmResults;
 import us.codecraft.webmagic.Spider;
 
 /**
@@ -31,8 +46,7 @@ import us.codecraft.webmagic.Spider;
  *  @author JasonWang
  */
 
-public class ImageRetrieveService extends Service implements
-        ImageRetrievePageProcessor.RetrieveCompleteListener {
+public class ImageRetrieveService extends Service {
 
     private static final String TAG = "ImageRetrieveService";
     private volatile Looper mServiceLooper;
@@ -42,11 +56,23 @@ public class ImageRetrieveService extends Service implements
     // max number of images to be retrieved a time
     public static final String EXTRA_EXPECTED_IMAGES = "maxImages";
     private static final int DEFAULT_RETRIEVE_TIME_OUT = 30*1000;
+    private static final int DEFAULT_DOWNLOAD_IMAGES = 15;
+    private static final int MAX_SEED_URL = 3;
 
     private ResultReceiver mReceiver;
     private ImageRetrievePageProcessor mProcessor;
     private Spider mSpider;
+    private LinkedBlockingDeque<List<String>> mRetrievedData;
+    private Thread mDataSaver;
+    private int mExpectedImages;
+    private int mRetrievedImageCount;
+    private RealmResults<ImagePageInfo> mAllPages;
+    private static Random sRandom = new Random();
+    private HashMap<String,Boolean> mPagesState;
+    private ImagePageFilter mPageFilter;
+    private List<String> mStartingUrl;
     private RealmApi mRealApi;
+
 
     public ImageRetrieveService(){
         super();
@@ -65,7 +91,60 @@ public class ImageRetrieveService extends Service implements
 
         mIsRetrieving = false;
 
-        //mRealApi = RealmApiImpl.getInstance();
+        mExpectedImages = DEFAULT_DOWNLOAD_IMAGES;
+        mRetrievedImageCount = 0;
+
+        mPagesState = new HashMap<>();
+        mPageFilter = new ImagePageFilter();
+        mStartingUrl = new ArrayList<>();
+        mRealApi = RealmApiImpl.getInstance();
+
+        loadPages();
+
+        mRetrievedData = new LinkedBlockingDeque<>(5);
+        mDataSaver = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                RealmApi realmApi = RealmApiImpl.getInstance();
+                try {
+                    while (true) {
+                        try {
+                            List<String> data = mRetrievedData.take();
+                            if (UrlUtil.isPossibleImageUrl(data.get(0))) {
+                                List<ImageRealm> realmObjects = new ArrayList<>(data.size());
+                                for (String url : data) {
+                                    ImageRealm ir = new ImageRealm();
+                                    if (mRetrievedImageCount++ <= mExpectedImages) {
+                                        ir.setUsed(true);
+                                    }
+                                    ir.setUrl(url);
+                                    realmObjects.add(ir);
+                                }
+                                realmApi.insertAsync(realmObjects);
+                            } else {
+                                List<ImagePageInfo> pages = new ArrayList<>(data.size());
+                                for (String url : data) {
+                                    ImagePageInfo pageInfo = new ImagePageInfo();
+                                    pageInfo.setUrl(url);
+                                    if (mPagesState.containsKey(url)) {
+                                        pageInfo.setIsVisited(mPagesState.get(url));
+                                    }
+                                    pages.add(pageInfo);
+                                }
+                                realmApi.insertAsync(pages);
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            break;
+                        }
+                    }
+                } finally {
+                    realmApi.closeRealm();
+                }
+            }
+        },"DataSaver");
+
+        mDataSaver.start();
     }
 
     @Nullable
@@ -83,36 +162,13 @@ public class ImageRetrieveService extends Service implements
     @Override
     public void onDestroy() {
         Log.v(TAG,"onDestroy()");
-
-        mProcessor.stopGracefully();
-
         sendResult(mProcessor.getRetrievedImageCount());
-
-        mProcessor.removeListener(this);
         if(mSpider.getStatus() == Spider.Status.Running){
             mSpider.stop();
         }
 
         mServiceLooper.quit();
-
-        //mRealApi.closeRealm();
-    }
-
-    @Override
-    public void onExpectedComplete(int size) {
-        Log.v(TAG,"onExpectedComplete()");
-        if(!mServiceHandler.hasMessages(H.EVENT_RETRIEVE_DONE)) {
-            Message msg = mServiceHandler.obtainMessage(H.EVENT_RETRIEVE_DONE);
-            msg.obj = size;
-            msg.sendToTarget();
-        }
-    }
-
-    @Override
-    public void onRetrieveComplete(int size) {
-        Log.v(TAG,"onRetrieveComplete()");
-        // ok, got what we want, clear up
-        clearUp();
+        mDataSaver.interrupt();
     }
 
     private void start(Intent intent, int startId) {
@@ -144,10 +200,9 @@ public class ImageRetrieveService extends Service implements
 
     private void startCrawler(int n) {
         Log.i(TAG,"startCrawler(): max images to be retrieved = " + n);
-        mProcessor = new ImageRetrievePageProcessor(n);
-        mProcessor.addListener(this);
-        List<String> lastUrl =  mProcessor.getStartUrl();
-        if (lastUrl.size() <= 0) {
+        mExpectedImages = n;
+        mProcessor = new ImageRetrievePageProcessor(mRetrievedData, mStartingUrl, mPagesState, mPageFilter);
+        if (mStartingUrl.size() <= 0) {
             List<String> defList = SharedPrefUtil.getImageSource();
             String[] defSource = defList.toArray(new String[defList.size()]);
             mSpider = Spider.create(mProcessor)
@@ -155,25 +210,19 @@ public class ImageRetrieveService extends Service implements
                     .setDownloader(new OkHttpDownloader());
         } else {
             mSpider = Spider.create(mProcessor)
-                    .addUrl((String[])lastUrl.toArray(new String[lastUrl.size()]))
+                    .addUrl((String[])mStartingUrl.toArray(new String[mStartingUrl.size()]))
                     .setDownloader(new OkHttpDownloader());
         }
-
         mSpider.run();
     }
 
     private void handleResult() {
-        Log.v(TAG,"handleTimeout()");
+        Log.v(TAG,"handleResult()");
         sendResult(mProcessor.getRetrievedImageCount());
-    }
-
-    private void clearUp() {
-        mProcessor.removeListener(this);
-        if(mSpider.getStatus() == Spider.Status.Running){
-            mSpider.stop();
+        if (mAllPages.isValid()) {
+            mAllPages.removeAllChangeListeners();
         }
-        // stop service
-        stopSelf();
+        mRealApi.closeRealm();
     }
 
     @SuppressLint("RestrictedApi")
@@ -186,6 +235,41 @@ public class ImageRetrieveService extends Service implements
             mReceiver.send(ServiceStatus.SUCCESS, bundle);
         } else {
             mReceiver.send(ServiceStatus.ERROR,null);
+        }
+    }
+
+    private void loadPages() {
+        mAllPages = (RealmResults<ImagePageInfo>) mRealApi.querySync(ImagePageInfo.class, null);
+
+        for (ImagePageInfo pageInfo : mAllPages) {
+            mPagesState.put(pageInfo.getUrl(), pageInfo.getIsVisited());
+        }
+
+        mAllPages.addChangeListener(new RealmChangeListener<RealmResults<ImagePageInfo>>() {
+            @Override
+            public void onChange(RealmResults<ImagePageInfo> element) {
+                for (ImagePageInfo info : element) {
+                    mPagesState.put(info.getUrl(),info.getIsVisited());
+                }
+            }
+        });
+
+        Log.d(TAG,"loadPages(): unvisited page size = " + mAllPages.size());
+        if (mAllPages.size() > 0) {
+            for (int i = 0; mStartingUrl.size() < MAX_SEED_URL && i < mAllPages.size(); ++i) {
+                int idx = sRandom.nextInt(mAllPages.size());
+
+                String url;
+                try {
+                    String pageUrl = mAllPages.get(idx).getUrl();
+                    url = UrlUtil.getRootUrl(pageUrl);
+                    if(mPageFilter.accept(url) && !mStartingUrl.contains(pageUrl)) {
+                        mStartingUrl.add(pageUrl);
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

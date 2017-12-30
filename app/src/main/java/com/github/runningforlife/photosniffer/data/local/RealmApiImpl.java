@@ -38,7 +38,7 @@ public class RealmApiImpl implements RealmApi {
     @Override
     public void insertAsync(final RealmObject data) {
         Log.v(TAG,"insertAsync()");
-        mRealm.executeTransactionAsync(new Realm.Transaction() {
+        mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 realm.insertOrUpdate(data);
@@ -60,36 +60,37 @@ public class RealmApiImpl implements RealmApi {
     @Override
     public RealmResults<? extends RealmObject> queryAsync(Class<? extends RealmObject> type, HashMap<String, String> params) {
         RealmQuery<? extends RealmObject> query = mRealm.where(type);
+        if (params != null) {
+            Set<Map.Entry<String, String>> entries = params.entrySet();
+            for (Map.Entry<String, String> entry : entries) {
+                if (type == ImageRealm.class) {
+                    String field = entry.getKey();
+                    switch (field) {
+                        case "mTimeStamp":
+                            query.equalTo(field, Long.parseLong(entry.getValue()));
+                            break;
+                        case "mIsUsed":
+                        case "mIsFavor":
+                        case "mIsWallpaper":
+                        case "mIsCached":
+                            query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
+                            break;
+                        default:
+                            query.equalTo(field, entry.getValue());
+                    }
+                } else if (type == ImagePageInfo.class) {
+                    String field = entry.getKey();
+                    switch (field) {
+                        case "mTimeStamp":
+                            query.equalTo(field, Long.parseLong(entry.getValue()));
+                            break;
+                        case "mIsVisited":
+                            query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
+                            break;
+                        default:
+                            query.equalTo(field, entry.getValue());
 
-        Set<Map.Entry<String, String>> entries = params.entrySet();
-        for (Map.Entry<String,String> entry : entries) {
-            if (type == ImageRealm.class) {
-                String field = entry.getKey();
-                switch (field) {
-                    case "mTimeStamp":
-                        query.equalTo(field, Long.parseLong(entry.getValue()));
-                        break;
-                    case "mIsUsed":
-                    case "mIsFavor":
-                    case "mIsWallpaper":
-                    case "mIsCached":
-                        query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
-                        break;
-                    default:
-                        query.equalTo(field, entry.getValue());
-                }
-            } else if (type == ImagePageInfo.class) {
-                String field = entry.getKey();
-                switch (field) {
-                    case "mTimeStamp":
-                        query.equalTo(field, Long.parseLong(entry.getValue()));
-                        break;
-                    case "mIsVisited":
-                        query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
-                        break;
-                    default:
-                        query.equalTo(field, entry.getValue());
-
+                    }
                 }
             }
         }
@@ -100,36 +101,37 @@ public class RealmApiImpl implements RealmApi {
     @Override
     public RealmResults<? extends RealmObject> querySync(Class<? extends RealmObject> type, HashMap<String, String> params) {
         RealmQuery<? extends RealmObject> query = mRealm.where(type);
+        if (params != null) {
+            Set<Map.Entry<String, String>> entries = params.entrySet();
+            for (Map.Entry<String, String> entry : entries) {
+                if (type == ImageRealm.class) {
+                    String field = entry.getKey();
+                    switch (field) {
+                        case "mTimeStamp":
+                            query.equalTo(field, Long.parseLong(entry.getValue()));
+                            break;
+                        case "mIsUsed":
+                        case "mIsFavor":
+                        case "mIsWallpaper":
+                        case "mIsCached":
+                            query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
+                            break;
+                        default:
+                            query.equalTo(field, entry.getValue());
+                    }
+                } else if (type == ImagePageInfo.class) {
+                    String field = entry.getKey();
+                    switch (field) {
+                        case "mTimeStamp":
+                            query.equalTo(field, Long.parseLong(entry.getValue()));
+                            break;
+                        case "mIsVisited":
+                            query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
+                            break;
+                        default:
+                            query.equalTo(field, entry.getValue());
 
-        Set<Map.Entry<String, String>> entries = params.entrySet();
-        for(Map.Entry<String,String> entry : entries){
-            if (type == ImageRealm.class) {
-                String field = entry.getKey();
-                switch (field) {
-                    case "mTimeStamp":
-                        query.equalTo(field, Long.parseLong(entry.getValue()));
-                        break;
-                    case "mIsUsed":
-                    case "mIsFavor":
-                    case "mIsWallpaper":
-                    case "mIsCached":
-                        query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
-                        break;
-                    default:
-                        query.equalTo(field, entry.getValue());
-                }
-            } else if (type == ImagePageInfo.class) {
-                String field = entry.getKey();
-                switch (field) {
-                    case "mTimeStamp":
-                        query.equalTo(field, Long.parseLong(entry.getValue()));
-                        break;
-                    case "mIsVisited":
-                        query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
-                        break;
-                    default:
-                        query.equalTo(field, entry.getValue());
-
+                    }
                 }
             }
         }

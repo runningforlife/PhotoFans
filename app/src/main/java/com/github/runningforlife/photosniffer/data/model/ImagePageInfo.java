@@ -15,6 +15,7 @@ public class ImagePageInfo extends RealmObject {
 
     public ImagePageInfo(){
         mTimeStamp = System.currentTimeMillis();
+        mIsVisited = false;
     }
 
     public ImagePageInfo(String url){

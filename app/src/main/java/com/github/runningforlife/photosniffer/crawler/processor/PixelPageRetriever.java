@@ -1,12 +1,6 @@
 package com.github.runningforlife.photosniffer.crawler.processor;
 
-import android.os.PatternMatcher;
 import android.util.Log;
-import android.webkit.URLUtil;
-
-import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
-import com.github.runningforlife.photosniffer.data.model.ImageRealm;
-
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -14,10 +8,6 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Pattern;
-
-import io.realm.Realm;
-import io.realm.RealmResults;
 import us.codecraft.webmagic.Page;
 
 /**
@@ -52,7 +42,7 @@ public class PixelPageRetriever implements PageRetriever {
     }
 
     @Override
-    public List<ImageRealm> retrieveImages(Page page) {
+    public List<String> retrieveImages(Page page) {
         Log.v(TAG,"retrieveImages(): page url = " + page.getUrl().get());
         // 1. photos 2. photo-details
         Document doc = page.getHtml().getDocument();
@@ -69,7 +59,7 @@ public class PixelPageRetriever implements PageRetriever {
             images.addAll(detail.getElementsByTag("img"));
         }
 
-        List<ImageRealm> imgList = new ArrayList<>();
+        List<String> imgList = new ArrayList<>();
 
         for (Element img : images) {
             String url = img.attr(ATTR_IMAGE_URL);
@@ -77,13 +67,7 @@ public class PixelPageRetriever implements PageRetriever {
             //String height = img.attr(ATTR_HEIGHT);
             Log.d(TAG, "retrieved image url = " + url);
             if (url.startsWith(PIXELS_IMAGE_START)) {
-                ImageRealm imageRealm = new ImageRealm();
-                imageRealm.setName(imgName);
-                imageRealm.setUrl(url);
-                imageRealm.setTimeStamp(System.currentTimeMillis() + images.indexOf(img));
-                imageRealm.setUsed(false);
-
-                imgList.add(imageRealm);
+                imgList.add(url);
             }
         }
 
@@ -91,12 +75,12 @@ public class PixelPageRetriever implements PageRetriever {
     }
 
     @Override
-    public List<ImagePageInfo> retrieveLinks(Page page) {
+    public List<String> retrieveLinks(Page page) {
         Log.v(TAG,"retrieveLinks()");
 
         //mPageState.put(page.getUrl().get(), true);
 
-        List<ImagePageInfo> pageLinks = new ArrayList<>();
+        List<String> pageLinks = new ArrayList<>();
         // 2 kinds of url we need to retrieve
         // 1. url from tag img 2. url from ie-fallback(page)
 
@@ -123,11 +107,9 @@ public class PixelPageRetriever implements PageRetriever {
         int pageNo = getLargestPageNo(morePage);
         for (int i = 2; i < pageNo; ++i) {
             String url = baseUrl + i;
-            if (mPageState.size() == 0 || !mPageState.get(url)) {
+            if (mPageState.size() == 0 || !mPageState.containsKey(url) || !mPageState.get(url)) {
                 page.addTargetRequest(url);
-
-                ImagePageInfo pi = new ImagePageInfo(url);
-                pageLinks.add(pi);
+                pageLinks.add(url);
             }
         }
 
@@ -135,27 +117,16 @@ public class PixelPageRetriever implements PageRetriever {
         for (Element link : links) {
             if (link.hasAttr(ATTR_REF)) {
                 String url = link.attr(ATTR_REF);
-
-                if (mPageState.size() == 0 || !mPageState.get(url)) {
+                if (mPageState.size() == 0 || !mPageState.containsKey(url) || !mPageState.get(url)) {
                     page.addTargetRequest(url);
-
-                    ImagePageInfo pi = new ImagePageInfo(url);
-                    pageLinks.add(pi);
+                    pageLinks.add(url);
                 }
             }
         }
 
         String url = page.getUrl().get();
-
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<ImagePageInfo> visitedPage = realm.where(ImagePageInfo.class)
-                .equalTo("mUrl", url).findAll();
-        if (!visitedPage.isEmpty()) {
-            realm.beginTransaction();
-            ImagePageInfo pi = visitedPage.get(0);
-            pi.setVisitTime(System.currentTimeMillis());
-            pi.setIsVisited(true);
-            realm.commitTransaction();
+        if (!pageLinks.contains(url)) {
+            pageLinks.add(url);
         }
 
         return pageLinks;
