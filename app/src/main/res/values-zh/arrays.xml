@@ -7,4 +7,12 @@
         <item>每半天</item>
         <item>每天</item>
     </string-array>
+
+    <string-array name="cache_clear_folder">
+        <item>缓存: /PhotoSniffer/cache</item>
+        <item>日志文件: /PhotoSniffer/log</item>
+        <item>保存的图片: /PhotoSniffer/photos</item>
+        <item>壁纸: /PhotoSniffer/wallpapers</item>
+    </string-array>
+
 </resources>

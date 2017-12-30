@@ -47,6 +47,7 @@
     <string name="hint_network_state_hung">网络不给力, 休息会再回来吧!</string>
     <string name="hint_network_state_slow">网络有点慢，请稍后再试</string>
     <string name="enable_auto_lockscreen_wallpaper">开启锁屏自动壁纸</string>
-    <string name="mesage_file_deletion_progress">正在删除,请稍后...</string>
+    <string name="mesage_file_deletion_progress">正在删除,请稍后&#8230;</string>
     <string name="add_wallpapers_from_gallery">从相册添加壁纸</string>
+    <string name="choose_the_cache_folder_to_delete">选择要删除的文件夹</string>
 </resources>

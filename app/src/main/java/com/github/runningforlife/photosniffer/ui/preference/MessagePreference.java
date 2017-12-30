@@ -27,6 +27,14 @@ import java.util.concurrent.TimeUnit;
 public class MessagePreference extends DialogPreference {
     private static final String TAG = "MessagePref";
     private static final int DELETION_WAIT_TIME_OUT = 10*1000;
+
+    private static final int DIR_CACHE = 0;
+    private static final int DIR_LOG = 1;
+    private static final int DIR_PHOTOS = 2;
+    private static final int DIR_WALLPAPERS = 3;
+
+    private boolean[] mDefaultSelectedFolder;
+
     private ExecutorService mDeletionExecutor;
     // a count down latch to wait for file deletion complete
     private CountDownLatch mLatch;
@@ -65,25 +73,45 @@ public class MessagePreference extends DialogPreference {
             // clear all caches
             final File cacheDir = Glide.getPhotoCacheDir(getContext());
             final File logDir = new File(MiscUtil.getLogDir());
+            final File photoDir = new File(MiscUtil.getPhotoDir());
             final File wallpaperDir = new File(MiscUtil.getWallpaperCacheDir());
-            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+
+            String[] clearedFolder = getContext().getResources().getStringArray(R.array.cache_clear_folder);
+            mDefaultSelectedFolder = new boolean[clearedFolder.length];
+            mDefaultSelectedFolder[DIR_CACHE] = mDefaultSelectedFolder[DIR_LOG] = true;
+            mDefaultSelectedFolder[DIR_PHOTOS] = mDefaultSelectedFolder[DIR_WALLPAPERS] = false;
+            builder.setTitle(R.string.choose_the_cache_folder_to_delete)
+                    .setMultiChoiceItems(R.array.cache_clear_folder, mDefaultSelectedFolder, new DialogInterface.OnMultiChoiceClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                    if (mDefaultSelectedFolder[which] != isChecked) {
+                        mDefaultSelectedFolder[which] = isChecked;
+                    }
+                }
+            }).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     mAlertDialog.show();
 
-                    if (cacheDir.exists()) {
+                    if (cacheDir.exists() && mDefaultSelectedFolder[DIR_CACHE]) {
                         DeleteRunnable cache = new DeleteRunnable(mLatch, cacheDir);
                         mDeletionExecutor.submit(cache);
                     } else {
                         mLatch.countDown();
                     }
-                    if (logDir.exists()) {
+                    if (logDir.exists() && mDefaultSelectedFolder[DIR_LOG]) {
                         DeleteRunnable log = new DeleteRunnable(mLatch, logDir);
                         mDeletionExecutor.submit(log);
                     } else {
                         mLatch.countDown();
                     }
-                    if (wallpaperDir.exists()) {
+                    if (photoDir.exists() && mDefaultSelectedFolder[DIR_PHOTOS]) {
+                        DeleteRunnable photo = new DeleteRunnable(mLatch, photoDir);
+                        mDeletionExecutor.submit(photo);
+                    } else {
+                        mLatch.countDown();
+                    }
+                    if (wallpaperDir.exists() && mDefaultSelectedFolder[DIR_WALLPAPERS]) {
                         DeleteRunnable wallpaper = new DeleteRunnable(mLatch, wallpaperDir);
                         mDeletionExecutor.submit(wallpaper);
                     } else {
@@ -97,6 +125,11 @@ public class MessagePreference extends DialogPreference {
                     }
                     mAlertDialog.dismiss();
                 }
+            }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
             });
         }
     }
@@ -104,7 +137,6 @@ public class MessagePreference extends DialogPreference {
     @Override
     public void onActivityDestroy() {
         super.onActivityDestroy();
-
         if (mDeletionExecutor.isTerminated()) {
             mDeletionExecutor.shutdown();
         }
@@ -113,13 +145,13 @@ public class MessagePreference extends DialogPreference {
     private void init() {
         String prefClearCache = getContext().getString(R.string.pref_cache_clear);
         if (prefClearCache.equals(getKey())) {
-
             mDeletionExecutor = Executors.newSingleThreadExecutor();
-            mLatch = new CountDownLatch(3);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setView(R.layout.item_file_deletion_alert);
             mAlertDialog = builder.create();
+
+            mLatch = new CountDownLatch(4);
         }
     }
 
