@@ -501,19 +501,23 @@ public class ImageDetailPagerFragment extends Fragment
 
     @Override
     public void onImageSaveDone(String path) {
-        if (!TextUtils.isEmpty(path)) {
-            showToast(getString(R.string.save_image_Success) + path);
-        } else {
-            showToast(getString(R.string.save_image_fail));
+        if (isAdded()) {
+            if (!TextUtils.isEmpty(path)) {
+                showToast(getString(R.string.save_image_Success) + path);
+            } else {
+                showToast(getString(R.string.save_image_fail));
+            }
         }
     }
 
     @Override
     public void onWallpaperSetDone(boolean isOk) {
-        if (isOk) {
-            showToast(getString(R.string.set_wallpaper_success));
-        } else {
-            showToast(getString(R.string.set_wallpaper_fail));
+        if (isAdded()) {
+            if (isOk) {
+                showToast(getString(R.string.set_wallpaper_success));
+            } else {
+                showToast(getString(R.string.set_wallpaper_fail));
+            }
         }
     }
 
@@ -523,11 +527,9 @@ public class ImageDetailPagerFragment extends Fragment
     }
 
     private void showToast(String msg) {
-        if (isAdded()) {
-            GalleryActivity activity = (GalleryActivity) getActivity();
-            if (activity != null) {
-                activity.showToast(msg);
-            }
+        GalleryActivity activity = (GalleryActivity) getActivity();
+        if (activity != null) {
+            activity.showToast(msg);
         }
     }
 }
