@@ -31,12 +31,7 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver {
         boolean isAutoWallpaperEnabled = SharedPrefUtil.getBoolean(autoWallpaper, true);
         if (isAutoWallpaperEnabled && ALARM_AUTO_WALLPAPER.equals(action)) {
             WallpaperUtils.startAutoWallpaperAlarm(context);
-           new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    WallpaperUtils.setWallpaperFromCache(context, WallpaperManager.FLAG_SYSTEM);
-                }
-            }).start();
+            WallpaperUtils.setWallpaperFromCache(context, WallpaperManager.FLAG_SYSTEM);
         } else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
             if (Build.VERSION.SDK_INT >= 24) {
                 WallpaperUtils.startLockScreenWallpaperService(context);

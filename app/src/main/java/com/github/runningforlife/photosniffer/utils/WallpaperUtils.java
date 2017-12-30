@@ -22,6 +22,7 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
+import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.service.LockScreenUpdateService;
 import com.github.runningforlife.photosniffer.service.WallpaperJobService;
 import com.github.runningforlife.photosniffer.service.WallpaperUpdaterService;
@@ -161,8 +162,18 @@ public class WallpaperUtils {
         context.stopService(intent);
     }
 
-    public static void setWallpaperFromCache(Context context, int flag) {
+    public static void setWallpaperFromCache(final Context context, final int flag) {
         Log.v(TAG, "setWallpaperFromCache()");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                WallpaperUtils.startWallpaperFromCache(context, flag);
+            }
+        }).start();
+
+    }
+
+    private static void startWallpaperFromCache(Context context, int flag) {
         RealmApi realmApi = RealmApiImpl.getInstance();
         HashMap<String, String> params = new HashMap<>();
         params.put("mIsUsed", Boolean.toString(true));
@@ -180,17 +191,17 @@ public class WallpaperUtils {
         String keyCacheIdx = context.getString(R.string.pref_wallpaper_cache_index);
         int cacheIdx = SharedPrefUtil.getInt(keyCacheIdx, 0);
         // find a wallpaper
-        ++cacheIdx;
         cacheIdx %= wallpapers.size();
 
         WallpaperManager wm = WallpaperManager.getInstance(context);
         try {
+            String url = wallpapers.get(cacheIdx).getUrl();
             FutureTarget<Bitmap> futureTarget =
                     Glide.with(context)
-                         .load(wallpapers.get(cacheIdx).getUrl())
-                         .asBitmap()
-                         .fitCenter()
-                         .into(DisplayUtil.getScreenDimen().widthPixels, DisplayUtil.getScreenDimen().heightPixels);
+                            .load(wallpapers.get(cacheIdx).getUrl())
+                            .asBitmap()
+                            .centerCrop()
+                            .into(Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
             Bitmap bitmap = futureTarget.get(5000, TimeUnit.MILLISECONDS);
             if (Build.VERSION.SDK_INT >= 24) {
                 wm.setBitmap(bitmap, null, false, flag);
@@ -201,7 +212,7 @@ public class WallpaperUtils {
             Log.e(TAG,"fail to set wallpaper");
         }
         // save current idx
-        SharedPrefUtil.putInt(keyCacheIdx, cacheIdx);
+        SharedPrefUtil.putInt(keyCacheIdx, ++cacheIdx);
         realmApi.closeRealm();
     }
 }

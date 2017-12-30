@@ -71,8 +71,6 @@ public class AppGlobals extends Application {
 
         initLeanCloud();
 
-        saveUserInfo();
-
         if (Build.VERSION.SDK_INT >= 24) {
             WallpaperUtils.startLockScreenWallpaperService(getApplicationContext());
         }
@@ -198,18 +196,6 @@ public class AppGlobals extends Application {
 
         LeanCloudManager cloudManager = LeanCloudManager.getInstance();
         cloudManager.saveFile(file);
-    }
-
-    private void saveUserInfo() {
-        if(isNewUser() && MiscUtil.isConnected(getApplicationContext())){
-            LeanCloudManager cloud = LeanCloudManager.getInstance();
-            cloud.newUser(Build.FINGERPRINT);
-        }
-    }
-
-    private boolean isNewUser() {
-        String key = getString(R.string.pref_new_user);
-        return SharedPrefUtil.getBoolean(key, true);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
