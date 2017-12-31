@@ -1,27 +1,16 @@
 package com.github.runningforlife.photosniffer.presenter;
 
-import android.app.WallpaperManager;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.bumptech.glide.Priority;
 import com.bumptech.glide.RequestManager;
-import com.github.runningforlife.photosniffer.loader.GlideLoader;
-import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
-import com.github.runningforlife.photosniffer.loader.Loader;
 
-import io.realm.Realm;
 import io.realm.RealmResults;
 
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_FAVOR;
 import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_GALLERY;

@@ -6,7 +6,6 @@ import android.util.Log;
 import com.bumptech.glide.RequestManager;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.ui.WallpaperView;
-import com.github.runningforlife.photosniffer.ui.fragment.WallPaperFragment;
 
 import java.util.HashMap;
 

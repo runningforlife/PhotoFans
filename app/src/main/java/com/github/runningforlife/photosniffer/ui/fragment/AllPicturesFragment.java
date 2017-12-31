@@ -269,8 +269,6 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
             //mRvImgList.invalidate();
             mRvImgList.removeAllViews();
             mAdapter.notifyDataSetChanged();
-
-            //Glide.with(this).onDestroy();
             mUserAdapter = adapter;
         }
 

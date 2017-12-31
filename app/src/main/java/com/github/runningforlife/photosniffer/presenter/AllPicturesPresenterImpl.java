@@ -2,7 +2,6 @@ package com.github.runningforlife.photosniffer.presenter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,13 +9,9 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
-import com.bumptech.glide.Priority;
 import com.bumptech.glide.RequestManager;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
-import com.github.runningforlife.photosniffer.loader.GlideLoader;
-import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
-import com.github.runningforlife.photosniffer.loader.Loader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -168,13 +163,6 @@ public class AllPicturesPresenterImpl extends PresenterBase
         }
         mReceiver.setReceiver(null);
     }
-
-    @Override
-    public void onImageSaveDone(String path) {
-        Log.v(TAG,"onImageSaveDone()");
-        mView.onImageSaveDone(path);
-    }
-
 
     @Override
     public void onReceiveResult(int resultCode, Bundle data) {

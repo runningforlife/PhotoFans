@@ -81,7 +81,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                 MiscUtil.preloadImage(vh.img);
                 if (AndroidLifecycleUtils.canLoadImage(mContext)) {
                     mCallback.loadImageIntoView(position, vh.img, Priority.HIGH,
-                            DEFAULT_IMAGE_MEDIUM_WIDTH, DEFAULT_IMAGE_MEDIUM_HEIGHT, ImageView.ScaleType.CENTER_CROP);
+                            800, 800, ImageView.ScaleType.CENTER_CROP);
                 }
             } else if (getItemCount() > 0) {
                 // remove from the list

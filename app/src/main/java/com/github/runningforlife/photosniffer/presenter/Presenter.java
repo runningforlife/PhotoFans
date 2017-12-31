@@ -17,7 +17,7 @@ import io.realm.RealmObject;
  * @since 1.0
  */
 
-public interface Presenter extends ImageSaveRunnable.ImageSaveCallback, LifeCycle {
+public interface Presenter extends LifeCycle {
     int DEFAULT_WIDTH = 1024;
     int DEFAULT_HEIGHT = (int)(DEFAULT_WIDTH* DisplayUtil.getScreenRatio());
     // if network error count is larger than 10, network is bad

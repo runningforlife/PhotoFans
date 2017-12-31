@@ -10,6 +10,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * a utility to decode/encode bitmap
@@ -20,6 +24,7 @@ import java.io.IOException;
 
 public class BitmapUtil {
 
+    private static DateFormat df = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US);
 
     // scale and keep aspect ratio
     public static Bitmap scaleToFitWidth(Bitmap b, int width)
@@ -108,6 +113,6 @@ public class BitmapUtil {
     }
 
     private static String buildImageFileName() {
-        return "img" + "_" + System.currentTimeMillis() + ".jpg";
+        return "img" + "_" + df.format(new Date()) + ".jpg";
     }
 }

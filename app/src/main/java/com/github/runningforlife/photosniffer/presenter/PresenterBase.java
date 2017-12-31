@@ -25,9 +25,13 @@ import com.github.runningforlife.photosniffer.loader.GlideLoader;
 import com.github.runningforlife.photosniffer.loader.GlideLoaderListener;
 import com.github.runningforlife.photosniffer.loader.Loader;
 import com.github.runningforlife.photosniffer.ui.UI;
+import com.github.runningforlife.photosniffer.utils.BitmapUtil;
 import com.github.runningforlife.photosniffer.utils.DisplayUtil;
+import com.github.runningforlife.photosniffer.utils.MediaStoreUtil;
+import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,22 +49,18 @@ import io.realm.RealmResults;
 
 import static com.github.runningforlife.photosniffer.loader.Loader.DEFAULT_IMG_HEIGHT;
 import static com.github.runningforlife.photosniffer.loader.Loader.DEFAULT_IMG_WIDTH;
-import static com.github.runningforlife.photosniffer.presenter.ImageSaveRunnable.*;
 
 /**
  * base class for presenter
  */
 
-abstract class PresenterBase implements Presenter, ImageSaveCallback {
+abstract class PresenterBase implements Presenter {
     private static final String TAG = "PresenterBase";
 
     private int mNetworkErrorCount;
-    // for image save or wallpaper setting
-    private ExecutorService mSavingExecutor;
-    //DiskCache mDiskCache;
-    private CacheApi mCacheMgr;
     private boolean mIsNetworkStateReported;
     private RequestManager mGlideManager;
+    private CacheApi mCacheMgr;
 
     int mMaxImagesAllowed;
 
@@ -80,7 +80,6 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback {
         mCacheMgr = DiskCacheManager.getInstance();
 
         mNetworkErrorCount = 0;
-        mSavingExecutor = Executors.newSingleThreadExecutor();
 
         // default value
         mMaxImagesAllowed = Integer.MAX_VALUE;
@@ -116,12 +115,6 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback {
     }
 
     @Override
-    public void onImageSaveDone(String path) {
-        Log.v(TAG,"onImageSaveDone()");
-        mView.onImageSaveDone(path);
-    }
-
-    @Override
     public void setWallpaperAtPos(int pos) {
         if(pos >= 0 && pos < mImageList.size()) {
             String url = mImageList.get(pos).getUrl();
@@ -130,24 +123,15 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback {
     }
 
     @Override
-    public void saveImageAtPos(final int pos) {
+    public void saveImageAtPos(int pos) {
         if (pos >= 0 && pos < mImageList.size()) {
-            GlideLoaderListener listener = new GlideLoaderListener();
-            listener.addCallback(new GlideLoaderListener.ImageLoadCallback() {
+            final String imgUrl = mImageList.get(pos).getUrl();
+            new Thread(new Runnable() {
                 @Override
-                public void onImageLoadDone(Object o) {
-                    Log.d(TAG, "onImageLoadDone()");
-                    if(o instanceof Bitmap) {
-                        ImageSaveRunnable r = new ImageSaveRunnable(((Bitmap) o));
-                        r.addCallback(PresenterBase.this);
-                        mSavingExecutor.submit(r);
-                    }
+                public void run() {
+                    saveBitmap(imgUrl);
                 }
-            });
-
-            String imgUrl = mImageList.get(pos).getUrl();
-            GlideLoader.downloadOnly(mContext, imgUrl, listener,Priority.HIGH,
-                    DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT, false);
+            }).start();
         }
     }
 
@@ -174,14 +158,13 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback {
                 mGlideManager.load(url)
                         //.thumbnail(0.5f)
                         .dontTransform()
-                        .dontAnimate()
-                        .override(800, 800)
+                        .override(w, h)
                         .error(R.drawable.ic_broken_image_white_24dp)
                         .centerCrop()
                         .into(iv);
             } else {
                 mGlideManager.load(url)
-                        //.thumbnail(0.5f)
+                        .thumbnail(0.5f)
                         .dontTransform()
                         .dontAnimate()
                         .override(w, h)
@@ -221,10 +204,6 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback {
             mImageList.removeChangeListener(mOrderRealmChangeListener);
         }
         mRealmApi.closeRealm();
-
-        if (mSavingExecutor != null && !mSavingExecutor.isTerminated()) {
-            mSavingExecutor.shutdown();
-        }
     }
 
     private void setWallpaper(final String url) {
@@ -253,7 +232,7 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback {
         FutureTarget<Bitmap> bitmapTarget = mGlideManager.load(url)
                      .asBitmap()
                      .centerCrop()
-                     .into(DisplayUtil.getScreenDimen().widthPixels, DisplayUtil.getScreenDimen().heightPixels);
+                     .into(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
         try {
             Bitmap bitmap = bitmapTarget.get(5000, TimeUnit.MILLISECONDS);
             WallpaperManager wm = WallpaperManager.getInstance(mContext);
@@ -322,6 +301,29 @@ abstract class PresenterBase implements Presenter, ImageSaveCallback {
                 + "h=" + px
                 + "&auto=compress"
                 + "&cs=tinysrgb";
+    }
+
+
+    private void saveBitmap(String url) {
+        FutureTarget<Bitmap> target = mGlideManager.load(url)
+                .asBitmap()
+                .centerCrop()
+                .into(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
+        try {
+            Bitmap bitmap = target.get(5000, TimeUnit.MILLISECONDS);
+            String imageDir = MiscUtil.getPhotoDir();
+            String filePath = BitmapUtil.saveToFile(bitmap, imageDir);
+            MediaStoreUtil.addImageToGallery(mContext,new File(filePath));
+
+            mView.onImageSaveDone(filePath);
+            return;
+        } catch (InterruptedException e) {
+        } catch (ExecutionException e) {
+        } catch (TimeoutException e) {
+        } catch (FileNotFoundException e) {
+        }
+
+        mView.onImageSaveDone(null);
     }
 
 
