@@ -94,7 +94,7 @@ public class AllPicturesPresenterImpl extends PresenterBase
         // add operation
         loadPolaPageIfNeeded();
 
-        if(mUnUsedImages == null || mUnUsedImages.size() < 10*DEFAULT_RETRIEVED_IMAGES) {
+        if(mUnUsedImages == null || mUnUsedImages.size() < 20*DEFAULT_RETRIEVED_IMAGES) {
             startCrawlerSilent(false);
             // timeout message
             Message msg = mMainHandler.obtainMessage(H.EVENT_RETRIEVE_TIME_OUT);

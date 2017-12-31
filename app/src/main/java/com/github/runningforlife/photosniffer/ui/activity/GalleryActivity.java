@@ -70,7 +70,6 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
 
         NavigationView navView = findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(this);
-        //headerView = navView.getHeaderView(0);
 
         mHintFragmentAdded = false;
         mStateSaved = false;
@@ -131,7 +130,7 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
                 @Override
                 public void run() {
                     if (!mStateSaved && mFragmentMgr.getBackStackEntryCount() > 0) {
-                        mFragmentMgr. popBackStackImmediate();
+                        mFragmentMgr.popBackStack();
                     }
                 }
             });
