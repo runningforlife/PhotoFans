@@ -201,21 +201,24 @@ abstract class PresenterBase implements Presenter {
 
         if(TextUtils.isEmpty(url)) return;
 
-        markAsWallpaper(url);
+        if (url.startsWith("http")) {
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // for pixels, we can use URL to download hd images
-                if (url.startsWith(ImageSource.PIXELS_IMAGE_START)) {
-                    int res = dm.heightPixels/2 > 1024 ?  1024 : dm.heightPixels;
-                    String imgUrl = buildHighResolutionPixelsUrl(url, res);
-                    setWallpaperAndCache(imgUrl);
-                } else {
-                    setWallpaperAndCache(url);
+            markAsWallpaper(url);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // for pixels, we can use URL to download hd images
+                    if (url.startsWith(ImageSource.PIXELS_IMAGE_START)) {
+                        int res = dm.heightPixels / 2 > 1024 ? 1024 : dm.heightPixels;
+                        String imgUrl = buildHighResolutionPixelsUrl(url, res);
+                        setWallpaperAndCache(imgUrl);
+                    } else {
+                        setWallpaperAndCache(url);
+                    }
                 }
-            }
-        }).start();
+            }).start();
+        }
     }
 
     private void setWallpaperAndCache(final String url) {
@@ -268,19 +271,17 @@ abstract class PresenterBase implements Presenter {
 
     private void markAsWallpaper(String url) {
         Log.v(TAG,"markAsWallpaper()");
-        if (url != null && URLUtil.isNetworkUrl(url)) {
-            // mark it as wall paper
-            HashMap<String,String> params = new HashMap<>();
-            HashMap<String, String> updated = new HashMap<>();
+        // mark it as wall paper
+        HashMap<String,String> params = new HashMap<>();
+        HashMap<String, String> updated = new HashMap<>();
 
-            params.put("mUrl", url);
+        params.put("mUrl", url);
 
-            updated.put("mUrl", mCacheMgr.getFilePath(url));
-            updated.put("mIsWallpaper", Boolean.toString(true));
-            updated.put("mIsFavor", Boolean.toString(Boolean.FALSE));
-            updated.put("mIsCached", Boolean.toString(Boolean.TRUE));
-            mRealmApi.updateAsync(ImageRealm.class, params, updated);
-        }
+        updated.put("mUrl", mCacheMgr.getFilePath(url));
+        updated.put("mIsWallpaper", Boolean.toString(true));
+        updated.put("mIsFavor", Boolean.toString(Boolean.FALSE));
+        updated.put("mIsCached", Boolean.toString(Boolean.TRUE));
+        mRealmApi.updateAsync(ImageRealm.class, params, updated);
     }
 
     private String buildHighResolutionPixelsUrl(String url, int px) {
