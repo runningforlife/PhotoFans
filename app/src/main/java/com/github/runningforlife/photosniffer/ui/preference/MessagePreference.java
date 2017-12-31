@@ -11,14 +11,20 @@ import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.github.runningforlife.photosniffer.R;
+import com.github.runningforlife.photosniffer.data.local.RealmApi;
+import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
+import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import io.realm.RealmResults;
 
 /**
  * Created by jason on 6/11/17.
@@ -114,6 +120,8 @@ public class MessagePreference extends DialogPreference {
                     if (wallpaperDir.exists() && mDefaultSelectedFolder[DIR_WALLPAPERS]) {
                         DeleteRunnable wallpaper = new DeleteRunnable(mLatch, wallpaperDir);
                         mDeletionExecutor.submit(wallpaper);
+
+                        removeRealmData();
                     } else {
                         mLatch.countDown();
                     }
@@ -153,6 +161,18 @@ public class MessagePreference extends DialogPreference {
 
             mLatch = new CountDownLatch(4);
         }
+    }
+
+    private void removeRealmData() {
+        RealmApi realmApi = RealmApiImpl.getInstance();
+        HashMap<String,String> params = new HashMap<>();
+        params.put("mIsWallpaper", Boolean.toString(true));
+        try {
+            realmApi.deleteAsync(ImageRealm.class, params);
+        } finally {
+            realmApi.closeRealm();
+        }
+
     }
 
     private final class DeleteRunnable implements Runnable {
