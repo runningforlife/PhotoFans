@@ -52,14 +52,16 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     public static final String StaggeredManager = "StaggeredManager";
 
     static final String USER_SETTING_ADAPTER = "adapter";
+    static final String ARGS_IMAGE_TYPE = "image_type";
 
     // current context menu item view position
     protected int mCurrentPos = -1;
     protected FragmentCallback mCallback;
     private Presenter mPresenter;
-    // user setted adapter
+    // user setting adapter
     String mUserAdapter;
     String mUserAdapterPrefKey;
+    int mImageType;
 
     public interface FragmentCallback {
         void onItemClick(View view, int pos, @ImageType int type);
@@ -119,6 +121,22 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     public void onResume() {
         super.onResume();
         Log.v(TAG,"onResume()");
+
+        int resId = R.string.app_name;
+        switch (mImageType) {
+            case ImageType.IMAGE_FAVOR:
+                resId = R.string.favorite;
+                break;
+            case ImageType.IMAGE_GALLERY:
+                resId = R.string.app_name;
+                break;
+            case ImageType.IMAGE_WALLPAPER:
+                resId = R.string.set_wallpaper;
+                break;
+        }
+
+        String title = getString(resId);
+        setTitle(title);
     }
 
     @Override

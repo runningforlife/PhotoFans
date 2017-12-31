@@ -20,6 +20,10 @@ public class BaseActivity extends AppCompatActivity {
     static final String PATH_NAME = "photos";
     static final String PATH_CRASH_LOG = "log";
 
+    static final String FRAGMENT_TAG_FAVOR = "favorite";
+    static final String FRAGMENT_TAG_WALLPAPER = "wallpaper";
+    static final String FRAGMENT_TAG_GALLERY = "gallery";
+
     @Override
     protected void onCreate(Bundle saveState){
         super.onCreate(saveState);

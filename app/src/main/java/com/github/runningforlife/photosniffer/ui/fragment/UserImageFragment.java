@@ -14,10 +14,9 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.presenter.ImageType;
+import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
-import com.github.runningforlife.photosniffer.presenter.WallpaperPresenterImpl;
-import com.github.runningforlife.photosniffer.ui.WallpaperView;
+import com.github.runningforlife.photosniffer.ui.ImageDetailView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
@@ -30,16 +29,21 @@ import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_W
  * fragment to manager wallpaper
  */
 
-public class WallPaperFragment extends BaseFragment implements WallpaperView {
+public class UserImageFragment extends BaseFragment implements ImageDetailView {
     public static final String TAG = "WallpaperFragment";
 
     @BindView(R.id.rcv_gallery) RecyclerView mRcvWallpaper;
 
     private GalleryAdapter mAdapter;
-    private WallpaperPresenterImpl mPresenter;
+    private ImageDetailPresenterImpl mPresenter;
 
-    public static WallPaperFragment newInstance() {
-        return new WallPaperFragment();
+    public static UserImageFragment newInstance(int type) {
+        Bundle args = new Bundle();
+        args.putInt(ARGS_IMAGE_TYPE, type);
+        UserImageFragment fragment = new UserImageFragment();
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     @Override
@@ -54,7 +58,9 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
         mAdapter = new GalleryAdapter(getActivity(), this);
         mAdapter.setLayoutManager(mUserAdapter);
 
-        mPresenter = new WallpaperPresenterImpl(Glide.with(this),getContext(), this);
+        mImageType = getArguments().getInt(ARGS_IMAGE_TYPE);
+        mPresenter = new ImageDetailPresenterImpl(Glide.with(this),
+                getContext(), this, mImageType);
         setPresenter(mPresenter);
         mPresenter.onStart();
     }
@@ -80,19 +86,17 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
     @Override
     public void onResume() {
         super.onResume();
-
         if (mCallback != null) {
             mCallback.onFragmentAttached();
         }
-
-        setTitle(getString(R.string.set_wallpaper));
+        //setTitle(getString(R.string.set_wallpaper));
     }
 
     @Override
     public void onItemClicked(View view, int pos, String adapter) {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
         if (isAdded() && mCallback != null) {
-            mCallback.onItemClick(view,pos, IMAGE_WALLPAPER);
+            mCallback.onItemClick(view,pos, mImageType);
         }
     }
 
@@ -196,5 +200,15 @@ public class WallPaperFragment extends BaseFragment implements WallpaperView {
         mRcvWallpaper.setAdapter(mAdapter);
         mRcvWallpaper.setItemAnimator(new DefaultItemAnimator());
         mRcvWallpaper.setBackgroundResource(R.color.colorLightGrey);
+    }
+
+    @Override
+    public void onImageLoadStart(int pos) {
+
+    }
+
+    @Override
+    public void onImageLoadDone(int pos, boolean isSuccess) {
+
     }
 }

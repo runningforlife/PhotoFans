@@ -47,8 +47,13 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     private AllPicturesPresenterImpl mPresenter;
     private GalleryAdapter mAdapter;
 
-    public static AllPicturesFragment newInstance(){
-        return new AllPicturesFragment();
+    public static AllPicturesFragment newInstance(int type){
+        Bundle args = new Bundle();
+        args.putInt(ARGS_IMAGE_TYPE, type);
+        AllPicturesFragment fragment = new AllPicturesFragment();
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     @Override
@@ -82,9 +87,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     public void onResume() {
         super.onResume();
         Log.v(TAG,"onResume()");
-        //mRvImgList.invalidate();
-
-        setTitle(getString(R.string.app_name));
+        //setTitle(getString(R.string.app_name));
     }
 
     @Override
@@ -277,6 +280,9 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
 
     private void initView() {
         Log.v(TAG,"initView()");
+
+        mImageType = getArguments().getInt(ARGS_IMAGE_TYPE);
+
         mUserAdapterPrefKey = TAG + "-" +  USER_SETTING_ADAPTER;
         mUserAdapter = SharedPrefUtil.getString(mUserAdapterPrefKey, GridManager);
 

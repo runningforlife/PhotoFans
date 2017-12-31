@@ -138,7 +138,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if (Build.VERSION.SDK_INT >= 21) {
             if (isEnabled) {
                 WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
-                WallpaperUtils.setWallpaperFromCache(getActivity().getApplicationContext(), WallpaperManager.FLAG_SYSTEM);
+                //WallpaperUtils.setWallpaperFromCache(getActivity().getApplicationContext(), WallpaperManager.FLAG_SYSTEM);
             } else {
                 WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
             }

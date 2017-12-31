@@ -27,10 +27,9 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.ui.GalleryView;
 import com.github.runningforlife.photosniffer.ui.fragment.AllPicturesFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.BaseFragment;
-import com.github.runningforlife.photosniffer.ui.fragment.FavoriteImageFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.ImageDetailPagerFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.RetrieveHintFragment;
-import com.github.runningforlife.photosniffer.ui.fragment.WallPaperFragment;
+import com.github.runningforlife.photosniffer.ui.fragment.UserImageFragment;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 
@@ -38,6 +37,10 @@ import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_FAVOR;
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_GALLERY;
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_WALLPAPER;
 
 public class GalleryActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback, BaseFragment.FragmentCallback, GalleryView {
 
@@ -157,13 +160,13 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
         int id = item.getItemId();
         switch (id){
             case R.id.nav_favorite:
-                startFragmentByTag(FavoriteImageFragment.TAG);
+                startFragmentByTag(FRAGMENT_TAG_FAVOR);
                 break;
             case R.id.nav_gallery:
-                startFragmentByTag(AllPicturesFragment.TAG);
+                startFragmentByTag(FRAGMENT_TAG_GALLERY);
                 break;
             case R.id.nav_wallpaper:
-                startFragmentByTag(WallPaperFragment.TAG);
+                startFragmentByTag(FRAGMENT_TAG_WALLPAPER);
                 break;
             case R.id.nav_settings:
                 startSetting();
@@ -260,14 +263,14 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
         BaseFragment fragment = (BaseFragment) mFragmentMgr.findFragmentByTag(tag);
         if (fragment == null) {
             switch (tag) {
-                case FavoriteImageFragment.TAG:
-                    fragment = FavoriteImageFragment.newInstance();
+                case FRAGMENT_TAG_FAVOR:
+                    fragment = UserImageFragment.newInstance(IMAGE_FAVOR);
                     break;
-                case WallPaperFragment.TAG:
-                    fragment = WallPaperFragment.newInstance();
+                case FRAGMENT_TAG_WALLPAPER:
+                    fragment = UserImageFragment.newInstance(IMAGE_WALLPAPER);
                     break;
                 default:
-                    fragment = AllPicturesFragment.newInstance();
+                    fragment = AllPicturesFragment.newInstance(IMAGE_GALLERY);
                     break;
             }
         }
