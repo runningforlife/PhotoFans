@@ -19,12 +19,9 @@ import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import io.realm.RealmResults;
 
 /**
  * Created by jason on 6/11/17.
