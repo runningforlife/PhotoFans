@@ -145,7 +145,7 @@ public class MessagePreference extends DialogPreference {
     @Override
     public void onActivityDestroy() {
         super.onActivityDestroy();
-        if (mDeletionExecutor.isTerminated()) {
+        if (mDeletionExecutor != null && mDeletionExecutor.isTerminated()) {
             mDeletionExecutor.shutdown();
         }
     }

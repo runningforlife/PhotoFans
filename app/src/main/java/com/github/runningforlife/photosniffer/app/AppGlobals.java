@@ -170,7 +170,7 @@ public class AppGlobals extends Application {
             }
             // save to cloud if wifi available
             if (MiscUtil.isWifiConnected(getApplicationContext())) {
-                saveLogToCloud(file);
+                //saveLogToCloud(file);
             }else{
                 // waiting for wifi
                 waitForWifi();
@@ -227,7 +227,7 @@ public class AppGlobals extends Application {
                         newThread(new Runnable() {
                     @Override
                     public void run() {
-                        uploadLogToCloud();
+                        //uploadLogToCloud();
                     }
                 }).start();
             }
