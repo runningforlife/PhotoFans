@@ -10,10 +10,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.SystemClock;
-import android.support.annotation.RequiresApi;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.bumptech.glide.Glide;
@@ -28,13 +27,16 @@ import com.github.runningforlife.photosniffer.service.WallpaperJobService;
 import com.github.runningforlife.photosniffer.service.WallpaperUpdaterService;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -49,32 +51,38 @@ import static android.content.Context.JOB_SCHEDULER_SERVICE;
 
 public class WallpaperUtils {
     private static final String TAG = "WallpaperUtils";
+    private static final SimpleDateFormat sDf = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.US);
+
     public static final String ALARM_AUTO_WALLPAPER = "com.github.runningforlife.AUTO_WALLPAPER";
 
     public static void startWallpaperCacheUpdaterService(Context context) {
-        List<String> wallpapers = new ArrayList<>();
         Realm rm = Realm.getDefaultInstance();
-        RealmQuery<ImageRealm> query = rm.where(ImageRealm.class);
-        RealmResults<ImageRealm> wallpaper = query
-                .equalTo("mIsFavor", true)
-                .or()
-                .equalTo("mIsUsed", false)
-                .findAll();
-
-        if (wallpaper.size() == 0) {
-            wallpaper = query
+        try {
+            RealmQuery<ImageRealm> query = rm.where(ImageRealm.class);
+            RealmResults<ImageRealm> wallpaper = query
+                    .equalTo("mIsFavor", true)
                     .or()
-                    .equalTo("mIsUsed", true)
+                    .equalTo("mIsUsed", false)
                     .findAll();
-        }
-        // 10 image cached a time
-        for (int i = 0; i < 15 && i < wallpaper.size(); ++i) {
-            wallpapers.add(wallpaper.get(i).getUrl());
-        }
 
-        Intent intent = new Intent(context, WallpaperUpdaterService.class);
-        intent.putStringArrayListExtra("wallpapers", (ArrayList<String>) wallpapers);
-        context.startService(intent);
+            if (wallpaper.size() == 0) {
+                wallpaper = query
+                        .or()
+                        .equalTo("mIsUsed", true)
+                        .findAll();
+            }
+            // 10 image cached a time
+            List<String> wallpapers = new ArrayList<>(15);
+            for (int i = 0; i < 15 && i < wallpaper.size(); ++i) {
+                wallpapers.add(wallpaper.get(i).getUrl());
+            }
+
+            Intent intent = new Intent(context, WallpaperUpdaterService.class);
+            intent.putStringArrayListExtra("wallpapers", (ArrayList<String>) wallpapers);
+            context.startService(intent);
+        } finally {
+            rm.close();
+        }
     }
 
     public static void startWallpaperCacheUpdaterAlarm(Context context) {
@@ -170,7 +178,6 @@ public class WallpaperUtils {
                 WallpaperUtils.startWallpaperFromCache(context, flag);
             }
         }).start();
-
     }
 
     private static void startWallpaperFromCache(Context context, int flag) {
@@ -183,8 +190,8 @@ public class WallpaperUtils {
 
         if (wallpapers.size() == 0) {
             // try to cache images
-            startWallpaperCacheUpdaterService(context);
             realmApi.closeRealm();
+            startWallpaperCacheUpdaterService(context);
             return;
         }
 
@@ -194,11 +201,11 @@ public class WallpaperUtils {
         cacheIdx %= wallpapers.size();
 
         WallpaperManager wm = WallpaperManager.getInstance(context);
+        String url = wallpapers.get(cacheIdx).getUrl();
         try {
-            String url = wallpapers.get(cacheIdx).getUrl();
             FutureTarget<Bitmap> futureTarget =
                     Glide.with(context)
-                            .load(wallpapers.get(cacheIdx).getUrl())
+                            .load(url)
                             .asBitmap()
                             .centerCrop()
                             .into(Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
@@ -208,11 +215,48 @@ public class WallpaperUtils {
             } else {
                 wm.setBitmap(bitmap);
             }
+            // recording wallpaper setting
+            recordWallpaperSetting(url, null);
         } catch (Exception e) {
             Log.e(TAG,"fail to set wallpaper");
+            recordWallpaperSetting(url, e);
+        } finally {
+            realmApi.closeRealm();
+            // save current idx
+            SharedPrefUtil.putInt(keyCacheIdx, ++cacheIdx);
         }
-        // save current idx
-        SharedPrefUtil.putInt(keyCacheIdx, ++cacheIdx);
-        realmApi.closeRealm();
+    }
+
+    private static void recordWallpaperSetting(String url, Exception ex) {
+        File logDir = new File(MiscUtil.getLogDir(), MiscUtil.getWallpaperLog());
+        if (!logDir.exists()) {
+            try {
+                if(!logDir.createNewFile()) {
+                    return;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+
+        try {
+            FileOutputStream fos = new FileOutputStream(logDir, true);
+            PrintWriter pw = new PrintWriter(fos);
+
+            pw.println("wallpaper setting date:" + sDf.format(new Date()));
+            pw.println("wallpaper url:" + url);
+            if (ex != null) {
+                pw.println("fail to set wallpaper" + ex);
+            }
+            pw.println();
+
+            pw.flush();
+
+            pw.close();
+            fos.close();
+        } catch (IOException e) {
+
+        }
     }
 }
