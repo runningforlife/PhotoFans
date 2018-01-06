@@ -42,7 +42,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     private LayoutInflater mInflater;
     private GalleryAdapterCallback mCallback;
     private Context mContext;
-    private String mLayoutMgr;
     private @MenuRes int mContextMenId;
     private List<String> mSelectedImages;
     private boolean mIsBatchEditEnabled;
@@ -52,8 +51,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         mInflater = LayoutInflater.from(context);
         // different device panel size may need different width and height
         mContext = context;
-
-        mLayoutMgr = GridManager;
 
         mContextMenId = R.menu.menu_context_default;
 
@@ -74,9 +71,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         mContextMenId = id;
     }
 
-    public void setLayoutManager(@RecycleLayout String layoutManager){
-        mLayoutMgr = layoutManager;
-    }
 
     @Override
     public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

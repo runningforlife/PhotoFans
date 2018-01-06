@@ -93,6 +93,14 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mRvImgList != null) {
+            mRvImgList.setAdapter(null);
+        }
+    }
+
+    @Override
     public boolean isRefreshing(){
         return mRefresher.isRefreshing();
     }
@@ -242,77 +250,21 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
         return mRvImgList;
     }
 
-    @Override
-    boolean onOptionsMenuSelected(MenuItem menu) {
-        Log.v(TAG,"onOptionsMenuSelected()");
-        return optionsItemSelected(menu);
-    }
-
-    private boolean optionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        String adapter = GridManager;
-        switch (id) {
-            case R.id.grid_view:
-                GridLayoutManager glm = new GridLayoutManager(getContext(),2);
-                mRvImgList.setLayoutManager(glm);
-                mRvImgList.setHasFixedSize(true);
-                glm.setAutoMeasureEnabled(true);
-                glm.setSmoothScrollbarEnabled(true);
-                break;
-            case R.id.list_view:
-                LinearLayoutManager ll = new LinearLayoutManager(getContext());
-                mRvImgList.setLayoutManager(ll);
-                ll.setAutoMeasureEnabled(true);
-                ll.setSmoothScrollbarEnabled(true);
-                adapter = LinearManager;
-                break;
-            case R.id.stagger_view:
-                StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-                mRvImgList.setLayoutManager(sglm);
-                sglm.setAutoMeasureEnabled(true);
-                adapter = StaggeredManager;
-                break;
-            default:
-                return false;
-        }
-
-        if (!mUserAdapter.equals(adapter)) {
-            mAdapter.setLayoutManager(adapter);
-            SharedPrefUtil.putString(mUserAdapterPrefKey, adapter);
-            //mRvImgList.invalidate();
-            mRvImgList.removeAllViews();
-            mAdapter.notifyDataSetChanged();
-            mUserAdapter = adapter;
-        }
-
-        return true;
-    }
 
     private void initView() {
         Log.v(TAG,"initView()");
 
         mImageType = getArguments().getInt(ARGS_IMAGE_TYPE);
 
-        mUserAdapterPrefKey = TAG + "-" +  USER_SETTING_ADAPTER;
-        mUserAdapter = SharedPrefUtil.getString(mUserAdapterPrefKey, GridManager);
-
-        if (GridManager.equals(mUserAdapter)) {
-            //LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
-            GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
-            gridLayoutMgr.setSmoothScrollbarEnabled(true);
-            mRvImgList.setHasFixedSize(true);
-            mRvImgList.setLayoutManager(gridLayoutMgr);
-        } else if (LinearManager.equals(mUserAdapter)) {
-            LinearLayoutManager ll = new LinearLayoutManager(getContext());
-            mRvImgList.setLayoutManager(ll);
-            ll.setAutoMeasureEnabled(true);
-            ll.setSmoothScrollbarEnabled(true);
-        }
+        //LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
+        GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
+        gridLayoutMgr.setSmoothScrollbarEnabled(true);
+        mRvImgList.setHasFixedSize(true);
+        mRvImgList.setLayoutManager(gridLayoutMgr);
         mRvImgList.setItemAnimator(new DefaultItemAnimator());
         mRvImgList.setBackgroundResource(R.color.colorLightGrey);
 
         mAdapter = new GalleryAdapter(getActivity(),this);
-        mAdapter.setLayoutManager(mUserAdapter);
         mAdapter.setContextMenuRes(R.menu.menu_context_gallery);
 
         mRvImgList.setAdapter(mAdapter);

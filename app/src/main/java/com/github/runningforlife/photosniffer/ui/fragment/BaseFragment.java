@@ -87,9 +87,6 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     ProgressBar mPbHint;
     private AlertDialog mHintAlert;
 
-    // user setting adapter
-    String mUserAdapter;
-    String mUserAdapterPrefKey;
     int mImageType;
 
     public interface FragmentCallback {
@@ -98,7 +95,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         void showToast(String toast);
     }
 
-    abstract boolean onOptionsMenuSelected(MenuItem menu);
+    //abstract boolean onOptionsMenuSelected(MenuItem menu);
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
@@ -133,7 +130,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
                 handleBatchEdit(false);
                 return true;
             default:
-                return onOptionsMenuSelected(menuItem);
+                return super.onOptionsItemSelected(menuItem);
         }
     }
 
@@ -181,6 +178,10 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
 
                 Window window = mHintAlert.getWindow();
                 if (window != null) {
+                    WindowManager.LayoutParams lp = window.getAttributes();
+                    lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
+                    lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                    window.setAttributes(lp);
                     window.setBackgroundDrawableResource(android.R.color.transparent);
                 }
             }

@@ -51,10 +51,7 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
 
         setRetainInstance(true);
 
-        mUserAdapterPrefKey = TAG + "-" +  USER_SETTING_ADAPTER;
-        mUserAdapter = SharedPrefUtil.getString(mUserAdapterPrefKey, GridManager);
         mAdapter = new GalleryAdapter(getActivity(), this);
-        mAdapter.setLayoutManager(mUserAdapter);
 
         mImageType = getArguments().getInt(ARGS_IMAGE_TYPE);
         mPresenter = new ImageDetailPresenterImpl(Glide.with(this),
@@ -73,12 +70,6 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
         initView();
 
         return root;
-    }
-
-    @Override
-    boolean onOptionsMenuSelected(MenuItem menu) {
-        Log.v(TAG,"onOptionsMenuSelected()");
-        return optionsItemSelected(menu);
     }
 
     @Override
@@ -148,59 +139,12 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
         return true;
     }
 
-    private boolean optionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        String adapter = GridManager;
-        switch (id) {
-            case R.id.grid_view:
-                GridLayoutManager glm = new GridLayoutManager(getContext(),2);
-                mRcvWallpaper.setLayoutManager(glm);
-                mRcvWallpaper.setHasFixedSize(true);
-                glm.setAutoMeasureEnabled(true);
-                break;
-            case R.id.list_view:
-                LinearLayoutManager ll = new LinearLayoutManager(getContext());
-                mRcvWallpaper.setLayoutManager(ll);
-                //ll.setAutoMeasureEnabled(true);
-                adapter = LinearManager;
-                break;
-            case R.id.stagger_view:
-                StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-                mRcvWallpaper.setLayoutManager(sglm);
-                sglm.setAutoMeasureEnabled(true);
-                adapter = StaggeredManager;
-                break;
-            default:
-                break;
-        }
-
-        if (!mUserAdapter.equals(adapter)) {
-            mAdapter.setLayoutManager(adapter);
-            SharedPrefUtil.putString(mUserAdapterPrefKey, adapter);
-
-            mRcvWallpaper.removeAllViews();
-            mAdapter.notifyDataSetChanged();
-
-            //Glide.with(this).onDestroy();
-            mUserAdapter = adapter;
-        }
-
-        return true;
-    }
 
     private void initView() {
-        if (GridManager.equals(mUserAdapter)) {
-            //LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
-            GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
-            gridLayoutMgr.setSmoothScrollbarEnabled(true);
-            mRcvWallpaper.setHasFixedSize(true);
-            mRcvWallpaper.setLayoutManager(gridLayoutMgr);
-        } else if (LinearManager.equals(mUserAdapter)) {
-            LinearLayoutManager ll = new LinearLayoutManager(getContext());
-            mRcvWallpaper.setLayoutManager(ll);
-            ll.setAutoMeasureEnabled(true);
-            ll.setSmoothScrollbarEnabled(true);
-        }
+        GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
+        gridLayoutMgr.setSmoothScrollbarEnabled(true);
+        mRcvWallpaper.setHasFixedSize(true);
+        mRcvWallpaper.setLayoutManager(gridLayoutMgr);
 
         mRcvWallpaper.setAdapter(mAdapter);
         mRcvWallpaper.setItemAnimator(new DefaultItemAnimator());
