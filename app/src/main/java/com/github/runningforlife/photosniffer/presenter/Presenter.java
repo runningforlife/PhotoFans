@@ -4,6 +4,7 @@ import android.util.DisplayMetrics;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
+import com.github.runningforlife.photosniffer.ui.fragment.BatchAction;
 import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 
 import java.util.List;
@@ -23,6 +24,10 @@ public interface Presenter extends LifeCycle {
     // if network error count is larger than 10, network is bad
     int NETWORK_HUNG_ERROR_COUNT = 10;
     int NETWORK_SLOW_ERROR_COUNT = 5;
+
+    /** event */
+    int EVENT_BATCH_REMOVE_TIMEOUT = 0x01;
+    int EVENT_BATCH_SAVE_TIMEOUT = 0x02;
 
     DisplayMetrics dm = DisplayUtil.getScreenDimen();
 
@@ -70,4 +75,9 @@ public interface Presenter extends LifeCycle {
      * save user selected photos to realm
      */
     void saveUserPickedPhotos(List<String> photoUris);
+
+    /**
+     *  batch edit
+     */
+    void batchEdit(List<String> images, @BatchAction String action);
 }

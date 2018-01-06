@@ -149,7 +149,9 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_home, menu);
+        getMenuInflater().inflate(R.menu.menu_home_usage, menu);
+        // add batch edit menu also
+        getMenuInflater().inflate(R.menu.menu_batch_edit, menu);
         return true;
     }
 
@@ -310,7 +312,9 @@ public class GalleryActivity extends BaseActivity implements NavigationView.OnNa
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    dismissRetrieveHintFragment();
+                    if (!mStateSaved) {
+                        dismissRetrieveHintFragment();
+                    }
                 }
             }, dismissCount);
         }

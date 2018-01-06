@@ -12,9 +12,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * a disk Cache to Cache wallpapers
@@ -26,11 +28,13 @@ public class DiskCache implements Cache {
     /** default size is 50MB */
     private static final int DEFAULT_CACHE_SIZE = 50 * 1024 * 1024;
     /** default imag format */
-    private static final String DEFAULT_IMAGE_FORMAT = ".jpg";
+    private static final String DEFAULT_IMAGE_FORMAT = ".png";
     private static final String CACHE_IMAGE_PREFIX = "img";
 
     /** all Cache entries info */
     private Map<String, CacheInfo> mEntries = new LinkedHashMap<>(30, 0.75f, true);
+    /** all cache file name */
+    private Set<String> mImageFiles = new HashSet<>();
     private File mRootDir;
     private int mMaxSize;
     private int mTotalSize;
@@ -70,6 +74,8 @@ public class DiskCache implements Cache {
             CacheInfo cacheInfo = new CacheInfo(key, entry.data.length);
             cacheInfo.lastModified = entry.lastModified;
             putEntry(key, cacheInfo);
+
+            mImageFiles.add(file.getAbsolutePath());
             Log.v(TAG,"put(): Cache image done");
             return;
         } catch (IOException e) {
@@ -114,6 +120,8 @@ public class DiskCache implements Cache {
         String key = getCacheKey(url);
         File file = getFileNameByKey(key);
 
+        mImageFiles.remove(file.getAbsolutePath());
+
         if (!file.delete()) {
             Log.e(TAG,"fail to delete file:" + file.getAbsolutePath());
         }
@@ -156,6 +164,7 @@ public class DiskCache implements Cache {
             }
         }
 
+        mImageFiles.clear();
         mEntries.clear();
         mTotalSize = 0;
 
@@ -173,7 +182,7 @@ public class DiskCache implements Cache {
 
     @Override
     public boolean isExist(String url) {
-        return mEntries.get(getCacheKey(url)) != null;
+        return mImageFiles.contains(url);
     }
 
     @Override
@@ -188,6 +197,8 @@ public class DiskCache implements Cache {
         if (files == null) return;
 
         for (File file : files) {
+            mImageFiles.add(file.getAbsolutePath());
+
             CacheInfo ci = new CacheInfo(file.getName(), file.length());
             ci.lastModified = file.lastModified();
 

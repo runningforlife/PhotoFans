@@ -8,9 +8,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:foreground="@drawable/ripple_background"
-        android:background="@drawable/ripple_background"
+        android:background="@drawable/__picker_photo_bg"
         android:contentDescription="@string/photo"
         android:scaleType="centerCrop"
         android:adjustViewBounds="true" />
+
+    <ImageView
+        android:id="@+id/iv_selected"
+        android:visibility="gone"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:clickable="true"
+        android:paddingTop="10dip"
+        android:paddingRight="10dip"
+        android:paddingLeft="20dip"
+        android:paddingBottom="20dip"
+        android:src="@drawable/__picker_checkbox_bg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </me.iwf.photopicker.widget.SquareItemLayout>

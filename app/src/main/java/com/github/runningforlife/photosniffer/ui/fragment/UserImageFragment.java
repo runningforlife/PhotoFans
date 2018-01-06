@@ -33,8 +33,6 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
     public static final String TAG = "WallpaperFragment";
 
     @BindView(R.id.rcv_gallery) RecyclerView mRcvWallpaper;
-
-    private GalleryAdapter mAdapter;
     private ImageDetailPresenterImpl mPresenter;
 
     public static UserImageFragment newInstance(int type) {
@@ -97,7 +95,14 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
         Log.v(TAG,"onItemClicked(): pos = " + pos);
         if (isAdded() && mCallback != null) {
             mCallback.onItemClick(view,pos, mImageType);
+            // disable batch edit
+            handleBatchEdit(false);
         }
+    }
+
+    @Override
+    public RecyclerView getRecycleView() {
+        return mRcvWallpaper;
     }
 
     @Override

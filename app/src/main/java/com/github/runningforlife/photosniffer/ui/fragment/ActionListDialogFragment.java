@@ -121,7 +121,7 @@ public class ActionListDialogFragment extends DialogFragment {
         if(args != null){
             mActionList = args.getStringArrayList("action_list");
 
-            ListView lv = (ListView)root.findViewById(R.id.lv_actions);
+            ListView lv = root.findViewById(R.id.lv_actions);
             lv.setAdapter(new ActionListAdapter());
         }
     }

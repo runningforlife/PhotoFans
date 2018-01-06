@@ -25,6 +25,9 @@ import me.iwf.photopicker.utils.AndroidLifecycleUtils;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.github.runningforlife.photosniffer.loader.Loader.*;
 import static com.github.runningforlife.photosniffer.ui.fragment.BaseFragment.*;
 
@@ -41,6 +44,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
     private Context mContext;
     private String mLayoutMgr;
     private @MenuRes int mContextMenId;
+    private List<String> mSelectedImages;
+    private boolean mIsBatchEditEnabled;
 
     public GalleryAdapter(Context context,BaseAdapterCallback callback) {
         mCallback = (GalleryAdapterCallback) callback;
@@ -51,8 +56,19 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         mLayoutMgr = GridManager;
 
         mContextMenId = R.menu.menu_context_default;
+
+        mSelectedImages = new ArrayList<>();
     }
 
+    public List<String> getSelectedImages() {
+        return new ArrayList<>(mSelectedImages);
+    }
+
+    public void enableBatchEdit(boolean isEnabled) {
+        mIsBatchEditEnabled = isEnabled;
+        mSelectedImages.clear();
+        notifyDataSetChanged();
+    }
 
     public void setContextMenuRes(@MenuRes int id){
         mContextMenId = id;
@@ -75,7 +91,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         if (img != null) {
             final String url = img.getUrl();
             Log.d(TAG, "onBindViewHolder(): pos = " + position);
-
             if (!TextUtils.isEmpty(url)) {
                 // preload image
                 MiscUtil.preloadImage(vh.img);
@@ -83,6 +98,29 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                     mCallback.loadImageIntoView(position, vh.img, Priority.HIGH,
                             800, 800, ImageView.ScaleType.CENTER_CROP);
                 }
+
+                if (mIsBatchEditEnabled) {
+                    vh.img.setSelected(isSelected(url));
+                    vh.selectedView.setVisibility(View.VISIBLE);
+                    vh.selectedView.setSelected(isSelected(url));
+
+                    vh.selectedView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (!mSelectedImages.contains(url)) {
+                                mSelectedImages.add(url);
+                            } else {
+                                mSelectedImages.remove(url);
+                            }
+                            notifyItemChanged(position);
+                            mCallback.onItemSelected(mSelectedImages.size());
+                        }
+                    });
+                } else {
+                    vh.selectedView.setVisibility(View.GONE);
+                    vh.img.setSelected(false);
+                }
+
             } else if (getItemCount() > 0) {
                 // remove from the list
                 mCallback.removeItemAtPos(position);
@@ -100,9 +138,14 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         return mCallback.getCount();
     }
 
+    private boolean isSelected(String url) {
+        return url != null && mSelectedImages.contains(url);
+    }
+
     final class PhotoViewHolder extends RecyclerView.ViewHolder
             implements View.OnCreateContextMenuListener {
         @BindView(R.id.iv_photo) ImageView img;
+        @BindView(R.id.iv_selected) View selectedView;
 
         PhotoViewHolder(View root) {
             super(root);
@@ -121,6 +164,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                     }
                 }
             });
+
             root.setOnCreateContextMenuListener(this);
         }
 

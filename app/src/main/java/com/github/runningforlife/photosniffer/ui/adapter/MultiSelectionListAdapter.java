@@ -76,11 +76,11 @@ public class MultiSelectionListAdapter extends BaseAdapter {
                     .inflate(R.layout.selection_list_dialog,parent,false);
         }
 
-        final CheckBox cb = (CheckBox)root.findViewById(R.id.cb_select);
+        final CheckBox cb = root.findViewById(R.id.cb_select);
         mCbs.put(cb,position);
 
-        TextView name = (TextView)root.findViewById(R.id.tv_site_name);
-        TextView url = (TextView)root.findViewById(R.id.tv_site_url);
+        TextView name = root.findViewById(R.id.tv_site_name);
+        TextView url = root.findViewById(R.id.tv_site_url);
 
         name.setText(mImgSource.get(position).name);
         String srcUrl = mImgSource.get(position).url;
@@ -110,7 +110,7 @@ public class MultiSelectionListAdapter extends BaseAdapter {
         root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CheckBox cb = (CheckBox)v.findViewById(R.id.cb_select);
+                CheckBox cb = v.findViewById(R.id.cb_select);
                 boolean isChecked = cb.isChecked();
                 cb.setChecked((!isChecked));
 /*
@@ -125,7 +125,7 @@ public class MultiSelectionListAdapter extends BaseAdapter {
             @Override
             public boolean onLongClick(View v) {
                 if(mCallback != null){
-                    CheckBox cb = (CheckBox)v.findViewById(R.id.cb_select);
+                    CheckBox cb = v.findViewById(R.id.cb_select);
                     int pos = mCbs.get(cb);
                     mCallback.onLongClick(mImgSource.get(pos));
                 }

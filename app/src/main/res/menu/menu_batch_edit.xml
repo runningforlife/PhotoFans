@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group android:id="@+id/group_batch_edit"
+        android:visible="false">
+
+        <item android:id="@+id/favor"
+            android:title="@string/action_favorite"
+            android:orderInCategory="100"
+            app:showAsAction="ifRoom"/>
+
+        <item android:id="@+id/delete"
+            android:title="@string/action_delete"
+            android:orderInCategory="101"
+            app:showAsAction="never"/>
+
+        <item android:id="@+id/save_as_wallpaper"
+            android:title="@string/action_save_as_wallpaper"
+            android:orderInCategory="102"
+            app:showAsAction="never"/>
+
+    </group>
+
+</menu>

@@ -13,6 +13,6 @@
     <TextView android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/mesage_file_deletion_progress"/>
+        android:text="@string/message_file_deletion_progress"/>
 
 </LinearLayout>

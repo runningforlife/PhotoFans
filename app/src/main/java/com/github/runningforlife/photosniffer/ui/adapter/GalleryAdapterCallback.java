@@ -9,4 +9,10 @@ public interface GalleryAdapterCallback extends BaseAdapterCallback {
      * context menu is created
      */
     void onContextMenuCreated(int pos, String adapter);
+
+
+    /**
+     * item selected
+     */
+    void onItemSelected(int totalCount);
 }

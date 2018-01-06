@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.MenuRes;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -21,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
 import com.github.runningforlife.photosniffer.R;
@@ -45,7 +48,6 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     @BindView(R.id.rcv_gallery) RecyclerView mRvImgList;
     @BindView(R.id.srl_refresh) SwipeRefreshLayout mRefresher;
     private AllPicturesPresenterImpl mPresenter;
-    private GalleryAdapter mAdapter;
 
     public static AllPicturesFragment newInstance(int type){
         Bundle args = new Bundle();
@@ -205,7 +207,11 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
         if (mRefresher.isRefreshing()) {
             mRefresher.setRefreshing(false);
         }
-        mCallback.onItemClick(view, pos, IMAGE_GALLERY);
+        if (isAdded() && mCallback != null) {
+            mCallback.onItemClick(view, pos, IMAGE_GALLERY);
+
+            handleBatchEdit(false);
+        }
     }
 
     @Override
@@ -232,11 +238,15 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     }
 
     @Override
+    public RecyclerView getRecycleView() {
+        return mRvImgList;
+    }
+
+    @Override
     boolean onOptionsMenuSelected(MenuItem menu) {
         Log.v(TAG,"onOptionsMenuSelected()");
         return optionsItemSelected(menu);
     }
-
 
     private boolean optionsItemSelected(MenuItem item) {
         int id = item.getItemId();

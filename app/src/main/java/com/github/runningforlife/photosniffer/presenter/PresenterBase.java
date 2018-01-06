@@ -3,6 +3,9 @@ package com.github.runningforlife.photosniffer.presenter;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
@@ -19,17 +22,22 @@ import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.ui.UI;
+import com.github.runningforlife.photosniffer.ui.fragment.BatchAction;
 import com.github.runningforlife.photosniffer.utils.BitmapUtil;
 import com.github.runningforlife.photosniffer.utils.MediaStoreUtil;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -39,6 +47,9 @@ import io.realm.RealmResults;
 
 import static com.github.runningforlife.photosniffer.loader.Loader.DEFAULT_IMG_HEIGHT;
 import static com.github.runningforlife.photosniffer.loader.Loader.DEFAULT_IMG_WIDTH;
+import static com.github.runningforlife.photosniffer.ui.fragment.BatchAction.BATCH_DELETE;
+import static com.github.runningforlife.photosniffer.ui.fragment.BatchAction.BATCH_FAVOR;
+import static com.github.runningforlife.photosniffer.ui.fragment.BatchAction.BATCH_SAVE_AS_WALLPAPER;
 
 /**
  * base class for presenter
@@ -51,6 +62,9 @@ abstract class PresenterBase implements Presenter {
     private boolean mIsNetworkStateReported;
     private RequestManager mGlideManager;
     private CacheApi mCacheMgr;
+    private ExecutorService mExecutors;
+    private CountDownLatch mSavingLatch;
+    private H mMainHandler;
 
     int mMaxImagesAllowed;
 
@@ -77,6 +91,8 @@ abstract class PresenterBase implements Presenter {
         mIsNetworkStateReported = false;
 
         mGlideManager = requestManager;
+
+        mMainHandler = new H(Looper.myLooper());
     }
 
 
@@ -131,7 +147,7 @@ abstract class PresenterBase implements Presenter {
         if(pos >= 0 && pos < mImageList.size()) {
             final ImageRealm ir = mImageList.get(pos);
             String url = ir.getUrl();
-            if (mCacheMgr.isExist(url)) {
+            if (!url.startsWith("http") && mCacheMgr.isExist(url)) {
                 mCacheMgr.remove(url);
             }
             mRealmApi.deleteSync(ir);
@@ -188,6 +204,26 @@ abstract class PresenterBase implements Presenter {
     }
 
     @Override
+    public void batchEdit(List<String> images, @BatchAction String action) {
+        Log.v(TAG,"batchEdit():size=" + images.size());
+        if (images.size() == 0) return;
+
+        switch (action) {
+            case BATCH_FAVOR:
+                markAsFavor(images);
+                break;
+            case BATCH_DELETE:
+                batchRemove(images);
+                break;
+            case BATCH_SAVE_AS_WALLPAPER:
+                saveAsWallpapers(images);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
     public void onDestroy() {
         Log.v(TAG,"onDestroy()");
         if (mImageList.isValid()) {
@@ -232,7 +268,7 @@ abstract class PresenterBase implements Presenter {
             wm.setBitmap(bitmap);
             mView.onWallpaperSetDone(true);
             // cache it
-            if (!mCacheMgr.isExist(url)) {
+            if (url.startsWith("http")) {
                 mCacheMgr.put(url, bitmap);
             }
             return;
@@ -243,6 +279,12 @@ abstract class PresenterBase implements Presenter {
         }
 
         mView.onWallpaperSetDone(false);
+    }
+
+    private void markAsFavor(List<String> images) {
+        for (String url : images) {
+            markAsFavor(url);
+        }
     }
 
     void markAsFavor(String url) {
@@ -269,19 +311,74 @@ abstract class PresenterBase implements Presenter {
         }
     }
 
+    private void batchRemove(List<String> urls) {
+        String imgUrl = urls.get(0);
+        if (!imgUrl.startsWith("http")) {
+            mView.notifyJobState(true, null);
+            // 2s timeout, we may want to be more specific
+            mMainHandler.sendEmptyMessageDelayed(EVENT_BATCH_REMOVE_TIMEOUT, 2000);
+        }
+        mRealmApi.deleteSync(urls);
+        for (String url : urls) {
+            if (url.startsWith("http")) {
+                break;
+            }
+            if (!mCacheMgr.isExist(url)) {
+                mCacheMgr.remove(url);
+            }
+        }
+    }
+
+    private void saveAsWallpapers(List<String> urls) {
+        if (mExecutors == null) {
+            mExecutors = Executors.newFixedThreadPool(2);
+            mSavingLatch = new CountDownLatch(urls.size());
+        }
+
+        for (final String url : urls) {
+            if (url.startsWith("http")) {
+                markAsWallpaper(url);
+                mExecutors.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        saveImageAsWallpaper(url);
+                        mSavingLatch.countDown();
+                    }
+                });
+            } else {
+                mSavingLatch.countDown();
+            }
+        }
+
+        mView.notifyJobState(true, null);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mSavingLatch.await(5,TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mMainHandler.sendEmptyMessage(EVENT_BATCH_SAVE_TIMEOUT);
+            }
+        }).start();
+    }
+
     private void markAsWallpaper(String url) {
         Log.v(TAG,"markAsWallpaper()");
         // mark it as wall paper
         HashMap<String,String> params = new HashMap<>();
-        HashMap<String, String> updated = new HashMap<>();
-
         params.put("mUrl", url);
 
-        updated.put("mUrl", mCacheMgr.getFilePath(url));
-        updated.put("mIsWallpaper", Boolean.toString(true));
-        updated.put("mIsFavor", Boolean.toString(Boolean.FALSE));
-        updated.put("mIsCached", Boolean.toString(Boolean.TRUE));
-        mRealmApi.updateAsync(ImageRealm.class, params, updated);
+        mRealmApi.deleteAsync(ImageRealm.class, params);
+
+        ImageRealm ir = new ImageRealm();
+        ir.setUrl(mCacheMgr.getFilePath(url));
+        ir.setUsed(true);
+        ir.setIsFavor(false);
+        ir.setIsWallpaper(true);
+        ir.setIsCached(true);
+        mRealmApi.insertAsync(ir);
     }
 
     private String buildHighResolutionPixelsUrl(String url, int px) {
@@ -294,6 +391,26 @@ abstract class PresenterBase implements Presenter {
                 + "&cs=tinysrgb";
     }
 
+    private void saveImageAsWallpaper(String url) {
+        FutureTarget<Bitmap> target = mGlideManager.load(url)
+                .asBitmap()
+                .centerCrop()
+                .into(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
+        try {
+            Bitmap bitmap = target.get(5000, TimeUnit.MILLISECONDS);
+
+            FileOutputStream fos = new FileOutputStream(mCacheMgr.getFilePath(url));
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+
+            fos.flush();
+            fos.close();
+        } catch (InterruptedException e) {
+        } catch (ExecutionException e) {
+        } catch (TimeoutException e) {
+        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
+        }
+    }
 
     private void saveBitmap(String url) {
         FutureTarget<Bitmap> target = mGlideManager.load(url)
@@ -315,6 +432,23 @@ abstract class PresenterBase implements Presenter {
         }
 
         mView.onImageSaveDone(null);
+    }
+
+    private final class H extends Handler {
+
+        H(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message message) {
+            switch (message.what) {
+                case EVENT_BATCH_REMOVE_TIMEOUT:
+                case EVENT_BATCH_SAVE_TIMEOUT:
+                    mView.notifyJobState(false, null);
+                    break;
+            }
+        }
     }
 
 

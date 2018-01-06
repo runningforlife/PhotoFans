@@ -39,6 +39,7 @@ public class MiscUtil {
     private static final String PATH_CRASH_LOG = "log";
     private static final String PATH_PHOTOS = "photos";
     private static final String PATH_GLIDE_CACHE = "cache";
+    private static final String WALLPAPER_LOG = "wallpaper_setting.log";
 
     public static OkHttpClient buildOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -58,6 +59,10 @@ public class MiscUtil {
 
     public static String getWallpaperCacheDir() {
         return getRootDir() + File.separator + PATH_WALLPAPER_CACHE;
+    }
+
+    public static String getWallpaperLog() {
+        return WALLPAPER_LOG;
     }
 
     public static String getGlideCacheDir() {

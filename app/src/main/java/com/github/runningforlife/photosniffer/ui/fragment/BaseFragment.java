@@ -8,15 +8,25 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
+import com.github.rahatarmanahmed.cpv.CircularProgressViewListener;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.presenter.ImageType;
@@ -24,6 +34,7 @@ import com.github.runningforlife.photosniffer.presenter.NetState;
 import com.github.runningforlife.photosniffer.presenter.Presenter;
 import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.ui.activity.Refresh;
+import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
@@ -32,11 +43,20 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
 import io.realm.RealmObject;
 import me.iwf.photopicker.PhotoPicker;
 import me.iwf.photopicker.PhotoPickerActivity;
 
+import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
+import static android.view.MenuItem.SHOW_AS_ACTION_IF_ROOM;
 import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_FAVOR;
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_GALLERY;
+import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_WALLPAPER;
+import static com.github.runningforlife.photosniffer.ui.fragment.BatchAction.BATCH_DELETE;
+import static com.github.runningforlife.photosniffer.ui.fragment.BatchAction.BATCH_FAVOR;
+import static com.github.runningforlife.photosniffer.ui.fragment.BatchAction.BATCH_SAVE_AS_WALLPAPER;
 
 /**
  * a abstract fragment class implemented by child
@@ -57,7 +77,16 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     // current context menu item view position
     protected int mCurrentPos = -1;
     protected FragmentCallback mCallback;
+
     private Presenter mPresenter;
+    private Menu mMenu;
+    private MenuItem mVisibleMenu;
+    private String mVisibleMenuTitle;
+    GalleryAdapter mAdapter;
+
+    ProgressBar mPbHint;
+    private AlertDialog mHintAlert;
+
     // user setting adapter
     String mUserAdapter;
     String mUserAdapterPrefKey;
@@ -72,12 +101,36 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     abstract boolean onOptionsMenuSelected(MenuItem menu);
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        Log.v(TAG,"onPrepareOptionsMenu()");
+        mMenu = menu;
+        handleVisibleMenu();
+        if (TextUtils.isEmpty(mVisibleMenuTitle)) {
+            mVisibleMenuTitle = mVisibleMenu.getTitle().toString();
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         int id = menuItem.getItemId();
         switch (id) {
             case R.id.add_wallpaper:
                 startPhotoPicker();
-                //startPickPhoto();
+                return true;
+            case R.id.batch_edit:
+                handleBatchEdit(true);
+                return true;
+            case R.id.favor:
+                mPresenter.batchEdit(mAdapter.getSelectedImages(), BATCH_FAVOR);
+                handleBatchEdit(false);
+                return true;
+            case R.id.delete:
+                mPresenter.batchEdit(mAdapter.getSelectedImages(), BATCH_DELETE);
+                handleBatchEdit(false);
+                return true;
+            case R.id.save_as_wallpaper:
+                mPresenter.batchEdit(mAdapter.getSelectedImages(), BATCH_SAVE_AS_WALLPAPER);
+                handleBatchEdit(false);
                 return true;
             default:
                 return onOptionsMenuSelected(menuItem);
@@ -118,13 +171,36 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     }
 
     @Override
+    public void notifyJobState(boolean isStarted, String hint) {
+        Log.v(TAG,"notifyJobState: is started=" + isStarted);
+        if (isStarted) {
+            if (mHintAlert == null) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                mHintAlert = builder.setView(R.layout.diaglog_busy_hint)
+                        .create();
+
+                Window window = mHintAlert.getWindow();
+                if (window != null) {
+                    window.setBackgroundDrawableResource(android.R.color.transparent);
+                }
+            }
+            mHintAlert.show();
+        } else {
+            //mPbHint.setVisibility(View.GONE);
+            if (mHintAlert.isShowing()) {
+                mHintAlert.dismiss();
+            }
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         Log.v(TAG,"onResume()");
 
         int resId = R.string.app_name;
         switch (mImageType) {
-            case ImageType.IMAGE_FAVOR:
+            case IMAGE_FAVOR:
                 resId = R.string.favorite;
                 break;
             case ImageType.IMAGE_GALLERY:
@@ -174,6 +250,8 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     protected void setPresenter(@NonNull Presenter presenter) {
         mPresenter = presenter;
     }
+
+    abstract RecyclerView getRecycleView();
 
     protected void setTitle(String title) {
         AppCompatActivity activity = (AppCompatActivity) getActivity();
@@ -228,6 +306,13 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     }
 
     @Override
+    public void onItemSelected(int totalCount) {
+        if (mVisibleMenu != null) {
+            mVisibleMenu.setTitle(mVisibleMenuTitle + "( " + String.valueOf(totalCount) + ")");
+        }
+    }
+
+    @Override
     public int getCount() {
         checkPresenter();
         return mPresenter.getItemCount();
@@ -249,6 +334,56 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     public void loadImageIntoView(int pos, ImageView iv, Priority priority, int w, int h, ImageView.ScaleType scaleType) {
         checkPresenter();
         mPresenter.loadImageIntoView(pos, iv, priority, w, h, scaleType);
+    }
+
+    void handleBatchEdit(boolean isEnabled) {
+        Log.v(TAG,"handleBatchEdit()");
+        if (isEnabled) {
+            mMenu.setGroupVisible(R.id.group_usage, false);
+            mMenu.setGroupVisible(R.id.group_batch_edit, true);
+        } else {
+            mMenu.setGroupVisible(R.id.group_usage, true);
+            mMenu.setGroupVisible(R.id.group_batch_edit, false);
+        }
+        if (getRecycleView() != null) {
+            getRecycleView().requestLayout();
+        }
+
+        handleVisibleMenu();
+
+        if (mAdapter != null) {
+            mAdapter.enableBatchEdit(isEnabled);
+        }
+
+        mVisibleMenu.setTitle(mVisibleMenuTitle);
+    }
+
+    private void handleVisibleMenu() {
+        if (mImageType != IMAGE_GALLERY) {
+            MenuItem menuItem = mMenu.findItem(R.id.favor);
+            if (menuItem != null) {
+                menuItem.setVisible(false);
+            }
+            if (mImageType == IMAGE_WALLPAPER) {
+                MenuItem menuItem1 = mMenu.findItem(R.id.save_as_wallpaper);
+                if (menuItem1 != null) {
+                    menuItem1.setVisible(false);
+                }
+
+                MenuItem delete = mMenu.findItem(R.id.delete);
+                delete.setShowAsAction(SHOW_AS_ACTION_IF_ROOM);
+
+                mVisibleMenu = delete;
+            } else {
+
+                MenuItem save = mMenu.findItem(R.id.save_as_wallpaper);
+                save.setShowAsAction(SHOW_AS_ACTION_IF_ROOM);
+
+                mVisibleMenu = save;
+            }
+        } else {
+            mVisibleMenu = mMenu.findItem(R.id.favor);
+        }
     }
 
     private void startPhotoPicker() {

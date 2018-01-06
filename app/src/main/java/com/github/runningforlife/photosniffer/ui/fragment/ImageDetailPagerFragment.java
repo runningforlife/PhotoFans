@@ -526,6 +526,11 @@ public class ImageDetailPagerFragment extends Fragment
 
     }
 
+    @Override
+    public void notifyJobState(boolean isStarted, String hint) {
+
+    }
+
     private void showToast(String msg) {
         GalleryActivity activity = (GalleryActivity) getActivity();
         if (activity != null) {

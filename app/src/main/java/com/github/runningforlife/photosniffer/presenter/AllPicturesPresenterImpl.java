@@ -237,7 +237,7 @@ public class AllPicturesPresenterImpl extends PresenterBase
         }
     }
 
-    private void saveAllPolaUrls(final int start, final int end){
+    private void saveAllPolaUrls(final int start, final int end) {
         List<ImageRealm> pola = new ArrayList<>();
         List<String> builtInWallpapers = SharedPrefUtil.getArrayList(mContext.getString(R.string.build_in_wallpaper_list));
         int count = 0;

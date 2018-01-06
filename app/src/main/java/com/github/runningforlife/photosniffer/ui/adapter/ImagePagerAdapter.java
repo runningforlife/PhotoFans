@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Priority;;
+import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
 
 import com.github.runningforlife.photosniffer.utils.MiscUtil;

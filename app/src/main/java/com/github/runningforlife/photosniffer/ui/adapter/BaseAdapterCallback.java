@@ -28,7 +28,6 @@ public interface BaseAdapterCallback {
      * @param view - shared element
      */
     void onItemClicked(View view, int pos, String adapter);
-
     /*
      * remove item at pos
      */

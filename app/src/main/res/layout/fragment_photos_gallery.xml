@@ -11,10 +11,10 @@
         android:id="@+id/rcv_gallery"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/grid_margin"
         android:layoutAnimation="@anim/anim_rcv_layout"
         android:scrollbars="vertical"
-        android:scrollbarStyle="insideInset"
+        android:layout_margin="@dimen/grid_margin"
+        android:scrollbarStyle="insideOverlay"
         android:scrollbarSize="@dimen/scroll_bar_size"/>
 
 </android.support.v4.widget.SwipeRefreshLayout>
