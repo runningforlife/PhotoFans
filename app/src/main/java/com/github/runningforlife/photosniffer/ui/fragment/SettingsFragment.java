@@ -161,7 +161,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     private void checkWallpaperInterval() {
         if (Build.VERSION.SDK_INT >= 21) {
-            WallpaperUtils.setWallpaperFromCache(getActivity(), WallpaperManager.FLAG_SYSTEM);
             WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
         } else {
             WallpaperUtils.startAutoWallpaperAlarm(getActivity());

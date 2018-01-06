@@ -50,7 +50,6 @@
     <string name="pref_automatic_wallpaper" translatable="false">Enable Automatic Wallpaper</string>
     <string name="enable_automatic_wallpaper">Enable Automatic Wallpaper</string>
     <string name="set_wallpaper">Wallpaper Setting</string>
-    <string name="key_auto_wallpaper_setting_interval" translatable="false">pref_auto_wallpaper_interval</string>
     <string name="set_auto_wallpaper_interval">Set Auto Wallpaper Interval</string>
     <string name="pref_pola_latest_collections_number" translatable="false">pola_latest_collections_number</string>
     <string name="pref_auto_wallpaper_interval" translatable="false">pref_auto_wallpaper_time_interval</string>

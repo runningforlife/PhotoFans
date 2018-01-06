@@ -50,7 +50,6 @@
     <string name="message_file_deletion_progress">正在删除,请稍后&#8230;</string>
     <string name="add_wallpapers_from_gallery">从相册添加壁纸</string>
     <string name="choose_the_cache_folder_to_delete">选择要删除的文件夹</string>
-    <string name="action_save_as_wallpaper">Save as Wallpaper</string>
-    <string name="wallpaper_saved_hint">Images is being saved as wallpaper,please wait...</string>
-    <string name="delete_image_hint">Images are being deleted, please waiting...</string>
+    <string name="action_save_as_wallpaper">保存为壁纸</string>
+    <string name="batch_edit">批量编辑</string>
 </resources>

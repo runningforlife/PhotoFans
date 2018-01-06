@@ -102,6 +102,9 @@ public class WallpaperUtils {
 
     @TargetApi(21)
     public static void startWallpaperSettingJob(Context context, int jobId) {
+        JobScheduler js = (JobScheduler) context.getSystemService(JOB_SCHEDULER_SERVICE);
+        js.cancel(jobId);
+
         String keyWallpaperInterval = context.getString(R.string.pref_auto_wallpaper_interval);
         int interval = Integer.parseInt(SharedPrefUtil.getString(keyWallpaperInterval, "900000"));
 
@@ -110,8 +113,6 @@ public class WallpaperUtils {
         builder.setPeriodic(interval)
                 .setPersisted(true);
 
-        JobScheduler js = (JobScheduler) context.getSystemService(JOB_SCHEDULER_SERVICE);
-        js.cancel(jobId);
         js.schedule(builder.build());
     }
 
