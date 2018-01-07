@@ -24,7 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.ui.GalleryView;
+import com.github.runningforlife.photosniffer.ui.RefreshView;
 import com.github.runningforlife.photosniffer.ui.fragment.AllPicturesFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.BaseFragment;
 import com.github.runningforlife.photosniffer.ui.fragment.ImageDetailPagerFragment;
@@ -42,7 +42,7 @@ import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_F
 import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_GALLERY;
 import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_WALLPAPER;
 
-public class GalleryActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback, BaseFragment.FragmentCallback, GalleryView {
+public class GalleryActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback, BaseFragment.FragmentCallback, RefreshView {
 
     private static final String TAG = "GalleryActivity";
     final static int MY_STORAGE_PERMISSION_REQUEST = 100;
