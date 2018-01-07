@@ -26,7 +26,7 @@ public class DiskCacheManager implements CacheApi {
 
     private DiskCacheManager() {
         mDiskCache = new DiskCache(new File(MiscUtil.getWallpaperCacheDir()));
-        mCacheExecutors = Executors.newSingleThreadExecutor();
+        mCacheExecutors = Executors.newCachedThreadPool();
         CacheActionRunnable car = new CacheActionRunnable(null, null,
                 ACTION_INIT, null);
         mCacheExecutors.submit(car);
