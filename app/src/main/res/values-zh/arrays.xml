@@ -15,4 +15,14 @@
         <item>壁纸: /PhotoSniffer/wallpapers</item>
     </string-array>
 
+    <string-array name="night_time_start">
+        <item>当天</item>
+        <item>第二天</item>
+    </string-array>
+
+    <string-array name="night_time_end">
+        <item>第二天</item>
+        <item>当天</item>
+    </string-array>
+
 </resources>

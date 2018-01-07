@@ -22,6 +22,7 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.app.AppGlobals;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -33,6 +34,7 @@ import okhttp3.OkHttpClient;
 public class MiscUtil {
     public static final String JOB_WALLPAPER_CACHE = "cache";
     public static final String JOB_WALLPAPER_SET = "setting";
+    public static final String JOB_NIGHT_TIME = "night_time";
 
     private static final String APP_NAME = "PhotoSniffer";
     private static final String PATH_WALLPAPER_CACHE = "wallpapers";
@@ -116,5 +118,29 @@ public class MiscUtil {
         NetworkInfo ni = cm.getActiveNetworkInfo();
 
         return ni != null && ni.isConnected() && ni.getType() == ConnectivityManager.TYPE_MOBILE;
+    }
+
+    public static boolean isNightTime(Context context) {
+        String prefNightTimeInterval = context.getString(R.string.pref_night_time_interval);
+        String prefNightTimeStart = context.getString(R.string.pref_night_time_starting);
+
+        long interval = SharedPrefUtil.getLong(prefNightTimeInterval, 0);
+        long start = SharedPrefUtil.getLong(prefNightTimeStart, 0);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(start);
+        int startHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int startMin = calendar.get(Calendar.MINUTE);
+
+        calendar.setTimeInMillis(start + interval);
+        int endHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int endMin = calendar.get(Calendar.MINUTE);
+
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int currentMin = calendar.get(Calendar.MINUTE);
+
+        return ((currentHour > startHour) || (currentHour == startHour && currentMin >= startMin)) &&
+                ((currentHour < endHour) || (currentHour == endHour && currentMin <= endMin));
     }
 }

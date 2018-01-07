@@ -73,7 +73,18 @@
     <string name="message_file_deletion_progress">File is being deleted, please wait&#8230;</string>
     <string name="pref_cache_clear" translatable="false">pref_cache_clear</string>
     <string name="add_wallpapers_from_gallery">Add images from gallery</string>
+    <string name="night_time_setting_explanation">during night time, photosniffer will not change your wallpaper, so it save your batter life</string>
+    <string name="starting_night_time">Starting time</string>
+    <string name="end_night_time">End Time</string>
+    <string name="pref_night_time_setting" translatable="false">night_time_setting</string>
+    <string name="init_start_night_time" translatable="false">22:00</string>
+    <string name="init_end_night_time" translatable="false">06:00</string>
     <string name="choose_the_cache_folder_to_delete">Choose the Folder you want to delete</string>
     <string name="batch_edit">batch edit</string>
     <string name="action_save_as_wallpaper">Save as Wallpaper</string>
+    <string name="night_time_setting">Cancel Wallpaper change during night time</string>
+    <string name="pref_lastest_wallpaper_time">latest_wallpaper_time</string>
+    <string name="interval_time_setting_error">Starting time should not be later than ending time</string>
+    <string name="pref_night_time_starting">pref_night_time_starting</string>
+    <string name="pref_night_time_interval">pref_night_time_interval</string>
 </resources>

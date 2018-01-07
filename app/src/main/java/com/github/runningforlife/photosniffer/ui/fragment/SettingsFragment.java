@@ -124,7 +124,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
     }
 
-    //FIXME: if no network connected, need persist user advice
     private void checkUserAdvice(String data) {
         if (!TextUtils.isEmpty(data) && MiscUtil.isConnected(getActivity())) {
             uploadAdviceToCloud(data);
@@ -190,4 +189,5 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         cloud.saveAdvice(advice);
     }
+
 }

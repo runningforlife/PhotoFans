@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layoutAnimation="@anim/anim_rcv_layout"
         android:scrollbars="vertical"
-        android:scrollbarStyle="insideInset"
+        android:scrollbarStyle="insideOverlay"
         android:scrollbarSize="@dimen/scroll_bar_size"/>
 
 </FrameLayout>

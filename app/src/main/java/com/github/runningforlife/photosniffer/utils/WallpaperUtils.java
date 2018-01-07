@@ -31,6 +31,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +46,7 @@ import io.realm.RealmResults;
 
 import static android.content.Context.ALARM_SERVICE;
 import static android.content.Context.JOB_SCHEDULER_SERVICE;
+import static com.github.runningforlife.photosniffer.utils.MiscUtil.JOB_NIGHT_TIME;
 
 /**
  * a utility class related with wallpaper
@@ -138,7 +141,6 @@ public class WallpaperUtils {
         js.schedule(builder.build());
     }
 
-
     public static void startAutoWallpaperAlarm(Context context) {
         PendingIntent pi = MiscUtil.getPendingIntent(ALARM_AUTO_WALLPAPER, context);
 
@@ -179,6 +181,40 @@ public class WallpaperUtils {
                 WallpaperUtils.startWallpaperFromCache(context, flag);
             }
         }).start();
+
+    }
+
+    public static void restartAutoWallpaperForNightTime(Context context) {
+        String prefNightTime = context.getString(R.string.pref_night_time_interval);
+        String prefNightTimeStarting = context.getString(R.string.pref_night_time_starting);
+        long nightTimeInterval = SharedPrefUtil.getLong(prefNightTime, 0);
+        long nightTimeStart = SharedPrefUtil.getLong(prefNightTimeStarting, 0);
+        if (nightTimeInterval > 0 && nightTimeStart > 0) {
+            cancelAutoWallpaperAlarm(context);
+            cancelSchedulerJob(context, MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
+
+            startNightTimeJobService(context);
+        }
+
+    }
+
+    @TargetApi(21)
+    private static void startNightTimeJobService(Context context) {
+        JobScheduler js = (JobScheduler) context.getSystemService(JOB_SCHEDULER_SERVICE);
+
+        String prefNightTimeDuration = context.getString(R.string.pref_night_time_interval);
+        long nightTimeDuration = SharedPrefUtil.getLong(prefNightTimeDuration, 0);
+        if (nightTimeDuration > 0) {
+            ComponentName jobService = new ComponentName(context, WallpaperJobService.class);
+            JobInfo.Builder builder = new JobInfo.Builder(MiscUtil.getJobId(JOB_NIGHT_TIME), jobService);
+            JobInfo jobInfo = builder.setPersisted(true)
+                   //.setPeriodic(nightTimeDuration)
+                   .setMinimumLatency(nightTimeDuration + 30*1000)
+                   .build();
+            if (js != null) {
+                js.schedule(jobInfo);
+            }
+        }
     }
 
     private static void startWallpaperFromCache(Context context, int flag) {

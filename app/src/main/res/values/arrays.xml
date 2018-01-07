@@ -48,4 +48,14 @@
         <item>Wallpapers: /PhotoSniffer/wallpapers</item>
     </string-array>
 
+    <string-array name="night_time_start">
+        <item>Current Day</item>
+        <item>The Second day</item>
+    </string-array>
+
+    <string-array name="night_time_end">
+        <item>The Second day</item>
+        <item>Current Day</item>
+    </string-array>
+
 </resources>

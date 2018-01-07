@@ -82,7 +82,7 @@ public class ActionListDialogFragment extends DialogFragment {
 
     @Override
     @NonNull
-    public Dialog onCreateDialog(Bundle savedInstanceState){
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
         Log.v(TAG,"onCreateDialog()");
         Dialog dialog = new Dialog(getContext(),R.style.FullScreeWidthDialog);
 

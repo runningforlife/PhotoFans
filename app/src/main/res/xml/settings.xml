@@ -13,6 +13,12 @@
         android:summary="@string/enable_automatic_wallpaper"
         android:defaultValue="false"/>
 
+    <com.github.runningforlife.photosniffer.ui.preference.SwitchActionPreference
+        android:key="@string/pref_night_time_setting"
+        android:dialogTitle="@string/night_time_setting_explanation"
+        android:summary="@string/night_time_setting"
+        android:title="@string/night_time_setting"/>
+
     <SwitchPreference
         android:key="@string/pref_enable_auto_lockscreen_wallpaper"
         android:title="@string/enable_auto_lockscreen_wallpaper"
