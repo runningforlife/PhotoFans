@@ -45,7 +45,7 @@ public class AllPicturesPresenterImpl extends PresenterBase
     // updateAsync Pola collections every 7days
     private static final long POLA_UPDATED_DURATION = TimeUnit.DAYS.toMillis(8);
     // current latest pola
-    private static final int LATEST_POLA_COUNT = 73;
+    private static final int LATEST_POLA_COUNT = 78;
 
     private RealmResults<ImageRealm> mUnUsedImages;
     // whether user is refreshing data
