@@ -29,7 +29,7 @@ public class DiskCache implements Cache {
     private static final int DEFAULT_CACHE_SIZE = 50 * 1024 * 1024;
     /** default imag format */
     private static final String DEFAULT_IMAGE_FORMAT = ".png";
-    private static final String CACHE_IMAGE_PREFIX = "img";
+    private static final String CACHE_IMAGE_PREFIX = "img-";
 
     /** all Cache entries info */
     private Map<String, CacheInfo> mEntries = new LinkedHashMap<>(30, 0.75f, true);

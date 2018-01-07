@@ -295,7 +295,7 @@ abstract class PresenterBase implements Presenter {
                 message.obj = url;
                 message.sendToTarget();
                 // cache it
-                mCacheMgr.put(url, bitmap);
+                mCacheMgr.put(imgUrl, bitmap);
             }
             return;
         } catch (InterruptedException e) {
@@ -423,7 +423,7 @@ abstract class PresenterBase implements Presenter {
         try {
             Bitmap bitmap = target.get(3000, TimeUnit.MILLISECONDS);
 
-            FileOutputStream fos = new FileOutputStream(mCacheMgr.getFilePath(url));
+            FileOutputStream fos = new FileOutputStream(mCacheMgr.getFilePath(imgUrl));
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
 
             fos.flush();
@@ -475,7 +475,9 @@ abstract class PresenterBase implements Presenter {
         mNetworkCb = new ConnectivityManager.NetworkCallback() {
             @Override
             public void onLost(Network network) {
-                mView.onNetworkState(NetState.STATE_DISCONNECT);
+                if (!MiscUtil.isConnected(mContext)) {
+                    mView.onNetworkState(NetState.STATE_DISCONNECT);
+                }
             }
 
             @Override

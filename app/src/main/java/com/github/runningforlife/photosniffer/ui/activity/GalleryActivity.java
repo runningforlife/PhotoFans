@@ -42,7 +42,8 @@ import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_F
 import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_GALLERY;
 import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_WALLPAPER;
 
-public class GalleryActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback, BaseFragment.FragmentCallback, RefreshView {
+public class GalleryActivity extends BaseActivity implements
+        NavigationView.OnNavigationItemSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback, BaseFragment.FragmentCallback, RefreshView {
 
     private static final String TAG = "GalleryActivity";
     final static int MY_STORAGE_PERMISSION_REQUEST = 100;
