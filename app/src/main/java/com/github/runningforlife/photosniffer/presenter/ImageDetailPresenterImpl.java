@@ -82,9 +82,9 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     }
 
     @Override
-    public void onImageLoadDone(int pos, boolean isSuccess) {
+    public void onImageLoadDone(boolean isSuccess) {
         Log.v(TAG,"onImageLoadDone()");
-        mView.onImageLoadDone(pos, isSuccess);
+        mView.onImageLoadDone(isSuccess);
     }
 
 }

@@ -28,6 +28,7 @@ public interface Presenter extends LifeCycle {
     /** event */
     int EVENT_BATCH_REMOVE_TIMEOUT = 0x01;
     int EVENT_BATCH_SAVE_TIMEOUT = 0x02;
+    int EVENT_IMAGE_LOAD_DONE = 0x03;
 
     DisplayMetrics dm = DisplayUtil.getScreenDimen();
 
@@ -69,7 +70,7 @@ public interface Presenter extends LifeCycle {
     /*
      * image loading complete
      */
-    void onImageLoadDone(int pos, boolean isSuccess);
+    void onImageLoadDone(boolean isSuccess);
 
     /**
      * save user selected photos to realm

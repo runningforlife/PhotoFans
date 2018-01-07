@@ -21,6 +21,7 @@ import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
@@ -42,6 +43,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.realm.RealmObject;
 
 import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_GALLERY;
@@ -64,7 +67,8 @@ public class ImageDetailPagerFragment extends Fragment
     public final static String ARG_CURRENT_ITEM = "ARG_CURRENT_ITEM";
 
     private ArrayList<String> mImageUrls;
-    private ViewPager mViewPager;
+    @BindView(R.id.vp_image) ViewPager mViewPager;
+    @BindView(R.id.pb_loading) ProgressBar mLoadingProgress;
     private ImagePagerAdapter mPagerAdapter;
 
     public final static long ANIM_DURATION = 200L;
@@ -162,9 +166,9 @@ public class ImageDetailPagerFragment extends Fragment
     @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                        Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(me.iwf.photopicker.R.layout.__picker_picker_fragment_image_pager, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_image_detail, container, false);
 
-        mViewPager = rootView.findViewById(me.iwf.photopicker.R.id.vp_photos);
+        ButterKnife.bind(this, rootView);
         mViewPager.setOffscreenPageLimit(5);
         mViewPager.setCurrentItem(currentItem);
 
@@ -472,12 +476,12 @@ public class ImageDetailPagerFragment extends Fragment
 
     @Override
     public void onImageLoadStart(int pos) {
-
+        mLoadingProgress.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void onImageLoadDone(int pos, boolean isSuccess) {
-
+    public void onImageLoadDone(boolean isSuccess) {
+        mLoadingProgress.setVisibility(View.GONE);
     }
 
     @Override

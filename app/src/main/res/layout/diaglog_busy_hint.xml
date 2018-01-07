@@ -6,13 +6,6 @@
     android:background="@android:color/transparent">
 
     <ProgressBar android:id="@+id/pb_hint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:elevation="3dp"
-        style="?android:progressBarStyleLarge"
-        android:indeterminateBehavior="cycle"
-        android:background="@android:color/transparent"
-        android:indeterminate="true" />
+        style="@style/MediumProgressBar" />
 
 </FrameLayout>

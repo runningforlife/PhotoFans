@@ -13,5 +13,5 @@ public interface ImageDetailView extends UI {
     /*
      * image loading complete
      */
-    void onImageLoadDone(int pos, boolean isSuccess);
+    void onImageLoadDone(boolean isSuccess);
 }

@@ -152,7 +152,7 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
     }
 
     @Override
-    public void onImageLoadDone(int pos, boolean isSuccess) {
+    public void onImageLoadDone(boolean isSuccess) {
 
     }
 }

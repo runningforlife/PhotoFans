@@ -99,10 +99,11 @@ abstract class PresenterBase implements Presenter {
     @Override
     public void onImageLoadStart(int pos) {
        // for detail presenter to use
+
     }
 
     @Override
-    public void onImageLoadDone(int pos, boolean isSuccess) {
+    public void onImageLoadDone(boolean isSuccess) {
         // for detail presenter to use
     }
 
@@ -177,6 +178,9 @@ abstract class PresenterBase implements Presenter {
                         .error(R.drawable.ic_broken_image_white_24dp)
                         .fitCenter()
                         .into(iv);
+
+                onImageLoadStart(pos);
+                mMainHandler.sendEmptyMessageDelayed(EVENT_IMAGE_LOAD_DONE, 800);
             }
         }
     }
@@ -446,6 +450,9 @@ abstract class PresenterBase implements Presenter {
                 case EVENT_BATCH_REMOVE_TIMEOUT:
                 case EVENT_BATCH_SAVE_TIMEOUT:
                     mView.notifyJobState(false, null);
+                    break;
+                case EVENT_IMAGE_LOAD_DONE:
+                    onImageLoadDone(true);
                     break;
             }
         }
