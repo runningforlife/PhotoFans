@@ -20,7 +20,6 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.FutureTarget;
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 import com.github.runningforlife.photosniffer.data.cache.CacheApi;
 import com.github.runningforlife.photosniffer.data.cache.DiskCacheManager;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
@@ -268,26 +267,21 @@ abstract class PresenterBase implements Presenter {
 
         if(TextUtils.isEmpty(url)) return;
 
-        String imgUrl = url;
-        if (url.startsWith(PIXELS_IMAGE_START)) {
-            imgUrl = UrlUtil.buildHighResolutionPixelsUrl(url, 650);
-        }
-        final String url1 = imgUrl;
-        if (url.startsWith("http")) {
-            markAsWallpaper(url, imgUrl);
-        }
-
         new Thread(new Runnable() {
             @Override
             public void run() {
-                setWallpaperAndCache(url1);
+                setWallpaperAndCache(url);
             }
         }).start();
     }
 
 
     private void setWallpaperAndCache(final String url) {
-        FutureTarget<Bitmap> bitmapTarget = mGlideManager.load(url)
+        String imgUrl = url;
+        if (url.startsWith(PIXELS_IMAGE_START)) {
+            imgUrl = UrlUtil.buildHighResolutionPixelsUrl(url, 650);
+        }
+        FutureTarget<Bitmap> bitmapTarget = mGlideManager.load(imgUrl)
                      .asBitmap()
                      .centerCrop()
                      .into(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
@@ -296,8 +290,11 @@ abstract class PresenterBase implements Presenter {
             WallpaperManager wm = WallpaperManager.getInstance(mContext);
             wm.setBitmap(bitmap);
             mView.onWallpaperSetDone(true);
-            // cache it
             if (url.startsWith("http")) {
+                Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
+                message.obj = url;
+                message.sendToTarget();
+                // cache it
                 mCacheMgr.put(url, bitmap);
             }
             return;
@@ -366,19 +363,10 @@ abstract class PresenterBase implements Presenter {
 
         for (final String url : urls) {
             if (url.startsWith("http")) {
-                String imgUrl = url;
-                if (url.startsWith(PIXELS_IMAGE_START)) {
-                    imgUrl = UrlUtil.buildHighResolutionPixelsUrl(url, 650);
-                }
-                final String url1 = imgUrl;
-                if (url.startsWith("http")) {
-                    markAsWallpaper(url, imgUrl);
-                }
                 mExecutors.submit(new Runnable() {
                     @Override
                     public void run() {
-
-                        saveImageAsWallpaper(url1);
+                        saveImageAsWallpaper(url);
                         mSavingLatch.countDown();
                     }
                 });
@@ -401,7 +389,7 @@ abstract class PresenterBase implements Presenter {
         }).start();
     }
 
-    private void markAsWallpaper(String url, String newUrl) {
+    private void markAsWallpaper(String url) {
         Log.v(TAG,"markAsWallpaper()");
         // mark it as wall paper
         HashMap<String,String> params = new HashMap<>();
@@ -409,8 +397,13 @@ abstract class PresenterBase implements Presenter {
 
         mRealmApi.deleteAsync(ImageRealm.class, params);
 
+        String imgUrl = url;
+        if (url.startsWith(PIXELS_IMAGE_START)) {
+            imgUrl = UrlUtil.buildHighResolutionPixelsUrl(url, 650);
+        }
+
         ImageRealm ir = new ImageRealm();
-        ir.setUrl(mCacheMgr.getFilePath(newUrl));
+        ir.setUrl(mCacheMgr.getFilePath(imgUrl));
         ir.setUsed(true);
         ir.setIsFavor(false);
         ir.setIsWallpaper(true);
@@ -419,18 +412,28 @@ abstract class PresenterBase implements Presenter {
     }
 
     private void saveImageAsWallpaper(String url) {
-        FutureTarget<Bitmap> target = mGlideManager.load(url)
+        String imgUrl = url;
+        if (url.startsWith(PIXELS_IMAGE_START)) {
+            imgUrl = UrlUtil.buildHighResolutionPixelsUrl(url, 650);
+        }
+        FutureTarget<Bitmap> target = mGlideManager.load(imgUrl)
                 .asBitmap()
                 .centerCrop()
                 .into(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
         try {
-            Bitmap bitmap = target.get(5000, TimeUnit.MILLISECONDS);
+            Bitmap bitmap = target.get(3000, TimeUnit.MILLISECONDS);
 
             FileOutputStream fos = new FileOutputStream(mCacheMgr.getFilePath(url));
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
 
             fos.flush();
             fos.close();
+            // ok, we will mark it as wallpaper
+            if (url.startsWith("http")) {
+                Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
+                message.obj = url;
+                message.sendToTarget();
+            }
         } catch (InterruptedException e) {
         } catch (ExecutionException e) {
         } catch (TimeoutException e) {
@@ -500,6 +503,9 @@ abstract class PresenterBase implements Presenter {
                     break;
                 case EVENT_IMAGE_LOAD_DONE:
                     onImageLoadDone(true);
+                    break;
+                case EVENT_WALLPAPER_SET_DONE:
+                    markAsWallpaper((String) message.obj);
                     break;
             }
         }

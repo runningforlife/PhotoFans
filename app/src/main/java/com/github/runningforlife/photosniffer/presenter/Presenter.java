@@ -23,6 +23,7 @@ public interface Presenter extends LifeCycle {
     int EVENT_BATCH_REMOVE_TIMEOUT = 0x01;
     int EVENT_BATCH_SAVE_TIMEOUT = 0x02;
     int EVENT_IMAGE_LOAD_DONE = 0x03;
+    int EVENT_WALLPAPER_SET_DONE = 0x04;
 
     DisplayMetrics dm = DisplayUtil.getScreenDimen();
 
