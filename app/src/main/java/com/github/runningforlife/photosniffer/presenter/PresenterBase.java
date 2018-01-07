@@ -1,8 +1,14 @@
 package com.github.runningforlife.photosniffer.presenter;
 
+import android.annotation.TargetApi;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -25,6 +31,7 @@ import com.github.runningforlife.photosniffer.ui.fragment.BatchAction;
 import com.github.runningforlife.photosniffer.utils.BitmapUtil;
 import com.github.runningforlife.photosniffer.utils.MediaStoreUtil;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
+import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -63,6 +70,8 @@ abstract class PresenterBase implements Presenter {
     private CountDownLatch mSavingLatch;
     private H mMainHandler;
     private boolean mIsFirstPager;
+    private ConnectivityManager mConnectMgr;
+    private ConnectivityManager.NetworkCallback mNetworkCb;
 
     int mMaxImagesAllowed;
 
@@ -90,6 +99,13 @@ abstract class PresenterBase implements Presenter {
 
         mIsFirstPager = false;
 
+    }
+
+    @Override
+    public void onStart() {
+        if (Build.VERSION.SDK_INT >= 21) {
+            monitorNetworkState();
+        }
     }
 
 
@@ -233,6 +249,12 @@ abstract class PresenterBase implements Presenter {
             mImageList.removeChangeListener(mOrderRealmChangeListener);
         }
         mRealmApi.closeRealm();
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            if (mNetworkCb != null && mConnectMgr != null) {
+                mConnectMgr.unregisterNetworkCallback(mNetworkCb);
+            }
+        }
     }
 
     private void setWallpaper(final String url) {
@@ -435,6 +457,30 @@ abstract class PresenterBase implements Presenter {
         }
 
         mView.onImageSaveDone(null);
+    }
+
+    @TargetApi(21)
+    private void monitorNetworkState() {
+        mConnectMgr = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkRequest.Builder builder = new NetworkRequest.Builder();
+        builder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+        if (SharedPrefUtil.isWifiOnlyDownloadMode(mContext)) {
+            builder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI);
+        }
+        mNetworkCb = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onLost(Network network) {
+                mView.onNetworkState(NetState.STATE_DISCONNECT);
+            }
+
+            @Override
+            public void onUnavailable() {
+                if (!MiscUtil.isConnected(mContext)) {
+                    mView.onNetworkState(NetState.STATE_DISCONNECT);
+                }
+            }
+        };
+        mConnectMgr.registerNetworkCallback(builder.build(), mNetworkCb);
     }
 
     private final class H extends Handler {

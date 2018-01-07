@@ -1,7 +1,12 @@
 package com.github.runningforlife.photosniffer.presenter;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,8 +40,8 @@ import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
 /**
  * a presenter to bridge UI and data repository
  */
-public class AllPicturesPresenterImpl extends PresenterBase
-        implements AllPicturesPresenter,SimpleResultReceiver.Receiver {
+public class AllPicturesPresenterImpl extends PresenterBase implements
+        AllPicturesPresenter,SimpleResultReceiver.Receiver {
     private static final String TAG = "AllPicturesPresenter";
 
     private static final int DEFAULT_RETRIEVE_TIME_OUT = 20*1000;
@@ -123,6 +128,7 @@ public class AllPicturesPresenterImpl extends PresenterBase
 
     @Override
     public void onStart() {
+        super.onStart();
         Log.v(TAG,"onStart()");
         HashMap<String,String> params = new HashMap<>();
         params.put("mIsUsed", Boolean.toString(true));
@@ -142,7 +148,6 @@ public class AllPicturesPresenterImpl extends PresenterBase
         });
 
         mIsRefreshing = false;
-        //mRealmMgr.addListener(this);
         mReceiver = new SimpleResultReceiver(new Handler(Looper.myLooper()));
         mReceiver.setReceiver(this);
     }
@@ -276,7 +281,6 @@ public class AllPicturesPresenterImpl extends PresenterBase
 
         return builder.toString();
     }
-
 
     private void startUpdateWallpaperCache() {
         // firstly, we try to fill wallpaper cache, and then

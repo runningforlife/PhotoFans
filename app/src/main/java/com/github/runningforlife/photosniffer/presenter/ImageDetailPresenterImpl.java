@@ -43,6 +43,7 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     @Override
     @SuppressWarnings("unchecked")
     public void onStart() {
+        super.onStart();
         Log.v(TAG,"onStart()");
         HashMap<String,String> params = new HashMap<>();
         switch (mImageType) {

@@ -19,12 +19,6 @@ import io.realm.RealmObject;
  */
 
 public interface Presenter extends LifeCycle {
-    int DEFAULT_WIDTH = 1024;
-    int DEFAULT_HEIGHT = (int)(DEFAULT_WIDTH* DisplayUtil.getScreenRatio());
-    // if network error count is larger than 10, network is bad
-    int NETWORK_HUNG_ERROR_COUNT = 10;
-    int NETWORK_SLOW_ERROR_COUNT = 5;
-
     /** event */
     int EVENT_BATCH_REMOVE_TIMEOUT = 0x01;
     int EVENT_BATCH_SAVE_TIMEOUT = 0x02;
