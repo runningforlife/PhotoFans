@@ -30,12 +30,7 @@ public class WifiStateReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if(ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
             if (MiscUtil.isWifiConnected(context)) {
-                new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                uploadLogToCloud();
-                            }
-                        }).start();
+                uploadLogToCloud();
             }
 
             String wifiOnlyMode = context.getString(R.string.pref_wifi_download);
@@ -54,26 +49,20 @@ public class WifiStateReceiver extends BroadcastReceiver {
     }
 
     private void uploadLogToCloud() {
-        String logPath = MiscUtil.getLogDir();
-        File file = new File(logPath);
-        if(file.exists()){
-            File[] logs = file.listFiles();
-            for(File log : logs){
-                if(log.isFile()){
-                    saveLogToCloud(log);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String logPath = MiscUtil.getLogDir();
+                File file = new File(logPath);
+                if (file.exists()) {
+                    File[] logs = file.listFiles();
+                    for (File log : logs) {
+                        if (log.isFile()) {
+                            MiscUtil.saveLogToCloud(log);
+                        }
+                    }
                 }
             }
-        }
-    }
-
-    private void saveLogToCloud(File file){
-        if(file.length() <= 0) return;
-
-        LeanCloudManager cloudManager = LeanCloudManager.getInstance();
-        cloudManager.saveFile(file);
-        // deleteSync file
-        if(file.exists()){
-            file.delete();
-        }
+        }).start();
     }
 }

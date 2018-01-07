@@ -66,16 +66,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    private class WifiStateReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (MiscUtil.isWifiConnected(context)) {
-                uploadLogToCloud();
-            }
-        }
-    }
-
     private void uploadLogToCloud() {
         new Thread(new Runnable() {
             @Override
@@ -92,5 +82,15 @@ public abstract class BaseActivity extends AppCompatActivity {
                 }
             }
         }).start();
+    }
+
+    private final class WifiStateReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (MiscUtil.isWifiConnected(context)) {
+                uploadLogToCloud();
+            }
+        }
     }
 }

@@ -8,7 +8,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
-import android.webkit.URLUtil;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
@@ -58,13 +57,12 @@ import static com.github.runningforlife.photosniffer.ui.fragment.BatchAction.BAT
 abstract class PresenterBase implements Presenter {
     private static final String TAG = "PresenterBase";
 
-    private int mNetworkErrorCount;
-    private boolean mIsNetworkStateReported;
     private RequestManager mGlideManager;
     private CacheApi mCacheMgr;
     private ExecutorService mExecutors;
     private CountDownLatch mSavingLatch;
     private H mMainHandler;
+    private boolean mIsFirstPager;
 
     int mMaxImagesAllowed;
 
@@ -83,23 +81,21 @@ abstract class PresenterBase implements Presenter {
         mRealmApi = RealmApiImpl.getInstance();
         mCacheMgr = DiskCacheManager.getInstance();
 
-        mNetworkErrorCount = 0;
-
         // default value
         mMaxImagesAllowed = Integer.MAX_VALUE;
-
-        mIsNetworkStateReported = false;
 
         mGlideManager = requestManager;
 
         mMainHandler = new H(Looper.myLooper());
+
+        mIsFirstPager = false;
+
     }
 
 
     @Override
     public void onImageLoadStart(int pos) {
        // for detail presenter to use
-
     }
 
     @Override
@@ -179,8 +175,11 @@ abstract class PresenterBase implements Presenter {
                         .fitCenter()
                         .into(iv);
 
-                onImageLoadStart(pos);
-                mMainHandler.sendEmptyMessageDelayed(EVENT_IMAGE_LOAD_DONE, 800);
+                if (!mIsFirstPager) {
+                    onImageLoadStart(pos);
+                    mMainHandler.sendEmptyMessageDelayed(EVENT_IMAGE_LOAD_DONE, 800);
+                    mIsFirstPager = true;
+                }
             }
         }
     }
