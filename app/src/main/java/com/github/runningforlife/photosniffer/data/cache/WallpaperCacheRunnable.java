@@ -2,6 +2,10 @@ package com.github.runningforlife.photosniffer.data.cache;
 
 
 import android.util.Log;
+import android.webkit.URLUtil;
+
+import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
+import com.github.runningforlife.photosniffer.utils.UrlUtil;
 
 import java.io.IOException;
 
@@ -10,6 +14,8 @@ import java.util.concurrent.CountDownLatch;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
+
+import static com.github.runningforlife.photosniffer.crawler.processor.ImageSource.PIXELS_IMAGE_START;
 
 /**
  * Created by jason on 12/9/17.
@@ -27,7 +33,8 @@ public class WallpaperCacheRunnable implements Runnable {
     public WallpaperCacheRunnable(OkHttpClient httpClient, DiskCache cache, String imgUrl, CountDownLatch latch,
                                   ArrayBlockingQueue<String> cachedUrl) {
         mDiskCache = cache;
-        mImageUrl = imgUrl;
+        mImageUrl = imgUrl.startsWith(PIXELS_IMAGE_START) ?
+                UrlUtil.buildHighResolutionPixelsUrl(imgUrl, 650) : imgUrl;
         mCountLatch = latch;
         mHttpClient = httpClient;
         mCachedUrl = cachedUrl;

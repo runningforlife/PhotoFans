@@ -110,9 +110,9 @@ public class ImageRetrieveService extends Service {
                                 List<ImageRealm> realmObjects = new ArrayList<>(data.size());
                                 for (String url : data) {
                                     ImageRealm ir = new ImageRealm();
-                                    if (mRetrievedImageCount++ <= mExpectedImages) {
+/*                                    if (mRetrievedImageCount++ <= mExpectedImages) {
                                         ir.setUsed(true);
-                                    }
+                                    }*/
                                     ir.setUrl(url);
                                     realmObjects.add(ir);
                                 }

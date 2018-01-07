@@ -32,6 +32,7 @@ import com.github.runningforlife.photosniffer.utils.BitmapUtil;
 import com.github.runningforlife.photosniffer.utils.MediaStoreUtil;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
+import com.github.runningforlife.photosniffer.utils.UrlUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -51,6 +52,7 @@ import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.RealmResults;
 
+import static com.github.runningforlife.photosniffer.crawler.processor.ImageSource.PIXELS_IMAGE_START;
 import static com.github.runningforlife.photosniffer.loader.Loader.DEFAULT_IMG_HEIGHT;
 import static com.github.runningforlife.photosniffer.loader.Loader.DEFAULT_IMG_WIDTH;
 import static com.github.runningforlife.photosniffer.ui.fragment.BatchAction.BATCH_DELETE;
@@ -182,7 +184,11 @@ abstract class PresenterBase implements Presenter {
                         .centerCrop()
                         .into(iv);
             } else {
-                mGlideManager.load(url)
+                String imgUrl = url;
+                if (url.startsWith(PIXELS_IMAGE_START)) {
+                    imgUrl = UrlUtil.buildHighResolutionPixelsUrl(url, 650);
+                }
+                mGlideManager.load(imgUrl)
                         .thumbnail(0.5f)
                         .dontTransform()
                         .dontAnimate()
@@ -262,25 +268,23 @@ abstract class PresenterBase implements Presenter {
 
         if(TextUtils.isEmpty(url)) return;
 
-        if (url.startsWith("http")) {
-
-            markAsWallpaper(url);
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    // for pixels, we can use URL to download hd images
-                    if (url.startsWith(ImageSource.PIXELS_IMAGE_START)) {
-                        int res = dm.heightPixels / 2 > 1024 ? 1024 : dm.heightPixels;
-                        String imgUrl = buildHighResolutionPixelsUrl(url, res);
-                        setWallpaperAndCache(imgUrl);
-                    } else {
-                        setWallpaperAndCache(url);
-                    }
-                }
-            }).start();
+        String imgUrl = url;
+        if (url.startsWith(PIXELS_IMAGE_START)) {
+            imgUrl = UrlUtil.buildHighResolutionPixelsUrl(url, 650);
         }
+        final String url1 = imgUrl;
+        if (url.startsWith("http")) {
+            markAsWallpaper(url, imgUrl);
+        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                setWallpaperAndCache(url1);
+            }
+        }).start();
     }
+
 
     private void setWallpaperAndCache(final String url) {
         FutureTarget<Bitmap> bitmapTarget = mGlideManager.load(url)
@@ -362,11 +366,19 @@ abstract class PresenterBase implements Presenter {
 
         for (final String url : urls) {
             if (url.startsWith("http")) {
-                markAsWallpaper(url);
+                String imgUrl = url;
+                if (url.startsWith(PIXELS_IMAGE_START)) {
+                    imgUrl = UrlUtil.buildHighResolutionPixelsUrl(url, 650);
+                }
+                final String url1 = imgUrl;
+                if (url.startsWith("http")) {
+                    markAsWallpaper(url, imgUrl);
+                }
                 mExecutors.submit(new Runnable() {
                     @Override
                     public void run() {
-                        saveImageAsWallpaper(url);
+
+                        saveImageAsWallpaper(url1);
                         mSavingLatch.countDown();
                     }
                 });
@@ -389,7 +401,7 @@ abstract class PresenterBase implements Presenter {
         }).start();
     }
 
-    private void markAsWallpaper(String url) {
+    private void markAsWallpaper(String url, String newUrl) {
         Log.v(TAG,"markAsWallpaper()");
         // mark it as wall paper
         HashMap<String,String> params = new HashMap<>();
@@ -398,22 +410,12 @@ abstract class PresenterBase implements Presenter {
         mRealmApi.deleteAsync(ImageRealm.class, params);
 
         ImageRealm ir = new ImageRealm();
-        ir.setUrl(mCacheMgr.getFilePath(url));
+        ir.setUrl(mCacheMgr.getFilePath(newUrl));
         ir.setUsed(true);
         ir.setIsFavor(false);
         ir.setIsWallpaper(true);
         ir.setIsCached(true);
         mRealmApi.insertAsync(ir);
-    }
-
-    private String buildHighResolutionPixelsUrl(String url, int px) {
-        int hIdx = url.indexOf("?");
-
-        return url.substring(0, hIdx)
-                + "?"
-                + "h=" + px
-                + "&auto=compress"
-                + "&cs=tinysrgb";
     }
 
     private void saveImageAsWallpaper(String url) {
