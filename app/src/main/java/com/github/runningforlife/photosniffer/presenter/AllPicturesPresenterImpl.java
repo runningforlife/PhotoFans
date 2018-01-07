@@ -36,7 +36,7 @@ import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
  * a presenter to bridge UI and data repository
  */
 public class AllPicturesPresenterImpl extends PresenterBase
-        implements AllPicturesPresenter,SimpleResultReceiver.Receiver{
+        implements AllPicturesPresenter,SimpleResultReceiver.Receiver {
     private static final String TAG = "AllPicturesPresenter";
 
     private static final int DEFAULT_RETRIEVE_TIME_OUT = 20*1000;

@@ -9,12 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.MenuItem;
-import android.widget.AdapterView;
 
-import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.service.MyThreadFactory;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.io.File;
@@ -23,7 +18,7 @@ import java.io.File;
  * a common used activity class
  */
 
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
     private static final String TAG = "BaseActivity";
     static final String ROOT_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
     static final String PATH_NAME = "photos";

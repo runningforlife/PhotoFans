@@ -1,14 +1,11 @@
 package com.github.runningforlife.photosniffer.data.cache;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

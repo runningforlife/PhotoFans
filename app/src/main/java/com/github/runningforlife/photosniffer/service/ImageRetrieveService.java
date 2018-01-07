@@ -12,7 +12,6 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.os.ResultReceiver;
 import android.util.Log;
-import android.webkit.URLUtil;
 
 import com.github.runningforlife.photosniffer.crawler.processor.ImagePageFilter;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageRetrievePageProcessor;
@@ -23,19 +22,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.github.runningforlife.photosniffer.crawler.OkHttpDownloader;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
-import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.UrlUtil;
 
 import io.realm.RealmChangeListener;
-import io.realm.RealmObject;
 import io.realm.RealmResults;
 import us.codecraft.webmagic.Spider;
 

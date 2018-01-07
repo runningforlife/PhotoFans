@@ -1,6 +1,5 @@
 package com.github.runningforlife.photosniffer.ui.adapter;
 
-import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.MenuRes;
@@ -27,9 +26,6 @@ import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.github.runningforlife.photosniffer.loader.Loader.*;
-import static com.github.runningforlife.photosniffer.ui.fragment.BaseFragment.*;
 
 /**
  * a gallery adapter to bind image data to recycleview

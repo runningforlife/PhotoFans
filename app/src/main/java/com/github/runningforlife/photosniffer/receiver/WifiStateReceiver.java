@@ -1,33 +1,19 @@
 package com.github.runningforlife.photosniffer.receiver;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Environment;
-import android.os.SystemClock;
 
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
-import com.github.runningforlife.photosniffer.service.MyThreadFactory;
-import com.github.runningforlife.photosniffer.service.WallpaperUpdaterService;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import io.realm.Realm;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
-
-import static android.content.Context.ALARM_SERVICE;
 
 /**
  * this is for API < 21(Android L); for Android LL, use JobScheduler
@@ -44,8 +30,7 @@ public class WifiStateReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if(ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
             if (MiscUtil.isWifiConnected(context)) {
-                MyThreadFactory.getInstance().
-                        newThread(new Runnable() {
+                new Thread(new Runnable() {
                             @Override
                             public void run() {
                                 uploadLogToCloud();
@@ -57,7 +42,7 @@ public class WifiStateReceiver extends BroadcastReceiver {
             boolean isWifiOnly = SharedPrefUtil.getBoolean(wifiOnlyMode, true);
             // pre-fill image cache
             if ((isWifiOnly && MiscUtil.isWifiConnected(context)) ||
-                (MiscUtil.isConnected(context))) {
+                (!isWifiOnly && MiscUtil.isConnected(context))) {
 
                 if (Build.VERSION.SDK_INT >= 21) {
                     WallpaperUtils.startWallpaperUpdaterJob(context, MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));

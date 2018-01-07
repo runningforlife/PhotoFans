@@ -8,11 +8,7 @@ import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.widget.TimePicker;
 
-import java.util.Calendar;
-
 import javax.annotation.Nonnull;
-
-import butterknife.OnClick;
 
 /**
  *  a time picker dialog

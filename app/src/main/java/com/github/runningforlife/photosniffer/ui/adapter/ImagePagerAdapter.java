@@ -1,29 +1,18 @@
 package com.github.runningforlife.photosniffer.ui.adapter;
 
 import android.content.Context;
-import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.SparseArray;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
 
-import com.github.runningforlife.photosniffer.utils.MiscUtil;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

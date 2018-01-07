@@ -1,17 +1,10 @@
 package com.github.runningforlife.photosniffer.data.cache;
 
 
-import android.app.backup.BackupDataOutput;
 import android.util.Log;
 
-
-import com.github.runningforlife.photosniffer.data.local.RealmApi;
-import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
-import com.github.runningforlife.photosniffer.data.model.ImageRealm;
-import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import java.io.IOException;
 
-import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 

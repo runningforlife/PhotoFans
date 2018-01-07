@@ -9,14 +9,12 @@ import android.graphics.drawable.RippleDrawable;
 import android.os.Build;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.utils.BitmapUtil;
 
 /**
  * Glide loader complete listener

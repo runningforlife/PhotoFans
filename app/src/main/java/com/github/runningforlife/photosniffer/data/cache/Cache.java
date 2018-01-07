@@ -1,7 +1,5 @@
 package com.github.runningforlife.photosniffer.data.cache;
 
-import android.graphics.Bitmap;
-
 /**
  * Created by jason on 12/8/17.
  */

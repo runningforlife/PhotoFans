@@ -6,7 +6,6 @@ import android.preference.PreferenceManager;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.app.AppGlobals;
-import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 
 import java.util.ArrayList;
 import java.util.Arrays;

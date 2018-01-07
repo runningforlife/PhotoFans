@@ -15,7 +15,6 @@ import java.util.Set;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.model.ImageWebSite;
 import com.github.runningforlife.photosniffer.ui.activity.ImageSourceSelectionActivity;
-import com.github.runningforlife.photosniffer.ui.activity.TimePickerActivity;
 
 /**
  * a list preference only to start an activity

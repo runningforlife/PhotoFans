@@ -1,7 +1,5 @@
 package com.github.runningforlife.photosniffer.data.local;
 
-import com.github.runningforlife.photosniffer.data.model.ImageRealm;
-
 import java.util.HashMap;
 import java.util.List;
 

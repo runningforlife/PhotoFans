@@ -3,9 +3,7 @@ package com.github.runningforlife.photosniffer.ui.fragment;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -18,12 +16,9 @@ import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
-import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_WALLPAPER;
 
 /**
  * fragment to manager wallpaper

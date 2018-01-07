@@ -1,6 +1,5 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
-import android.app.WallpaperManager;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;

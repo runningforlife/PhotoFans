@@ -13,8 +13,6 @@ import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
 
-import java.util.Calendar;
-
 import static com.github.runningforlife.photosniffer.utils.MiscUtil.JOB_NIGHT_TIME;
 import static com.github.runningforlife.photosniffer.utils.MiscUtil.JOB_WALLPAPER_CACHE;
 import static com.github.runningforlife.photosniffer.utils.MiscUtil.JOB_WALLPAPER_SET;

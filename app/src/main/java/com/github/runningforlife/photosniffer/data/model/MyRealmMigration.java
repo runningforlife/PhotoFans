@@ -3,7 +3,6 @@ package com.github.runningforlife.photosniffer.data.model;
 import android.util.Log;
 
 import io.realm.DynamicRealm;
-import io.realm.RealmMigration;
 import io.realm.RealmSchema;
 
 /**
