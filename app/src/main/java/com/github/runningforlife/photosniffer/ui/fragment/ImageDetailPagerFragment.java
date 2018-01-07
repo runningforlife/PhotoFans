@@ -227,18 +227,7 @@ public class ImageDetailPagerFragment extends Fragment
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        MenuItem mi = menu.findItem(R.id.add_wallpaper);
-        if (mi != null) {
-            mi.setVisible(false);
-        }
-        mi = menu.findItem(R.id.grid_view);
-        if (mi != null) {
-            mi.setVisible(false);
-        }
-        mi = menu.findItem(R.id.list_view);
-        if (mi != null) {
-            mi.setVisible(false);
-        }
+        menu.setGroupVisible(R.id.group_usage, false);
     }
 
     @Override
