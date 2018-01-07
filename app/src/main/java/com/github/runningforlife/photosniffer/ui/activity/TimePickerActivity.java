@@ -88,8 +88,8 @@ public class TimePickerActivity extends AppCompatActivity
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
 
         if (mNightTime[TIME_START] < mNightTime[TIME_END]) {
             String prefNightTime = getString(R.string.pref_night_time_interval);

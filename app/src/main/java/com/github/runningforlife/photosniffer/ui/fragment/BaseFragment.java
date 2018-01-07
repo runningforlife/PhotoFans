@@ -19,16 +19,9 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toolbar;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
-import com.github.rahatarmanahmed.cpv.CircularProgressView;
-import com.github.rahatarmanahmed.cpv.CircularProgressViewListener;
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.presenter.ImageType;
 import com.github.runningforlife.photosniffer.presenter.NetState;
 import com.github.runningforlife.photosniffer.presenter.Presenter;
@@ -36,21 +29,15 @@ import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.ui.activity.Refresh;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
-import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
 import io.realm.RealmObject;
 import me.iwf.photopicker.PhotoPicker;
-import me.iwf.photopicker.PhotoPickerActivity;
 
-import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 import static android.view.MenuItem.SHOW_AS_ACTION_IF_ROOM;
-import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_FAVOR;
 import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_GALLERY;
 import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_WALLPAPER;
@@ -63,6 +50,7 @@ import static com.github.runningforlife.photosniffer.ui.fragment.BatchAction.BAT
  */
 
 public abstract class BaseFragment extends Fragment implements Refresh, UI, GalleryAdapterCallback {
+    private static final String TAG = "BaseFragment";
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({LinearManager,GridManager, StaggeredManager})
@@ -71,8 +59,8 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     public static final String GridManager = "GridManager";
     public static final String StaggeredManager = "StaggeredManager";
 
-    static final String USER_SETTING_ADAPTER = "adapter";
     static final String ARGS_IMAGE_TYPE = "image_type";
+    static final String ARG_BATCH_EDIT_MODE = "batch_edit";
 
     // current context menu item view position
     protected int mCurrentPos = -1;
@@ -84,8 +72,8 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     private String mVisibleMenuTitle;
     GalleryAdapter mAdapter;
 
-    ProgressBar mPbHint;
     private AlertDialog mHintAlert;
+    private boolean mIsBatchEditMode;
 
     int mImageType;
 
@@ -94,8 +82,6 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         void onFragmentAttached();
         void showToast(String toast);
     }
-
-    //abstract boolean onOptionsMenuSelected(MenuItem menu);
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
@@ -129,6 +115,8 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
                 mPresenter.batchEdit(mAdapter.getSelectedImages(), BATCH_SAVE_AS_WALLPAPER);
                 handleBatchEdit(false);
                 return true;
+            case R.id.cancel:
+                handleBatchEdit(false);
             default:
                 return super.onOptionsItemSelected(menuItem);
         }
@@ -144,7 +132,18 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     }
 
     @Override
+    public void onActivityCreated(Bundle savedState) {
+        super.onActivityCreated(savedState);
+        Log.d(TAG,"onActivityCreated()");
+        if (savedState != null) {
+            mIsBatchEditMode = savedState.getBoolean(ARG_BATCH_EDIT_MODE);
+            handleBatchEdit(mIsBatchEditMode);
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle state) {
+        state.putBoolean(ARG_BATCH_EDIT_MODE, mIsBatchEditMode);
         super.onSaveInstanceState(state);
         Log.d(TAG,"onStateInstanceState()");
     }
@@ -309,7 +308,11 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     @Override
     public void onItemSelected(int totalCount) {
         if (mVisibleMenu != null) {
-            mVisibleMenu.setTitle(mVisibleMenuTitle + "( " + String.valueOf(totalCount) + ")");
+            if (totalCount > 0) {
+                mVisibleMenu.setTitle(mVisibleMenuTitle + "(" + String.valueOf(totalCount) + ")");
+            } else {
+                mVisibleMenu.setTitle(mVisibleMenuTitle);
+            }
         }
     }
 
@@ -339,6 +342,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
 
     void handleBatchEdit(boolean isEnabled) {
         Log.v(TAG,"handleBatchEdit()");
+        mIsBatchEditMode = isEnabled;
         if (isEnabled) {
             mMenu.setGroupVisible(R.id.group_usage, false);
             mMenu.setGroupVisible(R.id.group_batch_edit, true);

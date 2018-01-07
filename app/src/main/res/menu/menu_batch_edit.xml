@@ -20,6 +20,11 @@
             android:orderInCategory="102"
             app:showAsAction="never"/>
 
+        <item android:id="@+id/cancel"
+            android:title="@string/cancel"
+            android:orderInCategory="103"
+            app:showAsAction="never"/>
+
     </group>
 
 </menu>
