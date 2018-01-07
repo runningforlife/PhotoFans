@@ -51,10 +51,6 @@ public class LeanCloudManager implements CloudApi{
                         Log.d(TAG,"saveFile(): fail");
                         e.printStackTrace();
                     }else{
-                        // deleteSync file
-/*                        if(file.exists()){
-                            file.delete();
-                        }*/
                         Log.v(TAG,"saveFile(): success");
                     }
                 }

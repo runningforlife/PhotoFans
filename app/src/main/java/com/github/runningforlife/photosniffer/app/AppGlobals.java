@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
@@ -45,8 +46,6 @@ public class AppGlobals extends Application {
     private static final String LEAN_CLOUD_APP_ID = "Pivxf9C9FGTTHtyg7QXI1ICI-gzGzoHsz";
     private static final String LEAN_CLOUD_APP_KEY = "KCjSyXjVTA9mCIJVs7tDVkGS";
     private static AppGlobals sInstance;
-    // wifi state receiver
-    private WifiStateReceiver mWifiStateReceiver;
 
     public static AppGlobals getInstance(){
         return sInstance;
@@ -79,15 +78,11 @@ public class AppGlobals extends Application {
     @Override
     public void onTrimMemory(int level){
         super.onTrimMemory(level);
-
-        unRegisterWifiStateReceiver();
     }
 
     @Override
     public void onLowMemory(){
         super.onLowMemory();
-
-        unRegisterWifiStateReceiver();
     }
 
     private void initExceptionHandler(){
@@ -141,7 +136,7 @@ public class AppGlobals extends Application {
         private File file;
         private Throwable throwable;
 
-        FileSaveRunnable(File file,Throwable t){
+        FileSaveRunnable(File file,Throwable t) {
             this.file = file;
             this.throwable = t;
         }
@@ -152,7 +147,7 @@ public class AppGlobals extends Application {
                 FileOutputStream fos = new FileOutputStream(file);
                 PrintWriter pw = new PrintWriter(fos);
 
-                DateFormat df = DateFormat.getDateInstance(DateFormat.FULL, Locale.US);
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
                 pw.println("LOG Date: " + df.format(new Date()));
                 pw.println("Device FingerPrint: " + Build.FINGERPRINT);
                 pw.println();
@@ -170,70 +165,10 @@ public class AppGlobals extends Application {
             }
             // save to cloud if wifi available
             if (MiscUtil.isWifiConnected(getApplicationContext())) {
-                //saveLogToCloud(file);
-            }else{
-                // waiting for wifi
-                waitForWifi();
+                MiscUtil.saveLogToCloud(file);
             }
         }
     }
-
-    private void uploadLogToCloud() {
-        String logPath = MiscUtil.getLogDir();
-        File file = new File(logPath);
-        if (file.exists()) {
-            File[] logs = file.listFiles();
-            for (File log : logs) {
-                if (log.isFile()) {
-                    saveLogToCloud(log);
-                }
-            }
-        }
-    }
-
-    private void saveLogToCloud(File file) {
-        if(file.length() <= 0) return;
-
-        LeanCloudManager cloudManager = LeanCloudManager.getInstance();
-        cloudManager.saveFile(file);
-    }
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    private void waitForWifi() {
-        Log.v(TAG,"waitForWifi()");
-        registerWifiStateReceiver();
-    }
-
-    private void registerWifiStateReceiver() {
-        mWifiStateReceiver = new WifiStateReceiver();
-        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(this);
-        lbm.registerReceiver(mWifiStateReceiver,
-                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-    }
-
-    private void unRegisterWifiStateReceiver(){
-        if(mWifiStateReceiver != null){
-            LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(this);
-            lbm.unregisterReceiver(mWifiStateReceiver);
-        }
-    }
-
-    private class WifiStateReceiver extends BroadcastReceiver{
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(MiscUtil.isWifiConnected(context)){
-                MyThreadFactory.getInstance().
-                        newThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //uploadLogToCloud();
-                    }
-                }).start();
-            }
-        }
-    }
-
 
     private class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler{
 

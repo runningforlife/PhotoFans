@@ -15,7 +15,7 @@ import com.github.runningforlife.photosniffer.ui.fragment.SettingsFragment;
  * an activity to manage user settings
  */
 
-public class SettingsActivity extends AppCompatActivity{
+public class SettingsActivity extends AppCompatActivity {
     private static final String TAG = "Settings";
 
     @Override

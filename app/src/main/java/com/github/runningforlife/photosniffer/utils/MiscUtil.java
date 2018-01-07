@@ -20,6 +20,7 @@ import android.widget.ImageView;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.app.AppGlobals;
+import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
 
 import java.io.File;
 import java.util.Calendar;
@@ -142,5 +143,12 @@ public class MiscUtil {
 
         return ((currentHour > startHour) || (currentHour == startHour && currentMin >= startMin)) &&
                 ((currentHour < endHour) || (currentHour == endHour && currentMin <= endMin));
+    }
+
+    public static void saveLogToCloud(File file) {
+        if(file.length() <= 0) return;
+
+        LeanCloudManager cloudManager = LeanCloudManager.getInstance();
+        cloudManager.saveFile(file);
     }
 }
