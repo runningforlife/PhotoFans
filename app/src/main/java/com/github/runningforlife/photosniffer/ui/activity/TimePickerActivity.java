@@ -88,9 +88,8 @@ public class TimePickerActivity extends AppCompatActivity
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        Log.v(TAG,"onPause()");
+    public void onDestroy() {
+        super.onDestroy();
 
         if (mNightTime[TIME_START] < mNightTime[TIME_END]) {
             String prefNightTime = getString(R.string.pref_night_time_interval);
@@ -103,12 +102,6 @@ public class TimePickerActivity extends AppCompatActivity
                 WallpaperUtils.restartAutoWallpaperForNightTime(this);
             }
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
     }
 
     @Override
@@ -138,7 +131,7 @@ public class TimePickerActivity extends AppCompatActivity
         if (type == TIME_START) {
             mTvStart.setText(mTimeFormat.format(mCalendar.getTime()));
             mNightTime[TIME_START] = mCalendar.getTimeInMillis();
-            if (mDayType[TIME_START] == DAY_CURRENT) {
+            if (mDayType[TIME_START] == DAY_SECOND) {
                 mNightTime[TIME_START] += TimeUnit.HOURS.toMillis(24);
             }
         } else {
@@ -180,8 +173,9 @@ public class TimePickerActivity extends AppCompatActivity
         mCalendar = Calendar.getInstance();
 
         ArrayAdapter<CharSequence> startAdapter = ArrayAdapter.createFromResource(this,
-                R.array.night_time_start, android.R.layout.simple_spinner_item);
+                R.array.night_time_start, android.R.layout.simple_spinner_dropdown_item);
         mSpinStart.setAdapter(startAdapter);
+        //mSpinStart.setDropDownVerticalOffset(3);
         mSpinStart.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -198,7 +192,7 @@ public class TimePickerActivity extends AppCompatActivity
         });
 
         ArrayAdapter<CharSequence> endAdapter = ArrayAdapter.createFromResource(this,
-                R.array.night_time_end, android.R.layout.simple_spinner_item);
+                R.array.night_time_end, android.R.layout.simple_spinner_dropdown_item);
         mSpinEnd.setAdapter(endAdapter);
         mSpinEnd.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
