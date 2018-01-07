@@ -24,7 +24,7 @@
     <string name="give_your_advice">请给出您的建议</string>
     <string name="set_wallpaper">壁纸设置</string>
     <string name="set_auto_wallpaper_interval">设置自动壁纸时间间隔</string>
-    <string name="my_copyright_declaration">所有图片均来自网络免费图片，请勿用于任何商业目的。\n如有任何问题，请联系wlh2119@gmail.com</string>
+    <string name="my_copyright_declaration">所有图片均来自网络免费图片，请勿用于任何商业目的\n如有任何问题，请联系wlh2119@gmail.com</string>
     <string name="check_copyright_notes">查看版权说明</string>
     <string name="enable_automatic_wallpaper">开启自动壁纸设置</string>
     <string name="how_many_images_reserved">保留图片的最大数目</string>
@@ -57,4 +57,7 @@
     <string name="interval_time_setting_error">开始时间不能晚于结束时间</string>
     <string name="action_save_as_wallpaper">保存为壁纸</string>
     <string name="batch_edit">批量编辑</string>
+    <string name="any_network_download">有网络连接下载图片</string>
+    <string name="auto_wallpaper_disabled">自动壁纸已取消</string>
+    <string name="disable_night_time_settings">休息时间设置已取消</string>
 </resources>

@@ -5,18 +5,21 @@
         android:key="@string/pref_wifi_download"
         android:title="@string/way_to_download_images"
         android:summary="@string/wifi_only_download"
+        android:summaryOff="@string/any_network_download"
         android:defaultValue="true"/>
 
     <SwitchPreference
         android:key="@string/pref_automatic_wallpaper"
         android:title="@string/enable_automatic_wallpaper"
         android:summary="@string/enable_automatic_wallpaper"
+        android:summaryOff="@string/auto_wallpaper_disabled"
         android:defaultValue="false"/>
 
     <com.github.runningforlife.photosniffer.ui.preference.SwitchActionPreference
         android:key="@string/pref_night_time_setting"
         android:dialogTitle="@string/night_time_setting_explanation"
         android:summary="@string/night_time_setting"
+        android:summaryOff="@string/disable_night_time_settings"
         android:title="@string/night_time_setting"/>
 
     <SwitchPreference
