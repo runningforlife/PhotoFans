@@ -377,10 +377,15 @@ public class RealmApiImpl implements RealmApi {
                         }
                     }
 
-                    RealmResults<? extends RealmObject> rr = query.findAll().sort("mTimeStamp", Sort.DESCENDING);
+                    RealmResults<ImageRealm> rr = (RealmResults<ImageRealm>) query.findAll().sort("mTimeStamp", Sort.DESCENDING);
                     if (rr.size() > max) {
-                        for (int i = max; i < rr.size(); ++i) {
-                            rr.get(i).deleteFromRealm();
+                        try {
+                            long time = rr.get(max).getTimeStamp();
+                            RealmResults<ImageRealm> removed = (RealmResults<ImageRealm>) query.
+                                    lessThanOrEqualTo("mTimeStamp", time).findAll();
+                            removed.deleteAllFromRealm();
+                        } catch (Exception e) {
+
                         }
                     }
                 }

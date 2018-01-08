@@ -33,7 +33,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private RealmApi mRealmApi;
 
     @Override
-    public void onCreate(Bundle savedState){
+    public void onCreate(Bundle savedState) {
         super.onCreate(savedState);
 
         addPreferencesFromResource(R.xml.settings);
@@ -80,7 +80,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         String keyWifiOnly = getString(R.string.pref_wifi_download);
         String keyWallpaperInterval = getString(R.string.pref_auto_wallpaper_interval);
         String keyLockScreenWallpaper = getString(R.string.pref_enable_auto_lockscreen_wallpaper);
-        String keyMaxImages = getString(R.string.max_reserved_images);
+        String keyMaxImages = getString(R.string.pref_max_reserved_images);
 
         if (key.equals(keyImgSrc)) {
             Set<String> src = sharedPreferences.getStringSet(key,null);
