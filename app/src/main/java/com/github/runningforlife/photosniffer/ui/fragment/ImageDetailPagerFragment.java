@@ -411,6 +411,8 @@ public class ImageDetailPagerFragment extends Fragment
         if (mViewPager != null) {
             mViewPager.setAdapter(null);
         }
+        
+        mPresenter.onDestroy();
     }
 
     @Override
