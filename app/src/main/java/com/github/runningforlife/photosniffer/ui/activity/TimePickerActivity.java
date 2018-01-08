@@ -22,6 +22,7 @@ import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -76,7 +77,9 @@ public class TimePickerActivity extends AppCompatActivity
         mDayType[TIME_END] = DAY_SECOND;
 
         mNightTime = new long[2];
-        mNightTime[TIME_START] = mNightTime[TIME_END] = System.currentTimeMillis();
+        mNightTime[TIME_START] = SharedPrefUtil.getLong(getString(R.string.pref_night_time_starting), 0);
+        mNightTime[TIME_END] = mNightTime[TIME_START] + SharedPrefUtil.getLong(getString(R.string.pref_night_time_interval), 0);
+
 
         mHour = new int[2];
         mMinute = new int[2];
@@ -138,7 +141,7 @@ public class TimePickerActivity extends AppCompatActivity
             mTvEnd.setText(mTimeFormat.format(mCalendar.getTime()));
             mNightTime[TIME_END] = mCalendar.getTimeInMillis();
             if (mDayType[TIME_END] == DAY_SECOND) {
-                mNightTime[TIME_START] += TimeUnit.HOURS.toMillis(24);
+                mNightTime[TIME_END] += TimeUnit.HOURS.toMillis(24);
             }
         }
 
@@ -151,10 +154,27 @@ public class TimePickerActivity extends AppCompatActivity
     }
 
     private void initView() {
-        mTvStart.setText(R.string.init_start_night_time);
-        mTvEnd.setText(R.string.init_end_night_time);
-
+        mCalendar = Calendar.getInstance();
         mTimeFormat = new SimpleDateFormat("HH:mm", Locale.US);
+
+        Intent intent = getIntent();
+        ArrayList<Integer> initTime = intent.getIntegerArrayListExtra("init_time");
+        if (initTime != null) {
+            mHour[TIME_START] = initTime.get(0);
+            mHour[TIME_END] = initTime.get(1);
+            mMinute[TIME_END] = initTime.get(2);
+            mMinute[TIME_START] = initTime.get(3);
+        }
+
+        mCalendar.set(Calendar.HOUR_OF_DAY, mHour[TIME_START]);
+        mCalendar.set(Calendar.MINUTE, mMinute[TIME_START]);
+        mTvStart.setText(mTimeFormat.format(mCalendar.getTime()));
+        mNightTime[TIME_START] = mCalendar.getTimeInMillis();
+
+        mCalendar.set(Calendar.HOUR_OF_DAY, mHour[TIME_END]);
+        mCalendar.set(Calendar.MINUTE, mMinute[TIME_END]);
+        mTvEnd.setText(mTimeFormat.format(mCalendar.getTime()));
+        mNightTime[TIME_END] = mCalendar.getTimeInMillis();
 
         mTvStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,8 +189,6 @@ public class TimePickerActivity extends AppCompatActivity
                 showTimePicker(TIME_END, mHour[TIME_END], mMinute[TIME_END]);
             }
         });
-
-        mCalendar = Calendar.getInstance();
 
         ArrayAdapter<CharSequence> startAdapter = ArrayAdapter.createFromResource(this,
                 R.array.night_time_start, android.R.layout.simple_spinner_dropdown_item);

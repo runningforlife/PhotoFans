@@ -50,14 +50,15 @@
     <string name="message_file_deletion_progress">正在删除,请稍后&#8230;</string>
     <string name="add_wallpapers_from_gallery">从相册添加壁纸</string>
     <string name="choose_the_cache_folder_to_delete">选择要删除的文件夹</string>
-    <string name="night_time_setting_explanation">休息时间壁纸不会自动更新,这样会节省电量,延长电池使用寿命</string>
+    <string name="night_time_setting_explanation">睡觉时壁纸不会自动更新,这样会节省电量,延长电池使用寿命</string>
     <string name="end_night_time">结束时间</string>
-    <string name="night_time_setting">休息时取消自动壁纸</string>
+    <string name="night_time_setting">睡眠时取消自动壁纸</string>
     <string name="starting_night_time">开始时间</string>
     <string name="interval_time_setting_error">开始时间不能晚于结束时间</string>
     <string name="action_save_as_wallpaper">保存为壁纸</string>
     <string name="batch_edit">批量编辑</string>
     <string name="any_network_download">有网络连接下载图片</string>
     <string name="auto_wallpaper_disabled">自动壁纸已取消</string>
-    <string name="disable_night_time_settings">休息时间设置已取消</string>
+    <string name="disable_night_time_settings">睡眠时设置已取消</string>
+    <string name="sleeping_time">睡眠时间</string>
 </resources>

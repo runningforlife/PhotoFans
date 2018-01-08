@@ -77,8 +77,6 @@
     <string name="starting_night_time">Starting time</string>
     <string name="end_night_time">End Time</string>
     <string name="pref_night_time_setting" translatable="false">night_time_setting</string>
-    <string name="init_start_night_time" translatable="false">22:00</string>
-    <string name="init_end_night_time" translatable="false">06:00</string>
     <string name="choose_the_cache_folder_to_delete">Choose the Folder you want to delete</string>
     <string name="batch_edit">batch edit</string>
     <string name="action_save_as_wallpaper">Save as Wallpaper</string>
@@ -90,4 +88,6 @@
     <string name="any_network_download">Download images if network is connected</string>
     <string name="auto_wallpaper_disabled">Auto Wallpaper is disabled</string>
     <string name="disable_night_time_settings">Night Time setting is disabled</string>
+    <string name="pref_night_time_starting_copy">pref_night_time_starting_copy</string>
+    <string name="sleeping_time">Sleeping Time</string>
 </resources>

@@ -40,7 +40,9 @@ public class WallpaperJobService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         Log.v(TAG,"onStartJob()");
-        if (!MiscUtil.isNightTime(getApplicationContext())) {
+        String prefNightSetting = getString(R.string.pref_night_time_setting);
+        boolean isEnabled = SharedPrefUtil.getBoolean(prefNightSetting, false);
+        if (isEnabled && !MiscUtil.isSleepTime(getApplicationContext())) {
             int jobId = params.getJobId();
             if (jobId == MiscUtil.getJobId(JOB_WALLPAPER_CACHE)) {
                 String prefWifi = getString(R.string.pref_wifi_download);
@@ -54,7 +56,8 @@ public class WallpaperJobService extends JobService {
             // night time end, restart normal auto wallpaper
             } else if (jobId == MiscUtil.getJobId(JOB_NIGHT_TIME)) {
                 WallpaperUtils.cancelSchedulerJob(getApplicationContext(), MiscUtil.getJobId(JOB_NIGHT_TIME));
-                WallpaperUtils.startWallpaperSettingJob(getApplicationContext(), MiscUtil.getJobId(JOB_SCHEDULER_SERVICE));
+                WallpaperUtils.startWallpaperSettingJob(getApplicationContext(), MiscUtil.getJobId(JOB_WALLPAPER_SET));
+                WallpaperUtils.startWallpaperCacheUpdaterService(getApplicationContext());
             }
         } else {
             WallpaperUtils.restartAutoWallpaperForNightTime(getApplicationContext());

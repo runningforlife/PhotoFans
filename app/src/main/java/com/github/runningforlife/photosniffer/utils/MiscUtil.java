@@ -121,7 +121,7 @@ public class MiscUtil {
         return ni != null && ni.isConnected() && ni.getType() == ConnectivityManager.TYPE_MOBILE;
     }
 
-    public static boolean isNightTime(Context context) {
+    public static boolean isSleepTime(Context context) {
         String prefNightTimeInterval = context.getString(R.string.pref_night_time_interval);
         String prefNightTimeStart = context.getString(R.string.pref_night_time_starting);
 

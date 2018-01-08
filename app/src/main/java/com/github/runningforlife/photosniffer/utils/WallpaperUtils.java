@@ -191,6 +191,9 @@ public class WallpaperUtils {
             cancelSchedulerJob(context, MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
 
             startNightTimeJobService(context);
+            // ok change starting time to the next day
+            SharedPrefUtil.putLong(prefNightTimeStarting, System.currentTimeMillis() +
+                    TimeUnit.DAYS.toMillis(1));
         }
 
     }
