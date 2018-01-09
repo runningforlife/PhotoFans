@@ -1,11 +1,11 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
+import android.app.WallpaperManager;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.SwitchPreference;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -19,11 +19,8 @@ import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Set;
 
 import io.realm.RealmResults;
@@ -141,7 +138,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if (Build.VERSION.SDK_INT >= 21) {
             if (isEnabled) {
                 WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
-                //WallpaperUtils.setWallpaperFromCache(getActivity().getApplicationContext(), WallpaperManager.FLAG_SYSTEM);
+                WallpaperUtils.setWallpaperFromCache(getActivity().getApplicationContext(), WallpaperManager.FLAG_SYSTEM);
             } else {
                 WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
             }
