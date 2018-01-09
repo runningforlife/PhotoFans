@@ -186,7 +186,6 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
             }
             mHintAlert.show();
         } else {
-            //mPbHint.setVisibility(View.GONE);
             if (mHintAlert.isShowing()) {
                 mHintAlert.dismiss();
             }
@@ -344,23 +343,31 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         Log.v(TAG,"handleBatchEdit()");
         mIsBatchEditMode = isEnabled;
         if (isEnabled) {
-            mMenu.setGroupVisible(R.id.group_usage, false);
-            mMenu.setGroupVisible(R.id.group_batch_edit, true);
+            if (mMenu != null) {
+                mMenu.setGroupVisible(R.id.group_usage, false);
+                mMenu.setGroupVisible(R.id.group_batch_edit, true);
+            }
         } else {
-            mMenu.setGroupVisible(R.id.group_usage, true);
-            mMenu.setGroupVisible(R.id.group_batch_edit, false);
+            if (mMenu != null) {
+                mMenu.setGroupVisible(R.id.group_usage, true);
+                mMenu.setGroupVisible(R.id.group_batch_edit, false);
+            }
         }
         if (getRecycleView() != null) {
             getRecycleView().requestLayout();
         }
 
-        handleVisibleMenu();
+        if (mMenu != null) {
+            handleVisibleMenu();
+        }
 
         if (mAdapter != null) {
             mAdapter.enableBatchEdit(isEnabled);
         }
 
-        mVisibleMenu.setTitle(mVisibleMenuTitle);
+        if (mVisibleMenu != null) {
+            mVisibleMenu.setTitle(mVisibleMenuTitle);
+        }
     }
 
     private void handleVisibleMenu() {
