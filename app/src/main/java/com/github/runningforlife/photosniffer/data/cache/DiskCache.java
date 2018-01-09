@@ -26,7 +26,7 @@ public class DiskCache implements Cache {
 
     private static final String TAG = "DiskCache";
     /** default size is 50MB */
-    private static final int DEFAULT_CACHE_SIZE = 50 * 1024 * 1024;
+    private static final int DEFAULT_CACHE_SIZE = 100 * 1024 * 1024;
     /** default imag format */
     private static final String DEFAULT_IMAGE_FORMAT = ".png";
     private static final String CACHE_IMAGE_PREFIX = "img-";

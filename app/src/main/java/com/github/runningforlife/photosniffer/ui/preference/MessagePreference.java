@@ -31,10 +31,10 @@ public class MessagePreference extends DialogPreference {
     private static final String TAG = "MessagePref";
     private static final int DELETION_WAIT_TIME_OUT = 10*1000;
 
-    private static final int DIR_CACHE = 0;
-    private static final int DIR_LOG = 1;
-    private static final int DIR_PHOTOS = 2;
-    private static final int DIR_WALLPAPERS = 3;
+    //private static final int DIR_CACHE = 0;
+    private static final int DIR_LOG = 0;
+    private static final int DIR_PHOTOS = 1;
+    private static final int DIR_WALLPAPERS = 2;
 
     private boolean[] mDefaultSelectedFolder;
 
@@ -79,10 +79,6 @@ public class MessagePreference extends DialogPreference {
             final File photoDir = new File(MiscUtil.getPhotoDir());
             final File wallpaperDir = new File(MiscUtil.getWallpaperCacheDir());
 
-            String[] clearedFolder = getContext().getResources().getStringArray(R.array.cache_clear_folder);
-            mDefaultSelectedFolder = new boolean[clearedFolder.length];
-            mDefaultSelectedFolder[DIR_CACHE] = mDefaultSelectedFolder[DIR_LOG] = true;
-            mDefaultSelectedFolder[DIR_PHOTOS] = mDefaultSelectedFolder[DIR_WALLPAPERS] = false;
             builder.setTitle(R.string.choose_the_cache_folder_to_delete)
                     .setMultiChoiceItems(R.array.cache_clear_folder, mDefaultSelectedFolder, new DialogInterface.OnMultiChoiceClickListener() {
                 @Override
@@ -96,12 +92,6 @@ public class MessagePreference extends DialogPreference {
                 public void onClick(DialogInterface dialog, int which) {
                     mAlertDialog.show();
 
-                    if (cacheDir.exists() && mDefaultSelectedFolder[DIR_CACHE]) {
-                        DeleteRunnable cache = new DeleteRunnable(mLatch, cacheDir);
-                        mDeletionExecutor.submit(cache);
-                    } else {
-                        mLatch.countDown();
-                    }
                     if (logDir.exists() && mDefaultSelectedFolder[DIR_LOG]) {
                         DeleteRunnable log = new DeleteRunnable(mLatch, logDir);
                         mDeletionExecutor.submit(log);
@@ -150,13 +140,18 @@ public class MessagePreference extends DialogPreference {
     private void init() {
         String prefClearCache = getContext().getString(R.string.pref_cache_clear);
         if (prefClearCache.equals(getKey())) {
+            String[] clearedFolder = getContext().getResources().getStringArray(R.array.cache_clear_folder);
+            mDefaultSelectedFolder = new boolean[clearedFolder.length];
+            mDefaultSelectedFolder[DIR_LOG] = true;
+            mDefaultSelectedFolder[DIR_PHOTOS] = mDefaultSelectedFolder[DIR_WALLPAPERS] = false;
+
             mDeletionExecutor = Executors.newSingleThreadExecutor();
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setView(R.layout.item_file_deletion_alert);
             mAlertDialog = builder.create();
 
-            mLatch = new CountDownLatch(4);
+            mLatch = new CountDownLatch(clearedFolder.length);
         }
     }
 
