@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.ui.fragment.TimePickerFragment;
+import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.ToastUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
@@ -29,6 +30,9 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.github.runningforlife.photosniffer.utils.MiscUtil.JOB_NIGHT_TIME;
+import static com.github.runningforlife.photosniffer.utils.MiscUtil.JOB_WALLPAPER_SET;
 
 /**
  * activity to pick night time
@@ -103,6 +107,9 @@ public class TimePickerActivity extends AppCompatActivity
             long currentTime = System.currentTimeMillis();
             if (mNightTime[TIME_START] <= currentTime) {
                 WallpaperUtils.restartAutoWallpaperForNightTime(this);
+            } else {
+                WallpaperUtils.cancelSchedulerJob(this, MiscUtil.getJobId(JOB_NIGHT_TIME));
+                WallpaperUtils.startWallpaperSettingJob(this, MiscUtil.getJobId(JOB_WALLPAPER_SET));
             }
         }
     }
