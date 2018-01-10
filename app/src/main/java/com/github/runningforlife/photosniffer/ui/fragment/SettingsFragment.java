@@ -25,6 +25,9 @@ import java.util.Set;
 
 import io.realm.RealmResults;
 
+import static com.github.runningforlife.photosniffer.utils.MiscUtil.JOB_NIGHT_TIME;
+import static com.github.runningforlife.photosniffer.utils.MiscUtil.JOB_WALLPAPER_SET;
+
 /**
  * a fragment containing settings
  */
@@ -83,6 +86,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         String keyWallpaperInterval = getString(R.string.pref_auto_wallpaper_interval);
         String keyLockScreenWallpaper = getString(R.string.pref_enable_auto_lockscreen_wallpaper);
         String keyMaxImages = getString(R.string.pref_max_reserved_images);
+        String keySleepTime = getString(R.string.pref_night_time_setting);
 
         if (key.equals(keyImgSrc)) {
             Set<String> src = sharedPreferences.getStringSet(key,null);
@@ -108,6 +112,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 maxImages = Integer.MAX_VALUE;
             }
             trimDataAsync(maxImages);
+        } else if (keySleepTime.equals(key)) {
+            boolean isSleepMode = sharedPreferences.getBoolean(keySleepTime, false);
+            if (!isSleepMode) {
+                WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(JOB_NIGHT_TIME));
+                WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(JOB_WALLPAPER_SET));
+            }
         }
     }
 

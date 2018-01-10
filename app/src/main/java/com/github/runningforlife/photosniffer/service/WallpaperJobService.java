@@ -42,7 +42,7 @@ public class WallpaperJobService extends JobService {
         Log.v(TAG,"onStartJob()");
         String prefNightSetting = getString(R.string.pref_night_time_setting);
         boolean isEnabled = SharedPrefUtil.getBoolean(prefNightSetting, false);
-        if (!isEnabled && !MiscUtil.isSleepTime(getApplicationContext())) {
+        if (!(isEnabled && MiscUtil.isSleepTime(getApplicationContext()))) {
             int jobId = params.getJobId();
             if (jobId == MiscUtil.getJobId(JOB_WALLPAPER_CACHE)) {
                 String prefWifi = getString(R.string.pref_wifi_download);
