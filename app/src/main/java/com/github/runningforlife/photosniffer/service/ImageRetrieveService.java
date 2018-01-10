@@ -201,15 +201,18 @@ public class ImageRetrieveService extends Service {
         if (mStartingUrl.size() <= 0) {
             List<String> defList = SharedPrefUtil.getImageSource();
             String[] defSource = defList.toArray(new String[defList.size()]);
-            mSpider = Spider.create(mProcessor)
-                    .addUrl(defSource)
-                    .setDownloader(new OkHttpDownloader());
+            if (defSource.length > 0) {
+                mSpider = Spider.create(mProcessor)
+                        .addUrl(defSource)
+                        .setDownloader(new OkHttpDownloader());
+                mSpider.run();
+            }
         } else {
             mSpider = Spider.create(mProcessor)
                     .addUrl((String[])mStartingUrl.toArray(new String[mStartingUrl.size()]))
                     .setDownloader(new OkHttpDownloader());
+            mSpider.run();
         }
-        mSpider.run();
     }
 
     private void handleResult() {
