@@ -86,7 +86,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                 MiscUtil.preloadImage(vh.img);
                 if (AndroidLifecycleUtils.canLoadImage(mContext)) {
                     mCallback.loadImageIntoView(position, vh.img, Priority.HIGH,
-                            800, 800, ImageView.ScaleType.CENTER_CROP);
+                            600, 600, ImageView.ScaleType.CENTER_CROP);
                 }
 
                 if (mIsBatchEditEnabled) {

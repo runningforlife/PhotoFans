@@ -48,7 +48,6 @@ public class WallpaperCacheRunnable implements Runnable {
         try {
             Response response = mHttpClient.newCall(builder.build()).execute();
             if (response.isSuccessful()) {
-                mCachedUrl.offer(mImageUrl);
                 saveStreamToFile(response.body().bytes());
             }
         } catch (IOException e) {
@@ -62,6 +61,8 @@ public class WallpaperCacheRunnable implements Runnable {
     private void saveStreamToFile(byte[] data) {
         Log.v(TAG,"saveStreamToFile()");
         Cache.Entry entry = new Cache.Entry(data, System.currentTimeMillis());
-        mDiskCache.put(mImageUrl, entry);
+        if (mDiskCache.put(mImageUrl, entry)) {
+            mCachedUrl.offer(mImageUrl);
+        }
     }
 }

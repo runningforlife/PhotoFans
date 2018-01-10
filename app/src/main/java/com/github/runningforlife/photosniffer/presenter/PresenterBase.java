@@ -8,12 +8,14 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.URLUtil;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
@@ -188,7 +190,7 @@ abstract class PresenterBase implements Presenter {
                     imgUrl = UrlUtil.buildHighResolutionPixelsUrl(url, 650);
                 }
                 mGlideManager.load(imgUrl)
-                        .thumbnail(0.5f)
+                        //.thumbnail(0.5f)
                         .dontTransform()
                         .dontAnimate()
                         .override(w, h)
@@ -522,14 +524,24 @@ abstract class PresenterBase implements Presenter {
             //images.sort("mTimeStamp", Sort.DESCENDING);
             if (changeSet == null) {
                 mImageList = images;
-                mView.onDataSetChange(0, mImageList.size(), RealmOp.OP_REFRESH);
                 // trim data if needed only for non-favor;non-wallpaper
                 if (mImageList.size() > 0) {
                     ImageRealm ir = mImageList.get(0);
                     if (ir != null && !ir.getIsWallpaper() && !ir.getIsFavor()) {
                         trimData();
                     }
+                    // remove removed wallpaper realm data
+                    for (ImageRealm img : mImageList) {
+                        String url = img.getUrl();
+                        if (!url.startsWith("http")) {
+                            File file = new File(url);
+                            if (!file.exists()) {
+                                mRealmApi.deleteSync(img);
+                            }
+                        }
+                    }
                 }
+                mView.onDataSetChange(0, mImageList.size(), RealmOp.OP_REFRESH);
             } else {
                 // For deletions, the adapter has to be notified in reverse order.
                 OrderedCollectionChangeSet.Range[] deletions = changeSet.getDeletionRanges();

@@ -169,7 +169,7 @@ public class ImageDetailPagerFragment extends Fragment
         View rootView = inflater.inflate(R.layout.fragment_image_detail, container, false);
 
         ButterKnife.bind(this, rootView);
-        mViewPager.setOffscreenPageLimit(5);
+        mViewPager.setOffscreenPageLimit(3);
         mViewPager.setCurrentItem(currentItem);
 
         initPresenter();
