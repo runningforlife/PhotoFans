@@ -45,7 +45,7 @@ public class AppGlobals extends Application {
     public void onCreate(){
         super.onCreate();
 
-        String appName = getString(R.string.app_name);
+        String appName = "PhotoSniffer";
 
         Realm.init(this);
         RealmConfiguration realmConfig = new RealmConfiguration.Builder()

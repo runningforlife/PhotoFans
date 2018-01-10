@@ -336,7 +336,7 @@ public class GalleryActivity extends BaseActivity implements
     }
 
     private void makeAppDir() {
-        String appName = getString(R.string.app_name);
+        String appName = "PhotoSniffer";
         String imgPath = ROOT_PATH + File.separator + appName + File.separator + PATH_NAME;
         File file = new File(imgPath);
         if(!file.exists()) {

@@ -1,5 +1,5 @@
 <resources xmlns:android="http://schemas.android.com/tools">
-    <string name="app_name" translatable="false">PhotoSniffer</string>
+    <string name="app_name">PhotoSniffer</string>
 
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
@@ -83,11 +83,11 @@
     <string name="night_time_setting">Cancel Wallpaper change during night time</string>
     <string name="pref_lastest_wallpaper_time" translatable="false">latest_wallpaper_time</string>
     <string name="interval_time_setting_error">Starting time should not be later than ending time</string>
-    <string name="pref_night_time_starting">pref_night_time_starting</string>
-    <string name="pref_night_time_interval">pref_night_time_interval</string>
+    <string name="pref_night_time_starting" translatable="false">pref_night_time_starting</string>
+    <string name="pref_night_time_interval" translatable="false">pref_night_time_interval</string>
     <string name="any_network_download">Download images if network is connected</string>
     <string name="auto_wallpaper_disabled">Auto Wallpaper is disabled</string>
     <string name="disable_night_time_settings">Night Time setting is disabled</string>
-    <string name="pref_night_time_starting_copy">pref_night_time_starting_copy</string>
+    <string name="pref_night_time_starting_copy" translatable="false">pref_night_time_starting_copy</string>
     <string name="sleeping_time">Sleeping Time</string>
 </resources>
