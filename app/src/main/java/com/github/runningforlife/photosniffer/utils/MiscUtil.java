@@ -125,24 +125,11 @@ public class MiscUtil {
         String prefNightTimeInterval = context.getString(R.string.pref_night_time_interval);
         String prefNightTimeStart = context.getString(R.string.pref_night_time_starting);
 
-        long interval = SharedPrefUtil.getLong(prefNightTimeInterval, 0);
         long start = SharedPrefUtil.getLong(prefNightTimeStart, 0);
+        long end = SharedPrefUtil.getLong(prefNightTimeInterval, 0) + start;
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(start);
-        int startHour = calendar.get(Calendar.HOUR_OF_DAY);
-        int startMin = calendar.get(Calendar.MINUTE);
-
-        calendar.setTimeInMillis(start + interval);
-        int endHour = calendar.get(Calendar.HOUR_OF_DAY);
-        int endMin = calendar.get(Calendar.MINUTE);
-
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
-        int currentMin = calendar.get(Calendar.MINUTE);
-
-        return ((currentHour > startHour) || (currentHour == startHour && currentMin >= startMin)) &&
-                ((currentHour < endHour) || (currentHour == endHour && currentMin <= endMin));
+        long now = System.currentTimeMillis();
+        return now >= start && now <= (end);
     }
 
     public static void saveLogToCloud(File file) {
