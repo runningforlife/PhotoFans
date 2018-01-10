@@ -29,10 +29,14 @@ import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.ui.activity.Refresh;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
+import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.realm.RealmObject;
 import me.iwf.photopicker.PhotoPicker;
@@ -61,19 +65,20 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
 
     static final String ARGS_IMAGE_TYPE = "image_type";
     static final String ARG_BATCH_EDIT_MODE = "batch_edit";
+    static final String ARG_BATCH_SELECTED_IMAGES = "batch_selected_images";
 
     // current context menu item view position
     protected int mCurrentPos = -1;
     protected FragmentCallback mCallback;
 
     private Presenter mPresenter;
-    private Menu mMenu;
     private MenuItem mVisibleMenu;
     private String mVisibleMenuTitle;
     GalleryAdapter mAdapter;
+    Menu mMenu;
+    boolean mIsBatchEditMode;
 
     private AlertDialog mHintAlert;
-    private boolean mIsBatchEditMode;
 
     int mImageType;
 
@@ -85,11 +90,15 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        Log.v(TAG,"onPrepareOptionsMenu()");
+        Log.v(TAG,"onPrepareOptionsMenu(): batch mode=" + mIsBatchEditMode);
         mMenu = menu;
+        handleGroupMenu(mIsBatchEditMode);
         handleVisibleMenu();
         if (TextUtils.isEmpty(mVisibleMenuTitle)) {
             mVisibleMenuTitle = mVisibleMenu.getTitle().toString();
+        }
+        if (mIsBatchEditMode) {
+            mAdapter.setSelectedImages(SharedPrefUtil.getArrayList(ARG_BATCH_SELECTED_IMAGES));
         }
     }
 
@@ -137,6 +146,9 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         Log.d(TAG,"onActivityCreated()");
         if (savedState != null) {
             mIsBatchEditMode = savedState.getBoolean(ARG_BATCH_EDIT_MODE);
+            handleBatchEdit(mIsBatchEditMode);
+        } else {
+            mIsBatchEditMode = SharedPrefUtil.getBoolean(ARG_BATCH_EDIT_MODE, false);
             handleBatchEdit(mIsBatchEditMode);
         }
     }
@@ -214,10 +226,18 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         setTitle(title);
     }
 
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.v(TAG,"onPause()");
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         mPresenter.onDestroy();
+        disableBatchMode();
     }
 
     @Override
@@ -342,7 +362,35 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     void handleBatchEdit(boolean isEnabled) {
         Log.v(TAG,"handleBatchEdit()");
         mIsBatchEditMode = isEnabled;
-        if (isEnabled) {
+        handleGroupMenu(isEnabled);
+        if (mMenu != null) {
+            handleVisibleMenu();
+        }
+
+        if (mVisibleMenu != null) {
+            mVisibleMenu.setTitle(mVisibleMenuTitle);
+        }
+
+        if (getRecycleView() != null) {
+            getRecycleView().requestLayout();
+        }
+
+        if (mAdapter != null) {
+            mAdapter.enableBatchEdit(isEnabled);
+        }
+
+        if (!isEnabled) {
+            disableBatchMode();
+        }
+    }
+
+    private void disableBatchMode() {
+        SharedPrefUtil.putBoolean(ARG_BATCH_EDIT_MODE, false);
+        SharedPrefUtil.putArrayList(ARG_BATCH_SELECTED_IMAGES, new HashSet<String>());
+    }
+
+    private void handleGroupMenu(boolean isBatchMode) {
+        if (isBatchMode) {
             if (mMenu != null) {
                 mMenu.setGroupVisible(R.id.group_usage, false);
                 mMenu.setGroupVisible(R.id.group_batch_edit, true);
@@ -352,21 +400,6 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
                 mMenu.setGroupVisible(R.id.group_usage, true);
                 mMenu.setGroupVisible(R.id.group_batch_edit, false);
             }
-        }
-        if (getRecycleView() != null) {
-            getRecycleView().requestLayout();
-        }
-
-        if (mMenu != null) {
-            handleVisibleMenu();
-        }
-
-        if (mAdapter != null) {
-            mAdapter.enableBatchEdit(isEnabled);
-        }
-
-        if (mVisibleMenu != null) {
-            mVisibleMenu.setTitle(mVisibleMenuTitle);
         }
     }
 

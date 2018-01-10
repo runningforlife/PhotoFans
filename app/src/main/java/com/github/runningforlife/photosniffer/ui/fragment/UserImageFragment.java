@@ -16,6 +16,9 @@ import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
+import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
+
+import java.util.HashSet;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -82,7 +85,12 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
         if (isAdded() && mCallback != null) {
             mCallback.onItemClick(view,pos, mImageType);
             // disable batch edit
-            handleBatchEdit(false);
+            if (mMenu != null) {
+                mMenu.setGroupVisible(R.id.group_usage, true);
+                mMenu.setGroupVisible(R.id.group_batch_edit, false);
+            }
+            SharedPrefUtil.putArrayList(ARG_BATCH_SELECTED_IMAGES, new HashSet<>(mAdapter.getSelectedImages()));
+            SharedPrefUtil.putBoolean(ARG_BATCH_EDIT_MODE, mIsBatchEditMode);
         }
     }
 

@@ -53,13 +53,19 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         mSelectedImages = new ArrayList<>();
     }
 
+    public void setSelectedImages(List<String> selectedImages) {
+        mSelectedImages.clear();
+        mSelectedImages.addAll(selectedImages);
+        mCallback.onItemSelected(selectedImages.size());
+    }
+
     public List<String> getSelectedImages() {
         return new ArrayList<>(mSelectedImages);
     }
 
     public void enableBatchEdit(boolean isEnabled) {
-        mIsBatchEditEnabled = isEnabled;
         mSelectedImages.clear();
+        mIsBatchEditEnabled = isEnabled;
         notifyDataSetChanged();
     }
 
