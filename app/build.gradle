@@ -78,4 +78,7 @@ dependencies {
     // photo picker
     compile 'me.iwf.photopicker:PhotoPicker:0.9.5@aar'
     compile 'com.nineoldandroids:library:2.4.0'
+    // memory leak
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
 }

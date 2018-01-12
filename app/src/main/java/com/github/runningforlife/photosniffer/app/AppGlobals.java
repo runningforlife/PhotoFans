@@ -12,6 +12,7 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.model.MyRealmMigration;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
+import com.squareup.leakcanary.LeakCanary;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,6 +46,11 @@ public class AppGlobals extends Application {
     public void onCreate(){
         super.onCreate();
 
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            return;
+        }
+        LeakCanary.install(this);
+
         String appName = "PhotoSniffer";
 
         Realm.init(this);
@@ -63,16 +69,6 @@ public class AppGlobals extends Application {
         if (Build.VERSION.SDK_INT >= 24) {
             WallpaperUtils.startLockScreenWallpaperService(getApplicationContext());
         }
-    }
-
-    @Override
-    public void onTrimMemory(int level){
-        super.onTrimMemory(level);
-    }
-
-    @Override
-    public void onLowMemory(){
-        super.onLowMemory();
     }
 
     private void initExceptionHandler(){
