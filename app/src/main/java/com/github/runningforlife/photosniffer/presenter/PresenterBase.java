@@ -84,6 +84,7 @@ abstract class PresenterBase implements Presenter {
 
     OrderReamChangeListener mOrderRealmChangeListener;
 
+
     PresenterBase(RequestManager requestManager, Context context, UI view) {
         mContext = context;
         mView = view;

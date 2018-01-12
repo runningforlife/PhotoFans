@@ -41,12 +41,45 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     }
 
     @Override
+    public void onImageTypeChange(int type) {
+        Log.i(TAG,"onImageTypeChange()");
+        switchToImageType(type);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public void onStart() {
         super.onStart();
         Log.v(TAG,"onStart()");
+        switchToImageType(mImageType);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.v(TAG,"onDestroy()");
+        //mRealmMgr.onDestroy();
+    }
+
+    @Override
+    public void onImageLoadStart(int pos) {
+        Log.v(TAG,"onImageLoadStart()");
+        mView.onImageLoadStart(pos);
+    }
+
+    @Override
+    public void onImageLoadDone(boolean isSuccess) {
+        Log.v(TAG,"onImageLoadDone()");
+        mView.onImageLoadDone(isSuccess);
+    }
+
+    private void switchToImageType(int type) {
+        if (mImageList != null) {
+            mImageList.removeChangeListener(mOrderRealmChangeListener);
+        }
+
         HashMap<String,String> params = new HashMap<>();
-        switch (mImageType) {
+        switch (type) {
             case IMAGE_WALLPAPER:
                 params.put("mIsUsed", Boolean.toString(true));
                 params.put("mIsFavor", Boolean.toString(false));
@@ -67,25 +100,6 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
 
         mImageList = (RealmResults<ImageRealm>) mRealmApi.queryAsync(ImageRealm.class, params);
         mImageList.addChangeListener(mOrderRealmChangeListener);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.v(TAG,"onDestroy()");
-        //mRealmMgr.onDestroy();
-    }
-
-    @Override
-    public void onImageLoadStart(int pos) {
-        Log.v(TAG,"onImageLoadStart()");
-        mView.onImageLoadStart(pos);
-    }
-
-    @Override
-    public void onImageLoadDone(boolean isSuccess) {
-        Log.v(TAG,"onImageLoadDone()");
-        mView.onImageLoadDone(isSuccess);
     }
 
 }

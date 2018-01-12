@@ -9,4 +9,9 @@ public interface ImageDetailPresenter {
      * favor image at pos
      */
     void favorImageAtPos(int pos);
+
+    /**
+     * change image type to switch image lsit
+     */
+    void onImageTypeChange(int type);
 }

@@ -30,7 +30,7 @@ import butterknife.ButterKnife;
 public class UserImageFragment extends BaseFragment implements ImageDetailView {
     public static final String TAG = "WallpaperFragment";
 
-    @BindView(R.id.rcv_gallery) RecyclerView mRcvWallpaper;
+    @BindView(R.id.rcv_gallery) RecyclerView mRcvImageList;
     private ImageDetailPresenterImpl mPresenter;
 
     public static UserImageFragment newInstance(int type) {
@@ -95,7 +95,21 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
 
     @Override
     public RecyclerView getRecycleView() {
-        return mRcvWallpaper;
+        return mRcvImageList;
+    }
+
+    public void setImageType(int type) {
+        if (mImageType != type) {
+            mImageType = type;
+            onImageTypeChanged(type);
+        }
+    }
+
+    private void onImageTypeChanged(int type) {
+        Log.i(TAG,"onImageTypeChanged(): type=" + type);
+        if (mPresenter != null) {
+            mPresenter.onImageTypeChange(type);
+        }
     }
 
     @Override
@@ -103,7 +117,7 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
         Log.v(TAG,"onDataSetChange(): op=" + op);
         if (op == RealmOp.OP_INSERT) {
             mAdapter.notifyItemRangeInserted(start,  len);
-            mRcvWallpaper.smoothScrollToPosition(0);
+            mRcvImageList.smoothScrollToPosition(0);
         } else if (op == RealmOp.OP_DELETE) {
             mAdapter.notifyItemRangeRemoved(start, len);
         } else if (op == RealmOp.OP_MODIFY) {
@@ -145,12 +159,12 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
     private void initView() {
         GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
         gridLayoutMgr.setSmoothScrollbarEnabled(true);
-        mRcvWallpaper.setHasFixedSize(true);
-        mRcvWallpaper.setLayoutManager(gridLayoutMgr);
+        mRcvImageList.setHasFixedSize(true);
+        mRcvImageList.setLayoutManager(gridLayoutMgr);
 
-        mRcvWallpaper.setAdapter(mAdapter);
-        mRcvWallpaper.setItemAnimator(new DefaultItemAnimator());
-        mRcvWallpaper.setBackgroundResource(R.color.colorLightGrey);
+        mRcvImageList.setAdapter(mAdapter);
+        mRcvImageList.setItemAnimator(new DefaultItemAnimator());
+        mRcvImageList.setBackgroundResource(R.color.colorLightGrey);
     }
 
     @Override

@@ -276,11 +276,23 @@ public class GalleryActivity extends BaseActivity implements
                     fragment = AllPicturesFragment.newInstance(IMAGE_GALLERY);
                     break;
             }
+        } else if(!tag.equals(FRAGMENT_TAG_GALLERY)) {
+            switch (tag) {
+                case FRAGMENT_TAG_FAVOR:
+                    ((UserImageFragment)fragment).setImageType(IMAGE_FAVOR);
+                    break;
+                case FRAGMENT_TAG_WALLPAPER:
+                    ((UserImageFragment)fragment).setImageType(IMAGE_WALLPAPER);
+                    break;
+                default:
+                    break;
+            }
+
         }
 
         mFragmentMgr.beginTransaction()
-                    .replace(R.id.fragment_container, fragment, tag)
-                    .commit();
+                .replace(R.id.fragment_container, fragment, tag)
+                .commit();
     }
 
     private void showImagePagerFragment(View iv, int pos, int type) {

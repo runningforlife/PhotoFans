@@ -63,15 +63,11 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
     private boolean mIsRefreshing;
     // to receive result from service
     private SimpleResultReceiver mReceiver;
-    private ExecutorService mExecutor;
     private H mMainHandler;
 
     @SuppressWarnings("unchecked")
     public AllPicturesPresenterImpl(RequestManager requestManager, Context context, AllPictureView view) {
         super(requestManager, context, view);
-        // realm only allow one transaction a time
-        mExecutor = Executors.newSingleThreadExecutor();
-
         mMainHandler = new H(Looper.myLooper());
 
         String maxImages = SharedPrefUtil.getString(context.getString(R.string.pref_max_reserved_images), "1000");
@@ -171,10 +167,7 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
         }
         // stop service
         stopRetrieveIfNeeded();
-        // shut down thread pool
-        if (!mExecutor.isShutdown()) {
-            mExecutor.shutdown();
-        }
+
         mReceiver.setReceiver(null);
     }
 
