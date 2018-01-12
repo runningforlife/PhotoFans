@@ -87,12 +87,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".receiver.PackageStateReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_REMOVED"/>
-            </intent-filter>
-        </receiver>
-
     </application>
 
 </manifest>

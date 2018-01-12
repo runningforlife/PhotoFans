@@ -69,7 +69,12 @@ public class MiscUtil {
     }
 
     public static String getGlideCacheDir() {
-        return APP_NAME + File.separator + PATH_GLIDE_CACHE;
+        File cacheDir = AppGlobals.getInstance().getExternalCacheDir();
+        if (cacheDir == null || !cacheDir.exists()) {
+            cacheDir = AppGlobals.getInstance().getCacheDir();
+        }
+        File file = new File(cacheDir, PATH_GLIDE_CACHE);
+        return file.getAbsolutePath();
     }
 
     public static String getLogDir() {

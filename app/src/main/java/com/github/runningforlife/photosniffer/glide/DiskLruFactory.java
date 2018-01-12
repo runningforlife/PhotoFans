@@ -31,10 +31,10 @@ public class DiskLruFactory extends DiskLruCacheFactory {
         super(new CacheDirectoryGetter() {
             @Override
             public File getCacheDirectory() {
-                File dir = Environment.getExternalStorageDirectory();
+                File dir = context.getExternalCacheDir();
                 Log.d(TAG,"getCacheDirectory()");
                 if(dir == null){
-                    dir = context.getFilesDir();
+                    dir = context.getCacheDir();
                 }
 
                 if(diskCacheName != null){
