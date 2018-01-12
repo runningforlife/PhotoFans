@@ -209,8 +209,7 @@ public class WallpaperUtils {
             ComponentName jobService = new ComponentName(context, WallpaperJobService.class);
             JobInfo.Builder builder = new JobInfo.Builder(MiscUtil.getJobId(JOB_NIGHT_TIME), jobService);
             JobInfo jobInfo = builder.setPersisted(true)
-                   //.setPeriodic(nightTimeDuration)
-                   .setMinimumLatency(nightTimeDuration + 30*1000)
+                   .setMinimumLatency(nightTimeDuration)
                    .build();
             if (js != null) {
                 js.schedule(jobInfo);

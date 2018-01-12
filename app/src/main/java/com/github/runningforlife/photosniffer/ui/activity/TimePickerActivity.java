@@ -105,7 +105,7 @@ public class TimePickerActivity extends AppCompatActivity
             SharedPrefUtil.putLong(prefNightTimeStart, mNightTime[TIME_START]);
 
             long currentTime = System.currentTimeMillis();
-            if (mNightTime[TIME_START] <= currentTime) {
+            if (mNightTime[TIME_START] <= currentTime && currentTime <= mNightTime[TIME_END]) {
                 WallpaperUtils.restartAutoWallpaperForNightTime(this);
             } else {
                 WallpaperUtils.cancelSchedulerJob(this, MiscUtil.getJobId(JOB_NIGHT_TIME));
