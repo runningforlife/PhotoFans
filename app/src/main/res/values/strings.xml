@@ -95,4 +95,5 @@
     <string name="auto_lockscreen_wallpaper_enabled">Auto lockscreen wallpaper enabled</string>
     <string name="auto_lockscreen_wallpaper_disabled">Auto lockscreen wallpaper disabled</string>
     <string name="night_time_mode_is_enabled">Night time mode is disabled</string>
+    <string name="images_add_as_wallpaper">Images are added as wallpapers</string>
 </resources>

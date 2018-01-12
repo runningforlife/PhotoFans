@@ -255,6 +255,9 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
 
             if (photoUris != null && photoUris.size() > 0) {
                 mPresenter.saveUserPickedPhotos(photoUris);
+                if (isAdded() && mCallback != null) {
+                    mCallback.showToast(getString(R.string.images_add_as_wallpaper));
+                }
             }
         }
 

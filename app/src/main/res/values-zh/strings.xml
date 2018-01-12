@@ -67,4 +67,5 @@
     <string name="auto_lockscreen_wallpaper_enabled">锁屏自动壁纸已开启</string>
     <string name="auto_lockscreen_wallpaper_disabled">锁屏自动壁纸已取消</string>
     <string name="night_time_mode_is_enabled">睡眠时设置已开启</string>
+    <string name="images_add_as_wallpaper">图片已添加为壁纸</string>
 </resources>
