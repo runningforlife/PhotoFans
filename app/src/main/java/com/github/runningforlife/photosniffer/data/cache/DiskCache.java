@@ -4,7 +4,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 
-import com.github.runningforlife.photosniffer.utils.MiscUtil;
+import com.github.runningforlife.photosniffer.data.local.RealmApi;
+import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -12,11 +13,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * a disk Cache to Cache wallpapers
@@ -29,12 +30,10 @@ public class DiskCache implements Cache {
     private static final int DEFAULT_CACHE_SIZE = 100 * 1024 * 1024;
     /** default imag format */
     private static final String DEFAULT_IMAGE_FORMAT = ".png";
-    private static final String CACHE_IMAGE_PREFIX = "img-";
+    private static final String CACHE_IMAGE_PREFIX = "img";
 
     /** all Cache entries info */
     private Map<String, CacheInfo> mEntries = new LinkedHashMap<>(30, 0.75f, true);
-    /** all cache file name */
-    private Set<String> mImageFiles = new HashSet<>();
     private File mRootDir;
     private int mMaxSize;
     private int mTotalSize;
@@ -51,10 +50,8 @@ public class DiskCache implements Cache {
     }
 
     @Override
-    public synchronized void put(String url, Entry entry) {
+    public synchronized boolean put(String url, Entry entry) {
         // make sure Cache is under limited space
-        trim(entry.data.length);
-
         String key = getCacheKey(url);
         File file = getFileNameByKey(key);
         if (!file.exists()) {
@@ -62,7 +59,7 @@ public class DiskCache implements Cache {
                 file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
-                return;
+                return false;
             }
         }
 
@@ -74,10 +71,8 @@ public class DiskCache implements Cache {
             CacheInfo cacheInfo = new CacheInfo(key, entry.data.length);
             cacheInfo.lastModified = entry.lastModified;
             putEntry(key, cacheInfo);
-
-            mImageFiles.add(file.getAbsolutePath());
             Log.v(TAG,"put(): Cache image done");
-            return;
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -85,6 +80,8 @@ public class DiskCache implements Cache {
         if (!file.delete()) {
             Log.e(TAG,"fail to delete file:" + file.getAbsolutePath());
         }
+
+        return false;
     }
 
     @Override
@@ -120,8 +117,6 @@ public class DiskCache implements Cache {
         String key = getCacheKey(url);
         File file = getFileNameByKey(key);
 
-        mImageFiles.remove(file.getAbsolutePath());
-
         if (!file.delete()) {
             Log.e(TAG,"fail to delete file:" + file.getAbsolutePath());
         }
@@ -129,6 +124,7 @@ public class DiskCache implements Cache {
         removeEntry(key);
     }
 
+    // based on time or images number
     private void trim(int wantedSpace) {
         if (mTotalSize + wantedSpace < mMaxSize) {
             return;
@@ -164,7 +160,6 @@ public class DiskCache implements Cache {
             }
         }
 
-        mImageFiles.clear();
         mEntries.clear();
         mTotalSize = 0;
 
@@ -182,7 +177,8 @@ public class DiskCache implements Cache {
 
     @Override
     public boolean isExist(String url) {
-        return mImageFiles.contains(url);
+        String key = getCacheKey(url);
+        return mEntries.containsKey(key);
     }
 
     @Override
@@ -196,13 +192,22 @@ public class DiskCache implements Cache {
         File[] files = mRootDir.listFiles();
         if (files == null) return;
 
+        List<String> removed = new ArrayList<>();
         for (File file : files) {
-            mImageFiles.add(file.getAbsolutePath());
+            if (!file.exists()) {
+                removed.add(file.getAbsolutePath());
+            } else {
+                CacheInfo ci = new CacheInfo(file.getName(), file.length());
+                ci.lastModified = file.lastModified();
 
-            CacheInfo ci = new CacheInfo(file.getName(), file.length());
-            ci.lastModified = file.lastModified();
+                putEntry(ci.key, ci);
+            }
+        }
 
-            putEntry(ci.key, ci);
+        if (removed.size() > 0) {
+            RealmApi realmApi = RealmApiImpl.getInstance();
+            realmApi.deleteSync(removed);
+            realmApi.closeRealm();
         }
     }
 

@@ -184,8 +184,8 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
                 Log.v(TAG,"image retrieveImages success");
                 if (mIsRefreshing) {
                     ((AllPictureView)mView).onRefreshDone(true);
+                    mIsRefreshing = false;
                 }
-                mIsRefreshing = false;
                 removeMessageIfNeeded();
                 break;
         }

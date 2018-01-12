@@ -62,7 +62,13 @@ public interface RealmApi {
     /**
      * trim data to the given size
      */
-    void trimData(Class<? extends RealmObject> type, HashMap<String, String> params, int max);
+    void trimDataAsync(Class<? extends RealmObject> type, HashMap<String, String> params, int max);
+
+    /**
+     * trim data to the given size sync
+     */
+    void trimDataSync(Class<? extends RealmObject> type, HashMap<String,String> params, int max);
+
 
     /**
      * decrease reference

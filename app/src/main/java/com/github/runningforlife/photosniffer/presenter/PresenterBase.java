@@ -8,14 +8,12 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
-import android.webkit.URLUtil;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
@@ -329,14 +327,11 @@ abstract class PresenterBase implements Presenter {
     }
 
     private void trimData() {
-        if (mImageList.size() > mMaxImagesAllowed) {
-            ImageRealm ir = mImageList.get(0);
-            HashMap<String,String> params = new HashMap<>();
-            params.put("mIsUsed", Boolean.toString(ir.getUsed()));
-            params.put("mIsFavor", Boolean.toString(ir.getIsFavor()));
-            params.put("mIsWallpaper", Boolean.toString(ir.getIsWallpaper()));
-            mRealmApi.trimData(ImageRealm.class, params, mMaxImagesAllowed);
-        }
+        HashMap<String,String> params = new HashMap<>();
+        params.put("mIsUsed", Boolean.toString(true));
+        params.put("mIsFavor", Boolean.toString(false));
+        params.put("mIsWallpaper", Boolean.toString(false));
+        mRealmApi.trimDataSync(ImageRealm.class, params, mMaxImagesAllowed);
     }
 
     private void batchRemove(List<String> urls) {
@@ -522,25 +517,15 @@ abstract class PresenterBase implements Presenter {
         public void onChange(RealmResults<ImageRealm> images, OrderedCollectionChangeSet changeSet) {
             Log.v(TAG,"onChange(): size = " + images.size());
             //images.sort("mTimeStamp", Sort.DESCENDING);
+            // trim data if needed only for non-favor;non-wallpaper
+            if (images.size() > 0) {
+                ImageRealm ir = images.get(0);
+                if (ir != null && !ir.getIsWallpaper() && !ir.getIsFavor()) {
+                    trimData();
+                }
+            }
             if (changeSet == null) {
                 mImageList = images;
-                // trim data if needed only for non-favor;non-wallpaper
-                if (mImageList.size() > 0) {
-                    ImageRealm ir = mImageList.get(0);
-                    if (ir != null && !ir.getIsWallpaper() && !ir.getIsFavor()) {
-                        trimData();
-                    }
-                    // remove removed wallpaper realm data
-                    for (ImageRealm img : mImageList) {
-                        String url = img.getUrl();
-                        if (!url.startsWith("http")) {
-                            File file = new File(url);
-                            if (!file.exists()) {
-                                mRealmApi.deleteSync(img);
-                            }
-                        }
-                    }
-                }
                 mView.onDataSetChange(0, mImageList.size(), RealmOp.OP_REFRESH);
             } else {
                 // For deletions, the adapter has to be notified in reverse order.

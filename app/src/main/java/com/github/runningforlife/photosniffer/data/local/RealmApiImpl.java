@@ -351,8 +351,8 @@ public class RealmApiImpl implements RealmApi {
     }
 
     @Override
-    public void trimData(final Class<? extends RealmObject> type, final HashMap<String, String> params, final int max) {
-        Log.v(TAG,"trimData()");
+    public void trimDataAsync(final Class<? extends RealmObject> type, final HashMap<String, String> params, final int max) {
+        Log.v(TAG,"trimDataAsync()");
         mRealm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -392,6 +392,51 @@ public class RealmApiImpl implements RealmApi {
             }
         });
 
+    }
+
+    @Override
+    public void trimDataSync(final Class<? extends RealmObject> type, final HashMap<String, String> params, final int max) {
+        Log.v(TAG,"trimDataAsync()");
+        if (type == ImageRealm.class) {
+            mRealm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    RealmQuery<? extends RealmObject> query = realm.where(type);
+
+                    if (ImageRealm.class == type) {
+                        Set<Map.Entry<String, String>> entries = params.entrySet();
+                        for (Map.Entry<String, String> entry : entries) {
+                            String field = entry.getKey();
+                            switch (field) {
+                                case "mTimeStamp":
+                                    query.equalTo(field, Long.parseLong(entry.getValue()));
+                                    break;
+                                case "mIsUsed":
+                                case "mIsFavor":
+                                case "mIsWallpaper":
+                                case "mIsCached":
+                                    query.equalTo(field, Boolean.parseBoolean(entry.getValue()));
+                                    break;
+                                default:
+                                    query.equalTo(field, entry.getValue());
+                            }
+                        }
+
+                        RealmResults<ImageRealm> rr = (RealmResults<ImageRealm>) query.findAll().sort("mTimeStamp", Sort.DESCENDING);
+                        if (rr.size() > max) {
+                            try {
+                                long time = rr.get(max).getTimeStamp();
+                                RealmResults<ImageRealm> removed = (RealmResults<ImageRealm>) query.
+                                        lessThanOrEqualTo("mTimeStamp", time).findAll();
+                                removed.deleteAllFromRealm();
+                            } catch (Exception e) {
+
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 
     @Override

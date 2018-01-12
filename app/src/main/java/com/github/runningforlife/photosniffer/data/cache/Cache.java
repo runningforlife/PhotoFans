@@ -10,7 +10,7 @@ public interface Cache {
     void initialize();
 
     /** put a image with url to Cache */
-    void put(String url, Entry entry);
+    boolean put(String url, Entry entry);
 
     /** get Cache by url */
     Entry get(String url);
