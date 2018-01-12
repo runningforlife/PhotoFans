@@ -98,7 +98,11 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
             mVisibleMenuTitle = mVisibleMenu.getTitle().toString();
         }
         if (mIsBatchEditMode) {
-            mAdapter.setSelectedImages(SharedPrefUtil.getArrayList(ARG_BATCH_SELECTED_IMAGES));
+            if (SharedPrefUtil.getArrayList(ARG_BATCH_SELECTED_IMAGES).isEmpty()) {
+                setVisibleMenuTitle(mAdapter.getSelectedImages().size());
+            } else {
+                mAdapter.setSelectedImages(SharedPrefUtil.getArrayList(ARG_BATCH_SELECTED_IMAGES));
+            }
         }
     }
 
@@ -326,13 +330,8 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
 
     @Override
     public void onItemSelected(int totalCount) {
-        if (mVisibleMenu != null) {
-            if (totalCount > 0) {
-                mVisibleMenu.setTitle(mVisibleMenuTitle + "(" + String.valueOf(totalCount) + ")");
-            } else {
-                mVisibleMenu.setTitle(mVisibleMenuTitle);
-            }
-        }
+        Log.v(TAG,"onItemSelected()");
+        setVisibleMenuTitle(totalCount);
     }
 
     @Override
@@ -404,11 +403,13 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     }
 
     private void handleVisibleMenu() {
+        MenuItem item;
         if (mImageType != IMAGE_GALLERY) {
             MenuItem menuItem = mMenu.findItem(R.id.favor);
             if (menuItem != null) {
                 menuItem.setVisible(false);
             }
+
             if (mImageType == IMAGE_WALLPAPER) {
                 MenuItem menuItem1 = mMenu.findItem(R.id.save_as_wallpaper);
                 if (menuItem1 != null) {
@@ -418,16 +419,30 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
                 MenuItem delete = mMenu.findItem(R.id.delete);
                 delete.setShowAsAction(SHOW_AS_ACTION_IF_ROOM);
 
-                mVisibleMenu = delete;
+                item = delete;
             } else {
 
                 MenuItem save = mMenu.findItem(R.id.save_as_wallpaper);
                 save.setShowAsAction(SHOW_AS_ACTION_IF_ROOM);
 
-                mVisibleMenu = save;
+                item = save;
             }
         } else {
-            mVisibleMenu = mMenu.findItem(R.id.favor);
+            item = mMenu.findItem(R.id.favor);
+        }
+
+        if (mVisibleMenu == null || mVisibleMenu.getItemId() != item.getItemId()) {
+            mVisibleMenu = item;
+        }
+    }
+
+    private void setVisibleMenuTitle(int totalCount) {
+        if (mVisibleMenu != null) {
+            if (totalCount > 0) {
+                mVisibleMenu.setTitle(mVisibleMenuTitle + "(" + String.valueOf(totalCount) + ")");
+            } else {
+                mVisibleMenu.setTitle(mVisibleMenuTitle);
+            }
         }
     }
 

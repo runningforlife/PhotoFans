@@ -76,7 +76,6 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
         if (mCallback != null) {
             mCallback.onFragmentAttached();
         }
-        //setTitle(getString(R.string.set_wallpaper));
     }
 
     @Override
