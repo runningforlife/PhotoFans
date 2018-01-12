@@ -60,14 +60,15 @@ public class WallpaperUtils {
         try {
             RealmQuery<ImageRealm> query = rm.where(ImageRealm.class);
             RealmResults<ImageRealm> wallpaper = query
-                    .equalTo("mIsFavor", true)
-                    .or()
                     .equalTo("mIsUsed", false)
                     .findAll();
-
             if (wallpaper.size() == 0) {
                 wallpaper = query
-                        .or()
+                        .equalTo("mIsFavor", true)
+                        .findAll();
+            }
+            if (wallpaper.size() == 0) {
+                wallpaper = query
                         .equalTo("mIsUsed", true)
                         .findAll();
             }
