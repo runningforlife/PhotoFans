@@ -5,6 +5,7 @@
         android:key="@string/pref_wifi_download"
         android:title="@string/way_to_download_images"
         android:summary="@string/wifi_only_download"
+        android:summaryOn="@string/wifi_only_download"
         android:summaryOff="@string/any_network_download"
         android:defaultValue="true"/>
 
@@ -12,6 +13,7 @@
         android:key="@string/pref_automatic_wallpaper"
         android:title="@string/enable_automatic_wallpaper"
         android:summary="@string/enable_automatic_wallpaper"
+        android:summaryOn="@string/automatic_wallpaper_enabled"
         android:summaryOff="@string/auto_wallpaper_disabled"
         android:defaultValue="false"/>
 
@@ -28,13 +30,16 @@
         android:key="@string/pref_night_time_setting"
         android:dialogTitle="@string/night_time_setting_explanation"
         android:summary="@string/night_time_setting"
-        android:summaryOff="@string/disable_night_time_settings"
+        android:summaryOn="@string/night_time_mode_is_enabled"
+        android:summaryOff="@string/night_time_settings_disabled"
         android:title="@string/night_time_setting"/>
 
     <SwitchPreference
         android:key="@string/pref_enable_auto_lockscreen_wallpaper"
         android:title="@string/enable_auto_lockscreen_wallpaper"
         android:summary="@string/enable_auto_lockscreen_wallpaper"
+        android:summaryOn="@string/auto_lockscreen_wallpaper_enabled"
+        android:summaryOff="@string/auto_lockscreen_wallpaper_disabled"
         android:defaultValue="true"/>
 
     <com.github.runningforlife.photosniffer.ui.preference.EmptyListPreference
@@ -62,8 +67,7 @@
         android:key="@string/pref_give_your_advice"
         android:title="@string/give_your_advice"
         android:dialogTitle="@string/thanks_for_your_advice"
-        android:summary="@string/write_down_your_advice"
-        android:maxLines="2"/>
+        android:summary="@string/write_down_your_advice" />
 
     <com.github.runningforlife.photosniffer.ui.preference.MessagePreference
         android:dialogTitle="@string/copyright_declaration"

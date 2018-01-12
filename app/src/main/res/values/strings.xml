@@ -87,8 +87,12 @@
     <string name="pref_night_time_interval" translatable="false">pref_night_time_interval</string>
     <string name="any_network_download">Download images if network is connected</string>
     <string name="auto_wallpaper_disabled">Auto Wallpaper is disabled</string>
-    <string name="disable_night_time_settings">Night Time setting is disabled</string>
+    <string name="night_time_settings_disabled">Night Time setting is disabled</string>
     <string name="pref_night_time_starting_copy" translatable="false">pref_night_time_starting_copy</string>
     <string name="sleeping_time">Sleeping Time</string>
     <string name="default_image_source_empty">Default image source is empty</string>
+    <string name="automatic_wallpaper_enabled">Auto wallpaper is enabled</string>
+    <string name="auto_lockscreen_wallpaper_enabled">Auto lockscreen wallpaper enabled</string>
+    <string name="auto_lockscreen_wallpaper_disabled">Auto lockscreen wallpaper disabled</string>
+    <string name="night_time_mode_is_enabled">Night time mode is disabled</string>
 </resources>
