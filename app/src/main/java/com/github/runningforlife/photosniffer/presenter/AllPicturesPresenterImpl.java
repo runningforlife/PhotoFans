@@ -18,9 +18,13 @@ import com.bumptech.glide.RequestManager;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
+import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.service.ImageRetrieveService;
 import com.github.runningforlife.photosniffer.service.ServiceStatus;
@@ -35,6 +40,7 @@ import com.github.runningforlife.photosniffer.service.SimpleResultReceiver;
 import com.github.runningforlife.photosniffer.ui.AllPictureView;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
+import com.github.runningforlife.photosniffer.utils.UrlUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
 
 /**
@@ -44,7 +50,7 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
         AllPicturesPresenter,SimpleResultReceiver.Receiver {
     private static final String TAG = "AllPicturesPresenter";
 
-    private static final int DEFAULT_RETRIEVE_TIME_OUT = 20*1000;
+    private static final int DEFAULT_RETRIEVE_TIME_OUT = 10*1000;
     private static final int DEFAULT_STOP_TIME_OUT = 40*1000;
     private static final int DEFAULT_RETRIEVED_IMAGES = 10;
     // updateAsync Pola collections every 7days
@@ -59,7 +65,6 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
     private SimpleResultReceiver mReceiver;
     private ExecutorService mExecutor;
     private H mMainHandler;
-    // last removed position
 
     @SuppressWarnings("unchecked")
     public AllPicturesPresenterImpl(RequestManager requestManager, Context context, AllPictureView view) {
@@ -78,6 +83,9 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
                 // number exception, just ingore
             }
         }
+        // init default source
+        SharedPrefUtil.putArrayList(mContext.getString(R.string.pref_choose_image_source),
+                new HashSet<>(Arrays.asList(mContext.getResources().getStringArray(R.array.default_source_url))));
     }
 
     @Override
@@ -87,6 +95,8 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
             ((AllPictureView)mView).onNetworkDisconnect();
         } else if (MiscUtil.isMobileConnected(mContext) && SharedPrefUtil.isWifiOnlyDownloadMode(mContext)) {
             ((AllPictureView)mView).onMobileConnected();
+        } else if (isDefaultSourceEmpty()){
+            ((AllPictureView)mView).onImageSourceEmpty();
         } else {
             refreshAnyway();
         }
@@ -290,6 +300,11 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
         } else {
             WallpaperUtils.startWallpaperCacheUpdaterAlarm(mContext);
         }
+    }
+
+    private boolean isDefaultSourceEmpty() {
+        List<String> defImageSrc = SharedPrefUtil.getArrayList(mContext.getString(R.string.pref_choose_image_source));
+        return defImageSrc.isEmpty();
     }
 
     private final class  H extends Handler {

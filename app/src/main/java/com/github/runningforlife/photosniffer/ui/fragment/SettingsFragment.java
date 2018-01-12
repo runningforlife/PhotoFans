@@ -192,7 +192,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         params.put("mIsUsed", Boolean.toString(Boolean.TRUE));
         params.put("mIsFavor", Boolean.toString(Boolean.FALSE));
         params.put("mIsWallpaper", Boolean.toString(Boolean.FALSE));
-        mRealmApi.trimData(ImageRealm.class, params, maxImages);
+        mRealmApi.trimDataAsync(ImageRealm.class, params, maxImages);
     }
 
     private void uploadAdviceToCloud(String advice) {

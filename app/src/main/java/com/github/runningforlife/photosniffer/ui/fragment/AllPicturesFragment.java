@@ -156,6 +156,13 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     }
 
     @Override
+    public void onImageSourceEmpty() {
+        if (isAdded() && mCallback != null) {
+            mCallback.showToast(getString(R.string.default_image_source_empty));
+        }
+    }
+
+    @Override
     public void onDataSetChange(int start, int len, RealmOp op) {
         Log.v(TAG,"onDataSetChange(): op = " + op);
         if (op == RealmOp.OP_INSERT) {

@@ -9,4 +9,6 @@ public interface AllPictureView extends UI, RefreshView {
     void onNetworkDisconnect();
 
     void onMobileConnected();
+
+    void onImageSourceEmpty();
 }

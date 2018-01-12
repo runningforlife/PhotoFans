@@ -62,4 +62,5 @@
     <string name="disable_night_time_settings">睡眠时设置已取消</string>
     <string name="sleeping_time">睡眠时间</string>
     <string name="app_name">爱上壁纸</string>
+    <string name="default_image_source_empty">未选择任何图片源</string>
 </resources>

@@ -391,7 +391,8 @@ public class ImageDetailPagerFragment extends Fragment
         mViewPager.getBackground().setColorFilter(colorizerFilter);
     }
 
-    @Override public void onDestroy() {
+    @Override
+    public void onDestroy() {
         super.onDestroy();
 
         mImageUrls.clear();

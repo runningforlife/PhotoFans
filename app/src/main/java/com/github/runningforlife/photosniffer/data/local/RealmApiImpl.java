@@ -396,7 +396,7 @@ public class RealmApiImpl implements RealmApi {
 
     @Override
     public void trimDataSync(final Class<? extends RealmObject> type, final HashMap<String, String> params, final int max) {
-        Log.v(TAG,"trimDataAsync()");
+        Log.v(TAG,"trimDataSync()");
         if (type == ImageRealm.class) {
             mRealm.executeTransaction(new Realm.Transaction() {
                 @Override
