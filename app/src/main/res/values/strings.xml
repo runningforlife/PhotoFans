@@ -96,4 +96,7 @@
     <string name="auto_lockscreen_wallpaper_disabled">Auto lockscreen wallpaper disabled</string>
     <string name="night_time_mode_is_enabled">Night time mode is disabled</string>
     <string name="images_add_as_wallpaper">Images are added as wallpapers</string>
+    <string name="copyright_note">All pictures are open source and confer the Creative Common Zero (CC0)\n
+        about CC0, https://creativecommons.org/publicdomain/zero/1.0/legalcode
+    </string>
 </resources>

@@ -68,4 +68,6 @@
     <string name="auto_lockscreen_wallpaper_disabled">锁屏自动壁纸已取消</string>
     <string name="night_time_mode_is_enabled">睡眠时设置已开启</string>
     <string name="images_add_as_wallpaper">图片已添加为壁纸</string>
+    <string name="copyright_note">所有图片均来自开源网站,遵循"创造共享CC0"开源协议\n
+    https://creativecommons.org/publicdomain/zero/1.0/legalcode</string>
 </resources>
