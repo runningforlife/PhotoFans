@@ -156,7 +156,19 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                 @Override
                 public void onClick(View v) {
                     if(mCallback != null){
-                        mCallback.onItemClicked(img,getAdapterPosition(),TAG);
+                        if (!mIsBatchEditEnabled) {
+                            mCallback.onItemClicked(img, getAdapterPosition(), TAG);
+                        } else {
+                            final ImageRealm ir = (ImageRealm) mCallback.getItemAtPos(getAdapterPosition());
+                            String url = ir.getUrl();
+                            if (!mSelectedImages.contains(url)) {
+                                mSelectedImages.add(url);
+                            } else {
+                                mSelectedImages.remove(url);
+                            }
+                            notifyItemChanged(getAdapterPosition());
+                            mCallback.onItemSelected(mSelectedImages.size());
+                        }
                     }
                 }
             });
