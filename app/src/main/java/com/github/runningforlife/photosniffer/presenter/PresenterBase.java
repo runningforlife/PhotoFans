@@ -2,7 +2,10 @@ package com.github.runningforlife.photosniffer.presenter;
 
 import android.annotation.TargetApi;
 import android.app.WallpaperManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -71,8 +74,7 @@ abstract class PresenterBase implements Presenter {
     private CountDownLatch mSavingLatch;
     private H mMainHandler;
     private boolean mIsFirstPager;
-    private ConnectivityManager mConnectMgr;
-    private ConnectivityManager.NetworkCallback mNetworkCb;
+    private NetworkStateReceiver mNetStateReceiver;
 
     int mMaxImagesAllowed;
 
@@ -100,14 +102,26 @@ abstract class PresenterBase implements Presenter {
         mMainHandler = new H(Looper.myLooper());
 
         mIsFirstPager = false;
+    }
 
+    private final class NetworkStateReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
+                if (!MiscUtil.isConnected(context)) {
+                    mView.onNetworkState(NetState.STATE_DISCONNECT);
+                }
+            }
+        }
     }
 
     @Override
     public void onStart() {
-        if (Build.VERSION.SDK_INT >= 21) {
-            monitorNetworkState();
-        }
+        Log.v(TAG,"onStart()");
+        mNetStateReceiver = new NetworkStateReceiver();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        mContext.registerReceiver(mNetStateReceiver, filter);
     }
 
 
@@ -256,10 +270,8 @@ abstract class PresenterBase implements Presenter {
         }
         mRealmApi.closeRealm();
 
-        if (Build.VERSION.SDK_INT >= 21) {
-            if (mNetworkCb != null && mConnectMgr != null) {
-                mConnectMgr.unregisterNetworkCallback(mNetworkCb);
-            }
+        if (mNetStateReceiver != null) {
+            mContext.unregisterReceiver(mNetStateReceiver);
         }
     }
 
@@ -460,32 +472,6 @@ abstract class PresenterBase implements Presenter {
         }
 
         mView.onImageSaveDone(null);
-    }
-
-    @TargetApi(21)
-    private void monitorNetworkState() {
-        mConnectMgr = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkRequest.Builder builder = new NetworkRequest.Builder();
-        builder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
-        if (SharedPrefUtil.isWifiOnlyDownloadMode(mContext)) {
-            builder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI);
-        }
-        mNetworkCb = new ConnectivityManager.NetworkCallback() {
-            @Override
-            public void onLost(Network network) {
-                if (!MiscUtil.isConnected(mContext)) {
-                    mView.onNetworkState(NetState.STATE_DISCONNECT);
-                }
-            }
-
-            @Override
-            public void onUnavailable() {
-                if (!MiscUtil.isConnected(mContext)) {
-                    mView.onNetworkState(NetState.STATE_DISCONNECT);
-                }
-            }
-        };
-        mConnectMgr.registerNetworkCallback(builder.build(), mNetworkCb);
     }
 
     private final class H extends Handler {
