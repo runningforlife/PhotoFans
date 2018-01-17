@@ -20,7 +20,7 @@ public class LeanCloudManager implements CloudApi{
 
     private static final LeanCloudManager sInstance = new LeanCloudManager();
 
-    public static LeanCloudManager getInstance(){
+    public static LeanCloudManager getInstance() {
         return sInstance;
     }
 
@@ -74,14 +74,14 @@ public class LeanCloudManager implements CloudApi{
     }
 
     @Override
-    public void newUser(String info) {
+    public void newUser() {
         Log.v(TAG,"newUser()");
 
         AVObject ao = new AVObject(("UserInfo"));
         ao.put("brand", Build.BRAND);
         ao.put("device", Build.MODEL);
         ao.put("os version", Build.VERSION.RELEASE);
-        ao.put("device fingerprint", info);
+        ao.put("device fingerprint", Build.FINGERPRINT);
 
         ao.saveInBackground();
     }

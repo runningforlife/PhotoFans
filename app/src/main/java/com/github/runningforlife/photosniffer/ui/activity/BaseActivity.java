@@ -27,17 +27,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     static final String FRAGMENT_TAG_WALLPAPER = "wallpaper";
     static final String FRAGMENT_TAG_GALLERY = "gallery";
 
-    private BroadcastReceiver mWifiStateReceiver;
-
     @Override
     protected void onCreate(Bundle saveState) {
         super.onCreate(saveState);
 
-        if (!MiscUtil.isWifiConnected(this)) {
-            registerWifiStateReceiver();
-        } else {
-            uploadLogToCloud();
-        }
     }
 
     @Override
@@ -49,48 +42,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        unRegisterWifiStateReceiver();
     }
 
-    private void registerWifiStateReceiver() {
-        mWifiStateReceiver = new WifiStateReceiver();
-        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(this);
-        lbm.registerReceiver(mWifiStateReceiver,
-                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-    }
-
-    private void unRegisterWifiStateReceiver() {
-        if (mWifiStateReceiver != null) {
-            LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(this);
-            lbm.unregisterReceiver(mWifiStateReceiver);
-        }
-    }
-
-    private void uploadLogToCloud() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String logPath = MiscUtil.getLogDir();
-                File file = new File(logPath);
-                if (file.exists()) {
-                    File[] logs = file.listFiles();
-                    for (File log : logs) {
-                        if (log.isFile()) {
-                            MiscUtil.saveLogToCloud(log);
-                        }
-                    }
-                }
-            }
-        }).start();
-    }
-
-    private final class WifiStateReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (MiscUtil.isWifiConnected(context)) {
-                uploadLogToCloud();
-            }
-        }
-    }
 }

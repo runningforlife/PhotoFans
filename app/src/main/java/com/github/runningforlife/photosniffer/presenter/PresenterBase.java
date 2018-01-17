@@ -111,6 +111,8 @@ abstract class PresenterBase implements Presenter {
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
                 if (!MiscUtil.isConnected(context)) {
                     mView.onNetworkState(NetState.STATE_DISCONNECT);
+                }else if(MiscUtil.isWifiConnected(context)){
+                    uploadLogToCloud();
                 }
             }
         }
@@ -472,6 +474,24 @@ abstract class PresenterBase implements Presenter {
         }
 
         mView.onImageSaveDone(null);
+    }
+
+    private void uploadLogToCloud() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String logPath = MiscUtil.getLogDir();
+                File file = new File(logPath);
+                if (file.exists()) {
+                    File[] logs = file.listFiles();
+                    for (File log : logs) {
+                        if (log.isFile() && log.length() > 0) {
+                            MiscUtil.saveLogToCloud(log);
+                        }
+                    }
+                }
+            }
+        }).start();
     }
 
     private final class H extends Handler {

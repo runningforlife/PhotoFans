@@ -1,12 +1,7 @@
 package com.github.runningforlife.photosniffer.presenter;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkRequest;
+import android.content.Intent;;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,29 +13,24 @@ import com.bumptech.glide.RequestManager;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
-import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
+import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.service.ImageRetrieveService;
 import com.github.runningforlife.photosniffer.service.ServiceStatus;
 import com.github.runningforlife.photosniffer.service.SimpleResultReceiver;
 import com.github.runningforlife.photosniffer.ui.AllPictureView;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
-import com.github.runningforlife.photosniffer.utils.UrlUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
 
 /**
@@ -239,6 +229,8 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
                 // start wallpaper cache service
                 Message message = mMainHandler.obtainMessage(H.EVENT_START_WALLPAPER_CACHE);
                 mMainHandler.sendMessageDelayed(message, 500);
+
+                LeanCloudManager.getInstance().newUser();
             }
 
             SharedPrefUtil.putBoolean(keyNewUser, false);

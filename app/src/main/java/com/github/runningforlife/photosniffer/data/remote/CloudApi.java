@@ -26,5 +26,5 @@ public interface CloudApi {
     /*
      * record the number of user
      */
-    void newUser(String info);
+    void newUser();
 }
