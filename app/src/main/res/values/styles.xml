@@ -31,4 +31,12 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
+    <style name="UserGuideTextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_margin">16dp</item>
+    </style>
+
 </resources>

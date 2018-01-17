@@ -71,7 +71,7 @@
 
     <com.github.runningforlife.photosniffer.ui.preference.MessagePreference
         android:dialogTitle="@string/copyright_declaration"
-        android:dialogMessage="@string/my_copyright_declaration"
+        android:dialogMessage="@string/copyright_note"
         android:title="@string/check_copyright_notes"
         android:summary="@string/check_copyright_notes"/>
 

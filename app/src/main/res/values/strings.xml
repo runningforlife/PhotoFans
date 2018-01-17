@@ -54,8 +54,6 @@
     <string name="pref_pola_latest_collections_number" translatable="false">pola_latest_collections_number</string>
     <string name="pref_auto_wallpaper_interval" translatable="false">pref_auto_wallpaper_time_interval</string>
     <string name="pref_new_user" translatable="false">pref_new_user</string>
-    <string name="my_copyright_declaration">All those pictures are free. Please do not use them
-    for any commercial usage. Any problems, please send email wlh2119@gmail.com</string>
     <string name="check_copyright_notes">Check Copyright Notes</string>
     <string name="copyright_declaration">Copyright Declaration</string>
     <string name="pref_pola_retrieved" translatable="false">pref_pola_retrieved</string>
@@ -96,7 +94,8 @@
     <string name="auto_lockscreen_wallpaper_disabled">Auto lockscreen wallpaper disabled</string>
     <string name="night_time_mode_is_enabled">Night time mode is disabled</string>
     <string name="images_add_as_wallpaper">Images are added as wallpapers</string>
-    <string name="copyright_note">All pictures are open source and confer the Creative Common Zero (CC0)\n
-        about CC0, https://creativecommons.org/publicdomain/zero/1.0/legalcode
+    <string name="copyright_note">All pictures are open source and confer the Creative Common Zero (CC0);about CC0, please refer to \n
+        https://creativecommons.org/publicdomain/zero/1.0/legalcode
     </string>
+    <string name="usage_guide">Usage Guide</string>
 </resources>

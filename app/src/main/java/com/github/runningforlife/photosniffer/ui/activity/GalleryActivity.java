@@ -174,6 +174,9 @@ public class GalleryActivity extends BaseActivity implements
             case R.id.nav_settings:
                 startSetting();
                 break;
+            case R.id.nav_usage:
+                showUserGuide();
+                break;
             default:
                 break;
         }
@@ -250,6 +253,12 @@ public class GalleryActivity extends BaseActivity implements
     private void startSetting() {
         setRefreshing(false);
         Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
+        startActivity(intent);
+    }
+
+    private void showUserGuide() {
+        setRefreshing(false);
+        Intent intent = new Intent(getApplicationContext(), UsageGuideActivity.class);
         startActivity(intent);
     }
 
