@@ -428,6 +428,7 @@ abstract class PresenterBase implements Presenter {
         if (url.startsWith(PIXELS_IMAGE_START)) {
             imgUrl = UrlUtil.buildHighResolutionPixelsUrl(url, 650);
         }
+        //FIXME: this cannot call on non-main thread
         FutureTarget<Bitmap> target = mGlideManager.load(imgUrl)
                 .asBitmap()
                 .centerCrop()
@@ -485,8 +486,10 @@ abstract class PresenterBase implements Presenter {
                 if (file.exists()) {
                     File[] logs = file.listFiles();
                     for (File log : logs) {
-                        if (log.isFile() && log.length() > 0) {
+                        if (log.isFile() && log.getName().endsWith("txt") && log.length() > 0) {
                             MiscUtil.saveLogToCloud(log);
+                            // remove logs
+                            log.delete();
                         }
                     }
                 }

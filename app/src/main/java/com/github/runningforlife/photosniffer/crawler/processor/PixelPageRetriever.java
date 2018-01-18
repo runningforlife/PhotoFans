@@ -24,18 +24,8 @@ public class PixelPageRetriever implements PageRetriever {
     private static final String CLASS_PHOTO = "photos";
     private static final String CLASS_PHOTO_DETAIL = "photo-details";
     private static final String CLASS_MORE_PAGE = "pagination";
-    // attributes to locate image link
-    private static final String ATTR_IMAGE_URL = "src";
-    private static final String ATTR_REF = "href";
-    static final String ATTR_WIDTH = "width";
-    static final String ATTR_HEIGHT = "height";
-    static final String ATTR_ALT = "alt";
 
-    static final String REG_IMAGE = "img[src=\\s[.jpeg|.jpg|.png]\\s";
-
-    private static final String PIXELS_ROOT_URL = "https://www.pexels.com";
-    static final String PIXELS_IMAGE_START = "https://images.pexels.com/photos/";
-    static final String PIXELS_IMAGE_END = "\\s[0-9].[jpeg|jpg|png]\\s";
+    private static final String PIXELS_IMAGE_START = "https://images.pexels.com/photos/";
 
     PixelPageRetriever(HashMap<String, Boolean> pageState) {
         mPageState = pageState;

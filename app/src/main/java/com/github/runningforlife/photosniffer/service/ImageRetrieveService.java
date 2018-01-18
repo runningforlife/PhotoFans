@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.os.ResultReceiver;
 import android.util.Log;
 
+import com.github.runningforlife.photosniffer.crawler.HighResImageUrlBuilder;
 import com.github.runningforlife.photosniffer.crawler.processor.ImagePageFilter;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageRetrievePageProcessor;
 
@@ -106,6 +107,7 @@ public class ImageRetrieveService extends Service {
                                 for (String url : data) {
                                     ImageRealm ir = new ImageRealm();
                                     ir.setUrl(url);
+                                    ir.setHighResUrl(HighResImageUrlBuilder.buildHighResImageUrl(url));
                                     realmObjects.add(ir);
                                 }
                                 realmApi.insertAsync(realmObjects);
@@ -160,6 +162,8 @@ public class ImageRetrieveService extends Service {
             mAllPages.removeAllChangeListeners();
         }
         mRealApi.closeRealm();
+
+        mProcessor.onDestroy();
     }
 
     private void start(Intent intent, int startId) {

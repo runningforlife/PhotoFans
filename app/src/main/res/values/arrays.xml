@@ -8,7 +8,6 @@
         <item>http://en.freejpg.com.ar</item>
         <item>https://visualhunt.com</item>
         <item>https://pixabay.com</item>
-        <item>http://www.vcg.com</item>
     </string-array>
 
     <string-array name="image_website_name">
@@ -17,7 +16,6 @@
         <item>Free JPG</item>
         <item>Visual Hunt</item>
         <item>Pixabay</item>
-        <item>Visual China</item>
     </string-array>
 
     <string-array name="default_source_url">

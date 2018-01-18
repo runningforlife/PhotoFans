@@ -26,7 +26,7 @@ import us.codecraft.webmagic.selector.Html;
  * Created by jason on 4/1/17.
  */
 
-public class ImageRetrieverFactory implements PageRetriever,ImageSource{
+public class ImageRetrieverFactory implements PageRetriever,ImageSource {
     private static final String TAG = "RetrieverFactory";
 
     private static Map<String,String> sImgSource = new HashMap<>();
@@ -216,4 +216,5 @@ public class ImageRetrieverFactory implements PageRetriever,ImageSource{
         Log.v(TAG,"retrieveMmImage(): retrieved images = " + imgUrls.size());
         return imgUrls;
     }
+
 }

@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.crawler.processor;
 
+import android.net.Uri;
 import android.util.Log;
 import android.webkit.URLUtil;
 
@@ -18,31 +19,38 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private static final String TAG = "ImagePageProcessor";
 
+    private static final String PAGE_PEXELS = "pexels";
+    private static final String PAGE_FREE_JPG = "freejpg";
+    private static final String PAGE_DEFAULT = "default";
+
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000).setTimeOut(10000);
     private HashMap<String,Boolean> mPagesState;
-    // last url to start this page retrieving
-    private List<String> mLastUrl;
     private int mCurrentImages;
     @SuppressWarnings("unchecked")
     private ImagePageFilter mPageFilter;
-
-    private ImageRetrieverFactory mRetrieverFactory;
-    private PageRetriever mPixelsRetriever;
+    private HashMap<String, PageRetriever> mRetrieversMap;
     private BlockingDeque<List<String>> mDataQueue;
 
     public ImageRetrievePageProcessor(BlockingDeque<List<String>> dataQue, List<String> startUrl,
                                       HashMap<String,Boolean> pageState, PageFilter pageFilter) {
-        mLastUrl = startUrl;
         mCurrentImages = 0;
 
         mDataQueue = dataQue;
         mPagesState = pageState;
         mPageFilter = (ImagePageFilter) pageFilter;
 
-        //loadPages();
+        //mPixelsRetriever = new PixelPageRetriever(mPagesState);
 
-        mRetrieverFactory = ImageRetrieverFactory.getInstance();
-        mPixelsRetriever = new PixelPageRetriever(mPagesState);
+        mRetrieversMap = new HashMap<>(startUrl.size());
+
+        mRetrieversMap.put(PAGE_DEFAULT, new DefaultPageRetriever(mPagesState));
+        for (String url : startUrl) {
+            if (url.contains(PAGE_FREE_JPG)) {
+                mRetrieversMap.put(PAGE_FREE_JPG, new FreeJPGPageRetriever(mPagesState));
+            } else if (url.contains(PAGE_PEXELS)) {
+                mRetrieversMap.put(PAGE_PEXELS, new PixelPageRetriever(mPagesState));
+            }
+        }
     }
 
     @Override
@@ -65,9 +73,10 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         return site;
     }
 
-    public List<String> getStartUrl() {
-        Log.d(TAG,"getStartUrl(): url = " + mLastUrl.size());
-        return mLastUrl;
+    public synchronized void onDestroy() {
+        if (mRetrieversMap != null) {
+            mRetrieversMap.clear();
+        }
     }
 
     public int getRetrievedImageCount() {
@@ -76,63 +85,46 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private void retrieveImages(Page page) {
         List<String> result = null;
-        if (!isVisited(page) && isValidPage(page)) {
+        List<String> pages = null;
+
+        String pageUrl = page.getUrl().get();
+        if (!isVisited(pageUrl) && isValidPage(pageUrl)) {
+
+            PageRetriever pageRetriever = mRetrieversMap.get(PAGE_DEFAULT);
             try {
-                if (page.getUrl().get().contains("https://www.pexels.com")) {
-                    result = mPixelsRetriever.retrieveImages(page);
-                    // save pages we get
-                    List<String> pages = mPixelsRetriever.retrieveLinks(page);
-                    mPagesState.put(page.getUrl().get(), true);
-                    mDataQueue.put(pages);
-                } else {
-                    result = mRetrieverFactory.retrieveImages(page);
-                    mPagesState.put(page.getUrl().get(), true);
-                    // save to disk
-                    mDataQueue.put(getPageList(page));
+                if (pageUrl.contains(PAGE_PEXELS)) {
+                    pageRetriever = mRetrieversMap.get(PAGE_PEXELS);
+                } else if (pageUrl.contains(PAGE_FREE_JPG)) {
+                    pageRetriever = mRetrieversMap.get(PAGE_FREE_JPG);
                 }
 
+                mPagesState.put(pageUrl, true);
+
+                result = pageRetriever.retrieveImages(page);
                 if (result != null) {
                     mDataQueue.put(result);
                 }
+
+                pages = pageRetriever.retrieveLinks(page);
+                mDataQueue.put(pages);
             } catch (InterruptedException e) {
                 Log.e(TAG,"fail to put data to queue");
             }
         }
     }
 
-    private boolean isVisited(Page page) {
-        return (mPagesState.containsKey(page.getUrl().get())
-                && mPagesState.get(page.getUrl().get()));
+    private boolean isVisited(String pageUrl) {
+        return (mPagesState.containsKey(pageUrl) && mPagesState.get(pageUrl));
     }
 
-    private boolean isValidPage(Page page) {
+    private boolean isValidPage(String page) {
         try {
-            String baseUrl = UrlUtil.getRootUrl(page.getUrl().get());
-            return URLUtil.isValidUrl(baseUrl) && mPageFilter.accept(baseUrl);
+            String baseUrl = UrlUtil.getRootUrl(page);
+            return mPageFilter.accept(baseUrl);
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    private boolean isValidPageUrl(String url) {
-        return URLUtil.isValidUrl(url);
-    }
-
-    private List<String> getPageList(Page page) {
-        List<String> urlList = page.getHtml().links().all();
-        List<String> pageList = new ArrayList<>(urlList.size() + 1);
-
-        page.addTargetRequests(urlList);
-
-        urlList.add(page.getUrl().get());
-        for (String url : urlList) {
-            if(!mPagesState.containsKey(url) && isValidPageUrl(url)) {
-                pageList.add(url);
-                mPagesState.put(url,urlList.indexOf(url) != -1);
-            }
-        }
-
-        return pageList;
-    }
 }
