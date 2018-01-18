@@ -14,6 +14,7 @@ import io.realm.annotations.PrimaryKey;
 public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
     @PrimaryKey
     private String mUrl;
+    private String mHighResUrl; // high resolution url
     private String mName;
     private long mTimeStamp;
     private boolean mIsUsed;
@@ -33,6 +34,14 @@ public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
 
     public String getUrl(){
         return mUrl;
+    }
+
+    public void setHighResUrl(String url){
+        mHighResUrl = url;
+    }
+
+    public String getHighResUrl() {
+        return mHighResUrl;
     }
 
     public void setName(String name){
