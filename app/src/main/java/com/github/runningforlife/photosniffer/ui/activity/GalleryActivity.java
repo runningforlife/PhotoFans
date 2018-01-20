@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.UiThread;
@@ -17,6 +18,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -42,10 +44,16 @@ import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_F
 import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_GALLERY;
 import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_WALLPAPER;
 
-public class GalleryActivity extends BaseActivity implements
+public class GalleryActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback, BaseFragment.FragmentCallback, RefreshView {
-
     private static final String TAG = "GalleryActivity";
+
+    static final String FRAGMENT_TAG_FAVOR = "favorite";
+    static final String FRAGMENT_TAG_WALLPAPER = "wallpaper";
+    static final String FRAGMENT_TAG_GALLERY = "gallery";
+    static final String ROOT_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
+    static final String PATH_NAME = "photos";
+
     final static int MY_STORAGE_PERMISSION_REQUEST = 100;
 
     private boolean mHintFragmentAdded;
@@ -116,6 +124,11 @@ public class GalleryActivity extends BaseActivity implements
     public void onStop() {
         mStateSaved = true;
         super.onStop();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

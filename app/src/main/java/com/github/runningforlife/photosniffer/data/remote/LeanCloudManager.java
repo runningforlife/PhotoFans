@@ -61,13 +61,14 @@ public class LeanCloudManager implements CloudApi{
     }
 
     @Override
-    public void saveAdvice(String advice) {
+    public void saveAdvice(String email, String advice) {
         Log.v(TAG,"saveAdvice()");
 
         AVObject ao = new AVObject("UserAdvice");
         ao.put("brand", Build.BRAND);
         ao.put("device", Build.MODEL);
         ao.put("os version", Build.VERSION.RELEASE);
+        ao.put("email", email);
         ao.put("advice", advice);
 
         ao.saveInBackground();

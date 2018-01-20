@@ -15,6 +15,7 @@ import java.util.Set;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.model.ImageWebSite;
 import com.github.runningforlife.photosniffer.ui.activity.ImageSourceSelectionActivity;
+import com.github.runningforlife.photosniffer.ui.activity.UserAdviceActivity;
 
 /**
  * a list preference only to start an activity
@@ -43,6 +44,7 @@ public class EmptyListPreference extends MultiSelectListPreference {
     @Override
     public void onClick() {
         String prefImgSrc = getContext().getString(R.string.pref_choose_image_source);
+
         if (prefImgSrc.equals(getKey())) {
             CharSequence[] sourceName = getEntries();
             CharSequence[] sourceUrl = getEntryValues();
@@ -60,6 +62,7 @@ public class EmptyListPreference extends MultiSelectListPreference {
             intent.putStringArrayListExtra("default_value", new ArrayList<>(defaultValues));
 
             getContext().startActivity(intent);
+
         }
     }
 }

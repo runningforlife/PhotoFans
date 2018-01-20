@@ -63,6 +63,11 @@
             android:label="@string/usage_guide"
             android:screenOrientation="nosensor"/>
 
+        <activity android:name=".ui.activity.UserAdviceActivity"
+            android:theme="@style/AppTheme"
+            android:label="@string/advice_and_issue"
+            android:screenOrientation="nosensor"/>
+
         <service android:name="com.github.runningforlife.photosniffer.service.ImageRetrieveService"/>
 
         <service android:name=".service.LockScreenUpdateService"

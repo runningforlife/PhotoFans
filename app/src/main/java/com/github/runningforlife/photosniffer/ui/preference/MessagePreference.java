@@ -3,6 +3,7 @@ package com.github.runningforlife.photosniffer.ui.preference;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.preference.DialogPreference;
 import android.support.v7.app.AlertDialog;
@@ -14,6 +15,7 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
+import com.github.runningforlife.photosniffer.ui.activity.UserAdviceActivity;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
 import java.io.File;
@@ -67,6 +69,15 @@ public class MessagePreference extends DialogPreference {
         super(context);
 
         init();
+    }
+
+    @Override
+    public void onClick() {
+        String prefAdvice = getContext().getString(R.string.pref_report_issue_and_advice);
+        if (prefAdvice.equals(getKey())) {
+            Intent intent = new Intent(getContext(), UserAdviceActivity.class);
+            getContext().startActivity(intent);
+        }
     }
 
     @Override

@@ -23,11 +23,13 @@ import com.github.runningforlife.photosniffer.data.cache.DiskCacheManager;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
+import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.ui.fragment.BatchAction;
 import com.github.runningforlife.photosniffer.utils.BitmapUtil;
 import com.github.runningforlife.photosniffer.utils.MediaStoreUtil;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
+import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -104,7 +106,7 @@ abstract class PresenterBase implements Presenter {
                 if (!MiscUtil.isConnected(context)) {
                     mView.onNetworkState(NetState.STATE_DISCONNECT);
                 }else if(MiscUtil.isWifiConnected(context)){
-                    uploadLogToCloud();
+                    uploadLogAndAdviceToCloud();
                 }
             }
         }
@@ -464,7 +466,7 @@ abstract class PresenterBase implements Presenter {
         mView.onImageSaveDone(null);
     }
 
-    private void uploadLogToCloud() {
+    private void uploadLogAndAdviceToCloud() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -478,6 +480,15 @@ abstract class PresenterBase implements Presenter {
                             // remove logs
                             log.delete();
                         }
+                    }
+                }
+                // check whether there is advices
+                String prefAdvice = mContext.getString(R.string.pref_report_issue_and_advice);
+                String advice = SharedPrefUtil.getString(prefAdvice,"");
+                if (!TextUtils.isEmpty(advice)) {
+                    String subStr[] = advice.split(";");
+                    if (subStr.length == 2) {
+                        LeanCloudManager.getInstance().saveAdvice(subStr[0], subStr[1]);
                     }
                 }
             }

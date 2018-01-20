@@ -63,8 +63,8 @@
         android:summary="@string/clear_image_caches"
         android:title="@string/clear_image_caches"/>
 
-    <EditTextPreference
-        android:key="@string/pref_give_your_advice"
+    <com.github.runningforlife.photosniffer.ui.preference.MessagePreference
+        android:key="@string/pref_report_issue_and_advice"
         android:title="@string/give_your_advice"
         android:dialogTitle="@string/thanks_for_your_advice"
         android:summary="@string/write_down_your_advice" />

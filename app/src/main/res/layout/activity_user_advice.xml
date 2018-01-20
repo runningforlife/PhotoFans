@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/activity_vertical_margin">
+
+    <EditText android:id="@+id/et_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:background="@drawable/text_background"
+        android:hint="@string/input_email_hint"/>
+
+    <EditText android:id="@+id/et_advice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:background="@drawable/text_background"
+        android:minHeight="180dp"
+        android:hint="@string/input_advice_hint"/>
+
+</LinearLayout>

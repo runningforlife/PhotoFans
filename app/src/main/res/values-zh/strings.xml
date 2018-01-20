@@ -70,4 +70,7 @@
     <string name="copyright_note">所有图片均来自开源网站,遵循"创造共享CC0"开源协议:\n
     https://creativecommons.org/publicdomain/zero/1.0/legalcode</string>
     <string name="usage_guide">使用说明</string>
+    <string name="input_email_hint">请输入邮箱</string>
+    <string name="input_advice_hint"> 请写下你的建议,谢谢!</string>
+    <string name="advice_and_issue">问题与建议</string>
 </resources>

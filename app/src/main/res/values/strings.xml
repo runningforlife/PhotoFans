@@ -43,7 +43,6 @@
     <string name="Wallpaper">Wallpaper</string>
     <string name="want_to_clear_cache">Do you want to clear the caches?</string>
     <string name="clear_image_caches">clear all the caches</string>
-    <string name="pref_give_your_advice" translatable="false">key_give_your_advice</string>
     <string name="give_your_advice">Please give us your advice</string>
     <string name="thanks_for_your_advice">Thanks for your advices</string>
     <string name="write_down_your_advice">Please write down your advices</string>
@@ -98,4 +97,8 @@
         https://creativecommons.org/publicdomain/zero/1.0/legalcode
     </string>
     <string name="usage_guide">Usage Guide</string>
+    <string name="input_email_hint">Please input your email</string>
+    <string name="input_advice_hint">Please input your advice</string>
+    <string name="advice_and_issue">Issue and Advice</string>
+    <string name="pref_report_issue_and_advice" translatable="false">pref_report_issue_and_advices</string>
 </resources>

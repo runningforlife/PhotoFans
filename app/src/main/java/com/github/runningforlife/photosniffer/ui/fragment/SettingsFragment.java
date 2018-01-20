@@ -80,7 +80,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Log.v(TAG,"onSharedPreferenceChanged(): key = " + key);
 
         String keyImgSrc = getString(R.string.pref_choose_image_source);
-        String keyAdvice = getString(R.string.pref_give_your_advice);
         String keyAutoWallpaper = getString(R.string.pref_automatic_wallpaper);
         String keyWifiOnly = getString(R.string.pref_wifi_download);
         String keyWallpaperInterval = getString(R.string.pref_auto_wallpaper_interval);
@@ -91,9 +90,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if (key.equals(keyImgSrc)) {
             Set<String> src = sharedPreferences.getStringSet(key,null);
             checkImageSourceList(src);
-        }else if (keyAdvice.equals(key)) {
-            String data = sharedPreferences.getString(key,"");
-            checkUserAdvice(data);
         } else if (keyAutoWallpaper.equals(key)) {
             boolean isAuto = sharedPreferences.getBoolean(keyAutoWallpaper, true);
             checkAutoWallpaperSetting(isAuto);
@@ -135,13 +131,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
     }
 
-    private void checkUserAdvice(String data) {
-        if (!TextUtils.isEmpty(data) && MiscUtil.isConnected(getActivity())) {
-            uploadAdviceToCloud(data);
-        } else {
-            SharedPrefUtil.putString(getString(R.string.pref_give_your_advice), data);
-        }
-    }
+
 
     private void checkAutoWallpaperSetting(boolean isEnabled) {
         // for OS >= LL, use JobScheduler to do wallpaper setting
@@ -193,12 +183,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         params.put("mIsFavor", Boolean.toString(Boolean.FALSE));
         params.put("mIsWallpaper", Boolean.toString(Boolean.FALSE));
         mRealmApi.trimDataAsync(ImageRealm.class, params, maxImages);
-    }
-
-    private void uploadAdviceToCloud(String advice) {
-        LeanCloudManager cloud = LeanCloudManager.getInstance();
-
-        cloud.saveAdvice(advice);
     }
 
 }

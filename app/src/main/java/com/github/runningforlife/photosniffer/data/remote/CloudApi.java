@@ -21,7 +21,7 @@ public interface CloudApi {
     /*
      * upload user advice to cloud
      */
-    void saveAdvice(String advice);
+    void saveAdvice(String email, String advice);
 
     /*
      * record the number of user
