@@ -40,7 +40,7 @@ public class SharedPrefUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<String> getImageSource(){
+    public static List<String> getImageSource() {
         Context context = AppGlobals.getInstance();
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 

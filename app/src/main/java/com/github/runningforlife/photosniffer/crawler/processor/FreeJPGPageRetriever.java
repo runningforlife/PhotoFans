@@ -16,7 +16,7 @@ import us.codecraft.webmagic.Page;
  * retriever to retrieve images from free jpg
  */
 
-public class FreeJPGPageRetriever implements PageRetriever {
+public class FreeJPGPageRetriever extends PageRetriever {
     private static final String TAG = FreeJPGPageRetriever.class.getSimpleName();
 
     private static final String CLASS_THUMBNAIL = "thumbnail";
@@ -24,10 +24,8 @@ public class FreeJPGPageRetriever implements PageRetriever {
     private static final String FREE_JPG_IMAGE_START = "http://en.freejpg.com.ar/asset/";
     private static final String FREE_JPG_HREF_START = "http://en.freejpg.com.ar/free/";
 
-    private HashMap<String, Boolean> mPageState;
-
     FreeJPGPageRetriever(HashMap<String, Boolean> pageState) {
-        mPageState = pageState;
+        super(pageState);
     }
 
     @Override
@@ -42,7 +40,7 @@ public class FreeJPGPageRetriever implements PageRetriever {
             for (Element img : imgTags) {
                 String url = img.attr(ATTR_IMAGE_URL);
                 Log.d(TAG,"retrieve image url=" + url);
-                if (url != null && url.startsWith(FREE_JPG_IMAGE_START)) {
+                if (url != null && url.startsWith(FREE_JPG_IMAGE_START) && !images.contains(url)) {
                     images.add(url);
                 }
             }
@@ -69,9 +67,5 @@ public class FreeJPGPageRetriever implements PageRetriever {
         }
 
         return links;
-    }
-
-    private boolean isPageRetrieved(String pageUrl) {
-        return mPageState.size() != 0 && ((mPageState.containsKey(pageUrl) && mPageState.get(pageUrl)));
     }
 }

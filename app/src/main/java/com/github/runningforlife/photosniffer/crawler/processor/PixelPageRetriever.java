@@ -14,10 +14,8 @@ import us.codecraft.webmagic.Page;
  * a class to retrieveImages images from https://www.pexels.com
  */
 
-public class PixelPageRetriever implements PageRetriever {
+public class PixelPageRetriever extends PageRetriever {
     private static final String TAG = "PixelPageRetriever";
-
-    private HashMap<String, Boolean> mPageState;
 
     static final int MIN_HEIGHT = 350;
     // class tag
@@ -28,7 +26,7 @@ public class PixelPageRetriever implements PageRetriever {
     private static final String PIXELS_IMAGE_START = "https://images.pexels.com/photos/";
 
     PixelPageRetriever(HashMap<String, Boolean> pageState) {
-        mPageState = pageState;
+        super(pageState);
     }
 
     @Override
@@ -41,12 +39,12 @@ public class PixelPageRetriever implements PageRetriever {
 
         Elements photos = doc.getElementsByClass(CLASS_PHOTO);
         for (Element photo : photos) {
-            images.addAll(photo.getElementsByTag("img"));
+            images.addAll(photo.getElementsByTag(TAG_IMG));
         }
 
         Elements photoDetails = doc.getElementsByClass(CLASS_PHOTO_DETAIL);
         for (Element detail : photoDetails) {
-            images.addAll(detail.getElementsByTag("img"));
+            images.addAll(detail.getElementsByTag(TAG_IMG));
         }
 
         List<String> imgList = new ArrayList<>();

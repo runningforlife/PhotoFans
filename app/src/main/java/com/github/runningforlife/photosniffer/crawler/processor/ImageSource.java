@@ -56,6 +56,5 @@ public interface ImageSource {
 
     String POLA_IMAGE_START = "http://ppe.oss-cn-shenzhen.aliyuncs.com/collections";
     String POLA_IMAGE_END = "thumb.jpg";
-    String POLA_FULL_IMAGE_END = "full_res.jpg";
     int POLA_IMAGE_NUMBER_PER_COLLECTION = 10;
 }

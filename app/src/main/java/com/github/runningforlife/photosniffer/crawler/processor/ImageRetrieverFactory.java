@@ -26,7 +26,8 @@ import us.codecraft.webmagic.selector.Html;
  * Created by jason on 4/1/17.
  */
 
-public class ImageRetrieverFactory implements PageRetriever,ImageSource {
+
+public class ImageRetrieverFactory implements ImageSource {
     private static final String TAG = "RetrieverFactory";
 
     private static Map<String,String> sImgSource = new HashMap<>();
@@ -36,7 +37,7 @@ public class ImageRetrieverFactory implements PageRetriever,ImageSource {
         private static final ImageRetrieverFactory instance = new ImageRetrieverFactory();
     }
 
-    private ImageRetrieverFactory(){
+    private ImageRetrieverFactory() {
         //FIXME: we may want to use string array to do this
         sImgSource.put(URL_FREE_JPG,REG_FREE_JPG);
         sImgSource.put(URL_ALBUM,REG_ALBUM);
@@ -65,7 +66,6 @@ public class ImageRetrieverFactory implements PageRetriever,ImageSource {
         return InstanceHolder.instance;
     }
 
-    @Override
     public List<String> retrieveImages(Page page) {
         if(page == null){
             throw new IllegalArgumentException("page should not be null");
@@ -113,7 +113,6 @@ public class ImageRetrieverFactory implements PageRetriever,ImageSource {
         return imgList;
     }
 
-    @Override
     public List<String> retrieveLinks(Page page) {
         return null;
     }

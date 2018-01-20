@@ -1,6 +1,5 @@
 package com.github.runningforlife.photosniffer.crawler.processor;
 
-import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
 
@@ -18,13 +17,11 @@ import us.codecraft.webmagic.Page;
  * default pages retriever
  */
 
-public class DefaultPageRetriever implements PageRetriever {
+public class DefaultPageRetriever extends PageRetriever {
     private static final String TAG = DefaultPageRetriever.class.getSimpleName();
 
-    private HashMap<String, Boolean> mPageState;
-
     DefaultPageRetriever(HashMap<String,Boolean> pageState) {
-        mPageState = pageState;
+        super(pageState);
     }
 
     @Override
@@ -38,8 +35,9 @@ public class DefaultPageRetriever implements PageRetriever {
                 String url = img.attr(ATTR_IMAGE_URL);
 
                 Log.d(TAG, "retrieved image url = " + url);
-
-                imgList.add(url);
+                if (!imgList.contains(url)) {
+                    imgList.add(url);
+                }
             }
         }
 
@@ -63,9 +61,5 @@ public class DefaultPageRetriever implements PageRetriever {
 
 
         return pages;
-    }
-
-    private boolean isPageRetrieved(String pageUrl) {
-        return mPageState.size() != 0 && ((mPageState.containsKey(pageUrl) && mPageState.get(pageUrl)));
     }
 }

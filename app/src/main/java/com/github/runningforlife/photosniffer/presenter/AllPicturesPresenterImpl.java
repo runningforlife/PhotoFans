@@ -69,9 +69,6 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
                 // number exception, just ingore
             }
         }
-        // init default source
-        SharedPrefUtil.putArrayList(mContext.getString(R.string.pref_choose_image_source),
-                new HashSet<>(Arrays.asList(mContext.getResources().getStringArray(R.array.default_source_url))));
     }
 
     @Override
@@ -208,6 +205,11 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
         mMainHandler.removeMessages(H.EVENT_STOP_SERVICE);
     }
 
+    private boolean isFirstTimeUse() {
+        String keyNewUser = mContext.getString(R.string.pref_new_user);
+        return SharedPrefUtil.getBoolean(keyNewUser, true);
+    }
+
     // using webview to load pola youtu
     private void loadPolaPageIfNeeded() {
         final String lastUpdatedTime = mContext.getString(R.string.pref_pola_last_updated_time);
@@ -215,7 +217,7 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
         long now = System.currentTimeMillis();
 
         String keyNewUser = mContext.getString(R.string.pref_new_user);
-        boolean isFirstTimeUse = SharedPrefUtil.getBoolean(keyNewUser, true);
+        boolean isFirstTimeUse = isFirstTimeUse();
 
         if ((isFirstTimeUse || now >= lastTime + POLA_UPDATED_DURATION)) {
             String polaRetrieved = mContext.getString(R.string.pref_pola_retrieved);
@@ -288,7 +290,12 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
     }
 
     private boolean isDefaultSourceEmpty() {
-        List<String> defImageSrc = SharedPrefUtil.getArrayList(mContext.getString(R.string.pref_choose_image_source));
+        String prefImgSrc = mContext.getString(R.string.pref_choose_image_source);
+        if (isFirstTimeUse()) {
+            SharedPrefUtil.putArrayList(prefImgSrc,
+                    new HashSet<>(Arrays.asList(mContext.getResources().getStringArray(R.array.default_source_url))));
+        }
+        List<String> defImageSrc = SharedPrefUtil.getArrayList(prefImgSrc);
         return defImageSrc.isEmpty();
     }
 

@@ -21,6 +21,8 @@ public class ImageRetrievePageProcessor implements PageProcessor {
 
     private static final String PAGE_PEXELS = "pexels";
     private static final String PAGE_FREE_JPG = "freejpg";
+    private static final String PAGE_PIEXABAY = "pixabay";
+    private static final String PAGE_VISUAL_HUNT = "visualhunt";
     private static final String PAGE_DEFAULT = "default";
 
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000).setTimeOut(10000);
@@ -39,8 +41,6 @@ public class ImageRetrievePageProcessor implements PageProcessor {
         mPagesState = pageState;
         mPageFilter = (ImagePageFilter) pageFilter;
 
-        //mPixelsRetriever = new PixelPageRetriever(mPagesState);
-
         mRetrieversMap = new HashMap<>(startUrl.size());
 
         mRetrieversMap.put(PAGE_DEFAULT, new DefaultPageRetriever(mPagesState));
@@ -49,6 +49,10 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                 mRetrieversMap.put(PAGE_FREE_JPG, new FreeJPGPageRetriever(mPagesState));
             } else if (url.contains(PAGE_PEXELS)) {
                 mRetrieversMap.put(PAGE_PEXELS, new PixelPageRetriever(mPagesState));
+            } else if (url.contains(PAGE_PIEXABAY)) {
+                mRetrieversMap.put(PAGE_PIEXABAY, new PixabayPageRetriever(mPagesState));
+            } else if (url.contains(PAGE_VISUAL_HUNT)) {
+                mRetrieversMap.put(PAGE_VISUAL_HUNT, new VisualHuntPageRetriever(mPagesState));
             }
         }
     }
@@ -96,6 +100,10 @@ public class ImageRetrievePageProcessor implements PageProcessor {
                     pageRetriever = mRetrieversMap.get(PAGE_PEXELS);
                 } else if (pageUrl.contains(PAGE_FREE_JPG)) {
                     pageRetriever = mRetrieversMap.get(PAGE_FREE_JPG);
+                } else if (pageUrl.contains(PAGE_PIEXABAY)) {
+                    pageRetriever = mRetrieversMap.get(PAGE_PIEXABAY);
+                } else if (pageUrl.contains(PAGE_VISUAL_HUNT)) {
+                    pageRetriever = mRetrieversMap.get(PAGE_VISUAL_HUNT);
                 }
 
                 mPagesState.put(pageUrl, true);

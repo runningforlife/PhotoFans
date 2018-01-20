@@ -13,12 +13,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.os.ResultReceiver;
 import android.util.Log;
 
+import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.crawler.HighResImageUrlBuilder;
 import com.github.runningforlife.photosniffer.crawler.processor.ImagePageFilter;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageRetrievePageProcessor;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -102,7 +104,7 @@ public class ImageRetrieveService extends Service {
                     while (true) {
                         try {
                             List<String> data = mRetrievedData.take();
-                            if (UrlUtil.isPossibleImageUrl(data.get(0))) {
+                            if (data != null && data.size() > 0 && UrlUtil.isPossibleImageUrl(data.get(0))) {
                                 List<ImageRealm> realmObjects = new ArrayList<>(data.size());
                                 for (String url : data) {
                                     ImageRealm ir = new ImageRealm();
@@ -253,8 +255,14 @@ public class ImageRetrieveService extends Service {
             }
         }
 
+        List<String> currentSite = SharedPrefUtil.getImageSource();
         if (mStartingUrl.size() == 0) {
-            mStartingUrl.addAll(SharedPrefUtil.getImageSource());
+            if (currentSite.size() > 0) {
+                mStartingUrl.addAll(SharedPrefUtil.getImageSource());
+            } else {
+                List<String> pages = Arrays.asList(getApplicationContext().getResources().getStringArray(R.array.default_source_url));
+                mStartingUrl.addAll(pages);
+            }
         }
 
     }
