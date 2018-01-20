@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.SystemClock;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.bumptech.glide.Glide;
@@ -75,7 +76,12 @@ public class WallpaperUtils {
             // 10 image cached a time
             List<String> wallpapers = new ArrayList<>(15);
             for (int i = 0; i < 15 && i < wallpaper.size(); ++i) {
-                wallpapers.add(wallpaper.get(i).getUrl());
+                final ImageRealm ir = wallpaper.get(i);
+                if (!TextUtils.isEmpty(ir.getHighResUrl())) {
+                    wallpapers.add(ir.getHighResUrl());
+                } else {
+                    wallpapers.add(ir.getUrl());
+                }
             }
 
             Intent intent = new Intent(context, WallpaperUpdaterService.class);
@@ -238,7 +244,11 @@ public class WallpaperUtils {
         cacheIdx %= wallpapers.size();
 
         WallpaperManager wm = WallpaperManager.getInstance(context);
-        String url = wallpapers.get(cacheIdx).getUrl();
+        final ImageRealm ir = wallpapers.get(cacheIdx);
+        String url = ir.getUrl();
+        if (!TextUtils.isEmpty(ir.getHighResUrl())) {
+            url = ir.getHighResUrl();
+        }
         try {
             FutureTarget<Bitmap> futureTarget =
                     Glide.with(context)

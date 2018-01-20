@@ -80,9 +80,6 @@ public class ImageRetrieverFactory implements ImageSource {
                 case URL_FREE_JPG:
                     imgList = retrieve(page,URL_FREE_JPG);
                     break;
-                case URL_ALBUM:
-                    imgList = retrieve(page,URL_ALBUM);
-                    break;
                 case URL_PIXBABY:
                     imgList = retrieve(page,URL_PIXBABY);
                     break;

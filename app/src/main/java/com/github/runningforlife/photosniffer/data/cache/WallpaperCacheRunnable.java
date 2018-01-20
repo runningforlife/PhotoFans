@@ -26,7 +26,6 @@ public class WallpaperCacheRunnable implements Runnable {
 
     private DiskCache mDiskCache;
     private String mImageUrl;
-    private String mOriginalUrl;
     private CountDownLatch mCountLatch;
     private OkHttpClient mHttpClient;
     private ArrayBlockingQueue<String> mCachedUrl;
@@ -34,9 +33,7 @@ public class WallpaperCacheRunnable implements Runnable {
     public WallpaperCacheRunnable(OkHttpClient httpClient, DiskCache cache, String imgUrl, CountDownLatch latch,
                                   ArrayBlockingQueue<String> cachedUrl) {
         mDiskCache = cache;
-        mOriginalUrl = imgUrl;
-        mImageUrl = imgUrl.startsWith(PIXELS_IMAGE_START) ?
-                UrlUtil.buildHighResolutionPixelsUrl(imgUrl, 650) : imgUrl;
+        mImageUrl = imgUrl;
         mCountLatch = latch;
         mHttpClient = httpClient;
         mCachedUrl = cachedUrl;
@@ -64,7 +61,7 @@ public class WallpaperCacheRunnable implements Runnable {
         Log.v(TAG,"saveStreamToFile()");
         Cache.Entry entry = new Cache.Entry(data, System.currentTimeMillis());
         if (mDiskCache.put(mImageUrl, entry)) {
-            mCachedUrl.offer(mOriginalUrl);
+            mCachedUrl.offer(mImageUrl);
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.github.runningforlife.photosniffer.presenter;
 
-import android.annotation.TargetApi;
 import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,10 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkRequest;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -33,8 +28,6 @@ import com.github.runningforlife.photosniffer.ui.fragment.BatchAction;
 import com.github.runningforlife.photosniffer.utils.BitmapUtil;
 import com.github.runningforlife.photosniffer.utils.MediaStoreUtil;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
-import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
-import com.github.runningforlife.photosniffer.utils.UrlUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -54,7 +47,6 @@ import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.RealmResults;
 
-import static com.github.runningforlife.photosniffer.crawler.processor.ImageSource.PIXELS_IMAGE_START;
 import static com.github.runningforlife.photosniffer.loader.Loader.DEFAULT_IMG_HEIGHT;
 import static com.github.runningforlife.photosniffer.loader.Loader.DEFAULT_IMG_WIDTH;
 import static com.github.runningforlife.photosniffer.ui.fragment.BatchAction.BATCH_DELETE;
@@ -154,7 +146,11 @@ abstract class PresenterBase implements Presenter {
     @Override
     public void setWallpaperAtPos(int pos) {
         if(pos >= 0 && pos < mImageList.size()) {
-            String url = mImageList.get(pos).getUrl();
+            final ImageRealm ir = mImageList.get(pos);
+            String url = ir.getUrl();
+            if (!TextUtils.isEmpty(url)) {
+                url = ir.getHighResUrl();
+            }
             setWallpaper(url);
         }
     }
@@ -162,10 +158,14 @@ abstract class PresenterBase implements Presenter {
     @Override
     public void saveImageAtPos(int pos) {
         if (pos >= 0 && pos < mImageList.size()) {
-            final String imgUrl = mImageList.get(pos).getUrl();
+            final ImageRealm ir = mImageList.get(pos);
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    String imgUrl = ir.getUrl();
+                    if (!TextUtils.isEmpty(ir.getHighResUrl())) {
+                        imgUrl = ir.getHighResUrl();
+                    }
                     saveBitmap(imgUrl);
                 }
             }).start();
@@ -201,8 +201,8 @@ abstract class PresenterBase implements Presenter {
                         .into(iv);
             } else {
                 String imgUrl = url;
-                if (url.startsWith(PIXELS_IMAGE_START)) {
-                    imgUrl = UrlUtil.buildHighResolutionPixelsUrl(url, 650);
+                if (!TextUtils.isEmpty(ir.getHighResUrl())) {
+                    imgUrl = ir.getHighResUrl();
                 }
                 mGlideManager.load(imgUrl)
                         //.thumbnail(0.5f)
@@ -233,6 +233,7 @@ abstract class PresenterBase implements Presenter {
         for (int i = 0; i < photoUris.size(); ++i) {
             ImageRealm ir = new ImageRealm();
             ir.setUrl(photoUris.get(i));
+            ir.setHighResUrl(photoUris.get(i));
             ir.setIsWallpaper(true);
             ir.setIsCached(true);
             ir.setUsed(true);
@@ -291,11 +292,7 @@ abstract class PresenterBase implements Presenter {
     }
 
 
-    private void setWallpaperAndCache(final String url) {
-        String imgUrl = url;
-        if (url.startsWith(PIXELS_IMAGE_START)) {
-            imgUrl = UrlUtil.buildHighResolutionPixelsUrl(url, 650);
-        }
+    private void setWallpaperAndCache(final String imgUrl) {
         FutureTarget<Bitmap> bitmapTarget = mGlideManager.load(imgUrl)
                      .asBitmap()
                      .centerCrop()
@@ -305,9 +302,9 @@ abstract class PresenterBase implements Presenter {
             WallpaperManager wm = WallpaperManager.getInstance(mContext);
             wm.setBitmap(bitmap);
             mView.onWallpaperSetDone(true);
-            if (url.startsWith("http")) {
+            if (imgUrl.startsWith("http")) {
                 Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
-                message.obj = url;
+                message.obj = imgUrl;
                 message.sendToTarget();
                 // cache it
                 mCacheMgr.put(imgUrl, bitmap);
@@ -409,13 +406,8 @@ abstract class PresenterBase implements Presenter {
 
         mRealmApi.deleteAsync(ImageRealm.class, params);
 
-        String imgUrl = url;
-        if (url.startsWith(PIXELS_IMAGE_START)) {
-            imgUrl = UrlUtil.buildHighResolutionPixelsUrl(url, 650);
-        }
-
         ImageRealm ir = new ImageRealm();
-        ir.setUrl(mCacheMgr.getFilePath(imgUrl));
+        ir.setUrl(mCacheMgr.getFilePath(url));
         ir.setUsed(true);
         ir.setIsFavor(false);
         ir.setIsWallpaper(true);
@@ -423,12 +415,7 @@ abstract class PresenterBase implements Presenter {
         mRealmApi.insertAsync(ir);
     }
 
-    private void saveImageAsWallpaper(String url) {
-        String imgUrl = url;
-        if (url.startsWith(PIXELS_IMAGE_START)) {
-            imgUrl = UrlUtil.buildHighResolutionPixelsUrl(url, 650);
-        }
-        //FIXME: this cannot call on non-main thread
+    private void saveImageAsWallpaper(String imgUrl) {
         FutureTarget<Bitmap> target = mGlideManager.load(imgUrl)
                 .asBitmap()
                 .centerCrop()
@@ -442,9 +429,9 @@ abstract class PresenterBase implements Presenter {
             fos.flush();
             fos.close();
             // ok, we will mark it as wallpaper
-            if (url.startsWith("http")) {
+            if (imgUrl.startsWith("http")) {
                 Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
-                message.obj = url;
+                message.obj = imgUrl;
                 message.sendToTarget();
             }
         } catch (InterruptedException e) {

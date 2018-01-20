@@ -249,6 +249,7 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
                 String url = buildPolaImageUrl(c,n,ImageSource.POLA_IMAGE_END);
                 if (!builtInWallpapers.contains(url)) {
                     ir.setUrl(url);
+                    ir.setHighResUrl(url);
                     ir.setIsFavor(false);
                     ir.setIsWallpaper(false);
                     ir.setIsCached(false);

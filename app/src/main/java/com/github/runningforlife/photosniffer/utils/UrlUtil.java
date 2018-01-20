@@ -34,13 +34,4 @@ public class UrlUtil {
 
         return matcher.matches();
     }
-
-    public static String buildHighResolutionPixelsUrl(String url, int res) {
-        int hIdx = url.indexOf("?");
-        return url.substring(0, hIdx)
-                + "?"
-                + "h=" + res
-                + "&auto=compress"
-                + "&cs=tinysrgb";
-    }
 }
