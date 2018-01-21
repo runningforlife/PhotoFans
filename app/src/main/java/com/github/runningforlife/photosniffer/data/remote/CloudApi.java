@@ -1,5 +1,7 @@
 package com.github.runningforlife.photosniffer.data.remote;
 
+import android.service.autofill.SaveCallback;
+
 import java.io.File;
 
 /**
@@ -21,7 +23,7 @@ public interface CloudApi {
     /*
      * upload user advice to cloud
      */
-    void saveAdvice(String email, String advice);
+    void saveAdvice(String email, String advice, com.avos.avoscloud.SaveCallback callback);
 
     /*
      * record the number of user

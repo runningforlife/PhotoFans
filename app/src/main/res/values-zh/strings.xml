@@ -73,4 +73,5 @@
     <string name="input_email_hint">请输入邮箱</string>
     <string name="input_advice_hint"> 请写下你的建议,谢谢!</string>
     <string name="advice_and_issue">问题与建议</string>
+    <string name="button_send">发送</string>
 </resources>

@@ -4,8 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
+import android.util.Log;
+import android.widget.Button;
 import android.widget.EditText;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.SaveCallback;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
@@ -13,15 +17,20 @@ import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by jason on 1/20/18.
  */
 
 public class UserAdviceActivity extends BaseActivity {
+    private static final String TAG = "UserAdviceActivity";
 
     @BindView(R.id.et_email) EditText mEtEmail;
     @BindView(R.id.et_advice) EditText mEtAdvice;
+    @BindView(R.id.btn_send) Button mBtnSend;
+
+    private boolean mIsSent;
 
     @Override
     public void onCreate(Bundle savedState) {
@@ -36,13 +45,21 @@ public class UserAdviceActivity extends BaseActivity {
     public void onPause() {
         super.onPause();
 
-        saveUserAdvice(mEtEmail.getText().toString(), mEtAdvice.getText().toString());
+        if (!mIsSent) {
+            saveUserAdvice(mEtEmail.getText().toString(), mEtAdvice.getText().toString());
+        }
     }
 
     @Override
     protected void navigateToParentActivity() {
         Intent intent = new Intent(this, SettingsActivity.class);
         NavUtils.navigateUpTo(this, intent);
+    }
+
+    @OnClick(R.id.btn_send)
+    public void sendAdvice() {
+        mIsSent = true;
+        saveUserAdvice(mEtEmail.getText().toString(), mEtAdvice.getText().toString());
     }
 
     private void saveUserAdvice(String email, String data) {
@@ -58,6 +75,16 @@ public class UserAdviceActivity extends BaseActivity {
     private void uploadAdviceToCloud(String email, String advice) {
         LeanCloudManager cloud = LeanCloudManager.getInstance();
 
-        cloud.saveAdvice(email, advice);
+        cloud.saveAdvice(email, advice, new SaveCallback() {
+            @Override
+            public void done(AVException e) {
+                if (e != null) {
+                    Log.d(TAG, "uploadAdviceToCloud: done:" + e);
+                }
+                if (mIsSent) {
+                    navigateToParentActivity();
+                }
+            }
+        });
     }
 }

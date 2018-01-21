@@ -14,6 +14,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.SaveCallback;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.FutureTarget;
@@ -477,8 +479,6 @@ abstract class PresenterBase implements Presenter {
                     for (File log : logs) {
                         if (log.isFile() && log.getName().endsWith("txt") && log.length() > 0) {
                             MiscUtil.saveLogToCloud(log);
-                            // remove logs
-                            log.delete();
                         }
                     }
                 }
@@ -488,7 +488,12 @@ abstract class PresenterBase implements Presenter {
                 if (!TextUtils.isEmpty(advice)) {
                     String subStr[] = advice.split(";");
                     if (subStr.length == 2) {
-                        LeanCloudManager.getInstance().saveAdvice(subStr[0], subStr[1]);
+                        LeanCloudManager.getInstance().saveAdvice(subStr[0], subStr[1], new SaveCallback() {
+                            @Override
+                            public void done(AVException e) {
+                                Log.d(TAG,"advice saved done");
+                            }
+                        });
                     }
                 }
             }

@@ -1,7 +1,7 @@
 package com.github.runningforlife.photosniffer.presenter;
 
 import android.content.Context;
-import android.content.Intent;;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;

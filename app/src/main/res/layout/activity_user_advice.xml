@@ -9,6 +9,7 @@
         android:layout_height="wrap_content"
         android:inputType="textEmailAddress"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:minHeight="48dp"
         android:background="@drawable/text_background"
         android:hint="@string/input_email_hint"/>
 
@@ -17,7 +18,19 @@
         android:layout_height="wrap_content"
         android:inputType="text"
         android:background="@drawable/text_background"
+        android:textColorHighlight="@color/colorAccent"
         android:minHeight="180dp"
-        android:hint="@string/input_advice_hint"/>
+        android:hint="@string/input_advice_hint"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+
+    <Button android:id="@+id/btn_send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_send"
+        android:textSize="@dimen/button_text_size"
+        android:background="@drawable/button_background"
+        style="?android:attr/borderlessButtonStyle"
+        android:textColor="@color/colorPrimary"
+        android:layout_gravity="center" />
 
 </LinearLayout>

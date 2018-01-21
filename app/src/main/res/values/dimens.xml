@@ -20,4 +20,5 @@
     <dimen name="scroll_bar_size">1dp</dimen>
     <dimen name="text_padding">8dp</dimen>
     <dimen name="hint_text_size">12sp</dimen>
+    <dimen name="button_text_size">16sp</dimen>
 </resources>
