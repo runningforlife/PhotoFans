@@ -5,9 +5,9 @@
     <string-array name="image_website_url">
         <item>http://www.polayoutu.com</item>
         <item>https://www.pexels.com</item>
+        <item>https://pixabay.com</item>
         <item>http://en.freejpg.com.ar</item>
         <item>https://visualhunt.com</item>
-        <item>https://pixabay.com</item>
     </string-array>
 
     <string-array name="image_website_name">
