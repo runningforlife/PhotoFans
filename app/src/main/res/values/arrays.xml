@@ -13,9 +13,9 @@
     <string-array name="image_website_name">
         <item>Pola Youtu</item>
         <item>Pexels</item>
+        <item>Pixabay</item>
         <item>Free JPG</item>
         <item>Visual Hunt</item>
-        <item>Pixabay</item>
     </string-array>
 
     <string-array name="default_source_url">
