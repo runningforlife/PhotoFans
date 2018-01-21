@@ -68,11 +68,20 @@ public class SwitchActionPreference extends SwitchPreference {
     private void startNightTimeSettingActivity() {
         Intent intent = new Intent(getContext(), TimePickerActivity.class);
         ArrayList<Integer> time = new ArrayList<>(4);
-        time.add(mHour[0]);
+
+        String prefNightTimeInterval = getContext().getString(R.string.pref_night_time_interval);
+        String prefNightTimeStart = getContext().getString(R.string.pref_night_time_starting);
+        long interval = SharedPrefUtil.getLong(prefNightTimeInterval, 0);
+        long start = SharedPrefUtil.getLong(prefNightTimeStart, 0);
+
+        intent.putExtra("start_time", start);
+        intent.putExtra("end_time", start + interval);
+
+/*        time.add(mHour[0]);
         time.add(mHour[1]);
         time.add(mMinute[0]);
         time.add(mMinute[1]);
-        intent.putIntegerArrayListExtra("init_time", time);
+        intent.putIntegerArrayListExtra("init_time", time);*/
         getContext().startActivity(intent);
     }
 
@@ -93,7 +102,7 @@ public class SwitchActionPreference extends SwitchPreference {
         long interval = SharedPrefUtil.getLong(prefNightTimeInterval, 0);
         long start = SharedPrefUtil.getLong(prefNightTimeStart, 0);
 
-        if (interval != 0) {
+        if (interval > 0) {
             DateFormat df = new SimpleDateFormat("HH:mm", Locale.US);
             String summeryOnText = getContext().getString(R.string.sleeping_time);
 

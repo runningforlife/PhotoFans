@@ -143,6 +143,10 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
         mIsRefreshing = false;
         mReceiver = new SimpleResultReceiver(new Handler(Looper.myLooper()));
         mReceiver.setReceiver(this);
+
+        if (isFirstTimeUse()) {
+            LeanCloudManager.getInstance().newUser();
+        }
     }
 
     @Override
@@ -231,8 +235,6 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
                 // start wallpaper cache service
                 Message message = mMainHandler.obtainMessage(H.EVENT_START_WALLPAPER_CACHE);
                 mMainHandler.sendMessageDelayed(message, 500);
-
-                LeanCloudManager.getInstance().newUser();
             }
 
             SharedPrefUtil.putBoolean(keyNewUser, false);

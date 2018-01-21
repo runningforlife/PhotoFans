@@ -131,8 +131,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
     }
 
-
-
     private void checkAutoWallpaperSetting(boolean isEnabled) {
         // for OS >= LL, use JobScheduler to do wallpaper setting
         if (Build.VERSION.SDK_INT >= 21) {

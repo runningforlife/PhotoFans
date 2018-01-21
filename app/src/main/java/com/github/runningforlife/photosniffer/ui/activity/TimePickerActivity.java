@@ -81,9 +81,6 @@ public class TimePickerActivity extends AppCompatActivity
         mDayType[TIME_END] = DAY_SECOND;
 
         mNightTime = new long[2];
-        mNightTime[TIME_START] = SharedPrefUtil.getLong(getString(R.string.pref_night_time_starting), 0);
-        mNightTime[TIME_END] = mNightTime[TIME_START] + SharedPrefUtil.getLong(getString(R.string.pref_night_time_interval), 0);
-
 
         mHour = new int[2];
         mMinute = new int[2];
@@ -135,6 +132,7 @@ public class TimePickerActivity extends AppCompatActivity
     @Override
     public void onTimeSet(int hour, int minute, int type) {
         Log.v(TAG,"onTimeSet()");
+        mCalendar.setTimeInMillis(System.currentTimeMillis());
         mCalendar.set(Calendar.HOUR_OF_DAY, hour);
         mCalendar.set(Calendar.MINUTE, minute);
 
@@ -165,23 +163,34 @@ public class TimePickerActivity extends AppCompatActivity
         mTimeFormat = new SimpleDateFormat("HH:mm", Locale.US);
 
         Intent intent = getIntent();
-        ArrayList<Integer> initTime = intent.getIntegerArrayListExtra("init_time");
+/*        ArrayList<Integer> initTime = intent.getIntegerArrayListExtra("init_time");
         if (initTime != null) {
             mHour[TIME_START] = initTime.get(0);
             mHour[TIME_END] = initTime.get(1);
             mMinute[TIME_END] = initTime.get(2);
             mMinute[TIME_START] = initTime.get(3);
-        }
+        }*/
 
-        mCalendar.set(Calendar.HOUR_OF_DAY, mHour[TIME_START]);
-        mCalendar.set(Calendar.MINUTE, mMinute[TIME_START]);
+        long start = intent.getLongExtra("start_time", 0);
+        long end = intent.getLongExtra("end_time", 0);
+        if (start > 0) {
+            mCalendar.setTimeInMillis(start);
+        } else {
+            mCalendar.set(Calendar.HOUR_OF_DAY, mHour[TIME_START]);
+            mCalendar.set(Calendar.MINUTE, mMinute[TIME_START]);
+        }
         mTvStart.setText(mTimeFormat.format(mCalendar.getTime()));
         mNightTime[TIME_START] = mCalendar.getTimeInMillis();
 
-        mCalendar.set(Calendar.HOUR_OF_DAY, mHour[TIME_END]);
-        mCalendar.set(Calendar.MINUTE, mMinute[TIME_END]);
+        if (end > 0) {
+            mCalendar.setTimeInMillis(end);
+            mNightTime[TIME_END] = mCalendar.getTimeInMillis();
+        } else {
+            mCalendar.set(Calendar.HOUR_OF_DAY, mHour[TIME_END]);
+            mCalendar.set(Calendar.MINUTE, mMinute[TIME_END]);
+            mNightTime[TIME_END] = mCalendar.getTimeInMillis() + TimeUnit.DAYS.toMillis(1);
+        }
         mTvEnd.setText(mTimeFormat.format(mCalendar.getTime()));
-        mNightTime[TIME_END] = mCalendar.getTimeInMillis();
 
         mTvStart.setOnClickListener(new View.OnClickListener() {
             @Override
