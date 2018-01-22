@@ -163,10 +163,11 @@ abstract class PresenterBase implements Presenter {
     public void saveImageAtPos(int pos) {
         if (pos >= 0 && pos < mImageList.size()) {
             final ImageRealm ir = mImageList.get(pos);
+            final String url = ir.getUrl();
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    String imgUrl = ir.getUrl();
+                    String imgUrl = url;
                     if (!TextUtils.isEmpty(ir.getHighResUrl())) {
                         imgUrl = ir.getHighResUrl();
                     }
