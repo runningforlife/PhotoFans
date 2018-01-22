@@ -102,4 +102,5 @@
     <string name="advice_and_issue">Issue and Advice</string>
     <string name="pref_report_issue_and_advice" translatable="false">pref_report_issue_and_advices</string>
     <string name="button_send">Send</string>
+    <string name="pref_copyright" translatable="false">pref_copyright</string>
 </resources>

@@ -70,6 +70,7 @@
         android:summary="@string/write_down_your_advice" />
 
     <com.github.runningforlife.photosniffer.ui.preference.MessagePreference
+        android:key="@string/pref_copyright"
         android:dialogTitle="@string/copyright_declaration"
         android:dialogMessage="@string/copyright_note"
         android:title="@string/check_copyright_notes"

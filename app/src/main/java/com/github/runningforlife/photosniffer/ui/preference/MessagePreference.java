@@ -74,9 +74,14 @@ public class MessagePreference extends DialogPreference {
     @Override
     public void onClick() {
         String prefAdvice = getContext().getString(R.string.pref_report_issue_and_advice);
+        String prefCacheClear = getContext().getString(R.string.pref_cache_clear);
+        String prefCopyRight = getContext().getString(R.string.pref_copyright);
+
         if (prefAdvice.equals(getKey())) {
             Intent intent = new Intent(getContext(), UserAdviceActivity.class);
             getContext().startActivity(intent);
+        } else if (prefCacheClear.equals(getKey()) || prefCopyRight.equals(getKey())) {
+            super.onClick();
         }
     }
 
@@ -85,7 +90,6 @@ public class MessagePreference extends DialogPreference {
         String prefClearCache = getContext().getString(R.string.pref_cache_clear);
         if (prefClearCache.equals(getKey())) {
             // clear all caches
-            final File cacheDir = Glide.getPhotoCacheDir(getContext());
             final File logDir = new File(MiscUtil.getLogDir());
             final File photoDir = new File(MiscUtil.getPhotoDir());
             final File wallpaperDir = new File(MiscUtil.getWallpaperCacheDir());
