@@ -16,6 +16,7 @@ import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
+import com.github.runningforlife.photosniffer.ui.adapter.WrapperGridLayoutManager;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.util.HashSet;
@@ -157,7 +158,7 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
 
 
     private void initView() {
-        GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
+        GridLayoutManager gridLayoutMgr = new WrapperGridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
         gridLayoutMgr.setSmoothScrollbarEnabled(true);
         mRcvImageList.setHasFixedSize(true);
         mRcvImageList.setLayoutManager(gridLayoutMgr);

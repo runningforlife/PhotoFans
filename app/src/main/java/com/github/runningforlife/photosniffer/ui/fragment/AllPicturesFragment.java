@@ -21,6 +21,7 @@ import com.github.runningforlife.photosniffer.presenter.AllPicturesPresenterImpl
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.AllPictureView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
+import com.github.runningforlife.photosniffer.ui.adapter.WrapperGridLayoutManager;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.util.HashSet;
@@ -259,8 +260,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
 
         mImageType = getArguments().getInt(ARGS_IMAGE_TYPE);
 
-        //LinearLayoutManager llMgr = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
-        GridLayoutManager gridLayoutMgr = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
+        GridLayoutManager gridLayoutMgr = new WrapperGridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
         gridLayoutMgr.setSmoothScrollbarEnabled(true);
         mRvImgList.setHasFixedSize(true);
         mRvImgList.setLayoutManager(gridLayoutMgr);

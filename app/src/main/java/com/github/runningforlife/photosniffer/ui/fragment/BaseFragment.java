@@ -56,13 +56,6 @@ import static com.github.runningforlife.photosniffer.ui.fragment.BatchAction.BAT
 public abstract class BaseFragment extends Fragment implements Refresh, UI, GalleryAdapterCallback {
     private static final String TAG = "BaseFragment";
 
-    @Retention(RetentionPolicy.SOURCE)
-    @StringDef({LinearManager,GridManager, StaggeredManager})
-    public @interface RecycleLayout{}
-    public static final String LinearManager = "linearManager";
-    public static final String GridManager = "GridManager";
-    public static final String StaggeredManager = "StaggeredManager";
-
     static final String ARGS_IMAGE_TYPE = "image_type";
     static final String ARG_BATCH_EDIT_MODE = "batch_edit";
     static final String ARG_BATCH_SELECTED_IMAGES = "batch_selected_images";
