@@ -1,11 +1,8 @@
 package com.github.runningforlife.photosniffer.crawler.processor;
 
-import android.net.Uri;
 import android.util.Log;
-import android.webkit.URLUtil;
 
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;

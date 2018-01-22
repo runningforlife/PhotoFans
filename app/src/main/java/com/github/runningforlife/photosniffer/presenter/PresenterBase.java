@@ -164,12 +164,13 @@ abstract class PresenterBase implements Presenter {
         if (pos >= 0 && pos < mImageList.size()) {
             final ImageRealm ir = mImageList.get(pos);
             final String url = ir.getUrl();
+            final String highRes = ir.getHighResUrl();
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     String imgUrl = url;
-                    if (!TextUtils.isEmpty(ir.getHighResUrl())) {
-                        imgUrl = ir.getHighResUrl();
+                    if (!TextUtils.isEmpty(highRes)) {
+                        imgUrl = highRes;
                     }
                     saveBitmap(imgUrl);
                 }
