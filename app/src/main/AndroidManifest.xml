@@ -38,7 +38,7 @@
             android:theme="@style/AppTheme"
             android:label="@string/action_settings"
             android:screenOrientation="nosensor"
-            android:configChanges="orientation"/>
+            android:configChanges="locale"/>
 
         <activity android:name="com.github.runningforlife.photosniffer.ui.activity.ImageSourceSelectionActivity"
             android:theme="@style/AppTheme"

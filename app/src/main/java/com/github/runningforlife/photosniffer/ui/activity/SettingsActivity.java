@@ -1,13 +1,12 @@
 package com.github.runningforlife.photosniffer.ui.activity;
 
+import android.app.FragmentManager;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
+import android.util.Log;
 
-import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.ui.fragment.SettingsFragment;
 
 
@@ -24,8 +23,20 @@ public class SettingsActivity extends BaseActivity {
 
         android.app.FragmentManager fragmentMgr = getFragmentManager();
         fragmentMgr.beginTransaction()
-                   .add(android.R.id.content, new SettingsFragment())
+                   .replace(android.R.id.content, new SettingsFragment())
                    .commit();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration config) {
+        super.onConfigurationChanged(config);
+        Log.v(TAG,"onConfigurationChanged()");
+        // in Android 7.0, switch preference display error, so recreate a new fragment
+        FragmentManager fragmentMgr = getFragmentManager();
+        fragmentMgr.beginTransaction()
+                   .replace(android.R.id.content, new SettingsFragment())
+                   .commit();
+
     }
 
     protected void navigateToParentActivity() {
