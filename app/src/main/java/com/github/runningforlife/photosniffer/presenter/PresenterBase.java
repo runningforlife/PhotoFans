@@ -10,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
@@ -71,6 +72,7 @@ abstract class PresenterBase implements Presenter {
     private H mMainHandler;
     private boolean mIsFirstPager;
     private NetworkStateReceiver mNetStateReceiver;
+    private TelephonyManager mTm;
 
     int mMaxImagesAllowed;
 
@@ -98,6 +100,8 @@ abstract class PresenterBase implements Presenter {
         mMainHandler = new H(Looper.myLooper());
 
         mIsFirstPager = false;
+
+        mTm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
     }
 
     private final class NetworkStateReceiver extends BroadcastReceiver {
@@ -105,7 +109,7 @@ abstract class PresenterBase implements Presenter {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
-                if (!MiscUtil.isConnected(context)) {
+                if (!MiscUtil.isConnected(context) && !isInCalling()) {
                     mView.onNetworkState(NetState.STATE_DISCONNECT);
                 }else if(MiscUtil.isWifiConnected(context)){
                     uploadLogAndAdviceToCloud();
@@ -152,7 +156,7 @@ abstract class PresenterBase implements Presenter {
         if(pos >= 0 && pos < mImageList.size()) {
             final ImageRealm ir = mImageList.get(pos);
             String url = ir.getUrl();
-            if (!TextUtils.isEmpty(url)) {
+            if (!TextUtils.isEmpty(ir.getHighResUrl())) {
                 url = ir.getHighResUrl();
             }
             setWallpaper(url);
@@ -329,6 +333,10 @@ abstract class PresenterBase implements Presenter {
         for (String url : images) {
             markAsFavor(url);
         }
+    }
+
+    private boolean isInCalling() {
+        return mTm.getCallState() == TelephonyManager.CALL_STATE_RINGING;
     }
 
     void markAsFavor(String url) {

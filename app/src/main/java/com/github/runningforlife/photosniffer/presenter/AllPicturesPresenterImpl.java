@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.telecom.TelecomManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.bumptech.glide.RequestManager;
@@ -46,7 +48,7 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
     // updateAsync Pola collections every 7days
     private static final long POLA_UPDATED_DURATION = TimeUnit.DAYS.toMillis(8);
     // current latest pola
-    private static final int LATEST_POLA_COUNT = 78;
+    private static final int LATEST_POLA_COUNT = 79;
 
     private RealmResults<ImageRealm> mUnUsedImages;
     // whether user is refreshing data
@@ -91,15 +93,13 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
         // add operation
         loadPolaPageIfNeeded();
 
-        if(mUnUsedImages == null || mUnUsedImages.size() < 20*DEFAULT_RETRIEVED_IMAGES) {
-            startCrawlerSilent(false);
-            // timeout message
-            Message msg = mMainHandler.obtainMessage(H.EVENT_RETRIEVE_TIME_OUT);
-            mMainHandler.sendMessageDelayed(msg, DEFAULT_RETRIEVE_TIME_OUT);
-            // stop service
-            Message msg1 = mMainHandler.obtainMessage(H.EVENT_STOP_SERVICE);
-            mMainHandler.sendMessageDelayed(msg1, DEFAULT_STOP_TIME_OUT);
-        }
+        startCrawlerSilent(false);
+        // timeout message
+        Message msg = mMainHandler.obtainMessage(H.EVENT_RETRIEVE_TIME_OUT);
+        mMainHandler.sendMessageDelayed(msg, DEFAULT_RETRIEVE_TIME_OUT);
+        // stop service
+        Message msg1 = mMainHandler.obtainMessage(H.EVENT_STOP_SERVICE);
+        mMainHandler.sendMessageDelayed(msg1, DEFAULT_STOP_TIME_OUT);
 
         if (mUnUsedImages != null && mUnUsedImages.size() > 0) {
             if(mUnUsedImages.size() >= DEFAULT_RETRIEVED_IMAGES) {
