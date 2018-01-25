@@ -32,7 +32,7 @@ import io.realm.RealmResults;
  * an activity to select image source website
  */
 
-public class ImageSourceSelectionActivity extends AppCompatActivity
+public class ImageSourceSelectionActivity extends BaseActivity
             implements MultiSelectionListAdapter.SelectionItemClickListener {
     private static final String TAG = "ImageSourceSelection";
 
@@ -46,11 +46,6 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
     public void onCreate(Bundle savedState){
         super.onCreate(savedState);
 
-        ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null){
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_back_white_24dp);
-        }
         setContentView(R.layout.activity_image_source_selection);
 
         ButterKnife.bind(this);
@@ -60,6 +55,13 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
         mSharePref = PreferenceManager.getDefaultSharedPreferences(this);
 
         mRealmApi = RealmApiImpl.getInstance();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        navigateToParentActivity();
     }
 
 
@@ -85,18 +87,10 @@ public class ImageSourceSelectionActivity extends AppCompatActivity
         mRealmApi.closeRealm();
     }
 
-
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-
-        int id = item.getItemId();
-        if(id == android.R.id.home){
-            Intent intent = new Intent(this, SettingsActivity.class);
-            NavUtils.navigateUpTo(this,intent);
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+    protected void navigateToParentActivity() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        NavUtils.navigateUpTo(this,intent);    }
 
 
     private void initView(){
