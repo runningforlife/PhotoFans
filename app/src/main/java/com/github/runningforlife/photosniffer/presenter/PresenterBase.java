@@ -199,7 +199,7 @@ abstract class PresenterBase implements Presenter {
     public void loadImageIntoView(final int pos, final ImageView iv, Priority priority, int w, int h, final ImageView.ScaleType scaleType) {
         Log.v(TAG,"loadImageIntoView()");
         final ImageRealm ir = getItemAtPos(pos);
-        if (ir != null) {
+        if (ir != null && ir.isValid()) {
             final String url = ir.getUrl();
             if (scaleType == ImageView.ScaleType.CENTER_CROP) {
                 mGlideManager.load(url)
