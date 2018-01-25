@@ -312,9 +312,11 @@ public class GalleryActivity extends AppCompatActivity implements
 
         }
 
-        mFragmentMgr.beginTransaction()
-                .replace(R.id.fragment_container, fragment, tag)
-                .commit();
+        if (!fragment.isAdded()) {
+            mFragmentMgr.beginTransaction()
+                    .replace(R.id.fragment_container, fragment, tag)
+                    .commit();
+        }
     }
 
     private void showImagePagerFragment(View iv, int pos, int type) {
