@@ -329,7 +329,7 @@ abstract class PresenterBase implements Presenter {
                     String title = mContext.getString(R.string.set_wallpaper);
                     mContext.startActivity(Intent.createChooser(wallpaperSetting, title));
 
-                    if (imgUrl.startsWith("http")) {
+                    if (saveBitmap(mCacheMgr.getFilePath(imgUrl), bitmap) && imgUrl.startsWith("http")) {
                         Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
                         message.obj = imgUrl;
                         message.sendToTarget();
@@ -450,22 +450,32 @@ abstract class PresenterBase implements Presenter {
                 .asBitmap()
                 .centerCrop()
                 .into(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
+
         try {
-            Bitmap bitmap = target.get(3000, TimeUnit.MILLISECONDS);
-
-            FileOutputStream fos = new FileOutputStream(mCacheMgr.getFilePath(imgUrl));
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-
-            fos.flush();
-            fos.close();
-            // ok, we will mark it as wallpaper
-            if (imgUrl.startsWith("http")) {
+            Bitmap bitmap = target.get(5, TimeUnit.SECONDS);
+            if (saveBitmap(mCacheMgr.getFilePath(imgUrl), bitmap) && imgUrl.startsWith("http")) {
+                // ok, we will mark it as wallpaper
                 Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
                 message.obj = imgUrl;
                 message.sendToTarget();
             }
-        } catch (IOException | InterruptedException | ExecutionException | TimeoutException e) {
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
         }
+
+    }
+
+    private boolean saveBitmap(String path, Bitmap bitmap) {
+        try {
+            FileOutputStream fos = new FileOutputStream(path);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+
+            fos.flush();
+            fos.close();
+            return true;
+        } catch (IOException  e) {
+        }
+
+        return false;
     }
 
     private void saveBitmap(String url) {
@@ -481,10 +491,7 @@ abstract class PresenterBase implements Presenter {
 
             mView.onImageSaveDone(filePath);
             return;
-        } catch (InterruptedException e) {
-        } catch (ExecutionException e) {
-        } catch (TimeoutException e) {
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | InterruptedException | ExecutionException | TimeoutException e) {
         }
 
         mView.onImageSaveDone(null);
