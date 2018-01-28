@@ -134,7 +134,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         //option menu
         setHasOptionsMenu(true);
         // retain state; not recreate it again
-        setRetainInstance(true);
+        //setRetainInstance(true);
     }
 
     @Override
@@ -155,12 +155,6 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         state.putBoolean(ARG_BATCH_EDIT_MODE, mIsBatchEditMode);
         super.onSaveInstanceState(state);
         Log.d(TAG,"onStateInstanceState()");
-    }
-
-    @Override
-    public void onViewStateRestored(Bundle state) {
-        super.onViewStateRestored(state);
-        Log.d(TAG,"onViewStateRestored()");
     }
 
     @Override
