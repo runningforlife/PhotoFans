@@ -25,21 +25,6 @@ public class LeanCloudManager implements CloudApi{
     }
 
     @Override
-    public void saveFile(String name,String data) {
-        Log.v(TAG, "saveFile()");
-        AVFile file = new AVFile(name, data.getBytes());
-        file.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(AVException e) {
-                if(e != null){
-                    Log.d(TAG,"saveFile(): fail");
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    @Override
     public void saveFile(final File file) {
         String name = "log_" + System.currentTimeMillis() + ".txt";
         try {
@@ -47,14 +32,14 @@ public class LeanCloudManager implements CloudApi{
             cf.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(AVException e) {
-                    if(e != null){
+                    if (e != null) {
                         Log.d(TAG,"saveFile(): fail");
                         e.printStackTrace();
-                    }else{
+                    } else {
+                        // remove logs locally
+                        file.delete();
                         Log.v(TAG,"saveFile(): success");
                     }
-                    // remove logs locally
-                    file.delete();
                 }
             });
         } catch (FileNotFoundException e) {

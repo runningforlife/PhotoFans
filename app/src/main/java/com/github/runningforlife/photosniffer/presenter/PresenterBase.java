@@ -1,7 +1,6 @@
 package com.github.runningforlife.photosniffer.presenter;
 
 import android.annotation.TargetApi;
-import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -20,9 +19,11 @@ import android.widget.ImageView;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.SaveCallback;
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.FutureTarget;
+import com.bumptech.glide.request.RequestOptions;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.cache.CacheApi;
 import com.github.runningforlife.photosniffer.data.cache.DiskCacheManager;
@@ -59,8 +60,8 @@ import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.RealmResults;
 
-import static com.github.runningforlife.photosniffer.loader.Loader.DEFAULT_IMG_HEIGHT;
-import static com.github.runningforlife.photosniffer.loader.Loader.DEFAULT_IMG_WIDTH;
+import static com.github.runningforlife.photosniffer.glide.ImageSizer.DEFAULT_IMG_HEIGHT;
+import static com.github.runningforlife.photosniffer.glide.ImageSizer.DEFAULT_IMG_WIDTH;
 import static com.github.runningforlife.photosniffer.ui.fragment.BatchAction.BATCH_DELETE;
 import static com.github.runningforlife.photosniffer.ui.fragment.BatchAction.BATCH_FAVOR;
 import static com.github.runningforlife.photosniffer.ui.fragment.BatchAction.BATCH_SAVE_AS_WALLPAPER;
@@ -73,6 +74,8 @@ abstract class PresenterBase implements Presenter {
     private static final String TAG = "PresenterBase";
 
     private RequestManager mGlideManager;
+    private RequestOptions mRequestOptionsThumb;
+    private RequestOptions mRequestOptionsFull;
     private CacheApi mCacheMgr;
     private ExecutorService mExecutors;
     private CountDownLatch mSavingLatch;
@@ -99,6 +102,18 @@ abstract class PresenterBase implements Presenter {
         mRealmApi = RealmApiImpl.getInstance();
         mCacheMgr = DiskCacheManager.getInstance();
 
+        mRequestOptionsThumb = new RequestOptions();
+        mRequestOptionsThumb.dontAnimate()
+                       .error(R.drawable.ic_broken_image_white_24dp)
+                       .placeholder(R.drawable.ic_photo_grey_24dp)
+                       .centerCrop()
+                       .override(800, 800);
+        mRequestOptionsFull = new RequestOptions();
+        mRequestOptionsFull.dontAnimate()
+                .error(R.drawable.ic_broken_image_white_24dp)
+                .placeholder(R.drawable.ic_photo_grey_24dp)
+                .fitCenter()
+                .override(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
         // default value
         mMaxImagesAllowed = Integer.MAX_VALUE;
 
@@ -209,25 +224,18 @@ abstract class PresenterBase implements Presenter {
         if (ir != null && ir.isValid()) {
             final String url = ir.getUrl();
             if (scaleType == ImageView.ScaleType.CENTER_CROP) {
-                mGlideManager.load(url)
-                        //.thumbnail(0.5f)
-                        .dontTransform()
-                        .override(w, h)
-                        .error(R.drawable.ic_broken_image_white_24dp)
-                        .centerCrop()
+                mGlideManager.setDefaultRequestOptions(mRequestOptionsThumb)
+                        .load(url)
+                        .thumbnail(0.5f)
                         .into(iv);
             } else {
                 String imgUrl = url;
                 if (!TextUtils.isEmpty(ir.getHighResUrl())) {
                     imgUrl = ir.getHighResUrl();
                 }
-                mGlideManager.load(imgUrl)
-                        //.thumbnail(0.5f)
-                        .dontTransform()
-                        .dontAnimate()
-                        .override(w, h)
-                        .error(R.drawable.ic_broken_image_white_24dp)
-                        .fitCenter()
+                mGlideManager.setDefaultRequestOptions(mRequestOptionsFull)
+                        .load(imgUrl)
+                        .thumbnail(0.5f)
                         .into(iv);
 
                 if (!mIsFirstPager) {
@@ -236,6 +244,8 @@ abstract class PresenterBase implements Presenter {
                     mIsFirstPager = true;
                 }
             }
+        } else {
+            mGlideManager.clear(iv);
         }
     }
 
@@ -309,10 +319,11 @@ abstract class PresenterBase implements Presenter {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                FutureTarget<Bitmap> bitmapTarget = mGlideManager.load(imgUrl)
+                FutureTarget<Bitmap> bitmapTarget = Glide.with(mContext)
                         .asBitmap()
-                        .centerCrop()
-                        .into(DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
+                        .load(imgUrl)
+                        .apply(new RequestOptions().centerCrop())
+                        .submit(DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
 
                 try {
                     Bitmap bitmap = bitmapTarget.get(5, TimeUnit.SECONDS);
@@ -340,6 +351,9 @@ abstract class PresenterBase implements Presenter {
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
                     mView.onWallpaperSetDone(false);
                 }
+
+                // clear target
+                Glide.with(mContext).clear(bitmapTarget);
             }
         }).start();
 
@@ -446,10 +460,11 @@ abstract class PresenterBase implements Presenter {
     }
 
     private void saveImageAsWallpaper(String imgUrl) {
-        FutureTarget<Bitmap> target = mGlideManager.load(imgUrl)
+        FutureTarget<Bitmap> target = Glide.with(mContext)
                 .asBitmap()
-                .centerCrop()
-                .into(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
+                .apply(new RequestOptions().centerCrop())
+                .load(imgUrl)
+                .submit(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
 
         try {
             Bitmap bitmap = target.get(5, TimeUnit.SECONDS);
@@ -462,6 +477,8 @@ abstract class PresenterBase implements Presenter {
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
         }
 
+        // clear target
+        Glide.with(mContext).clear(target);
     }
 
     private boolean saveBitmap(String path, Bitmap bitmap) {
@@ -479,10 +496,11 @@ abstract class PresenterBase implements Presenter {
     }
 
     private void saveBitmap(String url) {
-        FutureTarget<Bitmap> target = mGlideManager.load(url)
+        FutureTarget<Bitmap> target = Glide.with(mContext)
                 .asBitmap()
-                .centerCrop()
-                .into(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
+                .apply(new RequestOptions().centerCrop())
+                .load(url)
+                .submit(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
         try {
             Bitmap bitmap = target.get(5000, TimeUnit.MILLISECONDS);
             String imageDir = MiscUtil.getPhotoDir();
@@ -495,6 +513,8 @@ abstract class PresenterBase implements Presenter {
         }
 
         mView.onImageSaveDone(null);
+
+        Glide.with(mContext).clear(target);
     }
 
     private void uploadAdviceToCloud() {

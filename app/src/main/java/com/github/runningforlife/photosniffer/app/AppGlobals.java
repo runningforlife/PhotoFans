@@ -8,7 +8,6 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.avos.avoscloud.AVOSCloud;
-import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.model.MyRealmMigration;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
@@ -43,7 +42,7 @@ public class AppGlobals extends Application {
     }
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
 
         if (LeakCanary.isInAnalyzerProcess(this)) {
@@ -71,15 +70,15 @@ public class AppGlobals extends Application {
         }
     }
 
-    private void initExceptionHandler(){
+    private void initExceptionHandler() {
         Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
     }
 
-    private void initLeanCloud(){
+    private void initLeanCloud() {
         AVOSCloud.initialize(this, LEAN_CLOUD_APP_ID, LEAN_CLOUD_APP_KEY);
     }
 
-    private String buildLogFileName(){
+    private String buildLogFileName() {
         return "log_" + System.currentTimeMillis() + ".txt";
     }
 

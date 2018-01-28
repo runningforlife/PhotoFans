@@ -88,6 +88,7 @@ public class OkHttpDownloader extends AbstractDownloader {
 
     @Override
     public void setThread(int threadNum) {
+        //setThread(3);
     }
 
     private Response handleRequest(Site site,Request req) throws IOException{

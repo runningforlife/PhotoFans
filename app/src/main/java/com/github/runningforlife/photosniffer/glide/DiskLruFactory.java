@@ -16,8 +16,8 @@ import java.io.File;
 public class DiskLruFactory extends DiskLruCacheFactory {
     private static final String TAG = "DiskLru";
     private static final String DISK_CACHE_DIR = MiscUtil.getGlideCacheDir();
-    private static final int DEFAULT_CACHE_SIZE = 1024*1024*100;
-    private static int DISK_CACHE_SIZE = getExternalCacheSize();
+    private static final int DEFAULT_CACHE_SIZE = 1024*1024*200;
+    private static int DISK_CACHE_SIZE = DEFAULT_CACHE_SIZE;
 
     DiskLruFactory(Context context) {
         this(context, DISK_CACHE_DIR, DISK_CACHE_SIZE);
@@ -44,14 +44,5 @@ public class DiskLruFactory extends DiskLruCacheFactory {
                 return dir;
             }
         },diskCacheSize);
-    }
-
-    private static int getExternalCacheSize() {
-        File file = Environment.getExternalStorageDirectory();
-
-        long freeSpace = (file.getFreeSpace()/1024/1024); //MB
-        int wantSpace = (int) (freeSpace/10);
-
-        return wantSpace > DEFAULT_CACHE_SIZE ? DEFAULT_CACHE_SIZE : wantSpace;
     }
 }

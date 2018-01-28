@@ -98,7 +98,7 @@ public class MiscUtil {
         }else{
             d = res.getDrawable(R.drawable.ic_photo_grey_24dp);
         }
-        iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        //iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         iv.setImageDrawable(d);
     }
 

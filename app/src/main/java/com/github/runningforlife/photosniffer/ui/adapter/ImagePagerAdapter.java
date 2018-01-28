@@ -18,7 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.iwf.photopicker.utils.AndroidLifecycleUtils;
 
-import static com.github.runningforlife.photosniffer.loader.Loader.*;
+import static com.github.runningforlife.photosniffer.glide.ImageSizer.*;
 
 
 /**
@@ -64,8 +64,6 @@ public class ImagePagerAdapter extends PagerAdapter {
         if (AndroidLifecycleUtils.canLoadImage(mContext)) {
             // preload image
             ImageView iv = imageHolder.imageView;
-            //MiscUtil.preloadImage(iv);
-            //view.setAnimation(AnimationUtils.loadAnimation(mContext, R.anim.anim_scale_in));
             mCallback.loadImageIntoView(position, iv, Priority.IMMEDIATE,
                     DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT, ImageView.ScaleType.FIT_CENTER);
 

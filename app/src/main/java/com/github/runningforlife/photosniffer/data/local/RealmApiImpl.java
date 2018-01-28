@@ -23,7 +23,6 @@ import io.realm.Sort;
 public class RealmApiImpl implements RealmApi {
     private static final String TAG = "RealmApi";
 
-    //private static RealmApiImpl sInstance = new RealmApiImpl();
     private Realm mRealm;
 
     private RealmApiImpl() {

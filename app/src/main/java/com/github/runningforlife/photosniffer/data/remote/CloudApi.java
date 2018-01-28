@@ -11,11 +11,6 @@ import java.io.File;
 public interface CloudApi {
 
     /*
-     * save a file to cloud
-     */
-    void saveFile(String name, String data);
-
-    /*
      * save local file to cloud
      */
     void saveFile(File file);

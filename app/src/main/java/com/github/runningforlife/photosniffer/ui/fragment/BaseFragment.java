@@ -20,6 +20,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.presenter.ImageType;
@@ -222,6 +223,8 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     public void onPause() {
         super.onPause();
         Log.v(TAG,"onPause()");
+
+        Glide.with(this).pauseRequests();
     }
 
     @Override

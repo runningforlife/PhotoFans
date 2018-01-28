@@ -21,7 +21,7 @@ import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
-import com.github.runningforlife.photosniffer.loader.Loader;
+import com.github.runningforlife.photosniffer.glide.ImageSizer;
 import com.github.runningforlife.photosniffer.service.LockScreenUpdateService;
 import com.github.runningforlife.photosniffer.service.WallpaperJobService;
 import com.github.runningforlife.photosniffer.service.WallpaperUpdaterService;
@@ -249,13 +249,13 @@ public class WallpaperUtils {
         if (!TextUtils.isEmpty(ir.getHighResUrl())) {
             url = ir.getHighResUrl();
         }
+
         try {
             FutureTarget<Bitmap> futureTarget =
                     Glide.with(context)
-                            .load(url)
                             .asBitmap()
-                            .centerCrop()
-                            .into(Loader.DEFAULT_IMG_WIDTH, Loader.DEFAULT_IMG_HEIGHT);
+                            .load(url)
+                            .submit(ImageSizer.DEFAULT_IMG_WIDTH, ImageSizer.DEFAULT_IMG_HEIGHT);
             Bitmap bitmap = futureTarget.get(5000, TimeUnit.MILLISECONDS);
             if (Build.VERSION.SDK_INT >= 24) {
                 wm.setBitmap(bitmap, null, false, flag);
@@ -264,6 +264,7 @@ public class WallpaperUtils {
             }
             // recording wallpaper setting
             recordWallpaperSetting(url, null);
+            Glide.with(context).clear(futureTarget);
         } catch (Exception e) {
             Log.e(TAG,"fail to set wallpaper");
             recordWallpaperSetting(url, e);

@@ -103,6 +103,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/prebuild" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/reload-dex" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/shaders" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/split-apk" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/splits-support" />
@@ -112,33 +113,33 @@
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 26 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 27 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="com.android.support:multidex-1.0.2" level="project" />
+    <orderEntry type="library" name="com.android.support:animated-vector-drawable-27.0.2" level="project" />
     <orderEntry type="library" scope="TEST" name="com.android.support.test:exposed-instrumentation-api-publish-0.5" level="project" />
     <orderEntry type="library" name="org.slf4j:slf4j-log4j12:1.7.6@jar" level="project" />
     <orderEntry type="library" name="org.jsoup:jsoup:1.8.3@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-vector-drawable-26.0.2" level="project" />
     <orderEntry type="library" scope="TEST" name="net.bytebuddy:byte-buddy-android:1.6.5@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="com.squareup:javawriter:2.1.1@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-fragment-26.0.2" level="project" />
     <orderEntry type="library" name="com.nineoldandroids:library:2.4.0@jar" level="project" />
-    <orderEntry type="library" name="com.github.bumptech.glide:glide:3.8.0@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-core-utils-26.0.2" level="project" />
-    <orderEntry type="library" name="me.iwf.photopicker:PhotoPicker-0.9.5" level="project" />
+    <orderEntry type="library" name="android.arch.lifecycle:runtime-1.0.3" level="project" />
     <orderEntry type="library" name="us.codecraft:xsoup:0.3.1@jar" level="project" />
     <orderEntry type="library" name="com.alibaba:fastjson:1.2.30@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-annotations:26.0.2@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-vector-drawable-27.0.2" level="project" />
     <orderEntry type="library" name="org.slf4j:slf4j-api:1.7.6@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="com.jakewharton.android.repackaged:dalvik-dx:1@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="org.hamcrest:hamcrest-core:1.3@jar" level="project" />
     <orderEntry type="library" name="com.jakewharton:butterknife-annotations:8.8.1@jar" level="project" />
     <orderEntry type="library" name="com.squareup.okhttp3:okhttp:3.8.0@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="com.android.support.test.espresso:espresso-core-2.2.2" level="project" />
-    <orderEntry type="library" name="com.android.support:support-v4-26.0.2" level="project" />
     <orderEntry type="library" scope="TEST" name="com.android.support.test:rules-0.5" level="project" />
+    <orderEntry type="library" name="android.arch.core:common:1.0.0@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-core-ui-27.0.2" level="project" />
+    <orderEntry type="library" name="com.android.support:support-compat-27.0.2" level="project" />
     <orderEntry type="library" scope="TEST" name="org.hamcrest:hamcrest-integration:1.3@jar" level="project" />
     <orderEntry type="library" name="com.squareup.haha:haha:2.0.3@jar" level="project" />
+    <orderEntry type="library" name="me.iwf.photopicker:PhotoPicker-0.9.12" level="project" />
     <orderEntry type="library" name="com.jayway.jsonpath:json-path:0.8.1@jar" level="project" />
     <orderEntry type="library" name="commons-codec:commons-codec:1.9@jar" level="project" />
     <orderEntry type="library" name="net.minidev:json-smart:1.1.1@jar" level="project" />
@@ -146,43 +147,48 @@
     <orderEntry type="library" name="us.codecraft:webmagic-core:0.6.1@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="net.bytebuddy:byte-buddy-agent:1.6.14@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="com.android.support.test.espresso:espresso-idling-resource-2.2.2" level="project" />
-    <orderEntry type="library" name="com.android.support:animated-vector-drawable-26.0.2" level="project" />
     <orderEntry type="library" scope="TEST" name="javax.annotation:javax.annotation-api:1.2@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-fragment-27.0.2" level="project" />
+    <orderEntry type="library" name="com.android.support:support-media-compat-27.0.2" level="project" />
+    <orderEntry type="library" name="com.github.bumptech.glide:gifdecoder:4.1.1@jar" level="project" />
     <orderEntry type="library" name="com.squareup.leakcanary:leakcanary-analyzer-1.5.4" level="project" />
-    <orderEntry type="library" name="com.android.support:cardview-v7-26.0.2" level="project" />
     <orderEntry type="library" name="com.getkeepsafe.relinker:relinker-1.2.2" level="project" />
-    <orderEntry type="library" name="com.android.support:recyclerview-v7-26.0.2" level="project" />
-    <orderEntry type="library" name="com.android.support:support-media-compat-26.0.2" level="project" />
+    <orderEntry type="library" name="com.android.support:support-v4-27.0.2" level="project" />
+    <orderEntry type="library" name="com.github.bumptech.glide:disklrucache:4.1.1@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:appcompat-v7-27.0.2" level="project" />
     <orderEntry type="library" name="commons-io:commons-io:1.3.2@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-annotations:27.0.2@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:design-27.0.2" level="project" />
     <orderEntry type="library" scope="TEST" name="junit:junit:4.12@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="org.mockito:mockito-android:2.8.9@jar" level="project" />
     <orderEntry type="library" name="org.apache.httpcomponents:httpclient:4.5.2@jar" level="project" />
-    <orderEntry type="library" name="com.github.bumptech.glide:okhttp3-integration-1.5.0" level="project" />
+    <orderEntry type="library" name="com.android.support:transition-27.0.2" level="project" />
     <orderEntry type="library" name="cn.leancloud.android:avoscloud-sdk:v4.1.0@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="javax.inject:javax.inject:1@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="org.mockito:mockito-core:2.8.9@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="org.objenesis:objenesis:2.5@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:recyclerview-v7-27.0.2" level="project" />
     <orderEntry type="library" name="commons-lang:commons-lang:2.6@jar" level="project" />
     <orderEntry type="library" name="io.realm:realm-annotations:4.1.0@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:appcompat-v7-26.0.2" level="project" />
     <orderEntry type="library" scope="TEST" name="com.jakewharton.android.repackaged:libcore-dex:2@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-core-ui-26.0.2" level="project" />
     <orderEntry type="library" name="com.squareup.okio:okio:1.13.0@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="net.bytebuddy:byte-buddy:1.6.14@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-compat-26.0.2" level="project" />
     <orderEntry type="library" name="commons-logging:commons-logging:1.2@jar" level="project" />
+    <orderEntry type="library" name="android.arch.lifecycle:common:1.0.3@jar" level="project" />
     <orderEntry type="library" name="com.jakewharton:butterknife-8.8.1" level="project" />
     <orderEntry type="library" name="org.apache.httpcomponents:httpcore:4.4.4@jar" level="project" />
+    <orderEntry type="library" name="com.github.bumptech.glide:glide:4.1.1@jar" level="project" />
+    <orderEntry type="library" name="com.github.bumptech.glide:okhttp3-integration:4.1.1@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="org.hamcrest:hamcrest-library:1.3@jar" level="project" />
     <orderEntry type="library" name="org.apache.commons:commons-lang3:3.1@jar" level="project" />
     <orderEntry type="library" name="log4j:log4j:1.2.17@jar" level="project" />
+    <orderEntry type="library" name="com.github.bumptech.glide:annotations:4.1.1@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="com.android.support.test:runner-0.5" level="project" />
     <orderEntry type="library" name="com.google.code.findbugs:jsr305:3.0.2@jar" level="project" />
     <orderEntry type="library" name="commons-collections:commons-collections:3.2.1@jar" level="project" />
     <orderEntry type="library" name="org.assertj:assertj-core:1.5.0@jar" level="project" />
     <orderEntry type="library" name="io.realm:realm-android-library-4.1.0" level="project" />
-    <orderEntry type="library" name="com.android.support:transition-26.0.2" level="project" />
-    <orderEntry type="library" name="com.android.support:design-26.0.2" level="project" />
+    <orderEntry type="library" name="com.android.support:support-core-utils-27.0.2" level="project" />
     <orderEntry type="library" name="com.squareup.leakcanary:leakcanary-android-1.5.4" level="project" />
     <orderEntry type="library" name="com.squareup.leakcanary:leakcanary-watcher:1.5.4@jar" level="project" />
   </component>
