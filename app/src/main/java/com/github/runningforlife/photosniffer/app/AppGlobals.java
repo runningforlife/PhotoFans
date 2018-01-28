@@ -149,10 +149,6 @@ public class AppGlobals extends Application {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            // save to cloud if wifi available
-            if (MiscUtil.isWifiConnected(getApplicationContext())) {
-                MiscUtil.saveLogToCloud(file);
-            }
         }
     }
 

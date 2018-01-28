@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.presenter;
 
+import android.annotation.TargetApi;
 import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,9 +8,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -38,9 +41,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -112,7 +119,7 @@ abstract class PresenterBase implements Presenter {
                 if (!MiscUtil.isConnected(context) && !isInCalling()) {
                     mView.onNetworkState(NetState.STATE_DISCONNECT);
                 }else if(MiscUtil.isWifiConnected(context)){
-                    uploadLogAndAdviceToCloud();
+                    uploadAdviceToCloud();
                 }
             }
         }
@@ -293,40 +300,49 @@ abstract class PresenterBase implements Presenter {
 
         if(TextUtils.isEmpty(url)) return;
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                setWallpaperAndCache(url);
-            }
-        }).start();
+        startWallpaperChooser(url);
     }
 
 
-    private void setWallpaperAndCache(final String imgUrl) {
-        FutureTarget<Bitmap> bitmapTarget = mGlideManager.load(imgUrl)
-                     .asBitmap()
-                     .centerCrop()
-                     .into(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
-        try {
-            Bitmap bitmap = bitmapTarget.get(5000, TimeUnit.MILLISECONDS);
-            WallpaperManager wm = WallpaperManager.getInstance(mContext);
-            wm.setBitmap(bitmap);
-            mView.onWallpaperSetDone(true);
-            if (imgUrl.startsWith("http")) {
-                Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
-                message.obj = imgUrl;
-                message.sendToTarget();
-                // cache it
-                mCacheMgr.put(imgUrl, bitmap);
-            }
-            return;
-        } catch (InterruptedException e) {
-        } catch (ExecutionException e) {
-        } catch (TimeoutException e) {
-        } catch (IOException e) {
-        }
+    @TargetApi(19)
+    private void startWallpaperChooser(final String imgUrl) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                FutureTarget<Bitmap> bitmapTarget = mGlideManager.load(imgUrl)
+                        .asBitmap()
+                        .centerCrop()
+                        .into(DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
 
-        mView.onWallpaperSetDone(false);
+                try {
+                    Bitmap bitmap = bitmapTarget.get(5, TimeUnit.SECONDS);
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.US);
+                    String wallpaperName = "wallpaper_" + df.format(new Date());
+                    Uri imgUri1 = Uri.parse(MediaStore.Images.Media
+                            .insertImage(mContext.getContentResolver(), bitmap , wallpaperName, wallpaperName));
+
+                    Intent wallpaperSetting = new Intent(Intent.ACTION_ATTACH_DATA);
+                    wallpaperSetting.setData(imgUri1);
+                    wallpaperSetting.putExtra("mimeType", "image/*");
+                    wallpaperSetting.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                    String title = mContext.getString(R.string.set_wallpaper);
+                    mContext.startActivity(Intent.createChooser(wallpaperSetting, title));
+
+                    if (imgUrl.startsWith("http")) {
+                        Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
+                        message.obj = imgUrl;
+                        message.sendToTarget();
+                        // cache it
+                        mCacheMgr.put(imgUrl, bitmap);
+                    }
+
+                } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                    mView.onWallpaperSetDone(false);
+                }
+            }
+        }).start();
+
     }
 
     private void markAsFavor(List<String> images) {
@@ -448,11 +464,7 @@ abstract class PresenterBase implements Presenter {
                 message.obj = imgUrl;
                 message.sendToTarget();
             }
-        } catch (InterruptedException e) {
-        } catch (ExecutionException e) {
-        } catch (TimeoutException e) {
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException | ExecutionException | TimeoutException e) {
         }
     }
 
@@ -478,20 +490,10 @@ abstract class PresenterBase implements Presenter {
         mView.onImageSaveDone(null);
     }
 
-    private void uploadLogAndAdviceToCloud() {
+    private void uploadAdviceToCloud() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String logPath = MiscUtil.getLogDir();
-                File file = new File(logPath);
-                if (file.exists()) {
-                    File[] logs = file.listFiles();
-                    for (File log : logs) {
-                        if (log.isFile() && log.getName().endsWith("txt") && log.length() > 0) {
-                            MiscUtil.saveLogToCloud(log);
-                        }
-                    }
-                }
                 // check whether there is advices
                 String prefAdvice = mContext.getString(R.string.pref_report_issue_and_advice);
                 String advice = SharedPrefUtil.getString(prefAdvice,"");
