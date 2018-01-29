@@ -102,12 +102,15 @@ abstract class PresenterBase implements Presenter {
         mRealmApi = RealmApiImpl.getInstance();
         mCacheMgr = DiskCacheManager.getInstance();
 
+        mExecutors = Executors.newFixedThreadPool(2);
+
         mRequestOptionsThumb = new RequestOptions();
         mRequestOptionsThumb.dontAnimate()
                        .error(R.drawable.ic_broken_image_white_24dp)
                        .placeholder(R.drawable.ic_photo_grey_24dp)
                        .centerCrop()
                        .override(800, 800);
+
         mRequestOptionsFull = new RequestOptions();
         mRequestOptionsFull.error(R.drawable.ic_broken_image_white_24dp)
                 .placeholder(R.drawable.ic_photo_grey_24dp)
@@ -190,7 +193,7 @@ abstract class PresenterBase implements Presenter {
             final ImageRealm ir = mImageList.get(pos);
             final String url = ir.getUrl();
             final String highRes = ir.getHighResUrl();
-            new Thread(new Runnable() {
+            mExecutors.execute(new Runnable() {
                 @Override
                 public void run() {
                     String imgUrl = url;
@@ -199,7 +202,7 @@ abstract class PresenterBase implements Presenter {
                     }
                     saveBitmap(imgUrl);
                 }
-            }).start();
+            });
         }
     }
 
@@ -309,52 +312,51 @@ abstract class PresenterBase implements Presenter {
 
         if(TextUtils.isEmpty(url)) return;
 
-        startWallpaperChooser(url);
+        mExecutors.execute(new Runnable() {
+            @Override
+            public void run() {
+                startWallpaperChooser(url);
+            }
+        });
     }
 
 
-    @TargetApi(19)
+    // NOTICE: do not use it on UI thread
     private void startWallpaperChooser(final String imgUrl) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                FutureTarget<Bitmap> bitmapTarget = Glide.with(mContext)
-                        .asBitmap()
-                        .load(imgUrl)
-                        .apply(new RequestOptions().centerCrop())
-                        .submit(DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
+        FutureTarget<Bitmap> bitmapTarget = Glide.with(mContext)
+                .asBitmap()
+                .load(imgUrl)
+                .apply(new RequestOptions().centerCrop())
+                .submit(DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
 
-                try {
-                    Bitmap bitmap = bitmapTarget.get(5, TimeUnit.SECONDS);
-                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.US);
-                    String wallpaperName = "wallpaper_" + df.format(new Date());
-                    Uri imgUri1 = Uri.parse(MediaStore.Images.Media
-                            .insertImage(mContext.getContentResolver(), bitmap , wallpaperName, wallpaperName));
+        try {
+            Bitmap bitmap = bitmapTarget.get(5, TimeUnit.SECONDS);
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.US);
+            String wallpaperName = "wallpaper_" + df.format(new Date());
+            Uri imgUri1 = Uri.parse(MediaStore.Images.Media
+                    .insertImage(mContext.getContentResolver(), bitmap , wallpaperName, wallpaperName));
 
-                    Intent wallpaperSetting = new Intent(Intent.ACTION_ATTACH_DATA);
-                    wallpaperSetting.setData(imgUri1);
-                    wallpaperSetting.putExtra("mimeType", "image/*");
-                    wallpaperSetting.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Intent wallpaperSetting = new Intent(Intent.ACTION_ATTACH_DATA);
+            wallpaperSetting.setData(imgUri1);
+            wallpaperSetting.putExtra("mimeType", "image/*");
+            wallpaperSetting.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-                    String title = mContext.getString(R.string.set_wallpaper);
-                    mContext.startActivity(Intent.createChooser(wallpaperSetting, title));
-                    // wait for user to complete wallpaper setting
-                    Thread.sleep(3000);
-                    if (saveBitmap(mCacheMgr.getFilePath(imgUrl), bitmap) && imgUrl.startsWith("http")) {
-                        Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
-                        message.obj = imgUrl;
-                        message.sendToTarget();
-                    }
-
-                } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                    mView.onWallpaperSetDone(false);
-                }
-
-                // clear target
-                Glide.with(mContext).clear(bitmapTarget);
+            String title = mContext.getString(R.string.set_wallpaper);
+            mContext.startActivity(Intent.createChooser(wallpaperSetting, title));
+            // wait for user to complete wallpaper setting
+            Thread.sleep(3000);
+            if (saveBitmap(mCacheMgr.getFilePath(imgUrl), bitmap) && imgUrl.startsWith("http")) {
+                Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
+                message.obj = imgUrl;
+                message.sendToTarget();
             }
-        }).start();
 
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            mView.onWallpaperSetDone(false);
+        }
+
+        // clear target
+        Glide.with(mContext).clear(bitmapTarget);
     }
 
     private void markAsFavor(List<String> images) {
@@ -407,8 +409,7 @@ abstract class PresenterBase implements Presenter {
     }
 
     private void saveAsWallpapers(List<String> urls) {
-        if (mExecutors == null) {
-            mExecutors = Executors.newFixedThreadPool(2);
+        if (mSavingLatch == null) {
             mSavingLatch = new CountDownLatch(urls.size());
         }
 
@@ -516,7 +517,11 @@ abstract class PresenterBase implements Presenter {
     }
 
     private void uploadAdviceToCloud() {
-        new Thread(new Runnable() {
+        if (mExecutors == null) {
+            mExecutors = Executors.newFixedThreadPool(2);
+        }
+
+        mExecutors.execute(new Runnable() {
             @Override
             public void run() {
                 // check whether there is advices
@@ -534,7 +539,7 @@ abstract class PresenterBase implements Presenter {
                     }
                 }
             }
-        }).start();
+        });
     }
 
     private final class H extends Handler {
