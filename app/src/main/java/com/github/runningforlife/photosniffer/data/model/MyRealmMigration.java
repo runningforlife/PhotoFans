@@ -31,7 +31,18 @@ public class MyRealmMigration implements io.realm.RealmMigration {
             schema.get("ImagePageInfo")
                   .removeField("mVisitTime")
                   .addField("mTimeStamp", Long.class);
-        } else if (oldVersion == 1) {
+        }
+
+        if (oldVersion == 1) {
+            ++oldVersion;
+
+            schema.get("ImageRealm")
+                    .addField("mHighResUrl", String.class);
+        }
+
+        if (oldVersion == 2) {
+            ++oldVersion;
+
             schema.get("ImageRealm")
                     .addField("mHighResUrl", String.class);
         }

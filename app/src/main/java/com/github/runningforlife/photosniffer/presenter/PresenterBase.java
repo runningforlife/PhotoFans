@@ -109,8 +109,7 @@ abstract class PresenterBase implements Presenter {
                        .centerCrop()
                        .override(800, 800);
         mRequestOptionsFull = new RequestOptions();
-        mRequestOptionsFull.dontAnimate()
-                .error(R.drawable.ic_broken_image_white_24dp)
+        mRequestOptionsFull.error(R.drawable.ic_broken_image_white_24dp)
                 .placeholder(R.drawable.ic_photo_grey_24dp)
                 .fitCenter()
                 .override(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
@@ -339,13 +338,12 @@ abstract class PresenterBase implements Presenter {
 
                     String title = mContext.getString(R.string.set_wallpaper);
                     mContext.startActivity(Intent.createChooser(wallpaperSetting, title));
-
+                    // wait for user to complete wallpaper setting
+                    Thread.sleep(3000);
                     if (saveBitmap(mCacheMgr.getFilePath(imgUrl), bitmap) && imgUrl.startsWith("http")) {
                         Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
                         message.obj = imgUrl;
                         message.sendToTarget();
-                        // cache it
-                        mCacheMgr.put(imgUrl, bitmap);
                     }
 
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {

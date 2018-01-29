@@ -444,7 +444,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         PhotoPicker.PhotoPickerBuilder builder = new PhotoPicker.PhotoPickerBuilder();
         builder.setGridColumnCount(3)
                 .setPreviewEnabled(true)
-                .setShowCamera(true)
+                .setShowCamera(false)
                 .setShowGif(false)
                 .start(getContext(), this, PhotoPicker.REQUEST_CODE);
     }
