@@ -157,22 +157,21 @@ public class ImageRetrieveService extends Service {
         if(mSpider.getStatus() == Spider.Status.Running){
             mSpider.stop();
         }
-        mServiceLooper.quit();
-        mDataSaver.interrupt();
 
         if (mAllPages.isValid()) {
             mAllPages.removeAllChangeListeners();
         }
-        mRealApi.closeRealm();
-
         mProcessor.onDestroy();
+
+        mServiceLooper.quit();
+        mDataSaver.interrupt();
+
+        mRealApi.closeRealm();
     }
 
     private void start(Intent intent, int startId) {
         Log.v(TAG,"start()");
         if (!mIsRetrieving) {
-            mIsRetrieving = false;
-
             Message message = mServiceHandler.obtainMessage(H.EVENT_RETRIEVE_START);
             message.obj = intent;
             message.arg1 = startId;
@@ -205,13 +204,13 @@ public class ImageRetrieveService extends Service {
 
     private void handleResult() {
         Log.v(TAG,"handleResult()");
+        mIsRetrieving = false;
         sendResult(mProcessor.getRetrievedImageCount());
     }
 
     @SuppressLint("RestrictedApi")
     private void sendResult(int size) {
         Log.v(TAG,"sendResult(): size = " + size);
-
         if (size != 0) {
             Bundle bundle = new Bundle();
             bundle.putLong("result", size);
