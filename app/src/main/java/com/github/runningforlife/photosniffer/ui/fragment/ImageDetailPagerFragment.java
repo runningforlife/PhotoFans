@@ -25,6 +25,7 @@ import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
+import com.bumptech.glide.RequestManager;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl;
 import com.github.runningforlife.photosniffer.presenter.ImageType;
@@ -70,6 +71,7 @@ public class ImageDetailPagerFragment extends Fragment
     @BindView(R.id.vp_image) ViewPager mViewPager;
     @BindView(R.id.pb_loading) ProgressBar mLoadingProgress;
     private ImagePagerAdapter mPagerAdapter;
+    private RequestManager mGlideRequestMgr;
 
     public final static long ANIM_DURATION = 200L;
 
@@ -396,7 +398,6 @@ public class ImageDetailPagerFragment extends Fragment
         super.onDestroy();
 
         mImageUrls.clear();
-        mImageUrls = null;
 
         if (mViewPager != null) {
             mViewPager.setAdapter(null);

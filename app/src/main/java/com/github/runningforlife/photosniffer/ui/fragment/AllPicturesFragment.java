@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import com.bumptech.glide.Glide;
 import com.github.runningforlife.photosniffer.R;
@@ -42,7 +43,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     @BindView(R.id.srl_refresh) SwipeRefreshLayout mRefresher;
     private AllPicturesPresenterImpl mPresenter;
 
-    public static AllPicturesFragment newInstance(int type){
+    public static AllPicturesFragment newInstance(int type) {
         Bundle args = new Bundle();
         args.putInt(ARGS_IMAGE_TYPE, type);
         AllPicturesFragment fragment = new AllPicturesFragment();
@@ -83,6 +84,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
         super.onResume();
         Log.v(TAG,"onResume()");
         //setTitle(getString(R.string.app_name));
+        checkRecycleViewLayoutState();
     }
 
     @Override
@@ -285,8 +287,21 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     }
 
     private void initPresenter() {
-        mPresenter = new AllPicturesPresenterImpl( Glide.with(this), getContext(),this);
+        mPresenter = new AllPicturesPresenterImpl(mGlideRequestMgr , getContext(),this);
         setPresenter(mPresenter);
         mPresenter.onStart();
+    }
+
+
+    private void checkRecycleViewLayoutState() {
+        final RecyclerView rv = getRecycleView();
+        if (rv != null) {
+            rv.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    Log.v(TAG,"onGlobalLayout(): count=" + rv.getChildCount());
+                }
+            });
+        }
     }
 }

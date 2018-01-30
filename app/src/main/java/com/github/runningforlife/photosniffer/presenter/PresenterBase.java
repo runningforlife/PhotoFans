@@ -107,13 +107,11 @@ abstract class PresenterBase implements Presenter {
         mRequestOptionsThumb = new RequestOptions();
         mRequestOptionsThumb.dontAnimate()
                        .error(R.drawable.ic_broken_image_white_24dp)
-                       .placeholder(R.drawable.ic_photo_grey_24dp)
                        .centerCrop()
                        .override(800, 800);
 
         mRequestOptionsFull = new RequestOptions();
         mRequestOptionsFull.error(R.drawable.ic_broken_image_white_24dp)
-                .placeholder(R.drawable.ic_photo_grey_24dp)
                 .fitCenter()
                 .override(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
         // default value

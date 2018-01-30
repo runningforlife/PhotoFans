@@ -53,7 +53,7 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
         mAdapter = new GalleryAdapter(getActivity(), this);
 
         mImageType = getArguments().getInt(ARGS_IMAGE_TYPE);
-        mPresenter = new ImageDetailPresenterImpl(Glide.with(this),
+        mPresenter = new ImageDetailPresenterImpl(mGlideRequestMgr,
                 getContext(), this, mImageType);
         setPresenter(mPresenter);
         mPresenter.onStart();

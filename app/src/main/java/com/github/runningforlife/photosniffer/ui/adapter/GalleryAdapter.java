@@ -88,8 +88,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
             final String url = img.getUrl();
             Log.d(TAG, "onBindViewHolder(): pos = " + position);
             if (!TextUtils.isEmpty(url)) {
-                // preload image
-                MiscUtil.preloadImage(vh.img);
                 if (AndroidLifecycleUtils.canLoadImage(mContext)) {
                     mCallback.loadImageIntoView(position, vh.img, Priority.HIGH,
                             600, 600, ImageView.ScaleType.CENTER_CROP);

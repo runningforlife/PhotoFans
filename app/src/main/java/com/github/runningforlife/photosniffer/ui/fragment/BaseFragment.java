@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -22,6 +21,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
+import com.bumptech.glide.RequestManager;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.presenter.ImageType;
 import com.github.runningforlife.photosniffer.presenter.NetState;
@@ -30,17 +30,15 @@ import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.ui.activity.Refresh;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapterCallback;
+import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import io.realm.RealmObject;
 import me.iwf.photopicker.PhotoPicker;
+import me.iwf.photopicker.utils.AndroidLifecycleUtils;
 
 import static android.view.MenuItem.SHOW_AS_ACTION_IF_ROOM;
 import static com.github.runningforlife.photosniffer.presenter.ImageType.IMAGE_FAVOR;
@@ -61,6 +59,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     static final String ARG_BATCH_EDIT_MODE = "batch_edit";
     static final String ARG_BATCH_SELECTED_IMAGES = "batch_selected_images";
 
+    private static final int SCROLL_THRESHOLD = 30;
     // current context menu item view position
     protected int mCurrentPos = -1;
     protected FragmentCallback mCallback;
@@ -71,6 +70,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     GalleryAdapter mAdapter;
     Menu mMenu;
     boolean mIsBatchEditMode;
+    RequestManager mGlideRequestMgr;
 
     private AlertDialog mHintAlert;
 
@@ -134,6 +134,8 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         super.onCreate(savedState);
         //option menu
         setHasOptionsMenu(true);
+
+        mGlideRequestMgr = Glide.with(this);
         // retain state; not recreate it again
         //setRetainInstance(true);
     }
@@ -216,6 +218,8 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
 
         String title = getString(resId);
         setTitle(title);
+
+        checkRecycleViewScrollState();
     }
 
 
@@ -224,7 +228,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         super.onPause();
         Log.v(TAG,"onPause()");
 
-        Glide.with(this).pauseRequests();
+        //mGlideRequestMgr.pauseRequests();
     }
 
     @Override
@@ -452,6 +456,30 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     private void checkPresenter() {
         if (mPresenter == null) {
             throw new IllegalArgumentException("presenter should not be null");
+        }
+    }
+
+    private void checkRecycleViewScrollState() {
+        RecyclerView rv = getRecycleView();
+        if (rv != null) {
+            rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    if (newState == 0 && AndroidLifecycleUtils.canLoadImage(BaseFragment.this)) {
+                        mGlideRequestMgr.resumeRequests();
+                    }
+                }
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    if (Math.abs(dy) > SCROLL_THRESHOLD) {
+                        mGlideRequestMgr.pauseRequests();
+                    } else if (AndroidLifecycleUtils.canLoadImage(BaseFragment.this)) {
+                        mGlideRequestMgr.resumeRequests();
+                    }
+                }
+            });
         }
     }
 }
