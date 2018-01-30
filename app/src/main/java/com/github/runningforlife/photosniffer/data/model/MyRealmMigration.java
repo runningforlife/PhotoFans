@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.data.model;
 
+import android.media.Image;
 import android.util.Log;
 
 import io.realm.DynamicRealm;
@@ -19,31 +20,21 @@ public class MyRealmMigration implements io.realm.RealmMigration {
         if (oldVersion == 0) {
             ++oldVersion;
 
-            schema.create("ImagePageInfo")
+            schema.create(ImagePageInfo.class.getSimpleName())
                   .addField("mUrl", String.class)
                   .addField("mTimeStamp", Long.class)
-                  .addField("mIsVisited", Boolean.class);
+                  .addField("mIsVisited", Boolean.class)
+                  .removeField("mVisitTime");
 
-            schema.get("ImageRealm")
+            schema.get(ImageRealm.class.getSimpleName())
                   .addField("mIsCached", Boolean.class)
                   .addField("mHighResUrl", String.class);
-
-            schema.get("ImagePageInfo")
-                  .removeField("mVisitTime")
-                  .addField("mTimeStamp", Long.class);
         }
 
         if (oldVersion == 1) {
             ++oldVersion;
 
-            schema.get("ImageRealm")
-                    .addField("mHighResUrl", String.class);
-        }
-
-        if (oldVersion == 2) {
-            ++oldVersion;
-
-            schema.get("ImageRealm")
+            schema.get(ImageRealm.class.getSimpleName())
                     .addField("mHighResUrl", String.class);
         }
     }

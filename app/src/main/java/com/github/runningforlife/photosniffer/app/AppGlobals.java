@@ -36,6 +36,8 @@ public class AppGlobals extends Application {
     private static final String LEAN_CLOUD_APP_ID = "Pivxf9C9FGTTHtyg7QXI1ICI-gzGzoHsz";
     private static final String LEAN_CLOUD_APP_KEY = "KCjSyXjVTA9mCIJVs7tDVkGS";
     private static AppGlobals sInstance;
+    // realm version
+    private static final int REALM_SCHEMA_VERSION = 1;
 
     public static AppGlobals getInstance(){
         return sInstance;
@@ -54,10 +56,12 @@ public class AppGlobals extends Application {
 
         Realm.init(this);
         RealmConfiguration realmConfig = new RealmConfiguration.Builder()
+                .schemaVersion(REALM_SCHEMA_VERSION)
                 .name(appName)
                 .migration(new MyRealmMigration())
                 .build();
         Realm.setDefaultConfiguration(realmConfig);
+        Log.v(TAG,"realm schema version:" + realmConfig.getSchemaVersion());
         // it seems that we should init here
         sInstance = AppGlobals.this;
 
