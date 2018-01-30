@@ -4,6 +4,7 @@ import android.media.Image;
 import android.util.Log;
 
 import io.realm.DynamicRealm;
+import io.realm.RealmObjectSchema;
 import io.realm.RealmSchema;
 
 /**
@@ -20,22 +21,29 @@ public class MyRealmMigration implements io.realm.RealmMigration {
         if (oldVersion == 0) {
             ++oldVersion;
 
-            schema.create(ImagePageInfo.class.getSimpleName())
-                  .addField("mUrl", String.class)
-                  .addField("mTimeStamp", Long.class)
-                  .addField("mIsVisited", Boolean.class)
-                  .removeField("mVisitTime");
+            RealmObjectSchema pageSchema = schema.get(ImagePageInfo.class.getSimpleName());
+            if (pageSchema != null) {
+                if (!pageSchema.hasField("mTimeStamp")) {
+                    pageSchema.addField("mTimeStamp", Long.class);
+                }
+                if (pageSchema.hasField("mVisitTime")) {
+                    pageSchema.removeField("mVisitTime");
+                }
+            }
 
-            schema.get(ImageRealm.class.getSimpleName())
-                  .addField("mIsCached", Boolean.class)
-                  .addField("mHighResUrl", String.class);
-        }
+            RealmObjectSchema imageSchema = schema.get(ImageRealm.class.getSimpleName());
+            if (imageSchema != null) {
+                if (!imageSchema.hasField("mIsWallpaper")) {
+                    imageSchema.addField("mIsWallpaper", Boolean.class);
+                }
+                if (!imageSchema.hasField("mIsCached")) {
+                    imageSchema.addField("mIsCached", Boolean.class);
+                }
+                if (!imageSchema.hasField("mHighResUrl")) {
+                    imageSchema.addField("mHighResUrl", String.class);
+                }
+            }
 
-        if (oldVersion == 1) {
-            ++oldVersion;
-
-            schema.get(ImageRealm.class.getSimpleName())
-                    .addField("mHighResUrl", String.class);
         }
     }
 }
