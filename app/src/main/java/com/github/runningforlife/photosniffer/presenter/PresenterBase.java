@@ -380,14 +380,6 @@ abstract class PresenterBase implements Presenter {
         mRealmApi.updateAsync(ImageRealm.class, params, updated);
     }
 
-    private void trimData() {
-        HashMap<String,String> params = new HashMap<>();
-        params.put("mIsUsed", Boolean.toString(true));
-        params.put("mIsFavor", Boolean.toString(false));
-        params.put("mIsWallpaper", Boolean.toString(false));
-        mRealmApi.trimDataSync(ImageRealm.class, params, mMaxImagesAllowed);
-    }
-
     private void batchRemove(List<String> urls) {
         String imgUrl = urls.get(0);
         if (!imgUrl.startsWith("http")) {
@@ -569,14 +561,6 @@ abstract class PresenterBase implements Presenter {
         @Override
         public void onChange(RealmResults<ImageRealm> images, OrderedCollectionChangeSet changeSet) {
             Log.v(TAG,"onChange(): size = " + images.size());
-            //images.sort("mTimeStamp", Sort.DESCENDING);
-            // trim data if needed only for non-favor;non-wallpaper
-            if (images.size() > 0) {
-                ImageRealm ir = images.get(0);
-                if (ir != null && !ir.getIsWallpaper() && !ir.getIsFavor()) {
-                    trimData();
-                }
-            }
             if (changeSet == null) {
                 mImageList = images;
                 mView.onDataSetChange(0, mImageList.size(), RealmOp.OP_REFRESH);

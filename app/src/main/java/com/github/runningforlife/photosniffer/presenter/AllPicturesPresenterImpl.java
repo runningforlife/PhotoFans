@@ -120,6 +120,12 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
     }
 
     @Override
+    public void trimData() {
+        Log.v(TAG,"trimData()");
+        trimDataAsync();
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         Log.v(TAG,"onStart()");
@@ -300,6 +306,16 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
         }
         List<String> defImageSrc = SharedPrefUtil.getArrayList(prefImgSrc);
         return defImageSrc.isEmpty();
+    }
+
+    private void trimDataAsync() {
+        if (mImageList.size() > mMaxImagesAllowed) {
+            HashMap<String, String> params = new HashMap<>();
+            params.put("mIsUsed", Boolean.toString(true));
+            params.put("mIsFavor", Boolean.toString(false));
+            params.put("mIsWallpaper", Boolean.toString(false));
+            mRealmApi.trimDataAsync(ImageRealm.class, params, mMaxImagesAllowed);
+        }
     }
 
     private final class  H extends Handler {

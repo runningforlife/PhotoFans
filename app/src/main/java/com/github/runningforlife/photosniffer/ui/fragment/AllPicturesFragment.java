@@ -42,6 +42,9 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     @BindView(R.id.rcv_gallery) RecyclerView mRvImgList;
     @BindView(R.id.srl_refresh) SwipeRefreshLayout mRefresher;
     private AllPicturesPresenterImpl mPresenter;
+    // global layout event
+    private ViewTreeObserver.OnGlobalLayoutListener mRecycleViewLayoutListener;
+    private boolean mIsLayoutComplete;
 
     public static AllPicturesFragment newInstance(int type) {
         Bundle args = new Bundle();
@@ -92,6 +95,10 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
         super.onDestroy();
         if (mRvImgList != null) {
             mRvImgList.setAdapter(null);
+        }
+
+        if(getRecycleView() != null) {
+            getRecycleView().getViewTreeObserver().removeOnGlobalLayoutListener(mRecycleViewLayoutListener);
         }
     }
 
@@ -296,12 +303,15 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     private void checkRecycleViewLayoutState() {
         final RecyclerView rv = getRecycleView();
         if (rv != null) {
-            rv.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            mRecycleViewLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    Log.v(TAG,"onGlobalLayout(): count=" + rv.getChildCount());
+                    Log.v(TAG,"onGlobalLayout()");
+                    //FIXME: may be called too much
+                    mPresenter.trimData();
                 }
-            });
+            };
+            rv.getViewTreeObserver().addOnGlobalLayoutListener(mRecycleViewLayoutListener);
         }
     }
 }

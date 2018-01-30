@@ -11,4 +11,6 @@ public interface AllPicturesPresenter {
     void refreshAnyway();
 
     void favorImageAtPos(int pos);
+
+    void trimData();
 }
