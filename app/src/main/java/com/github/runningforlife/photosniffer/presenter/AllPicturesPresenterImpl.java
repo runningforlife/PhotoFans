@@ -122,7 +122,9 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
     @Override
     public void trimData() {
         Log.v(TAG,"trimData()");
-        trimDataAsync();
+        if (mImageList != null && mImageList.isValid()) {
+            trimDataAsync();
+        }
     }
 
     @Override
