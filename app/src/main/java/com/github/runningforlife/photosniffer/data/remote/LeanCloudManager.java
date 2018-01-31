@@ -15,7 +15,7 @@ import java.io.FileNotFoundException;
  * lean cloud manager
  */
 
-public class LeanCloudManager implements CloudApi{
+public class LeanCloudManager implements CloudApi {
     private static final String TAG = "LeanCloudMgr";
 
     private static final LeanCloudManager sInstance = new LeanCloudManager();

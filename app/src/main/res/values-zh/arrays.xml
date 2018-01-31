@@ -1,27 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="auto_wallpaper_interval">
-        <item>每十五分钟</item>
-        <item>每个小时</item>
-        <item>每3个小时</item>
-        <item>每半天</item>
-        <item>每天</item>
-    </string-array>
 
     <string-array name="cache_clear_folder">
         <item>日志文件: /PhotoSniffer/log</item>
         <item>保存的图片: /PhotoSniffer/photos</item>
         <item>壁纸: /PhotoSniffer/wallpapers</item>
-    </string-array>
-
-    <string-array name="night_time_start">
-        <item>当天</item>
-        <item>第二天</item>
-    </string-array>
-
-    <string-array name="night_time_end">
-        <item>第二天</item>
-        <item>当天</item>
     </string-array>
 
 </resources>

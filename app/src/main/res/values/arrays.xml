@@ -24,36 +24,10 @@
         <item>https://www.pexels.com</item>
     </string-array>
 
-    <string-array name="auto_wallpaper_interval">
-        <item>every 15 minutes</item>
-        <item>every hour</item>
-        <item>every 3 hours</item>
-        <item>every half day</item>
-        <item>every day</item>
-    </string-array>
-
-    <string-array name="auto_wallpaper_interval_values">
-        <item>900000</item>
-        <item>3600000</item>
-        <item>10800000</item>
-        <item>43200000</item>
-        <item>86400000</item>
-    </string-array>
-
     <string-array name="cache_clear_folder">
         <item>Log: /PhotoSniffer/log</item>
         <item>Saved Images: /PhotoSniffer/photos</item>
         <item>Wallpapers: /PhotoSniffer/wallpapers</item>
-    </string-array>
-
-    <string-array name="night_time_start">
-        <item>Current Day</item>
-        <item>The Second day</item>
-    </string-array>
-
-    <string-array name="night_time_end">
-        <item>The Second day</item>
-        <item>Current Day</item>
     </string-array>
 
 </resources>

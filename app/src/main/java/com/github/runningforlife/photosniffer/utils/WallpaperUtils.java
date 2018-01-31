@@ -186,41 +186,6 @@ public class WallpaperUtils {
 
     }
 
-    public static void restartAutoWallpaperForNightTime(Context context) {
-        String prefNightTime = context.getString(R.string.pref_night_time_interval);
-        String prefNightTimeStarting = context.getString(R.string.pref_night_time_starting);
-        long nightTimeInterval = SharedPrefUtil.getLong(prefNightTime, 0);
-        long nightTimeStart = SharedPrefUtil.getLong(prefNightTimeStarting, 0);
-        if (nightTimeInterval > 0 && nightTimeStart > 0) {
-            cancelAutoWallpaperAlarm(context);
-            cancelSchedulerJob(context, MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
-
-            startNightTimeJobService(context);
-            // ok change starting time to the next day
-            SharedPrefUtil.putLong(prefNightTimeStarting, System.currentTimeMillis() +
-                    TimeUnit.DAYS.toMillis(1));
-        }
-
-    }
-
-    @TargetApi(21)
-    private static void startNightTimeJobService(Context context) {
-        JobScheduler js = (JobScheduler) context.getSystemService(JOB_SCHEDULER_SERVICE);
-
-        String prefNightTimeDuration = context.getString(R.string.pref_night_time_interval);
-        long nightTimeDuration = SharedPrefUtil.getLong(prefNightTimeDuration, 0);
-        if (nightTimeDuration > 0) {
-            ComponentName jobService = new ComponentName(context, WallpaperJobService.class);
-            JobInfo.Builder builder = new JobInfo.Builder(MiscUtil.getJobId(JOB_NIGHT_TIME), jobService);
-            JobInfo jobInfo = builder.setPersisted(true)
-                   .setMinimumLatency(nightTimeDuration)
-                   .build();
-            if (js != null) {
-                js.schedule(jobInfo);
-            }
-        }
-    }
-
     public static void startWallpaperFromCache(Context context, int flag) {
         RealmApi realmApi = RealmApiImpl.getInstance();
         HashMap<String, String> params = new HashMap<>();

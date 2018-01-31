@@ -49,11 +49,6 @@
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:screenOrientation="nosensor" />
 
-        <activity android:name=".ui.activity.TimePickerActivity"
-            android:theme="@style/AppTheme"
-            android:label="@string/night_time_setting"
-            android:screenOrientation="nosensor"/>
-
         <activity android:name=".ui.activity.UsageGuideActivity"
             android:theme="@style/AppTheme"
             android:label="@string/usage_guide"
