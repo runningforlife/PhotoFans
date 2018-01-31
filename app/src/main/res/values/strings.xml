@@ -103,4 +103,5 @@
     <string name="pref_report_issue_and_advice" translatable="false">pref_report_issue_and_advices</string>
     <string name="button_send">Send</string>
     <string name="pref_copyright" translatable="false">pref_copyright</string>
+    <string name="automatic_wallpaper_summary_on">auto wallpaper is on</string>
 </resources>

@@ -23,7 +23,7 @@ public class UrlUtil {
         return baseUrl;
     }
 
-    public static boolean isPossibleImageUrl(String url){
+    public static boolean isPossibleImageUrl(String url) {
         Pattern pattern = Pattern.compile(REG_IMAGES);
         Matcher matcher;
         if (url.contains("?")) {

@@ -69,9 +69,7 @@ public class AppGlobals extends Application {
 
         initLeanCloud();
 
-        if (Build.VERSION.SDK_INT >= 24) {
-            WallpaperUtils.startLockScreenWallpaperService(getApplicationContext());
-        }
+        WallpaperUtils.startWallpaperSettingService(this);
     }
 
     private void initExceptionHandler() {

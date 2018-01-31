@@ -6,7 +6,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.github.runningforlife.photosniffer.R;
@@ -14,7 +13,6 @@ import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
-import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.WallpaperUtils;
@@ -24,9 +22,6 @@ import java.util.HashMap;
 import java.util.Set;
 
 import io.realm.RealmResults;
-
-import static com.github.runningforlife.photosniffer.utils.MiscUtil.JOB_NIGHT_TIME;
-import static com.github.runningforlife.photosniffer.utils.MiscUtil.JOB_WALLPAPER_SET;
 
 /**
  * a fragment containing settings
@@ -65,7 +60,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
 
         getPreferenceScreen()
@@ -81,25 +76,17 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         String keyImgSrc = getString(R.string.pref_choose_image_source);
         String keyAutoWallpaper = getString(R.string.pref_automatic_wallpaper);
+        String keyLockWallpaper = getString(R.string.pref_enable_auto_lockscreen_wallpaper);
         String keyWifiOnly = getString(R.string.pref_wifi_download);
-        String keyWallpaperInterval = getString(R.string.pref_auto_wallpaper_interval);
-        String keyLockScreenWallpaper = getString(R.string.pref_enable_auto_lockscreen_wallpaper);
         String keyMaxImages = getString(R.string.pref_max_reserved_images);
-        String keySleepTime = getString(R.string.pref_night_time_setting);
 
         if (key.equals(keyImgSrc)) {
             Set<String> src = sharedPreferences.getStringSet(key,null);
             checkImageSourceList(src);
         } else if (keyAutoWallpaper.equals(key)) {
-            boolean isAuto = sharedPreferences.getBoolean(keyAutoWallpaper, true);
-            checkAutoWallpaperSetting(isAuto);
+            checkAutoWallpaperSetting();
         } else if (keyWifiOnly.equals(key)) {
             checkWifiOnlyDownloadMode();
-        } else if (keyWallpaperInterval.equals(key)) {
-            checkWallpaperInterval();
-        } else if (keyLockScreenWallpaper.equals(key)) {
-            boolean isEnabled = sharedPreferences.getBoolean(key, true);
-            checkLockScreenWallpaper(isEnabled);
         } else if (keyMaxImages.equals(key)) {
             int maxImages;
             try {
@@ -108,12 +95,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 maxImages = Integer.MAX_VALUE;
             }
             trimDataAsync(maxImages);
-        } else if (keySleepTime.equals(key)) {
-            boolean isSleepMode = sharedPreferences.getBoolean(keySleepTime, false);
-            if (!isSleepMode) {
-                WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(JOB_NIGHT_TIME));
-                WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(JOB_WALLPAPER_SET));
-            }
+        } else if (keyLockWallpaper.equals(key)) {
+
         }
     }
 
@@ -131,17 +114,23 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
     }
 
-    private void checkAutoWallpaperSetting(boolean isEnabled) {
+    private void checkAutoWallpaperSetting() {
         // for OS >= LL, use JobScheduler to do wallpaper setting
+        String keyAutoWallpaper = getString(R.string.pref_automatic_wallpaper);
+        String keyLockWallpaper = getString(R.string.pref_enable_auto_lockscreen_wallpaper);
+        boolean isAutoWallpaperEnabled = SharedPrefUtil.getBoolean(keyAutoWallpaper, true);
+        boolean isLockWallpaperEnabled = SharedPrefUtil.getBoolean(keyLockWallpaper, true);
         if (Build.VERSION.SDK_INT >= 21) {
-            if (isEnabled) {
-                WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
+            if (isAutoWallpaperEnabled || isLockWallpaperEnabled) {
+                WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
+                WallpaperUtils.startWallpaperSettingService(getActivity());
                 WallpaperUtils.setWallpaperFromCache(getActivity().getApplicationContext(), WallpaperManager.FLAG_SYSTEM);
             } else {
-                WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
+                WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
+                WallpaperUtils.stopWallpaperSettingService(getActivity());
             }
         } else {
-            if (isEnabled) {
+            if (isAutoWallpaperEnabled || isLockWallpaperEnabled) {
                 WallpaperUtils.startAutoWallpaperAlarm(getActivity());
             } else {
                 WallpaperUtils.cancelAutoWallpaperAlarm(getActivity());
@@ -154,24 +143,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             WallpaperUtils.startWallpaperUpdaterJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
         } else {
             WallpaperUtils.startWallpaperCacheUpdaterAlarm(getActivity());
-        }
-    }
-
-    private void checkWallpaperInterval() {
-        if (Build.VERSION.SDK_INT >= 21) {
-            WallpaperUtils.startWallpaperSettingJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_SET));
-        } else {
-            WallpaperUtils.startAutoWallpaperAlarm(getActivity());
-        }
-    }
-
-    private void checkLockScreenWallpaper(boolean isEnabled) {
-        if (isEnabled) {
-            WallpaperUtils.startLockScreenWallpaperService(getActivity());
-            WallpaperUtils.startWallpaperUpdaterJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
-        } else {
-            WallpaperUtils.cancelSchedulerJob(getActivity(), MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
-            WallpaperUtils.stopLockScreenWallpaperService(getActivity());
         }
     }
 

@@ -21,10 +21,4 @@ public class ThreadUtil {
     public static long getElapse(){
         return System.currentTimeMillis() - elapse.get();
     }
-
-    public static void checkMain(){
-        if(Looper.getMainLooper() == Looper.myLooper()){
-            throw new IllegalStateException("this is main thread!!!");
-        }
-    }
 }

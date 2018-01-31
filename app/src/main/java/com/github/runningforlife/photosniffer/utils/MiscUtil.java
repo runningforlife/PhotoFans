@@ -90,18 +90,6 @@ public class MiscUtil {
         return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    public static void preloadImage(ImageView iv) {
-        Resources res = iv.getContext().getResources();
-        Drawable d = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            d = res.getDrawable(R.drawable.ic_photo_grey_24dp, null);
-        }else{
-            d = res.getDrawable(R.drawable.ic_photo_grey_24dp);
-        }
-        //iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        iv.setImageDrawable(d);
-    }
-
     public static boolean isConnected(Context context) {
         ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -124,17 +112,6 @@ public class MiscUtil {
         NetworkInfo ni = cm.getActiveNetworkInfo();
 
         return ni != null && ni.isConnected() && ni.getType() == ConnectivityManager.TYPE_MOBILE;
-    }
-
-    public static boolean isSleepTime(Context context) {
-        String prefNightTimeInterval = context.getString(R.string.pref_night_time_interval);
-        String prefNightTimeStart = context.getString(R.string.pref_night_time_starting);
-
-        long start = SharedPrefUtil.getLong(prefNightTimeStart, 0);
-        long end = SharedPrefUtil.getLong(prefNightTimeInterval, 0) + start;
-
-        long now = System.currentTimeMillis();
-        return now >= start && now <= (end);
     }
 
     public static void saveLogToCloud(File file) {

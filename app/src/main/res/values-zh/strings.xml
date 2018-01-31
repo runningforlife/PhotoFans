@@ -25,7 +25,7 @@
     <string name="set_wallpaper">壁纸设置</string>
     <string name="set_auto_wallpaper_interval">设置自动壁纸时间间隔</string>
     <string name="check_copyright_notes">查看版权说明</string>
-    <string name="enable_automatic_wallpaper">开启自动壁纸设置</string>
+    <string name="enable_automatic_wallpaper">开启桌面自动壁纸</string>
     <string name="how_many_images_reserved">保留图片的最大数目</string>
     <string name="image_detail">图片详细</string>
     <string name="image_preview">图片预览</string>
@@ -74,4 +74,5 @@
     <string name="input_advice_hint">请写下你的建议,谢谢!</string>
     <string name="advice_and_issue">问题与建议</string>
     <string name="button_send">发送</string>
+    <string name="automatic_wallpaper_summary_on">屏幕点亮时更新桌面壁纸</string>
 </resources>

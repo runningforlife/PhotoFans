@@ -33,9 +33,7 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver {
             WallpaperUtils.startAutoWallpaperAlarm(context);
             WallpaperUtils.setWallpaperFromCache(context, WallpaperManager.FLAG_SYSTEM);
         } else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
-            if (Build.VERSION.SDK_INT >= 24) {
-                WallpaperUtils.startLockScreenWallpaperService(context);
-            }
+            WallpaperUtils.startWallpaperSettingService(context);
             if (isAutoWallpaperEnabled) {
                 WallpaperUtils.startAutoWallpaperAlarm(context);
             }
@@ -52,8 +50,6 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver {
             }
 
             WallpaperUtils.startWallpaperCacheUpdaterAlarm(context);
-            // make sure that lock screen wallpaper service is active
-            WallpaperUtils.startLockScreenWallpaperService(context);
         }
     }
 }

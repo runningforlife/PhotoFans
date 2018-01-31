@@ -13,26 +13,9 @@
         android:key="@string/pref_automatic_wallpaper"
         android:title="@string/enable_automatic_wallpaper"
         android:summary="@string/enable_automatic_wallpaper"
-        android:summaryOn="@string/automatic_wallpaper_enabled"
+        android:summaryOn="@string/automatic_wallpaper_summary_on"
         android:summaryOff="@string/auto_wallpaper_disabled"
-        android:defaultValue="false"/>
-
-    <ListPreference
-        android:key="@string/pref_auto_wallpaper_interval"
-        android:title="@string/set_auto_wallpaper_interval"
-        android:summary="@string/set_auto_wallpaper_interval"
-        android:dialogTitle="@string/set_auto_wallpaper_interval"
-        android:entries="@array/auto_wallpaper_interval"
-        android:entryValues="@array/auto_wallpaper_interval_values"
-        android:defaultValue="@string/auto_wallpaper_default_interval"/>
-
-    <com.github.runningforlife.photosniffer.ui.preference.SwitchActionPreference
-        android:key="@string/pref_night_time_setting"
-        android:dialogTitle="@string/night_time_setting_explanation"
-        android:summary="@string/night_time_setting"
-        android:summaryOn="@string/night_time_mode_is_enabled"
-        android:summaryOff="@string/night_time_settings_disabled"
-        android:title="@string/night_time_setting"/>
+        android:defaultValue="true"/>
 
     <SwitchPreference
         android:key="@string/pref_enable_auto_lockscreen_wallpaper"

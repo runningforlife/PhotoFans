@@ -22,7 +22,6 @@ import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.glide.ImageSizer;
-import com.github.runningforlife.photosniffer.service.LockScreenUpdateService;
 import com.github.runningforlife.photosniffer.service.WallpaperJobService;
 import com.github.runningforlife.photosniffer.service.WallpaperUpdaterService;
 
@@ -166,14 +165,13 @@ public class WallpaperUtils {
         alarmManager.cancel(alarmIntent);
     }
 
-    public static void startLockScreenWallpaperService(Context context) {
-        // start wallpaper service
-        Intent intent = new Intent(context, LockScreenUpdateService.class);
+    public static void startWallpaperSettingService(Context context) {
+        Intent intent = new Intent(context, WallpaperJobService.class);
         context.startService(intent);
     }
 
-    public static void stopLockScreenWallpaperService(Context context) {
-        Intent intent = new Intent(context, LockScreenUpdateService.class);
+    public static void stopWallpaperSettingService(Context context) {
+        Intent intent = new Intent(context, WallpaperJobService.class);
         context.stopService(intent);
     }
 
@@ -223,7 +221,7 @@ public class WallpaperUtils {
         }
     }
 
-    private static void startWallpaperFromCache(Context context, int flag) {
+    public static void startWallpaperFromCache(Context context, int flag) {
         RealmApi realmApi = RealmApiImpl.getInstance();
         HashMap<String, String> params = new HashMap<>();
         params.put("mIsUsed", Boolean.toString(true));
@@ -238,7 +236,8 @@ public class WallpaperUtils {
             return;
         }
 
-        String keyCacheIdx = context.getString(R.string.pref_wallpaper_cache_index);
+        String type = flag == WallpaperManager.FLAG_SYSTEM ? "_system" : "_lock";
+        String keyCacheIdx = context.getString(R.string.pref_wallpaper_cache_index) + type;
         int cacheIdx = SharedPrefUtil.getInt(keyCacheIdx, 0);
         // find a wallpaper
         cacheIdx %= wallpapers.size();
