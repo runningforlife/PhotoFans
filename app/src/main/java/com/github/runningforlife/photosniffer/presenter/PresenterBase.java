@@ -364,7 +364,7 @@ abstract class PresenterBase implements Presenter {
     }
 
     private boolean isInCalling() {
-        return mTm.getCallState() == TelephonyManager.CALL_STATE_RINGING;
+        return mTm.getCallState() != TelephonyManager.CALL_STATE_IDLE;
     }
 
     void markAsFavor(String url) {
