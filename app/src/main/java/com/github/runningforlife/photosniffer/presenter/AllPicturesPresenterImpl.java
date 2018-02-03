@@ -129,7 +129,6 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
 
     @Override
     public void onStart() {
-        super.onStart();
         Log.v(TAG,"onStart()");
         HashMap<String,String> params = new HashMap<>();
         params.put("mIsUsed", Boolean.toString(true));
@@ -160,14 +159,16 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.v(TAG,"onDestroy()");
+        Log.v(TAG, "onDestroy()");
         if (mUnUsedImages.isValid()) {
             mUnUsedImages.removeAllChangeListeners();
         }
         // stop service
         stopRetrieveIfNeeded();
 
-        mReceiver.setReceiver(null);
+        if (mReceiver != null) {
+            mReceiver.setReceiver(null);
+        }
     }
 
     @Override

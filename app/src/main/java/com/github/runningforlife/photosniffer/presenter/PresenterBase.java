@@ -115,13 +115,6 @@ abstract class PresenterBase implements Presenter {
     }
 
     @Override
-    public void onStart() {
-        Log.v(TAG,"onStart()");
-
-    }
-
-
-    @Override
     public void onImageLoadStart(int pos) {
        // for detail presenter to use
     }
@@ -230,15 +223,18 @@ abstract class PresenterBase implements Presenter {
 
         List<ImageRealm> photos = new ArrayList<>(photoUris.size());
         for (int i = 0; i < photoUris.size(); ++i) {
-            ImageRealm ir = new ImageRealm();
-            ir.setUrl(photoUris.get(i));
-            ir.setHighResUrl(photoUris.get(i));
-            ir.setIsWallpaper(true);
-            ir.setIsCached(true);
-            ir.setUsed(true);
-            ir.setTimeStamp(System.currentTimeMillis());
+            String photoUri = photoUris.get(i);
+            if (!photoUri.startsWith(MiscUtil.getWallpaperCacheDir())) {
+                ImageRealm ir = new ImageRealm();
+                ir.setUrl(photoUris.get(i));
+                ir.setHighResUrl(photoUris.get(i));
+                ir.setIsWallpaper(true);
+                ir.setIsCached(true);
+                ir.setUsed(true);
+                ir.setTimeStamp(System.currentTimeMillis());
 
-            photos.add(ir);
+                photos.add(ir);
+            }
         }
 
         mRealmApi.insertAsync(photos);
@@ -311,7 +307,7 @@ abstract class PresenterBase implements Presenter {
             mContext.startActivity(Intent.createChooser(wallpaperSetting, title));
             // wait for user to complete wallpaper setting
             Thread.sleep(3000);
-            if (saveBitmap(mCacheMgr.getFilePath(imgUrl), bitmap) && imgUrl.startsWith("http")) {
+            if (imgUrl.startsWith("http") && saveBitmap(mCacheMgr.getFilePath(imgUrl), bitmap)) {
                 Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
                 message.obj = imgUrl;
                 message.sendToTarget();
@@ -421,7 +417,7 @@ abstract class PresenterBase implements Presenter {
 
         try {
             Bitmap bitmap = target.get(5, TimeUnit.SECONDS);
-            if (saveBitmap(mCacheMgr.getFilePath(imgUrl), bitmap) && imgUrl.startsWith("http")) {
+            if (imgUrl.startsWith("http") && saveBitmap(mCacheMgr.getFilePath(imgUrl), bitmap)) {
                 // ok, we will mark it as wallpaper
                 Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
                 message.obj = imgUrl;
