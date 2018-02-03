@@ -38,10 +38,4 @@ public class SettingsActivity extends BaseActivity {
                    .commit();
 
     }
-
-    protected void navigateToParentActivity() {
-        Intent intent = new Intent(this, GalleryActivity.class);
-        NavUtils.navigateUpTo(this,intent);
-    }
-
 }

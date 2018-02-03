@@ -49,6 +49,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected void navigateToParentActivity() {
         // child should implement this
+        onBackPressed();
     }
 
 }

@@ -87,12 +87,6 @@ public class ImageSourceSelectionActivity extends BaseActivity
         mRealmApi.closeRealm();
     }
 
-    @Override
-    protected void navigateToParentActivity() {
-        Intent intent = new Intent(this, SettingsActivity.class);
-        NavUtils.navigateUpTo(this,intent);    }
-
-
     private void initView(){
         Log.v(TAG,"initView()");
 

@@ -28,13 +28,6 @@ public class UsageGuideActivity extends BaseActivity {
         initWebView();
     }
 
-    @Override
-    protected void navigateToParentActivity() {
-        Intent intent = new Intent(this, GalleryActivity.class);
-        NavUtils.navigateUpTo(this,intent);
-    }
-
-
     private void initWebView() {
         WebView helpHtmlView = findViewById(R.id.wv_help_html);
         WebSettings settings = helpHtmlView.getSettings();

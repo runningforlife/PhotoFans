@@ -50,12 +50,6 @@ public class UserAdviceActivity extends BaseActivity {
         }
     }
 
-    @Override
-    protected void navigateToParentActivity() {
-        Intent intent = new Intent(this, SettingsActivity.class);
-        NavUtils.navigateUpTo(this, intent);
-    }
-
     @OnClick(R.id.btn_send)
     public void sendAdvice() {
         mIsSent = true;
