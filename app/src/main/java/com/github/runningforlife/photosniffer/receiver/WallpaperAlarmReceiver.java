@@ -35,17 +35,17 @@ public class WallpaperAlarmReceiver extends BroadcastReceiver {
         } else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
             WallpaperUtils.startWallpaperSettingService(context);
             if (isAutoWallpaperEnabled) {
-                WallpaperUtils.startAutoWallpaperAlarm(context);
-            }
-            // wallpaper cache alarm for OS < 21
-            if (Build.VERSION.SDK_INT < 21) {
-                WallpaperUtils.startWallpaperCacheUpdaterAlarm(context);
+                if (Build.VERSION.SDK_INT >= 21) {
+                    WallpaperUtils.startWallpaperUpdaterJob(context, MiscUtil.getJobId(MiscUtil.JOB_WALLPAPER_CACHE));
+                } else {
+                    WallpaperUtils.startWallpaperCacheUpdaterAlarm(context);
+                }
             }
         } else if (action.equals(ALARM_UPDATE_WALLPAPER_CACHE)) {
             // wifi connected or not
             String prefWifi = context.getString(R.string.pref_wifi_download);
             boolean isWifiMode = SharedPrefUtil.getBoolean(prefWifi, false);
-            if ((isWifiMode && MiscUtil.isWifiConnected(context)) || MiscUtil.isConnected(context)) {
+            if (MiscUtil.isWifiConnected(context) || (!isWifiMode && MiscUtil.isConnected(context))) {
                 WallpaperUtils.startWallpaperCacheUpdaterService(context);
             }
 

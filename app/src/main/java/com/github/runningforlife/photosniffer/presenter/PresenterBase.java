@@ -1,24 +1,18 @@
 package com.github.runningforlife.photosniffer.presenter;
 
-import android.annotation.TargetApi;
-import android.content.BroadcastReceiver;
+
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.SaveCallback;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.RequestManager;
@@ -30,13 +24,11 @@ import com.github.runningforlife.photosniffer.data.cache.DiskCacheManager;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
-import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.ui.fragment.BatchAction;
 import com.github.runningforlife.photosniffer.utils.BitmapUtil;
 import com.github.runningforlife.photosniffer.utils.MediaStoreUtil;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
-import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -81,8 +73,6 @@ abstract class PresenterBase implements Presenter {
     private CountDownLatch mSavingLatch;
     private H mMainHandler;
     private boolean mIsFirstPager;
-    private NetworkStateReceiver mNetStateReceiver;
-    private TelephonyManager mTm;
 
     int mMaxImagesAllowed;
 
@@ -122,30 +112,12 @@ abstract class PresenterBase implements Presenter {
         mMainHandler = new H(Looper.myLooper());
 
         mIsFirstPager = false;
-
-        mTm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-    }
-
-    private final class NetworkStateReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
-                if (!MiscUtil.isConnected(context) && !isInCalling()) {
-                    mView.onNetworkState(NetState.STATE_DISCONNECT);
-                }else if(MiscUtil.isWifiConnected(context)){
-                    uploadAdviceToCloud();
-                }
-            }
-        }
     }
 
     @Override
     public void onStart() {
         Log.v(TAG,"onStart()");
-        mNetStateReceiver = new NetworkStateReceiver();
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        mContext.registerReceiver(mNetStateReceiver, filter);
+
     }
 
 
@@ -299,10 +271,6 @@ abstract class PresenterBase implements Presenter {
             mImageList.removeChangeListener(mOrderRealmChangeListener);
         }
         mRealmApi.closeRealm();
-
-        if (mNetStateReceiver != null) {
-            mContext.unregisterReceiver(mNetStateReceiver);
-        }
     }
 
     private void setWallpaper(final String url) {
@@ -361,10 +329,6 @@ abstract class PresenterBase implements Presenter {
         for (String url : images) {
             markAsFavor(url);
         }
-    }
-
-    private boolean isInCalling() {
-        return mTm.getCallState() != TelephonyManager.CALL_STATE_IDLE;
     }
 
     void markAsFavor(String url) {
@@ -504,32 +468,6 @@ abstract class PresenterBase implements Presenter {
         mView.onImageSaveDone(null);
 
         Glide.with(mContext).clear(target);
-    }
-
-    private void uploadAdviceToCloud() {
-        if (mExecutors == null) {
-            mExecutors = Executors.newFixedThreadPool(2);
-        }
-
-        mExecutors.execute(new Runnable() {
-            @Override
-            public void run() {
-                // check whether there is advices
-                String prefAdvice = mContext.getString(R.string.pref_report_issue_and_advice);
-                String advice = SharedPrefUtil.getString(prefAdvice,"");
-                if (!TextUtils.isEmpty(advice)) {
-                    String subStr[] = advice.split(";");
-                    if (subStr.length == 2) {
-                        LeanCloudManager.getInstance().saveAdvice(subStr[0], subStr[1], new SaveCallback() {
-                            @Override
-                            public void done(AVException e) {
-                                Log.d(TAG,"advice saved done");
-                            }
-                        });
-                    }
-                }
-            }
-        });
     }
 
     private final class H extends Handler {

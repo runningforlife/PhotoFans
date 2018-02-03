@@ -16,7 +16,6 @@ import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
-import com.github.runningforlife.photosniffer.utils.UrlUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,8 +28,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
-
-import static com.github.runningforlife.photosniffer.crawler.processor.ImageSource.PIXELS_IMAGE_START;
 
 /**
  * fetch images from web and cache them
@@ -93,7 +90,7 @@ public class WallpaperUpdaterService extends Service {
         Message message = mHandler.obtainMessage();
         message.obj = intent;
         message.sendToTarget();
-        return START_REDELIVER_INTENT;
+        return START_STICKY;
     }
     @Nullable
     @Override

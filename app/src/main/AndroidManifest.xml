@@ -77,14 +77,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".receiver.WifiStateReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"
-                    tools:ignore="BatteryLife" />
-            </intent-filter>
-        </receiver>
-
     </application>
 
 </manifest>
