@@ -24,6 +24,8 @@ import me.iwf.photopicker.utils.AndroidLifecycleUtils;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +33,7 @@ import java.util.List;
  * a gallery adapter to bind image data to recycleview
  */
 
-public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoViewHolder>{
+public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoViewHolder> {
     private static final String TAG = "GalleryAdapter";
 
     @SuppressWarnings("unchecked")
@@ -102,14 +104,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                         @Override
                         public void onClick(View v) {
                             if (!mSelectedImages.contains(url)) {
-                                if (!TextUtils.isEmpty(img.getHighResUrl())) {
-                                    mSelectedImages.add(img.getHighResUrl());
-                                } else {
-                                    mSelectedImages.add(url);
-                                }
+                                mSelectedImages.add(url);
                             } else {
                                 mSelectedImages.remove(url);
-                                mSelectedImages.remove(img.getHighResUrl());
                             }
                             notifyItemChanged(position);
                             mCallback.onItemSelected(mSelectedImages.size());
@@ -165,14 +162,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
                             final ImageRealm ir = (ImageRealm) mCallback.getItemAtPos(getAdapterPosition());
                             String url = ir.getUrl();
                             if (!mSelectedImages.contains(url)) {
-                                if (!TextUtils.isEmpty(ir.getHighResUrl())) {
-                                    mSelectedImages.add(ir.getHighResUrl());
-                                } else {
-                                    mSelectedImages.add(url);
-                                }
+                                mSelectedImages.add(url);
                             } else {
                                 mSelectedImages.remove(url);
-                                mSelectedImages.remove(ir.getHighResUrl());
                             }
                             notifyItemChanged(getAdapterPosition());
                             mCallback.onItemSelected(mSelectedImages.size());
