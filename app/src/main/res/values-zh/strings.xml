@@ -11,7 +11,7 @@
     <string name="save_image_Success">图片保存至</string>
     <string name="action_wallpaper">设置为壁纸</string>
     <string name="set_wallpaper_success">设置壁纸成功</string>
-    <string name="set_wallpaper_fail">设置壁纸出错</string>
+    <string name="set_wallpaper_fail">设置壁纸出错,请重试</string>
     <string name="action_grid_view">网格视图</string>
     <string name="action_list_view">列表视图</string>
     <string name="action_stagger_view">瀑布流视图</string>
@@ -44,7 +44,7 @@
     <string name="copyright_declaration">版权声明</string>
     <string name="refresh_hint">下拉获取图片</string>
     <string name="hint_network_state_hung">网络不给力, 休息会再回来吧!</string>
-    <string name="hint_network_state_slow">网络有点慢，请稍后再试</string>
+    <string name="hint_network_state_slow">网络有点慢, 请稍后再试</string>
     <string name="enable_auto_lockscreen_wallpaper">开启锁屏自动壁纸</string>
     <string name="message_file_deletion_progress">正在删除,请稍后&#8230;</string>
     <string name="add_wallpapers_from_gallery">从相册添加壁纸</string>
