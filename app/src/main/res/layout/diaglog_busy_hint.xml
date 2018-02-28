@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:background="@android:color/transparent">
 
-    <ProgressBar android:id="@+id/pb_hint"
-        style="@style/MediumProgressBar" />
+    <ProgressBar style="@style/MediumProgressBar" />
 
 </FrameLayout>

@@ -282,26 +282,6 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
     }
 
     @Override
-    public void onNetworkState(@NetState String state) {
-        Log.v(TAG,"onNetworkState():state = " + state);
-        if (mCallback != null && isAdded()) {
-            switch (state) {
-                case NetState.STATE_DISCONNECT:
-                    mCallback.showToast(getString(R.string.network_not_connected));
-                    break;
-                case NetState.STATE_HUNG:
-                    mCallback.showToast(getString(R.string.hint_network_state_hung));
-                    break;
-                case NetState.STATE_SLOW:
-                    mCallback.showToast(getString(R.string.hint_network_state_slow));
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    @Override
     public void onImageSaveDone(String path) {
         Log.v(TAG,"onImageSaveDone(): isOk = " + !TextUtils.isEmpty(path));
         if (isAdded()) {

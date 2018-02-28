@@ -1,7 +1,6 @@
 package com.github.runningforlife.photosniffer.glide;
 
 import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
 
 import com.bumptech.glide.load.engine.cache.DiskLruCacheFactory;

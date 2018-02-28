@@ -12,10 +12,8 @@
     <string name="favorite">Favorite</string>
     <string name="tools">Settings</string>
     <string name="image_detail">Image Detail</string>
-    <string name="image_preview">Image Preview</string>
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
-    <string name="action_share">Share</string>
     <string name="action_favorite">Favor</string>
     <string name="pref_wifi_download" translatable="false">pref_wifi_only_download</string>
     <string name="way_to_download_images">The way to download images</string>
@@ -29,13 +27,9 @@
     <string name="pref_max_reserved_images" translatable="false">Max Reserved Images</string>
     <string name="max_reserved_images">Max Reserved Images</string>
     <string name="how_many_images_reserved">How Many Images to Be reserved</string>
-    <string name="my_favorite_images">My Favorite Images</string>
     <string name="action_wallpaper">Set to Wallpaper</string>
     <string name="set_wallpaper_success">Wallpaper Setting Success</string>
     <string name="set_wallpaper_fail">Fail to Set Wallpaper</string>
-    <string name="action_grid_view">Grid View</string>
-    <string name="action_list_view">List View</string>
-    <string name="action_stagger_view">Stagger Grid View</string>
     <string name="network_not_connected">Network is not connected</string>
     <string name="network_mobile_connected">Network is mobile, do you want to continue?</string>
     <string name="cancel">Cancel</string>
@@ -49,8 +43,6 @@
     <string name="pref_automatic_wallpaper" translatable="false">Enable Automatic Wallpaper</string>
     <string name="enable_automatic_wallpaper">Automatic Wallpaper is enabled</string>
     <string name="set_wallpaper">Wallpaper Setting</string>
-    <string name="set_auto_wallpaper_interval">Set Auto Wallpaper Interval</string>
-    <string name="pref_pola_latest_collections_number" translatable="false">pola_latest_collections_number</string>
     <string name="pref_auto_wallpaper_interval" translatable="false">pref_auto_wallpaper_time_interval</string>
     <string name="pref_new_user" translatable="false">pref_new_user</string>
     <string name="check_copyright_notes">Check Copyright Notes</string>
@@ -59,29 +51,22 @@
     <string name="activity_image_transition" translatable="false">Activity Image Transition</string>
     <string name="pref_pola_last_updated_time" translatable="false">pola_last_updated_time</string>
     <string name="refresh_hint">Retrivee Images by pulling down</string>
-    <string name="hint_network_state_hung">Network is very slow, take a break and try it again</string>
-    <string name="hint_network_state_slow">Network is slow, please try it later</string>
     <string name="pref_enable_auto_lockscreen_wallpaper" translatable="false">pref_enable_auto_wallpaper_of_lockscreen</string>
     <string name="enable_auto_lockscreen_wallpaper">Enable auto lock screen wallpaper setting</string>
-    <string name="auto_wallpaper_default_interval" translatable="false">900000</string>
     <string name="build_in_wallpaper_list" translatable="false">pref_built_in_wallpapers</string>
     <string name="wallpaper_cache_update_interval" translatable="false">43200000</string>
     <string name="pref_wallpaper_cache_index" translatable="false">pref_wallpaper_cache_index</string>
     <string name="message_file_deletion_progress">File is being deleted, please wait&#8230;</string>
     <string name="pref_cache_clear" translatable="false">pref_cache_clear</string>
     <string name="add_wallpapers_from_gallery">Add images from gallery</string>
-    <string name="pref_night_time_setting" translatable="false">night_time_setting</string>
     <string name="choose_the_cache_folder_to_delete">Choose the Folder you want to delete</string>
     <string name="batch_edit">batch edit</string>
     <string name="action_save_as_wallpaper">Save as Wallpaper</string>
-    <string name="pref_lastest_wallpaper_time" translatable="false">latest_wallpaper_time</string>
     <string name="any_network_download">Download images if network is connected</string>
     <string name="auto_wallpaper_disabled">Auto Wallpaper is disabled</string>
     <string name="default_image_source_empty">Default image source is empty</string>
-    <string name="automatic_wallpaper_enabled">Auto wallpaper is enabled</string>
     <string name="auto_lockscreen_wallpaper_enabled">Auto lockscreen wallpaper enabled</string>
     <string name="auto_lockscreen_wallpaper_disabled">Auto lockscreen wallpaper disabled</string>
-    <string name="night_time_mode_is_enabled">Night time mode is disabled</string>
     <string name="images_add_as_wallpaper">Images are added as wallpapers</string>
     <string name="copyright_note">All pictures are open source and confer the Creative Common Zero (CC0);about CC0, please refer to \n
         https://creativecommons.org/publicdomain/zero/1.0/legalcode

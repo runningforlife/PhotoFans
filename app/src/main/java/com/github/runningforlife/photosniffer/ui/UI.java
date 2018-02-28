@@ -26,11 +26,6 @@ public interface UI {
     void onWallpaperSetDone(boolean isOk);
 
     /**
-     * notify user the current network state
-     */
-    void onNetworkState(@NetState String state);
-
-    /**
      * notify user we are busy for removing/saving
      */
     void notifyJobState(boolean isStarted, String hint);

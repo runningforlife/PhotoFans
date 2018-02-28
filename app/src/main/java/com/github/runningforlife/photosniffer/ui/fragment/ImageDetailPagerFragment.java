@@ -512,11 +512,6 @@ public class ImageDetailPagerFragment extends Fragment
     }
 
     @Override
-    public void onNetworkState(String state) {
-
-    }
-
-    @Override
     public void notifyJobState(boolean isStarted, String hint) {
 
     }

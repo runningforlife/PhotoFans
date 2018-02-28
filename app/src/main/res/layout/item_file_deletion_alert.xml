@@ -3,10 +3,9 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ProgressBar android:id="@+id/pb_showing"
-        style="@style/MediumProgressBar" />
+    <ProgressBar style="@style/MediumProgressBar" />
 
-    <TextView android:id="@+id/tv_title"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/message_file_deletion_progress"/>

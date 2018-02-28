@@ -6,19 +6,12 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="grid_margin">10dp</dimen>
     <dimen name="image_item_margin">2dp</dimen>
-    <dimen name="image_small">80dp</dimen>
-    <dimen name="list_view_image_min_height">220dp</dimen>
     <dimen name="margin_small">5dp</dimen>
     <dimen name="dialog_item_margin">8dp</dimen>
     <dimen name="list_item_margin_small">5dp</dimen>
     <dimen name="list_item_margin">5dp</dimen>
-    <dimen name="image_min_height">160dp</dimen>
-    <dimen name="preview_image_min_size">60dp</dimen>
-    <dimen name="progress_view_thickness">2dp</dimen>
     <dimen name="action_min_height">48dp</dimen>
     <dimen name="dialog_corner_size">8dp</dimen>
     <dimen name="scroll_bar_size">1dp</dimen>
-    <dimen name="text_padding">8dp</dimen>
-    <dimen name="hint_text_size">12sp</dimen>
     <dimen name="button_text_size">16sp</dimen>
 </resources>

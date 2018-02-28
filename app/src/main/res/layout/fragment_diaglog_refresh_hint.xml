@@ -5,7 +5,7 @@
     android:layout_margin="@dimen/margin_small"
     android:background="@drawable/round_corner_shape">
 
-    <TextView android:id="@+id/tv_refresh_hint"
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"

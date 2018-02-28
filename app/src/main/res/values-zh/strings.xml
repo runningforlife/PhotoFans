@@ -5,16 +5,12 @@
     <string name="tools">设置</string>
     <string name="action_save">保存</string>
     <string name="action_delete">删除</string>
-    <string name="action_share">分享</string>
     <string name="action_favorite">收藏</string>
     <string name="action_more">查看更多</string>
     <string name="save_image_Success">图片保存至</string>
     <string name="action_wallpaper">设置为壁纸</string>
     <string name="set_wallpaper_success">设置壁纸成功</string>
     <string name="set_wallpaper_fail">设置壁纸出错,请重试</string>
-    <string name="action_grid_view">网格视图</string>
-    <string name="action_list_view">列表视图</string>
-    <string name="action_stagger_view">瀑布流视图</string>
     <string name="network_not_connected">网络未链接</string>
     <string name="cancel">取消</string>
     <string name="ok">确认</string>
@@ -23,13 +19,10 @@
     <string name="clear_image_caches">清除缓存</string>
     <string name="give_your_advice">请给出您的建议</string>
     <string name="set_wallpaper">壁纸设置</string>
-    <string name="set_auto_wallpaper_interval">设置自动壁纸时间间隔</string>
     <string name="check_copyright_notes">查看版权说明</string>
     <string name="enable_automatic_wallpaper">开启桌面自动壁纸</string>
     <string name="how_many_images_reserved">保留图片的最大数目</string>
     <string name="image_detail">图片详细</string>
-    <string name="image_preview">图片预览</string>
-    <string name="my_favorite_images">收藏图片</string>
     <string name="network_mobile_connected">当前为移动网络，是否继续？</string>
     <string name="refresh_error">刷新失败</string>
     <string name="refresh_success">刷新成功</string>
@@ -43,8 +36,6 @@
     <string name="max_reserved_images">图片保存的最大数目</string>
     <string name="copyright_declaration">版权声明</string>
     <string name="refresh_hint">下拉获取图片</string>
-    <string name="hint_network_state_hung">网络不给力, 休息会再回来吧!</string>
-    <string name="hint_network_state_slow">网络有点慢, 请稍后再试</string>
     <string name="enable_auto_lockscreen_wallpaper">开启锁屏自动壁纸</string>
     <string name="message_file_deletion_progress">正在删除,请稍后&#8230;</string>
     <string name="add_wallpapers_from_gallery">从相册添加壁纸</string>
@@ -55,10 +46,8 @@
     <string name="auto_wallpaper_disabled">自动壁纸已取消</string>
     <string name="app_name">爱上壁纸</string>
     <string name="default_image_source_empty">未选择任何图片源</string>
-    <string name="automatic_wallpaper_enabled">自动壁纸已开启</string>
     <string name="auto_lockscreen_wallpaper_enabled">锁屏自动壁纸已开启</string>
     <string name="auto_lockscreen_wallpaper_disabled">锁屏自动壁纸已取消</string>
-    <string name="night_time_mode_is_enabled">睡眠时设置已开启</string>
     <string name="images_add_as_wallpaper">图片已添加为壁纸</string>
     <string name="copyright_note">所有图片均来自开源网站,遵循"创造共享CC0"开源协议:\n
     https://creativecommons.org/publicdomain/zero/1.0/legalcode</string>

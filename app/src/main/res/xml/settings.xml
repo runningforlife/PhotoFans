@@ -38,7 +38,7 @@
         android:title="@string/max_reserved_images"
         android:summary="@string/how_many_images_reserved"
         android:defaultValue="@integer/max_reserved_image_number"
-        android:inputType="numberDecimal"/>
+        android:inputType="number"/>
 
     <com.github.runningforlife.photosniffer.ui.preference.MessagePreference
         android:key="@string/pref_cache_clear"

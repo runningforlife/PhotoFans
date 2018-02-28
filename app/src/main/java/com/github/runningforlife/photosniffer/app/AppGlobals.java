@@ -39,7 +39,7 @@ public class AppGlobals extends Application {
     // realm version
     private static final int REALM_SCHEMA_VERSION = 1;
 
-    public static AppGlobals getInstance(){
+    public static AppGlobals getInstance() {
         return sInstance;
     }
 
@@ -114,7 +114,7 @@ public class AppGlobals extends Application {
             File file = getLogFile();
             new Thread(new FileSaveRunnable(file, t))
                     .start();
-        } else  {
+        } else {
             Log.e(TAG,"no write permission");
         }
     }
