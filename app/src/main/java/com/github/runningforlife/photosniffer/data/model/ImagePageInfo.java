@@ -13,7 +13,7 @@ public class ImagePageInfo extends RealmObject {
     private long mTimeStamp;
     private boolean mIsVisited;
 
-    public ImagePageInfo(){
+    public ImagePageInfo() {
         mTimeStamp = System.currentTimeMillis();
         mIsVisited = false;
     }

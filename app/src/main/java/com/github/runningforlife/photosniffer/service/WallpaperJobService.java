@@ -134,7 +134,7 @@ public class WallpaperJobService extends JobService {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            uploadCrashLog();
+                            //uploadCrashLog();
                             uploadUserAdvice();
                         }
                     }).start();
