@@ -63,6 +63,10 @@ public class WallpaperJobService extends JobService {
 
         mReceiver = new LockScreenWallpaperReceiver(handler);
         registerReceiver(mReceiver, intentFilter);
+
+        String prefWallpaperUpdateService = getString(R.string.pref_wallpaper_updater_service_state);
+        SharedPrefUtil.putBoolean(prefWallpaperUpdateService, true);
+
     }
 
     @Override
@@ -81,6 +85,9 @@ public class WallpaperJobService extends JobService {
         if (mReceiver != null) {
             unregisterReceiver(mReceiver);
         }
+
+        String prefWallpaperUpdateService = getString(R.string.pref_wallpaper_updater_service_state);
+        SharedPrefUtil.putBoolean(prefWallpaperUpdateService, false);
     }
 
     @Override

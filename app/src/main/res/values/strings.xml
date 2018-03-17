@@ -79,4 +79,5 @@
     <string name="button_send">Send</string>
     <string name="pref_copyright" translatable="false">pref_copyright</string>
     <string name="automatic_wallpaper_summary_on">auto wallpaper is on</string>
+    <string name="pref_wallpaper_updater_service_state" translatable="false">pref_wallpaper_updater_service_state</string>
 </resources>

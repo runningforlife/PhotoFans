@@ -130,18 +130,22 @@ public class WallpaperUtils {
 
     @TargetApi(21)
     public static void startWallpaperUpdaterJob(Context context, int jobId) {
-        int interval = Integer.parseInt(context.getString(R.string.wallpaper_cache_update_interval));
+        String prefWallpaperUpdateService = context.getString(R.string.pref_wallpaper_updater_service_state);
+        boolean isWallpaperUpdateServiceStarted = SharedPrefUtil.getBoolean(prefWallpaperUpdateService, false);
+        if (!isWallpaperUpdateServiceStarted) {
+            int interval = Integer.parseInt(context.getString(R.string.wallpaper_cache_update_interval));
 
-        ComponentName jobService = new ComponentName(context, WallpaperJobService.class);
-        JobInfo.Builder builder = new JobInfo.Builder(jobId, jobService);
-        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPeriodic(interval)
-                .setPersisted(true);
+            ComponentName jobService = new ComponentName(context, WallpaperJobService.class);
+            JobInfo.Builder builder = new JobInfo.Builder(jobId, jobService);
+            builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                    .setPeriodic(interval)
+                    .setPersisted(true);
 
-        JobScheduler js = (JobScheduler) context.getSystemService(JOB_SCHEDULER_SERVICE);
-        // first we cancel current scheduled job
-        js.cancel(jobId);
-        js.schedule(builder.build());
+            JobScheduler js = (JobScheduler) context.getSystemService(JOB_SCHEDULER_SERVICE);
+            // first we cancel current scheduled job
+            js.cancel(jobId);
+            js.schedule(builder.build());
+        }
     }
 
     public static void startAutoWallpaperAlarm(Context context) {

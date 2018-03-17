@@ -547,7 +547,7 @@ abstract class PresenterBase implements Presenter {
     }
 
 
-    // broad cast to listen wallpaper setting action
+    // broadcast to listen wallpaper setting action
     private class WallpaperSettingReceiver extends BroadcastReceiver {
         public static final String ACTION_WALLPAPER_SETTING_DONE = "com.github.photosniffer.wallpaper_setting_done";
 

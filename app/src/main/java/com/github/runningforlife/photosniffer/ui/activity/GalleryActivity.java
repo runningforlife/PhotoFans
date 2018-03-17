@@ -312,6 +312,8 @@ public class GalleryActivity extends AppCompatActivity implements
 
         }
 
+        // ensure all pending transactions are executed
+        mFragmentMgr.executePendingTransactions();
         if (!fragment.isAdded()) {
             mFragmentMgr.beginTransaction()
                     .replace(R.id.fragment_container, fragment, tag)

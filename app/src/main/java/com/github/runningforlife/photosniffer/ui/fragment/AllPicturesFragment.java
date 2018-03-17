@@ -44,7 +44,6 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     private AllPicturesPresenterImpl mPresenter;
     // global layout event
     private ViewTreeObserver.OnGlobalLayoutListener mRecycleViewLayoutListener;
-    private boolean mIsLayoutComplete;
 
     public static AllPicturesFragment newInstance(int type) {
         Bundle args = new Bundle();
@@ -132,7 +131,7 @@ public class AllPicturesFragment extends BaseFragment implements AllPictureView 
     @Override
     public void onNetworkDisconnect() {
         Log.v(TAG,"onNetworkDisconnect()");
-        if(mRefresher.isRefreshing()){
+        if(mRefresher.isRefreshing()) {
             mRefresher.setRefreshing(false);
         }
         if (isAdded() && mCallback != null) {
