@@ -66,7 +66,7 @@ dependencies {
     androidTestCompile 'org.mockito:mockito-android:2.8.9'
     testCompile 'org.mockito:mockito-core:2.8.9'
     compile 'us.codecraft:webmagic-core:0.7.3'
-    compile 'com.squareup.okhttp3:okhttp:3.8.0'
+    compile 'com.squareup.okhttp3:okhttp:3.9.1'
     compile 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     annotationProcessor "com.github.bumptech.glide:compiler:$glideVersion"
