@@ -1,22 +1,11 @@
 package com.github.runningforlife.photosniffer.ui.activity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.app.NavUtils;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.utils.MiscUtil;
-
-import java.io.File;
 
 /**
  * a common used activity class

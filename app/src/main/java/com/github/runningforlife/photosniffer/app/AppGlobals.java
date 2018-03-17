@@ -60,8 +60,8 @@ public class AppGlobals extends Application {
                 .name(appName)
                 .migration(new MyRealmMigration())
                 .build();
-        Realm.setDefaultConfiguration(realmConfig);
         Log.v(TAG,"realm schema version:" + realmConfig.getSchemaVersion());
+        Realm.setDefaultConfiguration(realmConfig);
         // it seems that we should init here
         sInstance = AppGlobals.this;
 

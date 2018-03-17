@@ -58,15 +58,7 @@ public class ImageSourceSelectionActivity extends BaseActivity
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-        navigateToParentActivity();
-    }
-
-
-    @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
 
         String key = getString(R.string.pref_choose_image_source);

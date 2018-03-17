@@ -87,7 +87,9 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
         Log.v(TAG,"onPrepareOptionsMenu(): batch mode=" + mIsBatchEditMode);
         mMenu = menu;
         handleGroupMenu(mIsBatchEditMode);
+
         handleVisibleMenu();
+
         if (TextUtils.isEmpty(mVisibleMenuTitle)) {
             mVisibleMenuTitle = mVisibleMenu.getTitle().toString();
         }
