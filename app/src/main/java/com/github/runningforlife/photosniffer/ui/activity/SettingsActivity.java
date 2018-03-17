@@ -23,7 +23,7 @@ public class SettingsActivity extends BaseActivity {
 
         android.app.FragmentManager fragmentMgr = getFragmentManager();
         fragmentMgr.beginTransaction()
-                   .replace(android.R.id.content, new SettingsFragment())
+                   .add(android.R.id.content, new SettingsFragment())
                    .commit();
     }
 
@@ -35,7 +35,7 @@ public class SettingsActivity extends BaseActivity {
         FragmentManager fragmentMgr = getFragmentManager();
         fragmentMgr.beginTransaction()
                    .replace(android.R.id.content, new SettingsFragment())
-                   .commit();
-
+                   .commitAllowingStateLoss();
+        fragmentMgr.executePendingTransactions();
     }
 }

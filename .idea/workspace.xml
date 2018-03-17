@@ -11,14 +11,9 @@
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f11a9955-1484-4121-8fab-e7332a85ea45" name="TimeIntervalPicker" comment="BugFix: persist user selected value">
+    <list default="true" id="f11a9955-1484-4121-8fab-e7332a85ea45" name="TimeIntervalPicker" comment="donot restart wallpaper updater service">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/PresenterBase.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/PresenterBase.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/service/WallpaperJobService.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/service/WallpaperJobService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/activity/GalleryActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/activity/GalleryActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/fragment/AllPicturesFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/fragment/AllPicturesFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/utils/WallpaperUtils.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/utils/WallpaperUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/activity/SettingsActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/activity/SettingsActivity.java" />
     </list>
     <ignored path="$PROJECT_DIR$/.idea/shelf/" />
     <ignored path=".gradle/2.14.1/taskArtifacts/" />
@@ -85,8 +80,8 @@
       <file leaf-file-name="SettingsFragment.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/fragment/SettingsFragment.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="185">
-              <caret line="139" column="51" lean-forward="false" selection-start-line="139" selection-start-column="27" selection-end-line="139" selection-end-column="51" />
+            <state relative-caret-position="-2302">
+              <caret line="29" column="13" lean-forward="false" selection-start-line="29" selection-start-column="13" selection-end-line="29" selection-end-column="13" />
               <folding>
                 <element signature="e#2539#2583#0" expanded="true" />
                 <element signature="e#2614#2652#0" expanded="true" />
@@ -95,7 +90,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="WallpaperUtils.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="WallpaperUtils.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/utils/WallpaperUtils.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="143">
@@ -104,6 +99,26 @@
                 <element signature="e#5190#5254#0" expanded="true" />
                 <element signature="e#5460#5519#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SettingsActivity.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/activity/SettingsActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="239">
+              <caret line="37" column="46" lean-forward="true" selection-start-line="37" selection-start-column="46" selection-end-line="37" selection-end-column="46" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FragmentManager.java" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Android/Sdk/sources/android-27/android/app/FragmentManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1008">
+              <caret line="102" column="32" lean-forward="true" selection-start-line="102" selection-start-column="32" selection-end-line="102" selection-end-column="32" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -168,19 +183,6 @@
               <folding>
                 <element signature="e#1873#1874#0" expanded="true" />
                 <element signature="e#1926#1927#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FragmentManager.java" pinned="false" current-in-tab="false">
-        <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.support/support-fragment/27.0.2/659085cb974e7ec1f25451d23f11578332ea0d7e/support-fragment-27.0.2-sources.jar!/android/support/v4/app/FragmentManager.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-119">
-              <caret line="2106" column="50" lean-forward="false" selection-start-line="2106" selection-start-column="50" selection-end-line="2106" selection-end-column="50" />
-              <folding>
-                <element signature="e#31526#31527#0" expanded="true" />
-                <element signature="e#31598#31599#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -2049,7 +2051,6 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/receiver/LockScreenWallpaperReceiver.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/ImageDetailPresenterImpl.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/AllPicturesPresenterImpl.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/activity/SettingsActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/values-zh/strings.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/glide/DiskLruFactory.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/UI.java" />
@@ -2077,6 +2078,7 @@
         <option value="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/utils/WallpaperUtils.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/service/WallpaperJobService.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/activity/SettingsActivity.java" />
       </list>
     </option>
   </component>
@@ -3133,7 +3135,7 @@
       <option name="DEEP_LINK" value="" />
       <option name="ACTIVITY_CLASS" value="" />
       <method>
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521293047137" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521293688005" />
       </method>
     </configuration>
     <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
@@ -3180,7 +3182,7 @@
         <option name="ADVANCED_PROFILING_ENABLED" value="false" />
       </Profilers>
       <method>
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521293047138" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521293688005" />
       </method>
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -3371,7 +3373,7 @@
       <option name="DEEP_LINK" value="" />
       <option name="ACTIVITY_CLASS" value="" />
       <method>
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521293047139" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521293688005" />
       </method>
     </configuration>
     <list size="2">
@@ -3455,13 +3457,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1512395695944</updated>
-    </task>
-    <task id="LOCAL-00081" summary="Function: add dialog to select deleted folder">
-      <created>1514644946919</created>
-      <option name="number" value="00081" />
-      <option name="presentableId" value="LOCAL-00081" />
-      <option name="project" value="LOCAL" />
-      <updated>1514644946919</updated>
     </task>
     <task id="LOCAL-00082" summary="Refactor: use glide to save images">
       <created>1514694732999</created>
@@ -3799,7 +3794,14 @@
       <option name="project" value="LOCAL" />
       <updated>1521278271895</updated>
     </task>
-    <option name="localTasksCounter" value="130" />
+    <task id="LOCAL-00130" summary="donot restart wallpaper updater service">
+      <created>1521293074585</created>
+      <option name="number" value="00130" />
+      <option name="presentableId" value="LOCAL-00130" />
+      <option name="project" value="LOCAL" />
+      <updated>1521293074585</updated>
+    </task>
+    <option name="localTasksCounter" value="131" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -3862,7 +3864,7 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2815534" sideWeight="0.81673306" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.38187703" sideWeight="0.51553786" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.37055016" sideWeight="0.51553786" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.48878205" sideWeight="0.7378486" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="14" side_tool="true" content_ui="tabs" />
@@ -3973,7 +3975,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <confirmRemoveEmptyChangelist value="2" />
-    <MESSAGE value="BugFix: donot add a fragment twice" />
     <MESSAGE value="BugFix: when back pressed, image source isnot saved" />
     <MESSAGE value="LocalChange" />
     <MESSAGE value="Refactor: using system chooser to set wallpaper" />
@@ -3998,7 +3999,8 @@
     <MESSAGE value="BugFix: donot allow context menu in batch edit mode" />
     <MESSAGE value="BugFix: use intentsender to receiver chooser result action" />
     <MESSAGE value="BugFix: persist user selected value" />
-    <option name="LAST_COMMIT_MESSAGE" value="BugFix: persist user selected value" />
+    <MESSAGE value="donot restart wallpaper updater service" />
+    <option name="LAST_COMMIT_MESSAGE" value="donot restart wallpaper updater service" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -4008,26 +4010,10 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/adapter/MultiSelectionListAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="149">
-          <caret line="24" column="13" lean-forward="false" selection-start-line="24" selection-start-column="13" selection-end-line="24" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/adapter/WrapperGridLayoutManager.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="84">
           <caret line="13" column="13" lean-forward="false" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/activity/SettingsActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="16" column="13" lean-forward="false" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
           <folding />
         </state>
       </provider>
@@ -4620,17 +4606,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/fragment/SettingsFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="185">
-          <caret line="139" column="51" lean-forward="false" selection-start-line="139" selection-start-column="27" selection-end-line="139" selection-end-column="51" />
-          <folding>
-            <element signature="e#2539#2583#0" expanded="true" />
-            <element signature="e#2614#2652#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/utils/WallpaperUtils.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="143">
@@ -4639,6 +4614,33 @@
             <element signature="e#5190#5254#0" expanded="true" />
             <element signature="e#5460#5519#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/fragment/SettingsFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2302">
+          <caret line="29" column="13" lean-forward="false" selection-start-line="29" selection-start-column="13" selection-end-line="29" selection-end-column="13" />
+          <folding>
+            <element signature="e#2539#2583#0" expanded="true" />
+            <element signature="e#2614#2652#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Android/Sdk/sources/android-27/android/app/FragmentManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1008">
+          <caret line="102" column="32" lean-forward="true" selection-start-line="102" selection-start-column="32" selection-end-line="102" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/ui/activity/SettingsActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="239">
+          <caret line="37" column="46" lean-forward="true" selection-start-line="37" selection-start-column="46" selection-end-line="37" selection-end-column="46" />
+          <folding />
         </state>
       </provider>
     </entry>
