@@ -76,7 +76,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         String keyImgSrc = getString(R.string.pref_choose_image_source);
         String keyAutoWallpaper = getString(R.string.pref_automatic_wallpaper);
-        String keyLockWallpaper = getString(R.string.pref_enable_auto_lockscreen_wallpaper);
         String keyWifiOnly = getString(R.string.pref_wifi_download);
         String keyMaxImages = getString(R.string.pref_max_reserved_images);
 
@@ -95,8 +94,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 maxImages = Integer.MAX_VALUE;
             }
             trimDataAsync(maxImages);
-        } else if (keyLockWallpaper.equals(key)) {
-
         }
     }
 

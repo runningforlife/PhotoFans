@@ -10,7 +10,6 @@ import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.util.Log;
 
-import com.bumptech.glide.Glide;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
@@ -86,9 +85,28 @@ public class MessagePreference extends DialogPreference {
     }
 
     @Override
+    protected void onDialogClosed(boolean positiveResult) {
+        Log.v(TAG,"onDialogClosed()");
+        String prefClearCache = getContext().getString(R.string.pref_cache_clear);
+        if (prefClearCache.equals(getKey())) {
+            int folderClearMap = 0;
+            folderClearMap += mDefaultSelectedFolder[DIR_LOG] ? 1 : 0;
+            folderClearMap += mDefaultSelectedFolder[DIR_PHOTOS] ? 1 << DIR_PHOTOS : 0;
+            folderClearMap += mDefaultSelectedFolder[DIR_WALLPAPERS] ? 1 << DIR_WALLPAPERS : 0;
+
+            persistInt(folderClearMap);
+        }
+    }
+
+    @Override
     protected void onPrepareDialogBuilder(android.app.AlertDialog.Builder builder) {
         String prefClearCache = getContext().getString(R.string.pref_cache_clear);
         if (prefClearCache.equals(getKey())) {
+            int selectFolderMap = getPersistedInt(1);
+            //selectFolderMap = SharedPrefUtil.getInt(prefClearCache, 1);
+            mDefaultSelectedFolder[DIR_LOG] = (selectFolderMap & 1) > 0;
+            mDefaultSelectedFolder[DIR_PHOTOS] = ((selectFolderMap & (1 << DIR_PHOTOS)) > 0);
+            mDefaultSelectedFolder[DIR_WALLPAPERS] = ((selectFolderMap & (1 << DIR_WALLPAPERS)) > 0);
             // clear all caches
             final File logDir = new File(MiscUtil.getLogDir());
             final File photoDir = new File(MiscUtil.getPhotoDir());
@@ -155,10 +173,10 @@ public class MessagePreference extends DialogPreference {
     private void init() {
         String prefClearCache = getContext().getString(R.string.pref_cache_clear);
         if (prefClearCache.equals(getKey())) {
+            setPersistent(true);
+
             String[] clearedFolder = getContext().getResources().getStringArray(R.array.cache_clear_folder);
             mDefaultSelectedFolder = new boolean[clearedFolder.length];
-            mDefaultSelectedFolder[DIR_LOG] = true;
-            mDefaultSelectedFolder[DIR_PHOTOS] = mDefaultSelectedFolder[DIR_WALLPAPERS] = false;
 
             mDeletionExecutor = Executors.newSingleThreadExecutor();
 
@@ -186,7 +204,7 @@ public class MessagePreference extends DialogPreference {
         private File file;
         private CountDownLatch latch;
 
-        DeleteRunnable(CountDownLatch latch, File file){
+        DeleteRunnable(CountDownLatch latch, File file) {
             this.file = file;
             this.latch = latch;
         }
