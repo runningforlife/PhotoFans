@@ -179,12 +179,13 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.PhotoVie
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             Log.v(TAG,"onCreateContextMenu()");
-            MenuInflater inflater = ((AppCompatActivity)mContext).getMenuInflater();
+            if (!mIsBatchEditEnabled) {
+                MenuInflater inflater = ((AppCompatActivity) mContext).getMenuInflater();
 
-            inflater.inflate(mContextMenId, menu);
-            /* batch mode, do do allow context menu */
-            if(mCallback != null && !mIsBatchEditEnabled) {
-                mCallback.onContextMenuCreated(getAdapterPosition(), TAG);
+                inflater.inflate(mContextMenId, menu);
+                if (mCallback != null) {
+                    mCallback.onContextMenuCreated(getAdapterPosition(), TAG);
+                }
             }
         }
     }

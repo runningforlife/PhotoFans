@@ -410,7 +410,7 @@ public abstract class BaseFragment extends Fragment implements Refresh, UI, Gall
             item = mMenu.findItem(R.id.favor);
         }
 
-        if (mVisibleMenu == null || mVisibleMenu.getItemId() != item.getItemId()) {
+        if (item != null) {
             mVisibleMenu = item;
         }
     }

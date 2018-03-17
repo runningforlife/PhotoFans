@@ -1,10 +1,15 @@
 package com.github.runningforlife.photosniffer.presenter;
 
 
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -73,6 +78,9 @@ abstract class PresenterBase implements Presenter {
     private CountDownLatch mSavingLatch;
     private H mMainHandler;
     private boolean mIsFirstPager;
+    // wallpaper setting action
+    private WallpaperSettingReceiver mWallpaperChangeReceiver;
+    private HashMap<String, Boolean> mSettingAsWallpaper;
 
     int mMaxImagesAllowed;
 
@@ -112,6 +120,12 @@ abstract class PresenterBase implements Presenter {
         mMainHandler = new H(Looper.myLooper());
 
         mIsFirstPager = false;
+
+        mWallpaperChangeReceiver = new WallpaperSettingReceiver();
+        IntentFilter filter = new IntentFilter(WallpaperSettingReceiver.ACTION_WALLPAPER_SETTING_DONE);
+        mContext.registerReceiver(mWallpaperChangeReceiver, filter);
+
+        mSettingAsWallpaper = new HashMap<>();
     }
 
     @Override
@@ -267,6 +281,14 @@ abstract class PresenterBase implements Presenter {
             mImageList.removeChangeListener(mOrderRealmChangeListener);
         }
         mRealmApi.closeRealm();
+
+        if (mWallpaperChangeReceiver != null) {
+            mContext.unregisterReceiver(mWallpaperChangeReceiver);
+        }
+
+        if (mSettingAsWallpaper != null) {
+            mSettingAsWallpaper.clear();
+        }
     }
 
     private void setWallpaper(final String url) {
@@ -303,15 +325,18 @@ abstract class PresenterBase implements Presenter {
             wallpaperSetting.putExtra("mimeType", "image/*");
             wallpaperSetting.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
+
             String title = mContext.getString(R.string.set_wallpaper);
-            mContext.startActivity(Intent.createChooser(wallpaperSetting, title));
-            // wait for user to complete wallpaper setting
-            Thread.sleep(3000);
-            if (imgUrl.startsWith("http") && saveBitmap(mCacheMgr.getFilePath(imgUrl), bitmap)) {
-                Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
-                message.obj = imgUrl;
-                message.sendToTarget();
+            if (Build.VERSION.SDK_INT >= 22) {
+                Intent setWallpaperDone = new Intent(WallpaperSettingReceiver.ACTION_WALLPAPER_SETTING_DONE);
+                setWallpaperDone.putExtra(EXTRA_WALLPAPER_URL, imgUrl);
+                PendingIntent pi = PendingIntent.getBroadcast(mContext, 0x30, setWallpaperDone, PendingIntent.FLAG_CANCEL_CURRENT);
+                IntentSender sender = pi.getIntentSender();
+                mContext.startActivity(Intent.createChooser(wallpaperSetting, title, sender));
+            } else {
+                mContext.startActivity(Intent.createChooser(wallpaperSetting, title));
             }
+            mSettingAsWallpaper.put(imgUrl, false);
 
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             mView.onWallpaperSetDone(false);
@@ -516,6 +541,25 @@ abstract class PresenterBase implements Presenter {
                 OrderedCollectionChangeSet.Range[] modifications = changeSet.getChangeRanges();
                 for (OrderedCollectionChangeSet.Range range : modifications) {
                     mView.onDataSetChange(range.startIndex, range.length, RealmOp.OP_MODIFY);
+                }
+            }
+        }
+    }
+
+
+    // broad cast to listen wallpaper setting action
+    private class WallpaperSettingReceiver extends BroadcastReceiver {
+        public static final String ACTION_WALLPAPER_SETTING_DONE = "com.github.photosniffer.wallpaper_setting_done";
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.v(TAG,"onReceive(): action = " + intent.getAction());
+            if (ACTION_WALLPAPER_SETTING_DONE.equals(intent.getAction())) {
+                String imgUrl = intent.getStringExtra(EXTRA_WALLPAPER_URL);
+                boolean isSetAsWallpaper = mSettingAsWallpaper.get(imgUrl);
+                if (imgUrl.startsWith("http") && !isSetAsWallpaper) {
+                    mSettingAsWallpaper.put(imgUrl, true);
+                    saveImageAsWallpaper(imgUrl);
                 }
             }
         }

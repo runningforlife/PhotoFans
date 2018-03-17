@@ -25,6 +25,8 @@ public interface Presenter extends LifeCycle {
     int EVENT_IMAGE_LOAD_DONE = 0x03;
     int EVENT_WALLPAPER_SET_DONE = 0x04;
 
+    String EXTRA_WALLPAPER_URL = "wallpaper_url";
+
     DisplayMetrics dm = DisplayUtil.getScreenDimen();
 
     /*
