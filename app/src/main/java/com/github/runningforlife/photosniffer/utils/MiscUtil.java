@@ -15,6 +15,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -112,6 +113,16 @@ public class MiscUtil {
         NetworkInfo ni = cm.getActiveNetworkInfo();
 
         return ni != null && ni.isConnected() && ni.getType() == ConnectivityManager.TYPE_MOBILE;
+    }
+
+    public static int getNetworkType(Context context) {
+        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        int netType = TelephonyManager.NETWORK_TYPE_UNKNOWN;
+        if (tm != null) {
+            netType = tm.getNetworkType();
+        }
+
+        return netType;
     }
 
     public static void saveLogToCloud(File file) {

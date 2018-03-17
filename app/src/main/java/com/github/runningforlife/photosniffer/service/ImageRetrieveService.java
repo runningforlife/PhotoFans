@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.os.ResultReceiver;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.github.runningforlife.photosniffer.R;
@@ -31,12 +32,14 @@ import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
+import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.UrlUtil;
 
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import us.codecraft.webmagic.Spider;
+import us.codecraft.webmagic.downloader.AbstractDownloader;
 
 /**
  *  a service to handle image retrieveImages request from client
@@ -71,7 +74,7 @@ public class ImageRetrieveService extends Service {
     private RealmApi mRealApi;
 
 
-    public ImageRetrieveService(){
+    public ImageRetrieveService() {
         super();
     }
 
@@ -196,9 +199,13 @@ public class ImageRetrieveService extends Service {
     private void startCrawler(int n) {
         Log.i(TAG,"startCrawler(): max images to be retrieved = " + n);
         mProcessor = new ImageRetrievePageProcessor(mRetrievedData, mStartingUrl, mPagesState, mPageFilter);
+
+        OkHttpDownloader downloader = new OkHttpDownloader();
+        setDownloaderThread(downloader);
+
         mSpider = Spider.create(mProcessor)
                 .addUrl((String[])mStartingUrl.toArray(new String[mStartingUrl.size()]))
-                .setDownloader(new OkHttpDownloader());
+                .setDownloader(downloader);
         mSpider.run();
     }
 
@@ -264,6 +271,15 @@ public class ImageRetrieveService extends Service {
             }
         }
 
+    }
+
+    private void setDownloaderThread(AbstractDownloader downloader) {
+        int netType = MiscUtil.getNetworkType(this);
+        if (netType == TelephonyManager.NETWORK_TYPE_LTE || MiscUtil.isWifiConnected(this)) {
+            downloader.setThread(2);
+        } else {
+            downloader.setThread(1);
+        }
     }
 
     private final class H extends  Handler {

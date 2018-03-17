@@ -30,8 +30,6 @@ import okhttp3.Request;
 public class OkHttpDownloader extends AbstractDownloader {
     private static final String LOG_TAG = "OkHttpDownloader";
 
-    private final static String REG_IMAGES = "(?m)(?s)<img\\s+(.*)src\\s*=\\s*\"([^\"]+)\"(.*)(\\.(gif|jpg|png|jpeg))$";
-
     @Override
     public Page download(us.codecraft.webmagic.Request request, Task task) {
         Log.v(LOG_TAG,"download()");
@@ -47,6 +45,7 @@ public class OkHttpDownloader extends AbstractDownloader {
         Site site = null;
         if (task != null) {
             site = task.getSite();
+            site.setRetryTimes(3);
         }
 
         int statusCode = 0;
@@ -71,9 +70,6 @@ public class OkHttpDownloader extends AbstractDownloader {
 
         }catch(IOException e){
             e.printStackTrace();
-            if(site.getCycleRetryTimes() > 0){
-                return addToCycleRetry(request,site);
-            }
         }
 
         onError(request);

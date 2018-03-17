@@ -28,10 +28,10 @@ public class ImageRetrieveTest {
 
     @Test
     public void downloadPages(){
-        ImageRetrievePageProcessor processor = new ImageRetrievePageProcessor(20);
+/*        ImageRetrievePageProcessor processor = new ImageRetrievePageProcessor(20);
         Spider.create(processor)
                 .setDownloader(new OkHttpDownloader())
                 .addUrl(URL_MM)
-                .run();
+                .run();*/
     }
 }
