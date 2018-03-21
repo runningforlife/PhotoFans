@@ -312,6 +312,10 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
     }
 
     private void trimDataAsync() {
+        if (mDeletedImages.size() > 0) {
+            mRealmApi.deleteSync(Arrays.asList(((String[]) mDeletedImages.toArray())));
+        }
+
         if (mImageList.size() > mMaxImagesAllowed) {
             HashMap<String, String> params = new HashMap<>();
             params.put("mIsUsed", Boolean.toString(true));

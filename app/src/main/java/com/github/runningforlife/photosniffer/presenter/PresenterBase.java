@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
+import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -25,6 +26,7 @@ import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.cache.CacheApi;
+import com.github.runningforlife.photosniffer.data.cache.DiskCache;
 import com.github.runningforlife.photosniffer.data.cache.DiskCacheManager;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
@@ -44,6 +46,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
@@ -81,6 +84,9 @@ abstract class PresenterBase implements Presenter {
     // wallpaper setting action
     private WallpaperSettingReceiver mWallpaperChangeReceiver;
     private HashMap<String, Boolean> mSettingAsWallpaper;
+
+    // record deleted image file locally
+    HashSet<String> mDeletedImages;
 
     int mMaxImagesAllowed;
 
@@ -126,6 +132,8 @@ abstract class PresenterBase implements Presenter {
         mContext.registerReceiver(mWallpaperChangeReceiver, filter);
 
         mSettingAsWallpaper = new HashMap<>();
+
+        mDeletedImages = new HashSet<>();
     }
 
     @Override
@@ -201,27 +209,45 @@ abstract class PresenterBase implements Presenter {
         Log.v(TAG,"loadImageIntoView()");
         final ImageRealm ir = getItemAtPos(pos);
         if (ir != null && ir.isValid()) {
-            final String url = ir.getUrl();
-            if (scaleType == ImageView.ScaleType.CENTER_CROP) {
-                mGlideManager.setDefaultRequestOptions(mRequestOptionsThumb)
-                        .load(url)
-                        .thumbnail(0.5f)
-                        .into(iv);
-            } else {
-                String imgUrl = url;
+            boolean isImageExist = true;
+            if (ir.getIsWallpaper()) {
+                File file1 = null, file2 = null;
                 if (!TextUtils.isEmpty(ir.getHighResUrl())) {
-                    imgUrl = ir.getHighResUrl();
+                    file1 = new File(mCacheMgr.getFilePath(ir.getHighResUrl()));
                 }
-                mGlideManager.setDefaultRequestOptions(mRequestOptionsFull)
-                        .load(imgUrl)
-                        .thumbnail(0.5f)
-                        .into(iv);
+                if (!TextUtils.isEmpty(ir.getUrl())) {
+                    file2 = new File(mCacheMgr.getFilePath(ir.getUrl()));
+                }
 
-                if (!mIsFirstPager) {
-                    onImageLoadStart(pos);
-                    mMainHandler.sendEmptyMessageDelayed(EVENT_IMAGE_LOAD_DONE, 800);
-                    mIsFirstPager = true;
+                if (!((file1 == null || file1.exists()) || (file2 == null || file2.exists()))) {
+                    isImageExist = false;
                 }
+            }
+            if (isImageExist) {
+                final String url = ir.getUrl();
+                if (scaleType == ImageView.ScaleType.CENTER_CROP) {
+                    mGlideManager.setDefaultRequestOptions(mRequestOptionsThumb)
+                            .load(url)
+                            .thumbnail(0.5f)
+                            .into(iv);
+                } else {
+                    String imgUrl = url;
+                    if (!TextUtils.isEmpty(ir.getHighResUrl())) {
+                        imgUrl = ir.getHighResUrl();
+                    }
+                    mGlideManager.setDefaultRequestOptions(mRequestOptionsFull)
+                            .load(imgUrl)
+                            .thumbnail(0.5f)
+                            .into(iv);
+
+                    if (!mIsFirstPager) {
+                        onImageLoadStart(pos);
+                        mMainHandler.sendEmptyMessageDelayed(EVENT_IMAGE_LOAD_DONE, 800);
+                        mIsFirstPager = true;
+                    }
+                }
+            } else {
+                mDeletedImages.add(ir.getUrl());
             }
         } else {
             mGlideManager.clear(iv);
@@ -513,7 +539,6 @@ abstract class PresenterBase implements Presenter {
             }
         }
     }
-
 
     private final class OrderReamChangeListener implements OrderedRealmCollectionChangeListener<RealmResults<ImageRealm>> {
 

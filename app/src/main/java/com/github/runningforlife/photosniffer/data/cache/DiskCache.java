@@ -108,6 +108,7 @@ public class DiskCache implements Cache {
 
     @Override
     public String getFilePath(String url) {
+        if (TextUtils.isEmpty(url)) return null;
         String key = getCacheKey(url);
         return getFileNameByKey(key).getAbsolutePath();
     }

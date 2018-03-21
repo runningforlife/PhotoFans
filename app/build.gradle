@@ -75,7 +75,7 @@ dependencies {
     // LeanCloud 基础包
     compile 'cn.leancloud.android:avoscloud-sdk:v4.1.0'
     // photo picker
-    compile 'me.iwf.photopicker:PhotoPicker:0.9.12@aar'
+    compile project(":photopicker")
     compile 'com.nineoldandroids:library:2.4.0'
     // memory leak
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.4'
