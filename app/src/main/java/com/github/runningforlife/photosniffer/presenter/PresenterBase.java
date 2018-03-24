@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
-import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -156,14 +155,16 @@ abstract class PresenterBase implements Presenter {
     }
 
     @Override
-    public void setWallpaperAtPos(int pos) {
+    public void setWallpaperAtPos(final int pos) {
         if(pos >= 0 && pos < mImageList.size()) {
             final ImageRealm ir = mImageList.get(pos);
-            String url = ir.getUrl();
-            if (!TextUtils.isEmpty(ir.getHighResUrl())) {
-                url = ir.getHighResUrl();
-            }
-            setWallpaper(url);
+            final String url = ir.getUrl();
+            mExecutors.execute(new Runnable() {
+                @Override
+                public void run() {
+                    startWallpaperChooser(pos,url);
+                }
+            });
         }
     }
 
@@ -289,28 +290,14 @@ abstract class PresenterBase implements Presenter {
             mSettingAsWallpaper.clear();
         }
 
-
         if (mWallpaperChangeReceiver != null) {
             mContext.unregisterReceiver(mWallpaperChangeReceiver);
         }
     }
 
-    private void setWallpaper(final String url) {
-        Log.v(TAG,"setWallpaper()");
-
-        if(TextUtils.isEmpty(url)) return;
-
-        mExecutors.execute(new Runnable() {
-            @Override
-            public void run() {
-                startWallpaperChooser(url);
-            }
-        });
-    }
-
 
     // NOTICE: do not use it on UI thread
-    private void startWallpaperChooser(final String imgUrl) {
+    private void startWallpaperChooser(final  int pos, final String imgUrl) {
         FutureTarget<Bitmap> bitmapTarget = Glide.with(mContext)
                 .asBitmap()
                 .load(imgUrl)
@@ -329,19 +316,19 @@ abstract class PresenterBase implements Presenter {
             wallpaperSetting.putExtra("mimeType", "image/*");
             wallpaperSetting.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
+            mSettingAsWallpaper.put(imgUrl, false);
 
             String title = mContext.getString(R.string.set_wallpaper);
             if (Build.VERSION.SDK_INT >= 22) {
                 Intent setWallpaperDone = new Intent(WallpaperSettingReceiver.ACTION_WALLPAPER_SETTING_DONE);
                 setWallpaperDone.putExtra(EXTRA_WALLPAPER_URL, imgUrl);
+                setWallpaperDone.putExtra(EXTRA_WALLPAPER_POSITION, pos);
                 PendingIntent pi = PendingIntent.getBroadcast(mContext, 0x30, setWallpaperDone, PendingIntent.FLAG_CANCEL_CURRENT);
                 IntentSender sender = pi.getIntentSender();
                 mContext.startActivity(Intent.createChooser(wallpaperSetting, title, sender));
             } else {
                 mContext.startActivity(Intent.createChooser(wallpaperSetting, title));
             }
-            mSettingAsWallpaper.put(imgUrl, false);
-
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             mView.onWallpaperSetDone(false);
         }
@@ -397,7 +384,7 @@ abstract class PresenterBase implements Presenter {
                 mExecutors.submit(new Runnable() {
                     @Override
                     public void run() {
-                        saveImageAsWallpaper(url);
+                        saveImageAsWallpaper(-1, url);
                         mSavingLatch.countDown();
                     }
                 });
@@ -420,24 +407,32 @@ abstract class PresenterBase implements Presenter {
         }).start();
     }
 
-    private void markAsWallpaper(String url) {
+    private void markAsWallpaper(int pos, String url) {
         Log.v(TAG,"markAsWallpaper()");
-        // mark it as wall paper
-        HashMap<String,String> params = new HashMap<>();
-        params.put("mUrl", url);
+        String originUrl = mImageList.get(pos).getUrl();
+        if (mSettingAsWallpaper != null) {
+            Boolean isSetAsWallpaper = mSettingAsWallpaper.get(originUrl);
+            if (isSetAsWallpaper == null || !isSetAsWallpaper) {
+                // mark it as wall paper
+                HashMap<String, String> params = new HashMap<>();
+                params.put("mUrl", originUrl);
 
-        mRealmApi.deleteAsync(ImageRealm.class, params);
+                mRealmApi.deleteAsync(ImageRealm.class, params);
 
-        ImageRealm ir = new ImageRealm();
-        ir.setUrl(mCacheMgr.getFilePath(url));
-        ir.setUsed(true);
-        ir.setIsFavor(false);
-        ir.setIsWallpaper(true);
-        ir.setIsCached(true);
-        mRealmApi.insertAsync(ir);
+                ImageRealm ir = new ImageRealm();
+                ir.setUrl(mCacheMgr.getFilePath(url));
+                ir.setUsed(true);
+                ir.setIsFavor(false);
+                ir.setIsWallpaper(true);
+                ir.setIsCached(true);
+                mRealmApi.insertAsync(ir);
+
+                mSettingAsWallpaper.put(originUrl, true);
+            }
+        }
     }
 
-    private void saveImageAsWallpaper(String imgUrl) {
+    private void saveImageAsWallpaper(int pos, String imgUrl) {
         FutureTarget<Bitmap> target = Glide.with(mContext)
                 .asBitmap()
                 .apply(new RequestOptions().centerCrop())
@@ -450,6 +445,7 @@ abstract class PresenterBase implements Presenter {
                 // ok, we will mark it as wallpaper
                 Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
                 message.obj = imgUrl;
+                message.arg1 = pos;
                 message.sendToTarget();
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -512,7 +508,22 @@ abstract class PresenterBase implements Presenter {
                     onImageLoadDone(true);
                     break;
                 case EVENT_WALLPAPER_SET_DONE:
-                    markAsWallpaper((String) message.obj);
+                    markAsWallpaper(message.arg1, (String) message.obj);
+                    break;
+                case EVENT_SAVE_AS_WALLPAPER:
+                    String url = (String)message.obj;
+                    final int pos = message.arg1;
+                    String higResUrl = mImageList.get(pos).getHighResUrl();
+                    if (!TextUtils.isEmpty(higResUrl)) {
+                        url = higResUrl;
+                    }
+                    final String imgUrl = url;
+                    mExecutors.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            saveImageAsWallpaper(pos, imgUrl);
+                        }
+                    });
                     break;
             }
         }
@@ -549,7 +560,6 @@ abstract class PresenterBase implements Presenter {
         }
     }
 
-
     // broadcast to listen wallpaper setting action
     private class WallpaperSettingReceiver extends BroadcastReceiver {
         public static final String ACTION_WALLPAPER_SETTING_DONE = "com.github.photosniffer.wallpaper_setting_done";
@@ -559,10 +569,12 @@ abstract class PresenterBase implements Presenter {
             Log.v(TAG,"onReceive(): action = " + intent.getAction());
             if (ACTION_WALLPAPER_SETTING_DONE.equals(intent.getAction())) {
                 String imgUrl = intent.getStringExtra(EXTRA_WALLPAPER_URL);
-                boolean isSetAsWallpaper = mSettingAsWallpaper.get(imgUrl);
-                if (imgUrl.startsWith("http") && !isSetAsWallpaper) {
-                    mSettingAsWallpaper.put(imgUrl, true);
-                    saveImageAsWallpaper(imgUrl);
+                int imgPos = intent.getIntExtra(EXTRA_WALLPAPER_POSITION, -1);
+                if (imgUrl.startsWith("http") && imgPos != -1) {
+                    Message message = mMainHandler.obtainMessage(EVENT_SAVE_AS_WALLPAPER);
+                    message.obj = imgUrl;
+                    message.arg1 = imgPos;
+                    mMainHandler.sendMessageDelayed(message, 600);
                 }
             }
         }
