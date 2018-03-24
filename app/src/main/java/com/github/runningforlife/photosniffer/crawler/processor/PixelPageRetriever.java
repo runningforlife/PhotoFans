@@ -6,6 +6,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import us.codecraft.webmagic.Page;
@@ -47,15 +48,17 @@ public class PixelPageRetriever extends PageRetriever {
             images.addAll(detail.getElementsByTag(TAG_IMG));
         }
 
-        List<String> imgList = new ArrayList<>();
-
-        for (Element img : images) {
-            String url = img.attr(ATTR_IMAGE_URL);
-            String imgName = img.attr(ATTR_ALT);
-            //String height = img.attr(ATTR_HEIGHT);
-            Log.d(TAG, "retrieved image url = " + url);
-            if (url.startsWith(PIXELS_IMAGE_START)) {
-                imgList.add(url);
+        List<String> imgList = Collections.EMPTY_LIST;
+        if (images .size() > 0) {
+            imgList = new ArrayList<>();
+            for (Element img : images) {
+                String url = img.attr(ATTR_IMAGE_URL);
+                String imgName = img.attr(ATTR_ALT);
+                //String height = img.attr(ATTR_HEIGHT);
+                Log.d(TAG, "retrieved image url = " + url);
+                if (url.startsWith(PIXELS_IMAGE_START)) {
+                    imgList.add(url);
+                }
             }
         }
 
@@ -65,8 +68,6 @@ public class PixelPageRetriever extends PageRetriever {
     @Override
     public List<String> retrieveLinks(Page page) {
         Log.v(TAG,"retrieveLinks()");
-
-        //mPageState.put(page.getUrl().get(), true);
 
         List<String> pageLinks = new ArrayList<>();
         // 2 kinds of url we need to retrieve

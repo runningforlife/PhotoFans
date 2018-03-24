@@ -15,7 +15,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.github.runningforlife.photosniffer.R;
-import com.github.runningforlife.photosniffer.crawler.HighResImageUrlBuilder;
+import com.github.runningforlife.photosniffer.crawler.DataSaver;
 import com.github.runningforlife.photosniffer.crawler.processor.ImagePageFilter;
 import com.github.runningforlife.photosniffer.crawler.processor.ImageRetrievePageProcessor;
 
@@ -25,13 +25,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import com.github.runningforlife.photosniffer.crawler.OkHttpDownloader;
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
-import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 import com.github.runningforlife.photosniffer.utils.UrlUtil;
@@ -49,8 +47,12 @@ import us.codecraft.webmagic.downloader.AbstractDownloader;
  */
 
 public class ImageRetrieveService extends Service {
-
     private static final String TAG = "ImageRetrieveService";
+
+    public static final int EVENT_RETRIEVE_START = 1;
+    public static final int EVENT_RETRIEVE_DONE = 2;
+    public static final int EVENT_RETRIEVE_TIMEOUT = 3;
+
     private volatile Looper mServiceLooper;
     private volatile H mServiceHandler;
     private boolean mIsRetrieving;
@@ -65,18 +67,12 @@ public class ImageRetrieveService extends Service {
     private ResultReceiver mReceiver;
     private ImageRetrievePageProcessor mProcessor;
     private Spider mSpider;
-    private LinkedBlockingDeque<List<String>> mRetrievedData;
-    private Thread mDataSaver;
+    private DataSaver mDataSaver;
     private RealmResults<ImagePageInfo> mAllPages;
     private HashMap<String,Boolean> mPagesState;
     private ImagePageFilter mPageFilter;
     private List<String> mStartingUrl;
     private RealmApi mRealApi;
-
-
-    public ImageRetrieveService() {
-        super();
-    }
 
     @Override
     public void onCreate() {
@@ -98,48 +94,7 @@ public class ImageRetrieveService extends Service {
 
         loadPages();
 
-        mRetrievedData = new LinkedBlockingDeque<>(5);
-        mDataSaver = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                RealmApi realmApi = RealmApiImpl.getInstance();
-                try {
-                    while (true) {
-                        try {
-                            List<String> data = mRetrievedData.take();
-                            if (data != null && data.size() > 0 && UrlUtil.isPossibleImageUrl(data.get(0))) {
-                                List<ImageRealm> realmObjects = new ArrayList<>(data.size());
-                                for (String url : data) {
-                                    ImageRealm ir = new ImageRealm();
-                                    ir.setUrl(url);
-                                    ir.setHighResUrl(HighResImageUrlBuilder.buildHighResImageUrl(url));
-                                    realmObjects.add(ir);
-                                }
-                                realmApi.insertAsync(realmObjects);
-                            } else {
-                                List<ImagePageInfo> pages = new ArrayList<>(data.size());
-                                for (String url : data) {
-                                    ImagePageInfo pageInfo = new ImagePageInfo();
-                                    pageInfo.setUrl(url);
-                                    if (mPagesState.containsKey(url)) {
-                                        pageInfo.setIsVisited(mPagesState.get(url));
-                                    }
-                                    pages.add(pageInfo);
-                                }
-                                realmApi.insertAsync(pages);
-                            }
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                            break;
-                        }
-                    }
-                } finally {
-                    realmApi.closeRealm();
-                }
-            }
-        },"DataSaver");
-
-        mDataSaver.start();
+        mDataSaver = new DataSaver(mServiceHandler, DEFAULT_RETRIEVED_IMAGES, mPagesState, thread.getLooper());
     }
 
     @Nullable
@@ -167,7 +122,7 @@ public class ImageRetrieveService extends Service {
         mProcessor.onDestroy();
 
         mServiceLooper.quit();
-        mDataSaver.interrupt();
+        //mDataSaver.interrupt();
 
         mRealApi.closeRealm();
     }
@@ -175,13 +130,13 @@ public class ImageRetrieveService extends Service {
     private void start(Intent intent, int startId) {
         Log.v(TAG,"start()");
         if (!mIsRetrieving) {
-            Message message = mServiceHandler.obtainMessage(H.EVENT_RETRIEVE_START);
+            Message message = mServiceHandler.obtainMessage(EVENT_RETRIEVE_START);
             message.obj = intent;
             message.arg1 = startId;
             message.sendToTarget();
 
             //timeout message
-            Message msg = mServiceHandler.obtainMessage(H.EVENT_RETRIEVE_TIMEOUT);
+            Message msg = mServiceHandler.obtainMessage(EVENT_RETRIEVE_TIMEOUT);
             mServiceHandler.sendMessageDelayed(msg, DEFAULT_RETRIEVE_TIME_OUT);
         }
     }
@@ -196,9 +151,10 @@ public class ImageRetrieveService extends Service {
         startCrawler(max);
     }
 
-    private void startCrawler(int n) {
-        Log.i(TAG,"startCrawler(): max images to be retrieved = " + n);
-        mProcessor = new ImageRetrievePageProcessor(mRetrievedData, mStartingUrl, mPagesState, mPageFilter);
+    private void startCrawler(int max) {
+        Log.i(TAG,"startCrawler(): max images to be retrieved = " + max);
+        mProcessor = new ImageRetrievePageProcessor(mDataSaver, mStartingUrl, mPagesState, mPageFilter);
+        mDataSaver.setMaxRetrievedImages(max);
 
         OkHttpDownloader downloader = new OkHttpDownloader();
         setDownloaderThread(downloader);
@@ -209,10 +165,10 @@ public class ImageRetrieveService extends Service {
         mSpider.run();
     }
 
-    private void handleResult() {
+    private void handleResult(int size) {
         Log.v(TAG,"handleResult()");
         mIsRetrieving = false;
-        sendResult(mProcessor.getRetrievedImageCount());
+        sendResult(size);
     }
 
     @SuppressLint("RestrictedApi")
@@ -283,9 +239,6 @@ public class ImageRetrieveService extends Service {
     }
 
     private final class H extends  Handler {
-        static final int EVENT_RETRIEVE_START = 1;
-        static final int EVENT_RETRIEVE_DONE = 2;
-        static final int EVENT_RETRIEVE_TIMEOUT = 3;
 
         H (Looper looper) {
             super(looper);
@@ -300,8 +253,10 @@ public class ImageRetrieveService extends Service {
                     handleIntent((Intent)msg.obj);
                     break;
                 case EVENT_RETRIEVE_DONE:
+                    handleResult((int)msg.obj);
+                    break;
                 case EVENT_RETRIEVE_TIMEOUT:
-                    handleResult();
+                    handleResult(mProcessor.getRetrievedImageCount());
                     break;
                 default:
                     break;

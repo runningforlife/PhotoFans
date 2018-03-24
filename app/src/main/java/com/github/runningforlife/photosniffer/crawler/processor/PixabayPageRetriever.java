@@ -7,6 +7,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,15 +37,18 @@ public class PixabayPageRetriever extends PageRetriever {
 
         Elements elements = doc.getElementsByClass(CLASS_ITEM);
 
-        List<String> imgList = new ArrayList<>();
-        for (Element element : elements) {
-            Elements images = element.getElementsByTag(TAG_IMG);
+        List<String> imgList = Collections.EMPTY_LIST;
+        if (elements != null && elements.size() > 0) {
+            imgList = new ArrayList<>();
+            for (Element element : elements) {
+                Elements images = element.getElementsByTag(TAG_IMG);
 
-            for (Element img : images) {
-                String url = img.attr(ATTR_IMAGE_URL);
-                Log.d(TAG,"retrieveImages(): image url=" + url);
-                if (url.startsWith(IMAGE_START) && !imgList.contains(url)) {
-                    imgList.add(url);
+                for (Element img : images) {
+                    String url = img.attr(ATTR_IMAGE_URL);
+                    Log.d(TAG, "retrieveImages(): image url=" + url);
+                    if (url.startsWith(IMAGE_START) && !imgList.contains(url)) {
+                        imgList.add(url);
+                    }
                 }
             }
         }
@@ -57,10 +61,14 @@ public class PixabayPageRetriever extends PageRetriever {
         Log.d(TAG,"retrieveLinks()");
         List<String> links = page.getHtml().links().all();
 
-        List<String> pageUrls = new ArrayList<>();
-        for (String link : links) {
-            if (!isPageRetrieved(link) && !pageUrls.contains(link) && link.contains("pixabay")) {
-                pageUrls.add(link);
+        List<String> pageUrls = Collections.EMPTY_LIST;
+        if (links != null && links.size() > 0) {
+            pageUrls = new ArrayList<>();
+
+            for (String link : links) {
+                if (!isPageRetrieved(link) && !pageUrls.contains(link) && link.contains("pixabay")) {
+                    pageUrls.add(link);
+                }
             }
         }
 

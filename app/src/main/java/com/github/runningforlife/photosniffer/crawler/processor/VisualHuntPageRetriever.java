@@ -7,6 +7,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -55,11 +56,14 @@ public class VisualHuntPageRetriever extends PageRetriever {
         Log.d(TAG,"retrieveLinks()");
         List<String> links  = page.getHtml().links().all();
 
-        List<String> pageLinks = new ArrayList<>();
-        for (String link : links) {
-            if (link != null && !isPageRetrieved(link) &&
-                    !pageLinks.contains(link) && link.contains("visualhunt")) {
-                pageLinks.add(link);
+        List<String> pageLinks = Collections.EMPTY_LIST;
+        if (links != null && links.size() > 0) {
+            pageLinks = new ArrayList<>();
+            for (String link : links) {
+                if (link != null && !isPageRetrieved(link) &&
+                        !pageLinks.contains(link) && link.contains("visualhunt")) {
+                    pageLinks.add(link);
+                }
             }
         }
 

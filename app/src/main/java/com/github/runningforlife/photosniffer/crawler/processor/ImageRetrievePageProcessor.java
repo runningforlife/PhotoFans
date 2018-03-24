@@ -1,12 +1,13 @@
 package com.github.runningforlife.photosniffer.crawler.processor;
 
+import android.os.Message;
 import android.util.Log;
 
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.BlockingDeque;
 
+import com.github.runningforlife.photosniffer.crawler.DataSaver;
 import com.github.runningforlife.photosniffer.utils.UrlUtil;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
@@ -28,13 +29,12 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     @SuppressWarnings("unchecked")
     private ImagePageFilter mPageFilter;
     private HashMap<String, PageRetriever> mRetrieversMap;
-    private BlockingDeque<List<String>> mDataQueue;
+    private DataSaver mDataSaver;
 
-    public ImageRetrievePageProcessor(BlockingDeque<List<String>> dataQue, List<String> startUrl,
-                                      HashMap<String,Boolean> pageState, PageFilter pageFilter) {
+    public ImageRetrievePageProcessor(DataSaver saver, List<String> startUrl, HashMap<String,Boolean> pageState, PageFilter pageFilter) {
         mCurrentImages = 0;
 
-        mDataQueue = dataQue;
+        mDataSaver = saver;
         mPagesState = pageState;
         mPageFilter = (ImagePageFilter) pageFilter;
 
@@ -85,35 +85,40 @@ public class ImageRetrievePageProcessor implements PageProcessor {
     }
 
     private void retrieveImages(Page page) {
-        List<String> result = null;
-        List<String> pages = null;
+        List<String> result;
+        List<String> pages;
 
         String pageUrl = page.getUrl().get();
         if (!isVisited(pageUrl) && isValidPage(pageUrl)) {
 
             PageRetriever pageRetriever = mRetrieversMap.get(PAGE_DEFAULT);
-            try {
-                if (pageUrl.contains(PAGE_PEXELS)) {
-                    pageRetriever = mRetrieversMap.get(PAGE_PEXELS);
-                } else if (pageUrl.contains(PAGE_FREE_JPG)) {
-                    pageRetriever = mRetrieversMap.get(PAGE_FREE_JPG);
-                } else if (pageUrl.contains(PAGE_PIEXABAY)) {
-                    pageRetriever = mRetrieversMap.get(PAGE_PIEXABAY);
-                } else if (pageUrl.contains(PAGE_VISUAL_HUNT)) {
-                    pageRetriever = mRetrieversMap.get(PAGE_VISUAL_HUNT);
-                }
+            if (pageUrl.contains(PAGE_PEXELS)) {
+                pageRetriever = mRetrieversMap.get(PAGE_PEXELS);
+            } else if (pageUrl.contains(PAGE_FREE_JPG)) {
+                pageRetriever = mRetrieversMap.get(PAGE_FREE_JPG);
+            } else if (pageUrl.contains(PAGE_PIEXABAY)) {
+                pageRetriever = mRetrieversMap.get(PAGE_PIEXABAY);
+            } else if (pageUrl.contains(PAGE_VISUAL_HUNT)) {
+                pageRetriever = mRetrieversMap.get(PAGE_VISUAL_HUNT);
+            }
 
-                mPagesState.put(pageUrl, true);
+            mPagesState.put(pageUrl, true);
 
-                result = pageRetriever.retrieveImages(page);
-                if (result != null) {
-                    mDataQueue.put(result);
-                }
+            result = pageRetriever.retrieveImages(page);
+            if (result != null && result.size() > 0) {
+                mCurrentImages += result.size();
+                //mDataQueue.put(result);
+                Message message = mDataSaver.obtainMessage(DataSaver.REQUEST_IMAGE_SAVE);
+                message.obj = result;
+                message.sendToTarget();
+            }
 
-                pages = pageRetriever.retrieveLinks(page);
-                mDataQueue.put(pages);
-            } catch (InterruptedException e) {
-                Log.e(TAG,"fail to put data to queue");
+            pages = pageRetriever.retrieveLinks(page);
+            if (pages.size() > 0) {
+                //mDataQueue.put(pages);
+                Message message = mDataSaver.obtainMessage(DataSaver.REQUEST_IMAGE_SAVE);
+                message.obj = pages;
+                message.sendToTarget();
             }
         }
     }

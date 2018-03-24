@@ -43,7 +43,7 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
     private static final String TAG = "AllPicturesPresenter";
 
     private static final int DEFAULT_RETRIEVE_TIME_OUT = 10*1000;
-    private static final int DEFAULT_STOP_TIME_OUT = 40*1000;
+    private static final int DEFAULT_STOP_TIME_OUT = 35*1000;
     private static final int DEFAULT_RETRIEVED_IMAGES = 10;
     // updateAsync Pola collections every 7days
     private static final long POLA_UPDATED_DURATION = TimeUnit.DAYS.toMillis(8);
@@ -107,9 +107,6 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
                 ((AllPictureView)mView).onRefreshDone(true);
             }
             markUnUsedRealm(DEFAULT_RETRIEVED_IMAGES);
-        } else if (!mIsRefreshing) {
-            // ah, something wrong
-            ((AllPictureView)mView).onRefreshDone(false);
         }
     }
 
@@ -332,16 +329,19 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
         }
 
         @Override
-        public void handleMessage(Message msg){
+        public void handleMessage(Message msg) {
             switch (msg.what){
                 case EVENT_RETRIEVE_TIME_OUT:
-                    ((AllPictureView)mView).onRefreshDone(true);
-                    mIsRefreshing = false;
+                    if (mIsRefreshing) {
+                        ((AllPictureView) mView).onRefreshDone(true);
+                        mIsRefreshing = false;
+                    }
                     break;
                 case EVENT_STOP_SERVICE:
                     stopRetrieveIfNeeded();
                     if(mIsRefreshing){
                         ((AllPictureView)mView).onRefreshDone(false);
+                        mIsRefreshing = false;
                     }
                     break;
                 case EVENT_START_WALLPAPER_CACHE:

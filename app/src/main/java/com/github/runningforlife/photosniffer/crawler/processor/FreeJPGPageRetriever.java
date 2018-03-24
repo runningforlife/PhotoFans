@@ -7,6 +7,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,18 +31,21 @@ public class FreeJPGPageRetriever extends PageRetriever {
 
     @Override
     public List<String> retrieveImages(Page page) {
-        List<String> images = new ArrayList<>();
+        List<String> images = Collections.EMPTY_LIST;
 
         Document doc = page.getHtml().getDocument();
         Elements imgElements = doc.getElementsByClass(CLASS_THUMBNAIL);
+        if (imgElements != null && imgElements.size() > 0) {
+            images = new ArrayList<>(imgElements.size());
 
-        for (Element element : imgElements) {
-            Elements imgTags = element.getElementsByTag(TAG_IMG);
-            for (Element img : imgTags) {
-                String url = img.attr(ATTR_IMAGE_URL);
-                Log.d(TAG,"retrieve image url=" + url);
-                if (url != null && url.startsWith(FREE_JPG_IMAGE_START) && !images.contains(url)) {
-                    images.add(url);
+            for (Element element : imgElements) {
+                Elements imgTags = element.getElementsByTag(TAG_IMG);
+                for (Element img : imgTags) {
+                    String url = img.attr(ATTR_IMAGE_URL);
+                    Log.d(TAG, "retrieve image url=" + url);
+                    if (url != null && url.startsWith(FREE_JPG_IMAGE_START) && !images.contains(url)) {
+                        images.add(url);
+                    }
                 }
             }
         }
@@ -51,18 +55,20 @@ public class FreeJPGPageRetriever extends PageRetriever {
 
     @Override
     public List<String> retrieveLinks(Page page) {
-        List<String> links = new ArrayList<>();
+        List<String> links = Collections.EMPTY_LIST;
 
         Document doc = page.getHtml().getDocument();
 
         Elements elements = doc.getElementsByTag(TAG_HREF);
-        for (Element element : elements) {
-            String pageUrl = element.attr(ATTR_REF);
-            if (pageUrl != null && pageUrl.startsWith(FREE_JPG_HREF_START)
-                && !isPageRetrieved(pageUrl)) {
-                links.add(pageUrl);
+        if (elements != null && elements.size() > 0) {
+            for (Element element : elements) {
+                String pageUrl = element.attr(ATTR_REF);
+                if (pageUrl != null && pageUrl.startsWith(FREE_JPG_HREF_START)
+                        && !isPageRetrieved(pageUrl)) {
+                    links.add(pageUrl);
 
-                page.addTargetRequest(pageUrl);
+                    page.addTargetRequest(pageUrl);
+                }
             }
         }
 
