@@ -37,7 +37,7 @@ ext {
     minSdkVersion = 16
     targetSdkVersion = 27
     // third party lib
-    glideVersion = "4.1.1"
+    glideVersion = "4.6.1"
     webmagicVersion = "0.7.3"
     okhttpVersion = "3.9.1"
     butterknifeVersion = "8.8.1"
