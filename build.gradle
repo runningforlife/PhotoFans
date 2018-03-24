@@ -26,6 +26,30 @@ allprojects {
     }
 }
 
+ext {
+    // APP version
+    versionCode = 17
+    versionName = "1.4.7"
+    // android sdk version
+    supportLibVersion = "27.0.2"
+    compileSdkVersion = 27
+    buildToolsVersion = "26.0.2"
+    minSdkVersion = 16
+    targetSdkVersion = 27
+    // third party lib
+    glideVersion = "4.1.1"
+    webmagicVersion = "0.7.3"
+    okhttpVersion = "3.9.1"
+    butterknifeVersion = "8.8.1"
+    nineoldandroidsVersion = "2.4.0"
+    avoscloudVersion = "v4.1.0"
+    leakcanaryVersion = "1.5.4"
+    // test lib
+    espressoVersion = "2.2.2"
+    junitVersion = "4.12"
+    mockitoVersion = "2.8.9"
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

@@ -11,9 +11,11 @@
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f11a9955-1484-4121-8fab-e7332a85ea45" name="TimeIntervalPicker" comment="Refactor: use module to implement photopicker instead of gradle dependencies">
+    <list default="true" id="f11a9955-1484-4121-8fab-e7332a85ea45" name="TimeIntervalPicker" comment="Refactor: donot pick images which user not selected">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/photopicker/src/main/java/me/iwf/photopicker/PhotoPickerActivity.java" afterPath="$PROJECT_DIR$/photopicker/src/main/java/me/iwf/photopicker/PhotoPickerActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/build.gradle" afterPath="$PROJECT_DIR$/app/build.gradle" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.gradle" afterPath="$PROJECT_DIR$/build.gradle" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/photopicker/build.gradle" afterPath="$PROJECT_DIR$/photopicker/build.gradle" />
     </list>
     <ignored path="$PROJECT_DIR$/.idea/shelf/" />
     <ignored path=".gradle/2.14.1/taskArtifacts/" />
@@ -62,11 +64,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="PhotoPickerActivity.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="PhotoPickerActivity.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/photopicker/src/main/java/me/iwf/photopicker/PhotoPickerActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="199">
-              <caret line="205" column="42" lean-forward="true" selection-start-line="205" selection-start-column="42" selection-end-line="205" selection-end-column="42" />
+            <state relative-caret-position="157">
+              <caret line="152" column="31" lean-forward="false" selection-start-line="152" selection-start-column="31" selection-end-line="152" selection-end-column="31" />
               <folding>
                 <element signature="e#2196#2219#0" expanded="true" />
                 <element signature="e#4627#4687#0" expanded="true" />
@@ -74,6 +76,8 @@
                 <element signature="e#6038#6115#0" expanded="true" />
                 <element signature="e#7053#7054#0" expanded="true" />
                 <element signature="e#7074#7075#0" expanded="true" />
+                <element signature="e#7175#7176#0" expanded="true" />
+                <element signature="e#7207#7208#0" expanded="true" />
                 <marker date="1521860079865" expanded="true" signature="6745:7008" ph="{...}" />
               </folding>
             </state>
@@ -83,22 +87,19 @@
       <file leaf-file-name="PhotoGridAdapter.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/photopicker/src/main/java/me/iwf/photopicker/adapter/PhotoGridAdapter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-294">
+            <state relative-caret-position="-483">
               <caret line="112" column="67" lean-forward="false" selection-start-line="112" selection-start-column="67" selection-end-line="112" selection-end-column="67" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
+      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/photopicker/build.gradle">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-42">
-              <caret line="19" column="30" lean-forward="false" selection-start-line="19" selection-start-column="30" selection-end-line="19" selection-end-column="30" />
-              <folding>
-                <marker date="1521859766320" expanded="true" signature="337:712" ph="{...}" />
-                <marker date="1521859766320" expanded="true" signature="759:963" ph="/*...*/" />
-              </folding>
+            <state relative-caret-position="588">
+              <caret line="28" column="44" lean-forward="false" selection-start-line="28" selection-start-column="44" selection-end-line="28" selection-end-column="44" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -106,48 +107,8 @@
       <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/build.gradle">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="320">
-              <caret line="55" column="14" lean-forward="false" selection-start-line="55" selection-start-column="14" selection-end-line="55" selection-end-column="14" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/build.gradle">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="252">
-              <caret line="12" column="25" lean-forward="false" selection-start-line="12" selection-start-column="25" selection-end-line="12" selection-end-column="25" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="settings.gradle" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/photopicker/settings.gradle">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="gradle.properties" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/photopicker/gradle.properties">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="231">
-              <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="strings.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/photopicker/src/main/res/values/strings.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="42">
-              <caret line="2" column="38" lean-forward="false" selection-start-line="2" selection-start-column="32" selection-end-line="2" selection-end-column="38" />
+            <state relative-caret-position="1533">
+              <caret line="73" column="0" lean-forward="true" selection-start-line="73" selection-start-column="0" selection-end-line="73" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -196,8 +157,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>onItemSelected</find>
-      <find>performConfigurationChanged</find>
       <find>mVisibleMenuTitle</find>
       <find>setWallpaperAndCache</find>
       <find>mGlideManager</find>
@@ -225,11 +184,15 @@
       <find>getHighResUrl</find>
       <find>markAsWallpaper</find>
       <find>selectedPhotos</find>
+      <find>&quot;</find>
+      <find>'</find>
       <find>updateTitleDoneItem</find>
     </findStrings>
     <replaceStrings>
       <replace>&lt;item&gt;</replace>
       <replace>SITE</replace>
+      <replace>'</replace>
+      <replace>&quot;</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/app/src/main/res/drawable</dir>
@@ -2870,7 +2833,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/glide/OkHttpGlideModule.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/glide/DiskStorageModule.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/glide/Loader.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/glide/ImageSizer.java" />
@@ -2917,10 +2879,11 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/AllPicturesPresenterImpl.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/data/cache/DiskCache.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/runningforlife/photosniffer/presenter/PresenterBase.java" />
-        <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/photopicker/build.gradle" />
         <option value="$PROJECT_DIR$/photopicker/src/main/java/me/iwf/photopicker/PhotoPickerActivity.java" />
+        <option value="$PROJECT_DIR$/photopicker/build.gradle" />
+        <option value="$PROJECT_DIR$/build.gradle" />
+        <option value="$PROJECT_DIR$/app/build.gradle" />
       </list>
     </option>
   </component>
@@ -3070,59 +3033,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="photopicker" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PhotoFans" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PhotoFans" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="photopicker" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PhotoFans" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PhotoFans" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="photopicker" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
+              <option name="myItemId" value="app" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -3286,7 +3197,7 @@
       <option name="ACTIVITY_CLASS" value="" />
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521860115998" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521862196195" />
       </method>
     </configuration>
     <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
@@ -3334,7 +3245,7 @@
       </Profilers>
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521860115998" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521862196195" />
       </method>
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -3526,7 +3437,7 @@
       <option name="ACTIVITY_CLASS" value="" />
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521860116001" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521862196196" />
       </method>
     </configuration>
     <list size="2">
@@ -3610,13 +3521,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1512395695944</updated>
-    </task>
-    <task id="LOCAL-00083" summary="Function: no sensor orientation change">
-      <created>1514697209793</created>
-      <option name="number" value="00083" />
-      <option name="presentableId" value="LOCAL-00083" />
-      <option name="project" value="LOCAL" />
-      <updated>1514697209793</updated>
     </task>
     <task id="LOCAL-00084" summary="Function: remove realm data when clear caching">
       <created>1514719268410</created>
@@ -3954,7 +3858,14 @@
       <option name="project" value="LOCAL" />
       <updated>1521293722830</updated>
     </task>
-    <option name="localTasksCounter" value="132" />
+    <task id="LOCAL-00132" summary="Refactor: donot pick images which user not selected">
+      <created>1521860169307</created>
+      <option name="number" value="00132" />
+      <option name="presentableId" value="LOCAL-00132" />
+      <option name="project" value="LOCAL" />
+      <updated>1521860169308</updated>
+    </task>
+    <option name="localTasksCounter" value="133" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -4010,14 +3921,14 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30420712" sideWeight="0.587251" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2815534" sideWeight="0.81673306" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.5" sideWeight="0.51553786" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.5145631" sideWeight="0.51553786" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.48878205" sideWeight="0.7378486" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5080906" sideWeight="0.7824701" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="14" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26454183" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20796813" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32988048" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19760956" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
@@ -4150,7 +4061,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <confirmRemoveEmptyChangelist value="2" />
-    <MESSAGE value="Refactor: using system chooser to set wallpaper" />
     <MESSAGE value="BugFix: batch edit cannot work properly" />
     <MESSAGE value="Refactor: save bitmap when wallpaper setting" />
     <MESSAGE value="update glide to 4.1.1 and photopicker to latest version" />
@@ -4175,7 +4085,8 @@
     <MESSAGE value="donot restart wallpaper updater service" />
     <MESSAGE value="BugFix: cannot perform action after onSaveInstanceState" />
     <MESSAGE value="Refactor: use module to implement photopicker instead of gradle dependencies" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor: use module to implement photopicker instead of gradle dependencies" />
+    <MESSAGE value="Refactor: donot pick images which user not selected" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor: donot pick images which user not selected" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -4185,13 +4096,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/PhotoPicker-0.9.12.aar/618212f559d2a25e018d222a94b421ad/jars/classes.jar!/me/iwf/photopicker/utils/PhotoDirectoryLoader.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="22" column="21" lean-forward="true" selection-start-line="22" selection-start-column="21" selection-end-line="22" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/PhotoPicker-0.9.12.aar/618212f559d2a25e018d222a94b421ad/jars/classes.jar!/me/iwf/photopicker/adapter/SelectableAdapter.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
@@ -4273,6 +4177,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -4415,8 +4320,8 @@
         <state relative-caret-position="127">
           <caret line="46" column="37" lean-forward="false" selection-start-line="46" selection-start-column="17" selection-end-line="46" selection-end-column="37" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#2025#2071#0" expanded="true" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#2025#2071#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -4532,7 +4437,7 @@
         <state relative-caret-position="-420">
           <caret line="82" column="32" lean-forward="false" selection-start-line="82" selection-start-column="32" selection-end-line="82" selection-end-column="32" />
           <folding>
-            <element signature="e#4870#5006#0" expanded="true" />
+            <element signature="e#4870#5006#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -4565,13 +4470,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/photopicker/build.gradle">
+    <entry file="file://$PROJECT_DIR$/photopicker/src/main/java/me/iwf/photopicker/PhotoPickerActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-42">
-          <caret line="19" column="30" lean-forward="false" selection-start-line="19" selection-start-column="30" selection-end-line="19" selection-end-column="30" />
+        <state relative-caret-position="157">
+          <caret line="152" column="31" lean-forward="false" selection-start-line="152" selection-start-column="31" selection-end-line="152" selection-end-column="31" />
           <folding>
-            <marker date="1521859766320" expanded="true" signature="337:712" ph="{...}" />
-            <marker date="1521859766320" expanded="true" signature="759:963" ph="/*...*/" />
+            <element signature="e#2196#2219#0" expanded="true" />
+            <element signature="e#4627#4687#0" expanded="true" />
+            <element signature="e#4738#4771#0" expanded="true" />
+            <element signature="e#6038#6115#0" expanded="true" />
+            <element signature="e#7053#7054#0" expanded="true" />
+            <element signature="e#7074#7075#0" expanded="true" />
+            <element signature="e#7175#7176#0" expanded="true" />
+            <element signature="e#7207#7208#0" expanded="true" />
+            <marker date="1521860079865" expanded="true" signature="6745:7008" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -4586,49 +4498,49 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/photopicker/gradle.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="231">
+        <state relative-caret-position="294">
           <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/build.gradle">
+    <entry file="file://$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="55" column="14" lean-forward="false" selection-start-line="55" selection-start-column="14" selection-end-line="55" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="12" column="25" lean-forward="false" selection-start-line="12" selection-start-column="25" selection-end-line="12" selection-end-column="25" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/photopicker/src/main/java/me/iwf/photopicker/adapter/PhotoGridAdapter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-294">
+        <state relative-caret-position="-483">
           <caret line="112" column="67" lean-forward="false" selection-start-line="112" selection-start-column="67" selection-end-line="112" selection-end-column="67" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/photopicker/src/main/java/me/iwf/photopicker/PhotoPickerActivity.java">
+    <entry file="file://$PROJECT_DIR$/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="199">
-          <caret line="205" column="42" lean-forward="true" selection-start-line="205" selection-start-column="42" selection-end-line="205" selection-end-column="42" />
-          <folding>
-            <element signature="e#2196#2219#0" expanded="true" />
-            <element signature="e#4627#4687#0" expanded="true" />
-            <element signature="e#4738#4771#0" expanded="true" />
-            <element signature="e#6038#6115#0" expanded="true" />
-            <element signature="e#7053#7054#0" expanded="true" />
-            <element signature="e#7074#7075#0" expanded="true" />
-            <marker date="1521860079865" expanded="true" signature="6745:7008" ph="{...}" />
-          </folding>
+        <state relative-caret-position="21">
+          <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1533">
+          <caret line="73" column="0" lean-forward="true" selection-start-line="73" selection-start-column="0" selection-end-line="73" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/photopicker/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="588">
+          <caret line="28" column="44" lean-forward="false" selection-start-line="28" selection-start-column="44" selection-end-line="28" selection-end-column="44" />
+          <folding />
         </state>
       </provider>
     </entry>

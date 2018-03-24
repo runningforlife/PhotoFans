@@ -10,15 +10,15 @@ android {
             storePassword 'zaq123'
         }
     }
-    compileSdkVersion 27
-    buildToolsVersion '27.0.2'
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
         applicationId "com.github.runningforlife.photosniffer"
-        minSdkVersion 16
-        targetSdkVersion 27
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
-        versionCode 17
-        versionName "1.4.7"
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -42,11 +42,6 @@ android {
     }
 }
 
-ext {
-    supportLibVersion = "27.0.2"
-    glideVersion = "4.1.1"
-}
-
 configurations.all {
     resolutionStrategy.dependencySubstitution {
         substitute module('org.apache.commons:commons-io:1.3.2') with module('commons-io:commons-io:1.3.2')
@@ -55,29 +50,30 @@ configurations.all {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestCompile("com.android.support.test.espresso:espresso-core:${rootProject.ext.espressoVersion}", {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile "com.android.support:appcompat-v7:$supportLibVersion"
-    compile "com.android.support:design:$supportLibVersion"
-    compile "com.android.support:support-annotations:$supportLibVersion"
-    testCompile 'junit:junit:4.12'
-    // mockito
-    androidTestCompile 'org.mockito:mockito-android:2.8.9'
-    testCompile 'org.mockito:mockito-core:2.8.9'
-    compile 'us.codecraft:webmagic-core:0.7.3'
-    compile 'com.squareup.okhttp3:okhttp:3.9.1'
-    compile 'com.jakewharton:butterknife:8.8.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-    annotationProcessor "com.github.bumptech.glide:compiler:$glideVersion"
-    compile "com.github.bumptech.glide:glide:$glideVersion"
-    compile "com.github.bumptech.glide:okhttp3-integration:$glideVersion"
+    compile "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    compile "com.android.support:design:${rootProject.ext.supportLibVersion}"
+    compile "com.android.support:support-annotations:${rootProject.ext.supportLibVersion}"
+    testCompile "junit:junit:${rootProject.ext.junitVersion}"
+    androidTestCompile "org.mockito:mockito-android:${rootProject.ext.mockitoVersion}"
+    testCompile "org.mockito:mockito-core:${rootProject.ext.mockitoVersion}"
+
+    compile "us.codecraft:webmagic-core:${rootProject.ext.webmagicVersion}"
+    compile "com.squareup.okhttp3:okhttp:${rootProject.ext.okhttpVersion}"
+    compile "com.jakewharton:butterknife:${rootProject.ext.butterknifeVersion}"
+    annotationProcessor "com.jakewharton:butterknife-compiler:${rootProject.ext.butterknifeVersion}"
+    annotationProcessor "com.github.bumptech.glide:compiler:${rootProject.ext.glideVersion}"
+    compile "com.github.bumptech.glide:glide:${rootProject.ext.glideVersion}"
+    compile "com.github.bumptech.glide:okhttp3-integration:${rootProject.ext.glideVersion}"
     // LeanCloud 基础包
-    compile 'cn.leancloud.android:avoscloud-sdk:v4.1.0'
+    compile "cn.leancloud.android:avoscloud-sdk:${rootProject.ext.avoscloudVersion}"
     // photo picker
     compile project(":photopicker")
-    compile 'com.nineoldandroids:library:2.4.0'
+
+    compile "com.nineoldandroids:library:${rootProject.ext.nineoldandroidsVersion}"
     // memory leak
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.4'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+    debugCompile "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakcanaryVersion}"
+    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakcanaryVersion}"
 }
