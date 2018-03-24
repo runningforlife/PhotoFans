@@ -1,6 +1,11 @@
 package com.github.runningforlife.photosniffer.data.cache;
 
 import android.graphics.Bitmap;
+import android.os.Build;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 
@@ -17,6 +22,7 @@ public class DiskCacheManager implements CacheApi {
 
     private DiskCache mDiskCache;
     private ExecutorService mCacheExecutors;
+    private EventHandler mEventHandler;
 
     private static DiskCacheManager sInstance = new DiskCacheManager();
 
@@ -27,27 +33,33 @@ public class DiskCacheManager implements CacheApi {
     private DiskCacheManager() {
         mDiskCache = new DiskCache(new File(MiscUtil.getWallpaperCacheDir()));
         mCacheExecutors = Executors.newCachedThreadPool();
-        CacheActionRunnable car = new CacheActionRunnable(null, null,
-                ACTION_INIT, null);
-        mCacheExecutors.submit(car);
+
+        HandlerThread ht = new HandlerThread("DiskCacheMgr");
+        ht.start();
+
+        mEventHandler = new EventHandler(ht.getLooper());
+
+        CacheActionRunnable car = new CacheActionRunnable(EVENT_PUT);
+        sendEvent(car);
+
     }
 
     @Override
     public void put(String url, Bitmap bitmap) {
-        CacheActionRunnable car = new CacheActionRunnable(url, ACTION_PUT, bitmap);
-        mCacheExecutors.submit(car);
+        CacheActionRunnable car = new CacheActionRunnable(url, EVENT_PUT, bitmap);
+        sendEvent(car);
     }
 
     @Override
     public void put(String url, Cache.Entry entry) {
-        CacheActionRunnable car = new CacheActionRunnable(url, null, ACTION_PUT, entry);
-        mCacheExecutors.submit(car);
+        CacheActionRunnable car = new CacheActionRunnable(url, null, EVENT_PUT, entry);
+        sendEvent(car);
     }
 
     @Override
     public void get(String url, CacheCallback callback) {
-        CacheActionRunnable car = new CacheActionRunnable(url, callback, ACTION_GET, null);
-        mCacheExecutors.submit(car);
+        CacheActionRunnable car = new CacheActionRunnable(url, callback, EVENT_GET, null);
+        sendEvent(car);
     }
 
     @Override
@@ -62,14 +74,14 @@ public class DiskCacheManager implements CacheApi {
 
     @Override
     public void remove(String url) {
-        CacheActionRunnable car = new CacheActionRunnable(url, null, ACTION_REMOVE, null);
-        mCacheExecutors.submit(car);
+        CacheActionRunnable car = new CacheActionRunnable(url, null, EVENT_REMOVE, null);
+        sendEvent(car);
     }
 
     @Override
     public void clear() {
-        CacheActionRunnable car = new CacheActionRunnable(null, null, ACTION_CLEAR, null);
-        mCacheExecutors.submit(car);
+        CacheActionRunnable car = new CacheActionRunnable(null, null, EVENT_CLEAR, null);
+        sendEvent(car);
     }
 
     @Override
@@ -77,21 +89,45 @@ public class DiskCacheManager implements CacheApi {
         return mDiskCache.isExist(url);
     }
 
+    private void sendEvent(Runnable runnable) {
+        Message message = mEventHandler.obtainMessage();
+        message.obj = runnable;
+        message.sendToTarget();
+    }
+
+    final class EventHandler extends Handler {
+        EventHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message message) {
+            if (message.obj != null) {
+                Runnable runnable = (Runnable) message.obj;
+                mCacheExecutors.submit(runnable);
+            }
+        }
+    }
+
     final class CacheActionRunnable implements Runnable {
         String url;
         CacheCallback callback;
-        @CacheAction String action;
+        @CacheAction int action;
         Cache.Entry entry;
         Bitmap bitmap;
 
-        CacheActionRunnable(String url, @CacheAction String action, Bitmap bitmap) {
+        CacheActionRunnable(@CacheAction int action) {
+            this.action = action;
+        }
+
+        CacheActionRunnable(String url, @CacheAction int action, Bitmap bitmap) {
             this.url = url;
             this.action = action;
             this.bitmap = bitmap;
         }
 
         CacheActionRunnable(String url, CacheCallback callback,
-                            @CacheAction String action, Cache.Entry entry) {
+                            @CacheAction int action, Cache.Entry entry) {
             this.url = url;
             this.callback = callback;
             this.action = action;
@@ -101,21 +137,26 @@ public class DiskCacheManager implements CacheApi {
         @Override
         public void run() {
             switch (action) {
-                case ACTION_INIT:
+                case EVENT_INIT:
                     mDiskCache.initialize();
                     break;
-                case ACTION_GET:
+                case EVENT_GET:
                     Cache.Entry entry1 = mDiskCache.get(url);
                     if (this.callback != null) {
                         callback.onGetEntryDone(entry1);
                     }
                     break;
-                case ACTION_CLEAR:
+                case EVENT_CLEAR:
                     mDiskCache.clear();
                     break;
-                case ACTION_PUT:
+                case EVENT_PUT:
                     if (bitmap != null) {
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream(bitmap.getAllocationByteCount());
+                        ByteArrayOutputStream bos;
+                        if ( Build.VERSION.SDK_INT >= 19) {
+                            bos = new ByteArrayOutputStream(bitmap.getAllocationByteCount());
+                        } else {
+                            bos = new ByteArrayOutputStream(bitmap.getByteCount());
+                        }
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
                         Cache.Entry entry2 = new Cache.Entry(bos.toByteArray(), System.currentTimeMillis());
                         mDiskCache.put(url, entry2);
@@ -124,7 +165,7 @@ public class DiskCacheManager implements CacheApi {
                         mDiskCache.put(url, entry);
                     }
                     break;
-                case ACTION_REMOVE:
+                case EVENT_REMOVE:
                     mDiskCache.remove(url);
                     break;
             }

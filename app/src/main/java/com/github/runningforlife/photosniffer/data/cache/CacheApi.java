@@ -1,6 +1,7 @@
 package com.github.runningforlife.photosniffer.data.cache;
 
 import android.graphics.Bitmap;
+import android.support.annotation.IntDef;
 import android.support.annotation.StringDef;
 
 import java.lang.annotation.Retention;
@@ -13,13 +14,13 @@ import java.lang.annotation.RetentionPolicy;
 public interface CacheApi {
 
     @Retention(RetentionPolicy.SOURCE)
-    @StringDef({ACTION_INIT, ACTION_PUT, ACTION_GET, ACTION_REMOVE, ACTION_CLEAR})
+    @IntDef({EVENT_INIT, EVENT_PUT, EVENT_GET, EVENT_REMOVE, EVENT_CLEAR})
     @interface CacheAction {}
-    String ACTION_INIT = "init";
-    String ACTION_PUT = "put";
-    String ACTION_GET = "get";
-    String ACTION_REMOVE = "remove";
-    String ACTION_CLEAR = "clear";
+    int EVENT_INIT = 0;
+    int EVENT_PUT = 1;
+    int EVENT_GET = 2;
+    int EVENT_REMOVE = 3;
+    int EVENT_CLEAR = 4;
 
     interface CacheCallback {
         void onGetEntryDone(Cache.Entry entry);

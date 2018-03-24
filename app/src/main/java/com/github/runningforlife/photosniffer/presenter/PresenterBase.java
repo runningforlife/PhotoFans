@@ -85,9 +85,6 @@ abstract class PresenterBase implements Presenter {
     private WallpaperSettingReceiver mWallpaperChangeReceiver;
     private HashMap<String, Boolean> mSettingAsWallpaper;
 
-    // record deleted image file locally
-    HashSet<String> mDeletedImages;
-
     int mMaxImagesAllowed;
 
     Context mContext;
@@ -132,8 +129,6 @@ abstract class PresenterBase implements Presenter {
         mContext.registerReceiver(mWallpaperChangeReceiver, filter);
 
         mSettingAsWallpaper = new HashMap<>();
-
-        mDeletedImages = new HashSet<>();
     }
 
     @Override
@@ -209,45 +204,27 @@ abstract class PresenterBase implements Presenter {
         Log.v(TAG,"loadImageIntoView()");
         final ImageRealm ir = getItemAtPos(pos);
         if (ir != null && ir.isValid()) {
-            boolean isImageExist = true;
-            if (ir.getIsWallpaper()) {
-                File file1 = null, file2 = null;
-                if (!TextUtils.isEmpty(ir.getHighResUrl())) {
-                    file1 = new File(mCacheMgr.getFilePath(ir.getHighResUrl()));
-                }
-                if (!TextUtils.isEmpty(ir.getUrl())) {
-                    file2 = new File(mCacheMgr.getFilePath(ir.getUrl()));
-                }
-
-                if (!((file1 == null || file1.exists()) || (file2 == null || file2.exists()))) {
-                    isImageExist = false;
-                }
-            }
-            if (isImageExist) {
-                final String url = ir.getUrl();
-                if (scaleType == ImageView.ScaleType.CENTER_CROP) {
-                    mGlideManager.setDefaultRequestOptions(mRequestOptionsThumb)
-                            .load(url)
-                            .thumbnail(0.5f)
-                            .into(iv);
-                } else {
-                    String imgUrl = url;
-                    if (!TextUtils.isEmpty(ir.getHighResUrl())) {
-                        imgUrl = ir.getHighResUrl();
-                    }
-                    mGlideManager.setDefaultRequestOptions(mRequestOptionsFull)
-                            .load(imgUrl)
-                            .thumbnail(0.5f)
-                            .into(iv);
-
-                    if (!mIsFirstPager) {
-                        onImageLoadStart(pos);
-                        mMainHandler.sendEmptyMessageDelayed(EVENT_IMAGE_LOAD_DONE, 800);
-                        mIsFirstPager = true;
-                    }
-                }
+            final String url = ir.getUrl();
+            if (scaleType == ImageView.ScaleType.CENTER_CROP) {
+                mGlideManager.setDefaultRequestOptions(mRequestOptionsThumb)
+                        .load(url)
+                        .thumbnail(0.3f)
+                        .into(iv);
             } else {
-                mDeletedImages.add(ir.getUrl());
+                String imgUrl = url;
+                if (!TextUtils.isEmpty(ir.getHighResUrl())) {
+                    imgUrl = ir.getHighResUrl();
+                }
+                mGlideManager.setDefaultRequestOptions(mRequestOptionsFull)
+                        .load(imgUrl)
+                        .thumbnail(0.3f)
+                        .into(iv);
+
+                if (!mIsFirstPager) {
+                    onImageLoadStart(pos);
+                    mMainHandler.sendEmptyMessageDelayed(EVENT_IMAGE_LOAD_DONE, 800);
+                    mIsFirstPager = true;
+                }
             }
         } else {
             mGlideManager.clear(iv);
@@ -308,12 +285,13 @@ abstract class PresenterBase implements Presenter {
         }
         mRealmApi.closeRealm();
 
-        if (mWallpaperChangeReceiver != null) {
-            mContext.unregisterReceiver(mWallpaperChangeReceiver);
-        }
-
         if (mSettingAsWallpaper != null) {
             mSettingAsWallpaper.clear();
+        }
+
+
+        if (mWallpaperChangeReceiver != null) {
+            mContext.unregisterReceiver(mWallpaperChangeReceiver);
         }
     }
 

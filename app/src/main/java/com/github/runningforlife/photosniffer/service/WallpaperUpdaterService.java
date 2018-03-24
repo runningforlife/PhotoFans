@@ -125,7 +125,7 @@ public class WallpaperUpdaterService extends Service {
             }
             // wait for all job is down
             try {
-                latch.await(10, TimeUnit.SECONDS);
+                latch.await(15, TimeUnit.SECONDS);
             } catch (Exception e) {
 
             }
