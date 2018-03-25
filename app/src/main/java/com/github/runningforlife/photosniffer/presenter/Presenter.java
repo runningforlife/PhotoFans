@@ -26,6 +26,9 @@ public interface Presenter extends LifeCycle {
     int EVENT_WALLPAPER_SET_DONE = 0x04;
     int EVENT_SAVE_AS_WALLPAPER = 0x05;
 
+    /** default maximum wallpapers to be cached */
+    int DEFAULT_MAX_WALLPAPERS = 600;
+
     String EXTRA_WALLPAPER_URL = "wallpaper_url";
     String EXTRA_WALLPAPER_POSITION = "wallpaper_position";
 
@@ -80,4 +83,9 @@ public interface Presenter extends LifeCycle {
      *  batch edit
      */
     void batchEdit(List<String> images, @BatchAction String action);
+
+    /**
+     * trim data
+     */
+    void trimData();
 }

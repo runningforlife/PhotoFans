@@ -73,7 +73,6 @@ abstract class PresenterBase implements Presenter {
     private RequestManager mGlideManager;
     private RequestOptions mRequestOptionsThumb;
     private RequestOptions mRequestOptionsFull;
-    private CacheApi mCacheMgr;
     private ExecutorService mExecutors;
     private CountDownLatch mSavingLatch;
     private H mMainHandler;
@@ -83,6 +82,7 @@ abstract class PresenterBase implements Presenter {
     private HashMap<String, Boolean> mSettingAsWallpaper;
 
     int mMaxImagesAllowed;
+    CacheApi mCacheMgr;
 
     Context mContext;
     UI mView;
@@ -127,6 +127,8 @@ abstract class PresenterBase implements Presenter {
 
         mSettingAsWallpaper = new HashMap<>();
     }
+
+    abstract void trimDataAsync();
 
     @Override
     public void onImageLoadStart(int pos) {
@@ -293,7 +295,6 @@ abstract class PresenterBase implements Presenter {
         }
     }
 
-
     // NOTICE: do not use it on UI thread
     private void startWallpaperChooser(final  int pos, final String imgUrl) {
         FutureTarget<Bitmap> bitmapTarget = Glide.with(mContext)
@@ -382,7 +383,7 @@ abstract class PresenterBase implements Presenter {
                 mExecutors.submit(new Runnable() {
                     @Override
                     public void run() {
-                        saveImageAsWallpaper(-1, url);
+                        saveImageAsWallpaper(-1, url, url);
                         mSavingLatch.countDown();
                     }
                 });
@@ -430,11 +431,14 @@ abstract class PresenterBase implements Presenter {
         }
     }
 
-    private void saveImageAsWallpaper(int pos, String imgUrl) {
+    private void saveImageAsWallpaper(int pos, String imgUrl, String higResUrl) {
+        if (TextUtils.isEmpty(higResUrl)) {
+            higResUrl = imgUrl;
+        }
         FutureTarget<Bitmap> target = Glide.with(mContext)
                 .asBitmap()
                 .apply(new RequestOptions().centerCrop())
-                .load(imgUrl)
+                .load(higResUrl)
                 .submit(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
 
         try {
@@ -509,17 +513,13 @@ abstract class PresenterBase implements Presenter {
                     markAsWallpaper(message.arg1, (String) message.obj);
                     break;
                 case EVENT_SAVE_AS_WALLPAPER:
-                    String url = (String)message.obj;
+                    final String url = (String)message.obj;
                     final int pos = message.arg1;
-                    String higResUrl = mImageList.get(pos).getHighResUrl();
-                    if (!TextUtils.isEmpty(higResUrl)) {
-                        url = higResUrl;
-                    }
-                    final String imgUrl = url;
+                    final String higResUrl = mImageList.get(pos).getHighResUrl();
                     mExecutors.submit(new Runnable() {
                         @Override
                         public void run() {
-                            saveImageAsWallpaper(pos, imgUrl);
+                            saveImageAsWallpaper(pos, url, higResUrl);
                         }
                     });
                     break;

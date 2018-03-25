@@ -125,6 +125,17 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
     }
 
     @Override
+    protected void trimDataAsync() {
+        if (mImageList.size() > mMaxImagesAllowed) {
+            HashMap<String, String> params = new HashMap<>();
+            params.put("mIsUsed", Boolean.toString(true));
+            params.put("mIsFavor", Boolean.toString(false));
+            params.put("mIsWallpaper", Boolean.toString(false));
+            mRealmApi.trimDataAsync(ImageRealm.class, params, mMaxImagesAllowed);
+        }
+    }
+
+    @Override
     public void onStart() {
         Log.v(TAG,"onStart()");
         HashMap<String,String> params = new HashMap<>();
@@ -251,6 +262,9 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
                         saveAllPolaUrls(LATEST_POLA_COUNT + 1, number);
                     }
                 });
+            } else {
+                // make sure we have a remote object to update
+                cloudApi.savePolaCollections(LATEST_POLA_COUNT);
             }
         }
         SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
@@ -316,16 +330,6 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
         }
         List<String> defImageSrc = SharedPrefUtil.getArrayList(prefImgSrc);
         return defImageSrc.isEmpty();
-    }
-
-    private void trimDataAsync() {
-        if (mImageList.size() > mMaxImagesAllowed) {
-            HashMap<String, String> params = new HashMap<>();
-            params.put("mIsUsed", Boolean.toString(true));
-            params.put("mIsFavor", Boolean.toString(false));
-            params.put("mIsWallpaper", Boolean.toString(false));
-            mRealmApi.trimDataAsync(ImageRealm.class, params, mMaxImagesAllowed);
-        }
     }
 
     private final class  H extends Handler {

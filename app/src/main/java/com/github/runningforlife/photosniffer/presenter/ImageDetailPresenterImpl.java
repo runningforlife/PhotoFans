@@ -6,6 +6,7 @@ import android.util.Log;
 import com.bumptech.glide.RequestManager;
 
 import io.realm.RealmResults;
+import io.realm.Sort;
 
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
@@ -61,6 +62,24 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     }
 
     @Override
+    protected void trimDataAsync() {
+        Log.v(TAG,"trimDataAsync()");
+        if (mImageList.size() > DEFAULT_MAX_WALLPAPERS) {
+            HashMap<String, String> params = new HashMap<>();
+            params.put("mIsUsed", Boolean.toString(true));
+            params.put("mIsFavor", Boolean.toString(false));
+            params.put("mIsWallpaper", Boolean.toString(true));
+            mImageList.sort("mTimeStamp", Sort.DESCENDING);
+
+            for (int i = DEFAULT_MAX_WALLPAPERS; i < mImageList.size(); ++i) {
+                String path = mImageList.get(i).getUrl();
+                mCacheMgr.remove(path);
+                mRealmApi.deleteSync(mImageList.get(i));
+            }
+        }
+    }
+
+    @Override
     public void onImageLoadStart(int pos) {
         Log.v(TAG,"onImageLoadStart()");
         mView.onImageLoadStart(pos);
@@ -70,6 +89,14 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     public void onImageLoadDone(boolean isSuccess) {
         Log.v(TAG,"onImageLoadDone()");
         mView.onImageLoadDone(isSuccess);
+    }
+
+    @Override
+    public void trimData() {
+        Log.v(TAG,"trimData()");
+        if (mImageType == IMAGE_WALLPAPER) {
+            trimDataAsync();
+        }
     }
 
     private void switchToImageType(int type) {

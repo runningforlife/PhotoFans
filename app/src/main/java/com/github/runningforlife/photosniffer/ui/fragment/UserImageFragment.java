@@ -1,5 +1,6 @@
 package com.github.runningforlife.photosniffer.ui.fragment;
 
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -9,9 +10,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.presenter.ImageDetailPresenterImpl;
+import com.github.runningforlife.photosniffer.presenter.ImageType;
 import com.github.runningforlife.photosniffer.presenter.RealmOp;
 import com.github.runningforlife.photosniffer.ui.ImageDetailView;
 import com.github.runningforlife.photosniffer.ui.adapter.GalleryAdapter;
@@ -32,6 +35,8 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
 
     @BindView(R.id.rcv_gallery) RecyclerView mRcvImageList;
     private ImageDetailPresenterImpl mPresenter;
+    // global layout event
+    private ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener;
 
     public static UserImageFragment newInstance(int type) {
         Bundle args = new Bundle();
@@ -75,6 +80,20 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
         super.onResume();
         if (mCallback != null) {
             mCallback.onFragmentAttached();
+        }
+
+        if (mImageType == ImageType.IMAGE_WALLPAPER) {
+            checkRecycleViewLayoutState();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (mImageType == ImageType.IMAGE_WALLPAPER) {
+            mRcvImageList.getViewTreeObserver().
+                    removeOnGlobalLayoutListener(mGlobalLayoutListener);
         }
     }
 
@@ -167,13 +186,22 @@ public class UserImageFragment extends BaseFragment implements ImageDetailView {
         mRcvImageList.setBackgroundResource(R.color.colorLightGrey);
     }
 
-    @Override
-    public void onImageLoadStart(int pos) {
-
+    private void checkRecycleViewLayoutState() {
+        if (mRcvImageList != null) {
+            mGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    Log.v(TAG,"onGlobalLayout()");
+                    mPresenter.trimData();
+                }
+            };
+            mRcvImageList.getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
+        }
     }
 
     @Override
-    public void onImageLoadDone(boolean isSuccess) {
+    public void onImageLoadStart(int pos) { }
 
-    }
+    @Override
+    public void onImageLoadDone(boolean isSuccess) { }
 }

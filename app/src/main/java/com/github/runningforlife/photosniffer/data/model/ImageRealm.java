@@ -28,7 +28,7 @@ public class ImageRealm extends RealmObject implements Comparable<ImageRealm> {
         mIsUsed = false;
     }
 
-    public void setUrl(String url){
+    public void setUrl(String url) {
         mUrl = url;
     }
 
