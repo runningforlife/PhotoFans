@@ -24,4 +24,18 @@ public interface CloudApi {
      * record the number of user
      */
     void newUser();
+
+    /**
+     * save latest pola collections count
+     */
+    void savePolaCollections(int number);
+
+    /**
+     * get latest pola collections
+     */
+    void getPolaCollections(String objectId, GetDataCallback callback);
+
+    public interface GetDataCallback {
+        void onQueryPolaCollectionsDone(int number);
+    }
 }

@@ -7,8 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.telecom.TelecomManager;
-import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.bumptech.glide.RequestManager;
@@ -26,6 +25,7 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
+import com.github.runningforlife.photosniffer.data.remote.CloudApi;
 import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
 import com.github.runningforlife.photosniffer.service.ImageRetrieveService;
 import com.github.runningforlife.photosniffer.service.ServiceStatus;
@@ -43,12 +43,12 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
     private static final String TAG = "AllPicturesPresenter";
 
     private static final int DEFAULT_RETRIEVE_TIME_OUT = 10*1000;
-    private static final int DEFAULT_STOP_TIME_OUT = 35*1000;
+    private static final int DEFAULT_STOP_TIME_OUT = 32*1000;
     private static final int DEFAULT_RETRIEVED_IMAGES = 10;
     // updateAsync Pola collections every 7days
     private static final long POLA_UPDATED_DURATION = TimeUnit.DAYS.toMillis(8);
     // current latest pola
-    private static final int LATEST_POLA_COUNT = 79;
+    private static final int LATEST_POLA_COUNT = 88;
 
     private RealmResults<ImageRealm> mUnUsedImages;
     // whether user is refreshing data
@@ -229,22 +229,31 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
         String keyNewUser = mContext.getString(R.string.pref_new_user);
         boolean isFirstTimeUse = isFirstTimeUse();
 
-        if ((isFirstTimeUse || now >= lastTime + POLA_UPDATED_DURATION)) {
-            String polaRetrieved = mContext.getString(R.string.pref_pola_retrieved);
-            boolean isPolaRetrieved = SharedPrefUtil.getBoolean(polaRetrieved, false);
-            if (!isPolaRetrieved) {
-                saveAllPolaUrls(1, LATEST_POLA_COUNT);
-                SharedPrefUtil.putBoolean(polaRetrieved, true);
-                SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
-            }
-            if (isFirstTimeUse) {
-                // start wallpaper cache service
-                Message message = mMainHandler.obtainMessage(H.EVENT_START_WALLPAPER_CACHE);
-                mMainHandler.sendMessageDelayed(message, 500);
-            }
+        CloudApi cloudApi = LeanCloudManager.getInstance();
+
+        if (isFirstTimeUse) {
+            // start wallpaper cache service
+            Message message = mMainHandler.obtainMessage(H.EVENT_START_WALLPAPER_CACHE);
+            mMainHandler.sendMessageDelayed(message, 500);
+            // save latest pola collections
+            cloudApi.savePolaCollections(LATEST_POLA_COUNT);
+
+            saveAllPolaUrls(1, LATEST_POLA_COUNT);
 
             SharedPrefUtil.putBoolean(keyNewUser, false);
+
+        } else if (now >= lastTime + POLA_UPDATED_DURATION) {
+            String polaCollectionsId = SharedPrefUtil.getString("pola_collections_id", "");
+            if (!TextUtils.isEmpty(polaCollectionsId)) {
+                cloudApi.getPolaCollections(polaCollectionsId, new CloudApi.GetDataCallback() {
+                    @Override
+                    public void onQueryPolaCollectionsDone(int number) {
+                        saveAllPolaUrls(LATEST_POLA_COUNT + 1, number);
+                    }
+                });
+            }
         }
+        SharedPrefUtil.putLong(lastUpdatedTime, System.currentTimeMillis());
     }
 
     private void saveAllPolaUrls(final int start, final int end) {
@@ -255,9 +264,10 @@ public class AllPicturesPresenterImpl extends PresenterBase implements
             for(int n = 1; n <= ImageSource.POLA_IMAGE_NUMBER_PER_COLLECTION; ++n) {
                 ImageRealm ir = new ImageRealm();
                 String url = buildPolaImageUrl(c,n,ImageSource.POLA_IMAGE_END);
+                String highRes = buildPolaImageUrl(c, n, ImageSource.POLA_IMAGE_HIGH_RES);
                 if (!builtInWallpapers.contains(url)) {
                     ir.setUrl(url);
-                    ir.setHighResUrl(url);
+                    ir.setHighResUrl(highRes);
                     ir.setIsFavor(false);
                     ir.setIsWallpaper(false);
                     ir.setIsCached(false);

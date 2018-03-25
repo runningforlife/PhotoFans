@@ -6,7 +6,10 @@ import android.util.Log;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.GetCallback;
 import com.avos.avoscloud.SaveCallback;
+import com.github.runningforlife.photosniffer.utils.SharedPrefUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -72,5 +75,39 @@ public class LeanCloudManager implements CloudApi {
         ao.put("fingerprint", Build.FINGERPRINT);
 
         ao.saveInBackground();
+    }
+
+    @Override
+    public void savePolaCollections(int number) {
+        Log.v(TAG,"savePolaCollections()");
+
+        final AVObject ao = new AVObject("PolaCollections");
+        ao.put("collections", number);
+
+        ao.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(AVException e) {
+                if (e == null) {
+                    SharedPrefUtil.putString("pola_collections_id", ao.getObjectId());
+                }
+            }
+        });
+    }
+
+    @Override
+    public void getPolaCollections(String objectID, final GetDataCallback callback) {
+        Log.v(TAG,"getPolaCollections()");
+
+        AVQuery<AVObject> avQuery = new AVQuery<>("PolaCollections");
+        avQuery.getInBackground(objectID, new GetCallback<AVObject>() {
+            @Override
+            public void done(AVObject avObject, AVException e) {
+                if (e == null) {
+                    callback.onQueryPolaCollectionsDone(avObject.getInt("collections"));
+                } else {
+                    callback.onQueryPolaCollectionsDone(0);
+                }
+            }
+        });
     }
 }
