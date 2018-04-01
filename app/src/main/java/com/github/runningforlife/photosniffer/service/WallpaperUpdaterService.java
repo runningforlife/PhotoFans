@@ -16,6 +16,7 @@ import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
+import com.github.runningforlife.photosniffer.utils.OkHttpUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,6 +36,8 @@ import okhttp3.OkHttpClient;
 
 public class WallpaperUpdaterService extends Service {
     private static final String TAG = "WallpaperUpdaterService";
+
+    private static long DEFAULT_CACHE_UPDATE_TIMEOUT = TimeUnit.SECONDS.toSeconds(15);
 
     private DiskCache mDiskCache;
     private ExecutorService mUpdateExecutor;
@@ -73,7 +76,7 @@ public class WallpaperUpdaterService extends Service {
 
         mUpdateExecutor = Executors.newFixedThreadPool(2);
 
-        mHttpClient = MiscUtil.buildOkHttpClient();
+        mHttpClient = OkHttpUtil.buildOkHttpClient();
     }
 
     @Override
@@ -125,7 +128,7 @@ public class WallpaperUpdaterService extends Service {
             }
             // wait for all job is down
             try {
-                latch.await(15, TimeUnit.SECONDS);
+                latch.await(DEFAULT_CACHE_UPDATE_TIMEOUT, TimeUnit.SECONDS);
             } catch (Exception e) {
 
             }

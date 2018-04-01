@@ -1,7 +1,5 @@
 package com.github.runningforlife.photosniffer.data.remote;
 
-import android.service.autofill.SaveCallback;
-
 import java.io.File;
 
 /**

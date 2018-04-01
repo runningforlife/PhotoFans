@@ -65,7 +65,7 @@ public class ImagePagerAdapter extends PagerAdapter {
             // preload image
             ImageView iv = imageHolder.imageView;
             mCallback.loadImageIntoView(position, iv, Priority.IMMEDIATE,
-                    DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT, ImageView.ScaleType.FIT_CENTER);
+                    DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT, ImageView.ScaleType.FIT_XY);
 
         }
         view.setOnClickListener(new View.OnClickListener() {

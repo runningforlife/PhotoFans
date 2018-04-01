@@ -42,7 +42,7 @@ public class BitmapUtil {
         return file.getAbsolutePath();
     }
 
-    private static String buildImageFileName() {
-        return "img" + "_" + df.format(new Date()) + ".jpg";
+    public static String buildImageFileName() {
+        return "img" + "_" + df.format(new Date()) + ".png";
     }
 }

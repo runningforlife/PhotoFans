@@ -118,7 +118,7 @@ public class DiskCache implements Cache {
         String key = getCacheKey(url);
         File file = getFileNameByKey(key);
 
-        if (!file.delete()) {
+        if (file.exists() && !file.delete()) {
             Log.e(TAG,"fail to delete file:" + file.getAbsolutePath());
         }
 

@@ -23,8 +23,9 @@ public interface Presenter extends LifeCycle {
     int EVENT_BATCH_REMOVE_TIMEOUT = 0x01;
     int EVENT_BATCH_SAVE_TIMEOUT = 0x02;
     int EVENT_IMAGE_LOAD_DONE = 0x03;
-    int EVENT_WALLPAPER_SET_DONE = 0x04;
-    int EVENT_SAVE_AS_WALLPAPER = 0x05;
+    int EVENT_MARK_AS_WALLPAPER = 0x04;
+    int EVENT_IMAGE_SAVE_DONE = 0x06;
+    int EVENT_WALLPAPER_SET_DONE = 0x07;
 
     /** default maximum wallpapers to be cached */
     int DEFAULT_MAX_WALLPAPERS = 600;

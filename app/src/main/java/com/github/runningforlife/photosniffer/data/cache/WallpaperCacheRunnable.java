@@ -2,10 +2,8 @@ package com.github.runningforlife.photosniffer.data.cache;
 
 
 import android.util.Log;
-import android.webkit.URLUtil;
 
-import com.github.runningforlife.photosniffer.crawler.processor.ImageSource;
-import com.github.runningforlife.photosniffer.utils.UrlUtil;
+import com.github.runningforlife.photosniffer.utils.OkHttpUtil;
 
 import java.io.IOException;
 
@@ -41,16 +39,13 @@ public class WallpaperCacheRunnable implements Runnable {
 
     @Override
     public void run() {
-        okhttp3.Request.Builder builder = new okhttp3.Request.Builder();
-        builder.url(mImageUrl)
-                .get();
         try {
-            Response response = mHttpClient.newCall(builder.build()).execute();
+            Response response = mHttpClient.newCall(OkHttpUtil.buildHttpRequest(mImageUrl)).execute();
             if (response.isSuccessful()) {
                 saveStreamToFile(response.body().bytes());
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         } finally {
             // job is done
             mCountLatch.countDown();

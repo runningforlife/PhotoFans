@@ -1,11 +1,6 @@
 package com.github.runningforlife.photosniffer.glide;
 
-import android.support.annotation.StringDef;
-
 import com.github.runningforlife.photosniffer.utils.DisplayUtil;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 
 /**
  * Created by jason on 6/10/17.

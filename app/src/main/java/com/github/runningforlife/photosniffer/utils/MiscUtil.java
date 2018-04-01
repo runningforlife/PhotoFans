@@ -1,33 +1,18 @@
 package com.github.runningforlife.photosniffer.utils;
 
-import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
-import android.util.Log;
-import android.widget.ImageView;
 
-import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.app.AppGlobals;
 import com.github.runningforlife.photosniffer.data.remote.LeanCloudManager;
 
 import java.io.File;
-import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.OkHttpClient;
 
 /**
  * Created by jason on 6/5/17.
@@ -44,14 +29,6 @@ public class MiscUtil {
     private static final String PATH_PHOTOS = "photos";
     private static final String PATH_GLIDE_CACHE = "cache";
     private static final String WALLPAPER_LOG = "wallpaper_setting.log";
-
-    public static OkHttpClient buildOkHttpClient() {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.readTimeout(10000, TimeUnit.MILLISECONDS)
-                .connectTimeout(10000, TimeUnit.MILLISECONDS);
-
-        return builder.build();
-    }
 
     public static int getJobId(@NonNull String jn) {
         return jn.hashCode();

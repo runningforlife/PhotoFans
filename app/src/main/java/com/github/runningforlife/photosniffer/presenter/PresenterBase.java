@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -34,6 +33,7 @@ import com.github.runningforlife.photosniffer.ui.fragment.BatchAction;
 import com.github.runningforlife.photosniffer.utils.BitmapUtil;
 import com.github.runningforlife.photosniffer.utils.MediaStoreUtil;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
+import com.github.runningforlife.photosniffer.utils.OkHttpUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,15 +47,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.RealmResults;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import static com.github.runningforlife.photosniffer.glide.ImageSizer.DEFAULT_IMG_HEIGHT;
 import static com.github.runningforlife.photosniffer.glide.ImageSizer.DEFAULT_IMG_WIDTH;
@@ -80,6 +81,8 @@ abstract class PresenterBase implements Presenter {
     // wallpaper setting action
     private WallpaperSettingReceiver mWallpaperChangeReceiver;
     private HashMap<String, Boolean> mSettingAsWallpaper;
+    // saving images
+    private OkHttpClient mHttpClient;
 
     int mMaxImagesAllowed;
     CacheApi mCacheMgr;
@@ -106,7 +109,7 @@ abstract class PresenterBase implements Presenter {
         mRequestOptionsThumb.dontAnimate()
                        .error(R.drawable.ic_broken_image_white_24dp)
                        .centerCrop()
-                       .override(800, 800);
+                       .override(600, 600);
 
         mRequestOptionsFull = new RequestOptions();
         mRequestOptionsFull.error(R.drawable.ic_broken_image_white_24dp)
@@ -126,6 +129,8 @@ abstract class PresenterBase implements Presenter {
         mContext.registerReceiver(mWallpaperChangeReceiver, filter);
 
         mSettingAsWallpaper = new HashMap<>();
+
+        mHttpClient = OkHttpUtil.buildOkHttpClient();
     }
 
     abstract void trimDataAsync();
@@ -159,10 +164,11 @@ abstract class PresenterBase implements Presenter {
         if(pos >= 0 && pos < mImageList.size()) {
             final ImageRealm ir = mImageList.get(pos);
             final String url = ir.getUrl();
+            final String highResUrl = ir.getHighResUrl();
             mExecutors.execute(new Runnable() {
                 @Override
                 public void run() {
-                    startWallpaperChooser(pos,url);
+                    startWallpaperChooser(pos,highResUrl, url);
                 }
             });
         }
@@ -181,7 +187,15 @@ abstract class PresenterBase implements Presenter {
                     if (!TextUtils.isEmpty(highRes)) {
                         imgUrl = highRes;
                     }
-                    saveBitmap(imgUrl);
+
+                    String fileName = MiscUtil.getPhotoDir() + File.separator + BitmapUtil.buildImageFileName();
+                    if (saveImage(imgUrl, fileName)) {
+                        Message message = mMainHandler.obtainMessage(EVENT_IMAGE_SAVE_DONE);
+                        message.obj = fileName;
+                        message.sendToTarget();
+                    } else {
+                        mMainHandler.sendEmptyMessage(EVENT_IMAGE_SAVE_DONE);
+                    }
                 }
             });
         }
@@ -296,20 +310,33 @@ abstract class PresenterBase implements Presenter {
     }
 
     // NOTICE: do not use it on UI thread
-    private void startWallpaperChooser(final  int pos, final String imgUrl) {
-        FutureTarget<Bitmap> bitmapTarget = Glide.with(mContext)
-                .asBitmap()
-                .load(imgUrl)
-                .apply(new RequestOptions().centerCrop())
-                .submit(DEFAULT_IMG_WIDTH,DEFAULT_IMG_HEIGHT);
+    private void startWallpaperChooser(final  int pos, String highResUrl, final String imgUrl) {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.US);
+        String wallpaperName = "wallpaper_" + df.format(new Date());
+        Uri imgUri1 = null;
+
+        if (TextUtils.isEmpty(highResUrl)) {
+            highResUrl = imgUrl;
+        }
 
         try {
-            Bitmap bitmap = bitmapTarget.get(5, TimeUnit.SECONDS);
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.US);
-            String wallpaperName = "wallpaper_" + df.format(new Date());
-            Uri imgUri1 = Uri.parse(MediaStore.Images.Media
-                    .insertImage(mContext.getContentResolver(), bitmap , wallpaperName, wallpaperName));
+            if (imgUrl.startsWith("http")) {
+                String fileName = mCacheMgr.getFilePath(imgUrl);
+                if (saveImage(highResUrl, fileName)) {
+                    imgUri1 = Uri.parse(MediaStore.Images.Media.insertImage(mContext.getContentResolver(),
+                            fileName, wallpaperName, wallpaperName));
+                } else {
+                    mCacheMgr.remove(imgUrl);
+                }
+            } else {
+                imgUri1 = Uri.parse(MediaStore.Images.Media.insertImage(mContext.getContentResolver(),
+                        imgUrl, wallpaperName, wallpaperName));
+            }
+        } catch (FileNotFoundException e) {
+            Log.e(TAG,"startWallpaperChooser(): error to save image");
+        }
 
+        if (imgUri1 != null) {
             Intent wallpaperSetting = new Intent(Intent.ACTION_ATTACH_DATA);
             wallpaperSetting.setData(imgUri1);
             wallpaperSetting.putExtra("mimeType", "image/*");
@@ -328,12 +355,9 @@ abstract class PresenterBase implements Presenter {
             } else {
                 mContext.startActivity(Intent.createChooser(wallpaperSetting, title));
             }
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            mView.onWallpaperSetDone(false);
+        } else {
+            mMainHandler.sendEmptyMessage(EVENT_WALLPAPER_SET_DONE);
         }
-
-        // clear target
-        Glide.with(mContext).clear(bitmapTarget);
     }
 
     private void markAsFavor(List<String> images) {
@@ -367,9 +391,7 @@ abstract class PresenterBase implements Presenter {
             if (url.startsWith("http")) {
                 break;
             }
-            if (!mCacheMgr.isExist(url)) {
-                mCacheMgr.remove(url);
-            }
+            mCacheMgr.remove(url);
         }
     }
 
@@ -435,62 +457,40 @@ abstract class PresenterBase implements Presenter {
         if (TextUtils.isEmpty(higResUrl)) {
             higResUrl = imgUrl;
         }
-        FutureTarget<Bitmap> target = Glide.with(mContext)
-                .asBitmap()
-                .apply(new RequestOptions().centerCrop())
-                .load(higResUrl)
-                .submit(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
 
-        try {
-            Bitmap bitmap = target.get(5, TimeUnit.SECONDS);
-            if (imgUrl.startsWith("http") && saveBitmap(mCacheMgr.getFilePath(imgUrl), bitmap)) {
+        String path = mCacheMgr.getFilePath(imgUrl);
+        if (imgUrl.startsWith("http")) {
+            if (saveImage(higResUrl, path)) {
                 // ok, we will mark it as wallpaper
-                Message message = mMainHandler.obtainMessage(EVENT_WALLPAPER_SET_DONE);
+                Message message = mMainHandler.obtainMessage(EVENT_MARK_AS_WALLPAPER);
                 message.obj = imgUrl;
                 message.arg1 = pos;
                 message.sendToTarget();
+            } else {
+                mMainHandler.sendEmptyMessage(EVENT_WALLPAPER_SET_DONE);
+                mCacheMgr.remove(imgUrl);
             }
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
         }
-
-        // clear target
-        Glide.with(mContext).clear(target);
     }
 
-    private boolean saveBitmap(String path, Bitmap bitmap) {
+    private boolean saveImage(String url, String path) {
+        final Request request = OkHttpUtil.buildHttpRequest(url);
         try {
-            FileOutputStream fos = new FileOutputStream(path);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            Response response = mHttpClient.newCall(request).execute();
+            if (response.isSuccessful()) {
+                FileOutputStream fos = new FileOutputStream(path);
+                fos.write(response.body().bytes());
 
-            fos.flush();
-            fos.close();
-            return true;
-        } catch (IOException  e) {
+                fos.flush();
+                fos.close();
+
+                return true;
+            }
+        } catch (IOException e) {
+            Log.e(TAG,"fail to save image, url = " + url);
         }
 
         return false;
-    }
-
-    private void saveBitmap(String url) {
-        FutureTarget<Bitmap> target = Glide.with(mContext)
-                .asBitmap()
-                .apply(new RequestOptions().centerCrop())
-                .load(url)
-                .submit(DEFAULT_IMG_WIDTH, DEFAULT_IMG_HEIGHT);
-        try {
-            Bitmap bitmap = target.get(5000, TimeUnit.MILLISECONDS);
-            String imageDir = MiscUtil.getPhotoDir();
-            String filePath = BitmapUtil.saveToFile(bitmap, imageDir);
-            MediaStoreUtil.addImageToGallery(mContext,new File(filePath));
-
-            mView.onImageSaveDone(filePath);
-            return;
-        } catch (FileNotFoundException | InterruptedException | ExecutionException | TimeoutException e) {
-        }
-
-        mView.onImageSaveDone(null);
-
-        Glide.with(mContext).clear(target);
     }
 
     private final class H extends Handler {
@@ -509,19 +509,22 @@ abstract class PresenterBase implements Presenter {
                 case EVENT_IMAGE_LOAD_DONE:
                     onImageLoadDone(true);
                     break;
-                case EVENT_WALLPAPER_SET_DONE:
+                case EVENT_MARK_AS_WALLPAPER:
                     markAsWallpaper(message.arg1, (String) message.obj);
                     break;
-                case EVENT_SAVE_AS_WALLPAPER:
-                    final String url = (String)message.obj;
-                    final int pos = message.arg1;
-                    final String higResUrl = mImageList.get(pos).getHighResUrl();
-                    mExecutors.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            saveImageAsWallpaper(pos, url, higResUrl);
-                        }
-                    });
+                case EVENT_IMAGE_SAVE_DONE:
+                    if (message.obj != null) {
+                        mView.onImageSaveDone((String)message.obj);
+                    } else {
+                        mView.onImageSaveDone(null);
+                    }
+                    break;
+                case EVENT_WALLPAPER_SET_DONE:
+                    if (message.obj != null) {
+                        mView.onWallpaperSetDone(true);
+                    } else {
+                        mView.onWallpaperSetDone(false);
+                    }
                     break;
             }
         }
@@ -569,7 +572,7 @@ abstract class PresenterBase implements Presenter {
                 String imgUrl = intent.getStringExtra(EXTRA_WALLPAPER_URL);
                 int imgPos = intent.getIntExtra(EXTRA_WALLPAPER_POSITION, -1);
                 if (imgUrl.startsWith("http") && imgPos != -1) {
-                    Message message = mMainHandler.obtainMessage(EVENT_SAVE_AS_WALLPAPER);
+                    Message message = mMainHandler.obtainMessage(EVENT_MARK_AS_WALLPAPER);
                     message.obj = imgUrl;
                     message.arg1 = imgPos;
                     mMainHandler.sendMessageDelayed(message, 600);

@@ -1,18 +1,11 @@
 package com.github.runningforlife.photosniffer.utils;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
+
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * add images to media store

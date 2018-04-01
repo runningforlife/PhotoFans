@@ -41,7 +41,7 @@ import us.codecraft.webmagic.downloader.AbstractDownloader;
 
 /**
  *  a service to handle image retrieveImages request from client
- *  client may want to give a limited number of images to retrieveImages at a time
+ *  client may want to give a limited number of images to retrieve at a time
  *
  *  @author JasonWang
  */
