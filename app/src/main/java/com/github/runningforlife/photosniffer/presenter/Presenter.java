@@ -1,11 +1,9 @@
 package com.github.runningforlife.photosniffer.presenter;
 
-import android.util.DisplayMetrics;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
 import com.github.runningforlife.photosniffer.ui.fragment.BatchAction;
-import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 
 import java.util.List;
 
@@ -32,8 +30,6 @@ public interface Presenter extends LifeCycle {
 
     String EXTRA_WALLPAPER_URL = "wallpaper_url";
     String EXTRA_WALLPAPER_POSITION = "wallpaper_position";
-
-    DisplayMetrics dm = DisplayUtil.getScreenDimen();
 
     /*
      * get total item

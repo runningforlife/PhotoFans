@@ -3,11 +3,13 @@ package com.github.runningforlife.photosniffer.crawler;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.DisplayMetrics;
 
 import com.github.runningforlife.photosniffer.data.local.RealmApi;
 import com.github.runningforlife.photosniffer.data.local.RealmApiImpl;
 import com.github.runningforlife.photosniffer.data.model.ImagePageInfo;
 import com.github.runningforlife.photosniffer.data.model.ImageRealm;
+import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 import com.github.runningforlife.photosniffer.utils.UrlUtil;
 
 import java.util.ArrayList;
@@ -71,7 +73,11 @@ public class DataSaver extends Handler {
                     for (String url : data) {
                         ImageRealm ir = new ImageRealm();
                         ir.setUrl(url);
-                        ir.setHighResUrl(HighResImageUrlBuilder.buildHighResImageUrl(url));
+                        if (DisplayUtil.getScreenDensity() >= DisplayMetrics.DENSITY_HIGH) {
+                            ir.setHighResUrl(HighResImageUrlBuilder.buildHighResImageUrl(url, true));
+                        } else {
+                            ir.setHighResUrl(HighResImageUrlBuilder.buildHighResImageUrl(url, false));
+                        }
                         realmObjects.add(ir);
                     }
                     realmApi.insertAsync(realmObjects);

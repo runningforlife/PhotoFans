@@ -23,4 +23,15 @@ public class DisplayUtil {
 
         return metrics;
     }
+
+    public static int getScreenDensity() {
+        DisplayMetrics metrics = new DisplayMetrics();
+
+        Context context = AppGlobals.getInstance();
+
+        WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        windowManager.getDefaultDisplay().getMetrics(metrics);
+
+        return metrics.densityDpi;
+    }
 }

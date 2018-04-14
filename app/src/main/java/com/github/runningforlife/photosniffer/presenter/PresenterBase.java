@@ -14,13 +14,12 @@ import android.os.Looper;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.runningforlife.photosniffer.R;
 import com.github.runningforlife.photosniffer.data.cache.CacheApi;
@@ -31,7 +30,7 @@ import com.github.runningforlife.photosniffer.data.model.ImageRealm;
 import com.github.runningforlife.photosniffer.ui.UI;
 import com.github.runningforlife.photosniffer.ui.fragment.BatchAction;
 import com.github.runningforlife.photosniffer.utils.BitmapUtil;
-import com.github.runningforlife.photosniffer.utils.MediaStoreUtil;
+import com.github.runningforlife.photosniffer.utils.DisplayUtil;
 import com.github.runningforlife.photosniffer.utils.MiscUtil;
 import com.github.runningforlife.photosniffer.utils.OkHttpUtil;
 
@@ -83,6 +82,8 @@ abstract class PresenterBase implements Presenter {
     private HashMap<String, Boolean> mSettingAsWallpaper;
     // saving images
     private OkHttpClient mHttpClient;
+    // screen DPI based thumbnail image size
+    private int mThumbSize;
 
     int mMaxImagesAllowed;
     CacheApi mCacheMgr;
@@ -105,11 +106,13 @@ abstract class PresenterBase implements Presenter {
 
         mExecutors = Executors.newFixedThreadPool(2);
 
+        mThumbSize = DisplayUtil.getScreenDimen().widthPixels/2;
+
         mRequestOptionsThumb = new RequestOptions();
         mRequestOptionsThumb.dontAnimate()
                        .error(R.drawable.ic_broken_image_white_24dp)
                        .centerCrop()
-                       .override(600, 600);
+                       .override(mThumbSize, mThumbSize);
 
         mRequestOptionsFull = new RequestOptions();
         mRequestOptionsFull.error(R.drawable.ic_broken_image_white_24dp)
