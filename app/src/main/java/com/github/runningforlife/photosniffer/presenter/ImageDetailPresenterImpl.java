@@ -64,7 +64,7 @@ public class ImageDetailPresenterImpl extends PresenterBase implements ImageDeta
     @Override
     protected void trimDataAsync() {
         Log.v(TAG,"trimDataAsync()");
-        if (mImageList.size() > DEFAULT_MAX_WALLPAPERS) {
+        if (mImageList.isValid() && mImageList.size() > DEFAULT_MAX_WALLPAPERS) {
             HashMap<String, String> params = new HashMap<>();
             params.put("mIsUsed", Boolean.toString(true));
             params.put("mIsFavor", Boolean.toString(false));
