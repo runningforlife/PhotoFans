@@ -1,9 +1,16 @@
 # PhotoFans
 
-PhotoFans is APP to get favorite pictures from free websites. 
+PhotoFans is a simple & user friendly APP to retrieve beautiful pictures from web:
 
-# Issue Tracker
+- automatically retrieve pics from websites;
+- you can save pictures you like or set them as wallpaper
+- wallpaper will be changed automatically every time you turn on your screen if you enable auto wallaper
 
-- restarting: exit --> restart, there is no data on UI
-- display delay: display is a little slow; try to find a better strategey to display it faster
-- pull refresher seems too sensitive: it is easy to pull the trigger to refresh data set when user try to view the list from down to up
+# CopyRight
+
+all pictures retrieved from web follow "Common CopyRight Zero"(CC0):
+
+The person who associated a work with this deed has dedicated the work to the public domain by waiving all of his or her rights to the work worldwide under copyright law, including all related and neighboring rights, to the extent allowed by law.
+
+https://creativecommons.org/publicdomain/zero/1.0/ 
+
